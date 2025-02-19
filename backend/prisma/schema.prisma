@@ -1,0 +1,55 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+model dept {
+  id          Int       @id @default(autoincrement()) @db.UnsignedInt
+  name        String    @unique(map: "name") @db.VarChar(10)
+  create_time DateTime? @db.DateTime(0)
+  update_time DateTime? @db.DateTime(0)
+}
+
+/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+model emp {
+  id          Int       @id @default(autoincrement()) @db.UnsignedInt
+  username    String    @unique(map: "username") @db.VarChar(20)
+  password    String?   @default("123456") @db.VarChar(50)
+  name        String    @db.VarChar(10)
+  gender      Int       @db.UnsignedTinyInt
+  phone       String    @unique(map: "phone") @db.Char(11)
+  job         Int?      @db.UnsignedTinyInt
+  salary      Int?      @db.UnsignedInt
+  image       String?   @db.VarChar(300)
+  entry_date  DateTime? @db.Date
+  dept_id     Int?      @db.UnsignedInt
+  create_time DateTime? @db.DateTime(0)
+  update_time DateTime? @db.DateTime(0)
+}
+
+/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+model emp_expr {
+  id      Int       @id @default(autoincrement()) @db.UnsignedInt
+  emp_id  Int?      @db.UnsignedInt
+  begin   DateTime? @db.Date
+  end     DateTime? @db.Date
+  company String?   @db.VarChar(50)
+  job     String?   @db.VarChar(50)
+}
+
+/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+model operate_log {
+  id             Int       @id @default(autoincrement()) @db.UnsignedInt
+  operate_emp_id Int?      @db.UnsignedInt
+  operate_time   DateTime? @db.DateTime(0)
+  class_name     String?   @db.VarChar(100)
+  method_name    String?   @db.VarChar(100)
+  method_params  String?   @db.VarChar(1000)
+  return_value   String?   @db.VarChar(2000)
+  cost_time      Int?
+}
