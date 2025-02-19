@@ -1,0 +1,604 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>每日新房 - Qrent</title>
+    <link rel="stylesheet" href="styles.css">
+    <!-- 添加日期选择器的样式 -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        /* 新房源标签样式 */
+        .new-house-tag {
+            background-color: #ff4757;
+            color: white;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 12px;
+            font-weight: bold;
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            z-index: 1;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0% {
+                transform: scale(1);
+            }
+            50% {
+                transform: scale(1.05);
+            }
+            100% {
+                transform: scale(1);
+            }
+        }
+
+        /* 更新时间标签样式 */
+        .update-time {
+            color: #666;
+            font-size: 12px;
+            margin-top: 5px;
+        }
+
+        /* 日期筛选器样式 */
+        .date-filter {
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .date-filter select {
+            padding: 8px;
+            border-radius: 4px;
+            border: 1px solid #ddd;
+        }
+
+        /* 统计信息样式 */
+        .stats-banner {
+            background: #f8f9fa;
+            padding: 12px 20px;
+            margin-bottom: 15px;
+            border-radius: 8px;
+            text-align: center;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+        }
+
+        .stats-main {
+            margin-bottom: 4px;
+        }
+
+        .stats-count {
+            font-size: 32px;
+            font-weight: bold;
+            color: #2c3e50;
+        }
+
+        .stats-unit {
+            font-size: 18px;
+            color: #34495e;
+            margin-left: 6px;
+        }
+
+        .stats-source {
+            font-size: 11px;
+            color: #7f8c8d;
+            line-height: 1;
+        }
+
+        /* 区域选择器样式 */
+        .checkbox-group {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            max-height: 300px;
+            overflow-y: auto;
+            padding-right: 8px;
+            transition: max-height 0.3s ease-out;
+        }
+
+        .checkbox-group.collapsed {
+            max-height: 0;
+            overflow: hidden;
+            padding: 0;
+            margin: 0;
+        }
+
+        /* 确保非折叠状态下的滚动条正常显示 */
+        #suburbsGroup:not(.collapsed) {
+            max-height: 200px;
+            overflow-y: auto;
+            padding: 8px;
+        }
+
+        /* 美化滚动条样式 */
+        .checkbox-group::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        .checkbox-group::-webkit-scrollbar-track {
+            background: #f1f1f1;
+            border-radius: 3px;
+        }
+
+        .checkbox-group::-webkit-scrollbar-thumb {
+            background: #888;
+            border-radius: 3px;
+        }
+
+        .checkbox-group::-webkit-scrollbar-thumb:hover {
+            background: #555;
+        }
+
+        .checkbox-group label {
+            flex: 0 0 calc(50% - 8px);
+            display: flex;
+            align-items: center;
+            padding: 4px;
+            cursor: pointer;
+            white-space: nowrap;
+        }
+
+        .checkbox-group input[type="checkbox"] {
+            margin-right: 6px;
+        }
+
+        .checkbox-group label:hover {
+            background-color: #f0f0f0;
+            border-radius: 4px;
+        }
+
+        .filter-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            cursor: pointer;
+            padding: 5px 0;
+        }
+
+        .filter-header i {
+            transition: transform 0.3s ease;
+        }
+
+        .filter-header.collapsed i {
+            transform: rotate(-180deg);
+        }
+
+        .filter-group {
+            margin-bottom: 15px;
+        }
+
+        /* 订阅组样式 */
+        .subscription-group {
+            border-bottom: 1px solid #eee;
+            margin-bottom: 15px;
+            padding-bottom: 12px;
+        }
+
+        .subscription-controls {
+            display: inline-block;
+            margin-left: 20px;
+            position: relative;
+        }
+
+        /* 订阅按钮样式优化 */
+        .btn-save {
+            background: linear-gradient(135deg, #1E88E5, #42A5F5) !important;
+            border: none !important;
+            color: white !important;
+            padding: 10px 24px;
+            border-radius: 6px;
+            font-size: 14px;
+            font-weight: 500;
+            letter-spacing: 0.5px;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: 0 2px 4px rgba(30, 136, 229, 0.2);
+            position: relative;
+            overflow: hidden;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        /* 悬停效果 */
+        .btn-save:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 4px 8px rgba(30, 136, 229, 0.3);
+            background: linear-gradient(135deg, #42A5F5, #1E88E5) !important;
+        }
+
+        /* 点击效果 */
+        .btn-save:active {
+            transform: translateY(1px);
+            box-shadow: 0 1px 2px rgba(30, 136, 229, 0.2);
+        }
+
+        /* 图标优化 */
+        .btn-save i {
+            color: #FFD700;
+            font-size: 16px;
+            transition: transform 0.3s ease;
+        }
+
+        .btn-save:hover i {
+            transform: rotate(-15deg) scale(1.1);
+        }
+
+        /* 微光效果 */
+        .btn-save::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 50%;
+            height: 100%;
+            background: linear-gradient(
+                90deg,
+                rgba(255, 255, 255, 0) 0%,
+                rgba(255, 255, 255, 0.2) 50%,
+                rgba(255, 255, 255, 0) 100%
+            );
+            animation: shine 2s infinite;
+        }
+
+        @keyframes shine {
+            100% {
+                left: 200%;
+            }
+        }
+
+        /* 字体优化 */
+        .btn-save span {
+            position: relative;
+            z-index: 1;
+            text-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+        }
+
+        .subscription-locked {
+            border: 2px solid var(--primary-color);
+            border-radius: 8px;
+            padding: 8px 16px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            background: rgba(255,255,255,0.9);
+        }
+
+        .subscription-locked:hover {
+            background: var(--primary-light);
+            color: white;
+        }
+
+        .subscription-locked:hover .locked-message {
+            color: white;
+        }
+
+        .locked-message {
+            color: var(--primary-color);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 14px;
+            transition: color 0.3s ease;
+        }
+
+        .changes-alert {
+            margin-top: 8px;
+            padding: 8px 12px;
+            background: #fff3cd;
+            border: 1px solid #ffeeba;
+            border-radius: 4px;
+            font-size: 14px;
+            color: #856404;
+        }
+
+        .changes-alert button {
+            margin-top: 6px;
+            padding: 4px 8px;
+            background: none;
+            border: 1px solid currentColor;
+            border-radius: 3px;
+            color: inherit;
+            cursor: pointer;
+            font-size: 12px;
+        }
+
+        .changes-alert button:hover {
+            background: rgba(0,0,0,0.05);
+        }
+
+        .hidden {
+            display: none !important;
+        }
+
+        .filter-nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px 20px;
+            background: #fff;
+            border-bottom: 1px solid #eee;
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+        }
+
+        .nav-left {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .nav-right {
+            display: flex;
+            gap: 10px;
+        }
+
+        .nav-right .btn-load,
+        .nav-right .btn-save {
+            height: 32px;
+            padding: 0 16px;
+            font-size: 13px;
+            border-radius: 4px;
+        }
+
+        .nav-right .btn-load {
+            background: #f8f9fa;
+            color: #333;
+            border: 1px solid #ddd;
+        }
+
+        .nav-right .btn-save {
+            background: #3498db;
+            color: white;
+            border: 1px solid #3498db;
+        }
+
+        .nav-right .btn-load:hover {
+            background: #e9ecef;
+        }
+
+        .nav-right .btn-save:hover {
+            background: #2980b9;
+        }
+
+        /* 调整锁定状态的样式 */
+        .nav-right .subscription-locked {
+            padding: 6px 12px;
+            border-radius: 4px;
+            background: #f8f9fa;
+            border: 1px dashed #ddd;
+        }
+
+        .nav-right .locked-message {
+            font-size: 13px;
+        }
+
+        /* 调整提示框的位置 */
+        #changesAlert {
+            position: fixed;
+            top: 60px;
+            right: 20px;
+            z-index: 1001;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+
+        .page-title {
+            font-size: 20px;
+            font-weight: 600;
+            color: #2c3e50;
+            position: relative;
+            padding-right: 20px;
+        }
+
+        /* 在样式部分添加提示样式 */
+        .subscription-alert {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            padding: 12px 20px;
+            border-radius: 6px;
+            color: white;
+            z-index: 10000;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+            animation: slideIn 0.3s ease-out;
+        }
+
+        .subscription-alert.success {
+            background: #4CAF50;
+        }
+
+        .subscription-alert.error {
+            background: #f44336;
+        }
+
+        @keyframes slideIn {
+            from { transform: translateX(100%); }
+            to { transform: translateX(0); }
+        }
+    </style>
+</head>
+<body>
+    <!-- 修改导航栏部分 -->
+    <nav class="filter-nav">
+        <div class="nav-left">
+            <a href="index.html" class="back-home">
+                <i class="fas fa-chevron-left"></i>
+                <span>返回首页</span>
+            </a>
+            <div class="page-title" style="margin-right: 20px;">每日新房</div>
+            <!-- 订阅控件 -->
+            <div class="subscription-controls">
+                <!-- 未登录时显示的内容 -->
+                <div class="subscription-locked" id="subscriptionLocked">
+                    <div class="locked-message">
+                        <i class="fas fa-lock"></i>
+                        <span>登录后可订阅</span>
+                    </div>
+                </div>
+                <!-- 已登录时显示的内容 -->
+                <div class="subscription-content hidden" id="subscriptionContent">
+                    <button class="btn-save" onclick="saveSubscription(event)">
+                        <i class="fas fa-star"></i> 订阅当前筛选
+                    </button>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <div class="filter-container">
+        <!-- 左侧筛选栏 -->
+        <div class="filter-sidebar">
+            <!-- 在左侧筛选栏顶部添加学校选择 -->
+            <div class="filter-group">
+                <h3>目标学校</h3>
+                <select id="targetSchool" class="select-input">
+                    <option value="unsw">新南威尔士大学 (UNSW)</option>
+                    <option value="usyd">悉尼大学 (USYD)</option>
+                </select>
+            </div>
+
+            <!-- 价格范围 -->
+            <div class="filter-group">
+                <h3>价格范围 (每周)</h3>
+                <div class="range-inputs">
+                    <input type="number" id="priceMin" placeholder="最低" class="number-input">
+                    <span>-</span>
+                    <input type="number" id="priceMax" placeholder="最高" class="number-input">
+                </div>
+            </div>
+
+            <!-- 卧室数量 -->
+            <div class="filter-group">
+                <h3>卧室数量</h3>
+                <div class="range-inputs">
+                    <input type="number" id="bedroomsMin" placeholder="最少" class="number-input">
+                    <span>-</span>
+                    <input type="number" id="bedroomsMax" placeholder="最多" class="number-input">
+                </div>
+            </div>
+
+            <!-- 卫生间数量 -->
+            <div class="filter-group">
+                <h3>卫生间数量</h3>
+                <select id="bathrooms" class="select-input">
+                    <option value="">不限</option>
+                    <option value="1">≥ 1个</option>
+                    <option value="2">≥ 2个</option>
+                    <option value="3">≥ 3个</option>
+                </select>
+            </div>
+
+            <!-- 所在区域 -->
+            <div class="filter-group">
+                <div class="filter-header collapsed" onclick="toggleSuburbs()">
+                    <h3>所在区域</h3>
+                    <i class="fas fa-chevron-down"></i>
+                </div>
+                <div class="checkbox-group collapsed" id="suburbsGroup">
+                    <!-- 动态区域选项将通过JavaScript生成 -->
+                </div>
+            </div>
+
+            <!-- 房屋类型 -->
+            <div class="filter-group">
+                <h3>房屋类型</h3>
+                <div class="checkbox-group">
+                    <label><input type="checkbox" name="house_type" value="Apartment / Unit / Flat"> 公寓/单元</label>
+                    <label><input type="checkbox" name="house_type" value="house"> 房屋</label>
+                </div>
+            </div>
+
+            <!-- 房屋评分 -->
+            <div class="filter-group">
+                <h3>房屋评分</h3>
+                <div class="score-slider">
+                    <input type="range" id="minScore" min="0" max="20" value="13" step="0.5" class="range-input">
+                    <div class="score-value">≥ <span id="scoreValue">13</span>分</div>
+                </div>
+            </div>
+
+            <!-- 通勤时间 -->
+            <div class="filter-group">
+                <h3>通勤时间（分钟）</h3>
+                <div class="range-inputs">
+                    <input type="number" id="commuteMin" placeholder="最短" class="number-input">
+                    <span>-</span>
+                    <input type="number" id="commuteMax" placeholder="最长" class="number-input">
+                </div>
+            </div>
+
+            <!-- 入住日期 -->
+            <div class="filter-group">
+                <h3>入住日期</h3>
+                <input type="text" id="availableDate" class="date-input" placeholder="选择日期">
+            </div>
+
+            <!-- 关键词搜索 -->
+            <!-- <div class="filter-group">
+                <h3>关键词搜索</h3>
+                <input type="text" id="keywords" class="text-input" placeholder="输入关键词">
+            </div> -->
+        </div>
+
+        <!-- 右侧房源列表 -->
+        <div class="housing-list">
+            <!-- 统计信息横幅 -->
+            <div class="stats-banner">
+                <div class="stats-main">
+                    <span class="stats-count" id="todayUpdateCount">0</span>
+                    <span class="stats-unit">套房源今日更新</span>
+                </div>
+                <div class="stats-source">所有房源数据均来源于domain</div>
+            </div>
+            
+            <div id="housingList">
+                <!-- 房源列表将通过 JavaScript 动态生成 -->
+            </div>
+        </div>
+    </div>
+
+    <!-- 引入日期选择器 -->
+    <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+    <script src="daily-houses.js"></script>
+    <script>
+    // 检查登录状态
+    function checkSubscriptionAuth() {
+        const token = localStorage.getItem('token');
+        const subscriptionContent = document.getElementById('subscriptionContent');
+        const subscriptionLocked = document.getElementById('subscriptionLocked');
+        
+        if (token) {
+            subscriptionContent.classList.remove('hidden');
+            subscriptionLocked.classList.add('hidden');
+        } else {
+            subscriptionContent.classList.add('hidden');
+            subscriptionLocked.classList.remove('hidden');
+        }
+    }
+
+    // 订阅按钮点击处理
+    function saveSubscription(event) {
+        if (!localStorage.getItem('token')) {
+            alert('请先登录以保存订阅');
+            window.location.href = 'login.html';
+            return;
+        }
+        // 原有保存订阅逻辑...
+    }
+
+    // 登录提示点击处理
+    document.getElementById('subscriptionLocked').addEventListener('click', () => {
+        window.location.href = 'login.html';
+    });
+
+    // 初始化检查
+    document.addEventListener('DOMContentLoaded', checkSubscriptionAuth);
+    </script>
+</body>
+</html> 

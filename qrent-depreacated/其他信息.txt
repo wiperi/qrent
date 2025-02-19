@@ -1,0 +1,5 @@
+supervisord项目地址：
+files = supervisord.d/*.ini
+
+编辑配置文件
+sudo nano /etc/supervisord.d/1_10_api_upload.ini
