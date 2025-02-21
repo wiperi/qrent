@@ -1,25 +1,54 @@
-import express from 'express';
+import express, { NextFunction, Request, Response, Router } from 'express';
 import { PrismaClient } from '@prisma/client';
+import process from 'process';
+import HttpError from '@/error/HttpError';
+import router from '@/api';
+
 
 const app = express();
 const prisma = new PrismaClient();
 
+/////////////////////////////////////////////////////////////////////
+// Server Setup
+/////////////////////////////////////////////////////////////////////
+
 // Middleware to parse JSON bodies
 app.use(express.json());
 
-// Basic route
-app.get('/', (req, res) => {
-  res.json({ message: 'Welcome to the API' });
+/////////////////////////////////////////////////////////////////////
+// Routes
+/////////////////////////////////////////////////////////////////////
+
+app.use('/', router);
+
+app.use((err: HttpError, req: Request, res: Response, next: NextFunction) => {
+  const statusCode = err.statusCode || 500;
+  const message = err.message || 'Internal Server Error';
+
+  res.status(statusCode);
+  res.json({ error: message });
 });
 
+/////////////////////////////////////////////////////////////////////
+// Server Start
+/////////////////////////////////////////////////////////////////////
+
 // Start server
-const PORT = process.env.PORT || 3000;
-app.listen(PORT, () => {
-  console.log(`Server is running on port ${PORT}`);
+const PORT = Number(process.env.PORT) || 3000;
+const HOST = process.env.HOST || 'localhost';
+const server = app.listen(PORT, HOST, async () => {
+  console.log(`⚡️ Server started on port ${PORT} at ${HOST}`);
+
+  const userCount = await prisma.user.count();
+  console.log(`You have ${userCount} users in your database`);
 });
 
 // Handle shutdown gracefully
-process.on('SIGINT', async () => {
-  await prisma.$disconnect();
-  process.exit();
+process.on('SIGINT', () => {
+  server.close(async () => {
+    console.log('Shutting down server gracefully.');
+    await prisma.$disconnect();
+    console.log('Database disconnected');
+    process.exit();
+  });
 });

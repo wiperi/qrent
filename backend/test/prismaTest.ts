@@ -5,7 +5,7 @@ const prisma = new PrismaClient();
 async function main() {
   // ... you will write your Prisma Client queries here
 
-  const user = await prisma.emp.findFirst();
+  const user = await prisma.user.findFirst();
   console.log(user);
 }
 
