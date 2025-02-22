@@ -11,8 +11,15 @@ export default {
     extend: {
       fontFamily: {
         sans:['Inter', ...defaultTheme.fontFamily.sans],
+      },
+      colors: {
+        morandi: {
+          green: '#597A69',
+          blue: '#2A4C65',
+          gray: '#EBEBE9'
+        }
       }
-    },
+    }
   },
-  plugins: [],
+  plugins: [require('tailwindcss-animate')],
 } satisfies Config;
