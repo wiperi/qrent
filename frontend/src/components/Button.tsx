@@ -3,7 +3,7 @@ import Link from 'next/link';
 import React, { forwardRef } from 'react'
 
 const baseStyles={
-    solid:'inline-flex justify-center rounded-lg py-3 px-5 text-lg font-semibold outline-2 outline-offset-2 transition-colors',
+    solid:'inline-flex justify-center rounded-lg py-3 px-5 text-lg font-semibold outline-2 outline-offset-2 transition-colors fixed top-0 right-0',
 
     outline:'inline-flex justify-center rounded-lg border py-[calc(theme(spacing.2)-1px)] px-[calc(theme(spacing.3)-1px)] text-lg outline-2 outline-offset-2 transition-colors',
 };
