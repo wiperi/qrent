@@ -2,26 +2,3 @@
 @tailwind components;
 @tailwind utilities;
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
-}
-
-body {
-  color: var(--foreground);
-  background: var(--background);
-  font-family: Arial, Helvetica, sans-serif;
-}
-
-@layer base {
-  .nav-item {
-    @apply inline-flex items-center font-semibold text-white/70 gap-2 hover:text-white/90 hover:bg-white/10 p-2 rounded-lg;
-  }
-}
