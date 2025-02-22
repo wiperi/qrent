@@ -3,6 +3,13 @@ import React from 'react'
 import Container from './Container'
 import Logo from './Logo'
 import NavLinks from './NavLinks'
+import Button from './Button';
+import { Roboto_Flex } from 'next/font/google';
+
+const robotoFlexFont = Roboto_Flex({
+  subsets: ['latin'],
+  weight: '400'
+})
 
 const Landing = () => {
   return (
@@ -14,10 +21,13 @@ const Landing = () => {
                     <Logo />
                 </div>
                 {/* NavLinks */}
-                <div className='hidden lg:flex lg:gap-10 items-center'>
+                {/* <div className='hidden lg:flex lg:gap-10 items-center'>
                   <NavLinks />
-                </div>
+                </div> */}
                 {/* Buttons */}
+                <div className='flex items-center gap-6'>
+                  <Button className={robotoFlexFont.className} href='#'>LOG IN</Button>
+                </div>
                 {/* Mobile NavLinks */}
             </Container>
         </nav>
