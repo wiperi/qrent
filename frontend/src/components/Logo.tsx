@@ -10,7 +10,7 @@ const dmSerifTextFont = DM_Serif_Text({
 const Logo = ({ className, props }) => {
   return (
     <Link href={"/"}>
-        <h2 className={clsx('text-9xl font-bold text-blue-700 hover:text-blue-900 duration-300', dmSerifTextFont.className)}{...props}>
+        <h2 className={clsx('text-9xl font-bold text-blue-900 hover:text-blue-950 duration-300', dmSerifTextFont.className)}{...props}>
             Qrent
         </h2>
     </Link>

@@ -10,7 +10,7 @@ const baseStyles={
 
 const variantStyles={
     solid:{
-        blue: 'relative overflow-hidden bg-white-10 text-blue-600 before:absolute before:inset-0 avtive:before:bg-transparent hover:before:bg-white/10 avtive:bg-blue-600 active:text-white/80 before:transition-colors',
+        blue: 'relative overflow-hidden bg-white-10 text-morandi-blue before:absolute before:inset-0 avtive:before:bg-transparent hover:before:bg-white/10 avtive:bg-blue-600 active:text-white/80 before:transition-colors',
         gray: 'bg-white-10 text-gray-800 hover:bg-white-10 active:bg-gray-800 active:text-white/80',
     },
 
