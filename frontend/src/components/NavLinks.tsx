@@ -2,6 +2,13 @@ import React, { useState } from 'react'
 import { navData } from '../constants'
 import { AnimatePresence, motion } from 'framer-motion';
 import Link from 'next/link';
+import { Roboto_Flex } from "next/font/google";
+import clsx from 'clsx';
+
+const robotoFlexFont = Roboto_Flex({
+  subsets: ['latin'],
+  weight: '400'
+})
 
 const NavLinks = () => {
     const [hoverIndex, setHoverIndex] = useState(null);
@@ -11,7 +18,7 @@ const NavLinks = () => {
         <Link 
             key={_id} 
             href={href} 
-            className="relative -mx-3 -my-2 rounded-lg py-2 px-3 text-base text-blue-500 transition-colors"
+            className={clsx("relative -mx-3 -my-2 rounded-lg py-2 px-3 text-base text-blue-500 transition-colors", robotoFlexFont.className)}
             onMouseEnter={()=>setHoverIndex(_id)}
             onMouseLeave={()=>setHoverIndex(null)}
         >
