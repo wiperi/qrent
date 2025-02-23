@@ -62,7 +62,7 @@ const items = [
     {
       image:
         MockImage2.src,
-      title: "653 Valley View Drive",
+      title: "653 Valley Drive",
     },
     {
       image:
