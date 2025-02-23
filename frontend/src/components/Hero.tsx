@@ -18,9 +18,9 @@ const Hero = () => {
                     ]}
                 />
                 {/* Right side: Automatic Slideshow, click to see details */}
-                <Expandable className='fixed right-10 w-1/2 min-w-72 storybook-fix'/>
+                <Expandable className='sticky right-10 w-1/2 min-w-72 storybook-fix'/>
             </div>
-            <div className='flex justify-end h-screen mt-44'>
+            <div className='flex justify-end h-screen mt-24'>
                 <LanguageButton />
             </div>
         </Container>
