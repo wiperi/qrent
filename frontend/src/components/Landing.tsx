@@ -21,7 +21,7 @@ const Landing = () => {
                     <Logo />
                 </div>
                 {/* Buttons */}
-                <div className='flex items-center gap-6'>
+                <div className='relative flex items-center gap-6'>
                   <Button className={robotoFlexFont.className} href='#'>LOG IN</Button>
                 </div>
             </Container>

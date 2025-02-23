@@ -90,7 +90,7 @@ export default function Expandable({ list = items, autoPlay = true, className }:
   }, [autoPlay, list.length, isHovering]);
 
   return (
-    <div className={cn("flex h-96 w-full gap-1", className)}>
+    <div className={cn("flex flex-wrap h-96 w-auto gap-1 items-stretch", className)}>
       {list.map((item, index) => (
         <List
           key={item.title}
