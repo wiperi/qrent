@@ -16,7 +16,8 @@ export default {
         morandi: {
           green: '#597A69',
           blue: '#2A4C65',
-          gray: '#EBEBE9'
+          gray: '#EBEBE9',
+          lightBlue: '#BFC2CB'
         }
       },
       transitionTimingFunction: {

@@ -2,6 +2,7 @@ import React from 'react'
 import Container from './Container'
 import MenuAnimation from './animata/list/menu-animation';
 import Expandable from './animata/carousel/expandable';
+import LanguageButton from './animata/button/algolia-white-button';
 
 const Hero = () => {
   return (
@@ -18,6 +19,9 @@ const Hero = () => {
                 />
                 {/* Right side: Automatic Slideshow, click to see details */}
                 <Expandable className='fixed right-10 w-1/2 min-w-72 storybook-fix'/>
+            </div>
+            <div className='flex justify-end h-screen mt-44'>
+                <LanguageButton />
             </div>
         </Container>
     </section>
