@@ -1,12 +1,11 @@
 import express, { NextFunction, Request, Response, Router } from 'express';
-import { PrismaClient } from '@prisma/client';
 import process from 'process';
+import { prisma } from '@qrent/shared';
 import HttpError from '@/error/HttpError';
 import router from '@/api';
 
 
 const app = express();
-const prisma = new PrismaClient();
 
 /////////////////////////////////////////////////////////////////////
 // Server Setup
