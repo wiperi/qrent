@@ -18,3 +18,13 @@ export async function tryCatch(fn: any, req: Request, res: Response, next: NextF
     next(error);
   }
 }
+
+export async function catchError(fn: Function): Promise<Function> {
+  return async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      return res.json(await fn(req, res, next));
+    } catch (error) {
+      next(error);
+    }
+  }
+}

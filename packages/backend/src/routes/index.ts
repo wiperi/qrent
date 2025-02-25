@@ -1,20 +1,14 @@
-import { Router, Request, Response, NextFunction } from 'express';
-import { tryCatch } from '@/utils/helper';
-import { UserDTO } from '@qrent/shared';
-import { userRegisterService } from '@/services/auth';
+import { Router } from 'express';
+import { AuthController } from '@/controllers/AuthController';
 
 const router = Router();
+const authController = new AuthController();
 
-router.get('/hello', (req: Request, res: Response, next: NextFunction) => {
+router.get('/hello', (req, res) => {
   res.json({ message: 'Hello, world!' });
 });
 
-router.post('/auth/register', (req: Request, res: Response, next: NextFunction) => {
-  tryCatch(async () => {
-    const user = req.body as UserDTO;
-    const userId = await userRegisterService(user);
-    res.json({ userId });
-  }, req, res, next);
-});
+router.post('/auth/register', authController.register);
+router.post('/auth/login', authController.login);
 
 export default router;

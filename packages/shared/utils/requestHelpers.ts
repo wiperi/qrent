@@ -59,4 +59,8 @@ function register(data: UserDTO): Promise<{ userId: number }> {
   return http.post('/auth/register', data);
 }
 
-export { hello, register };
+function login(data: Pick<UserDTO, 'email' | 'password'>): Promise<{ userId: number }> {
+  return http.post('/auth/login', data);
+}
+
+export { hello, register, login };
