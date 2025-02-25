@@ -2,7 +2,9 @@ import express, { NextFunction, Request, Response, Router } from 'express';
 import process from 'process';
 import { prisma } from '@qrent/shared';
 import HttpError from '@/error/HttpError';
-import router from '@/api';
+import router from '@/routes';
+import morgan from 'morgan';
+import dotenv from 'dotenv';
 
 
 const app = express();
@@ -11,8 +13,14 @@ const app = express();
 // Server Setup
 /////////////////////////////////////////////////////////////////////
 
+// Load environment variables
+dotenv.config();
+
 // Middleware to parse JSON bodies
 app.use(express.json());
+
+// Request logging middleware
+app.use(morgan('dev'));
 
 /////////////////////////////////////////////////////////////////////
 // Routes
