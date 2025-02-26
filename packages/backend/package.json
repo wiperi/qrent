@@ -11,9 +11,11 @@
   "license": "ISC",
   "description": "",
   "devDependencies": {
+    "prisma": "6.3.1",
     "ts-node": "^10.9.2"
   },
   "dependencies": {
+    "@prisma/client": "6.3.1",
     "@qrent/shared": "workspace:*",
     "@types/bcrypt": "^5.0.2",
     "@types/express": "^5.0.0",

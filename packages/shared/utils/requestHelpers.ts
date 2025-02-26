@@ -2,7 +2,7 @@ import axios, { AxiosError } from 'axios';
 import { UserDTO } from '../dto';
 
 const http = axios.create({
-  baseURL: process.env.BACKEND_URL || 'http://localhost:3001',
+  baseURL: process.env.BACKEND_URL || 'http://localhost:3000',
   timeout: 5000,
   headers: {
     'Content-Type': 'application/json'
