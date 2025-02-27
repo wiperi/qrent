@@ -1,6 +1,6 @@
 import { ReactNode } from "react";
 
-import { cn } from "@/src/libs/utils";
+import { cn } from "@/src/lib/utils";
 
 interface WaveRevealProps {
   /**
@@ -110,8 +110,22 @@ const createDelay = ({
   return delay + (index + offset) * 50 + "ms";
 };
 
-const createAnimatedNodes = (args: ReducedValue, word: string, index: number): ReducedValue => {
-  const { nodes, offset, wordsLength, textLength, mode, direction, duration, delay, blur } = args;
+const createAnimatedNodes = (
+  args: ReducedValue,
+  word: string,
+  index: number
+): ReducedValue => {
+  const {
+    nodes,
+    offset,
+    wordsLength,
+    textLength,
+    mode,
+    direction,
+    duration,
+    delay,
+    blur,
+  } = args;
 
   const isWordMode = mode === "word";
   const isUp = direction === "up";
@@ -127,7 +141,7 @@ const createAnimatedNodes = (args: ReducedValue, word: string, index: number): R
       ["animate-[reveal-down,content-blur]"]: !isUp && blur,
       ["animate-[reveal-up,content-blur]"]: isUp && blur,
     },
-    args.className,
+    args.className
   );
   const node = (
     <span
@@ -202,7 +216,7 @@ export default function WaveReveal({
     <div
       className={cn(
         "relative flex flex-wrap justify-center whitespace-pre px-2 text-4xl font-black md:px-6 md:text-7xl",
-        className,
+        className
       )}
     >
       {nodes}

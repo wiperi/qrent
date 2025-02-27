@@ -17,11 +17,9 @@ const Landing = () => {
     <header>
       <nav>
         <Container className="relative z-50 flex justify-between py-8">
-          {/* QRENT LOGO */}
           <div className="relative z-10">
             <Logo />
           </div>
-          {/* Buttons */}
           <div className="relative flex items-center gap-6">
             <DropDownList />
           </div>
