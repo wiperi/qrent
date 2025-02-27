@@ -23,9 +23,13 @@ export default {
         blue: {
           primary: "#1E4F9C",
         },
+        foreground: "hsl(var(--foreground))",
       },
       transitionTimingFunction: {
         "minor-spring": "cubic-bezier(0.18,0.89,0.82,1.04)",
+      },
+      animation: {
+        "flip-words": "flip-words 8s infinite",
       },
       keyframes: {
         "reveal-up": {
@@ -43,6 +47,16 @@ export default {
         "bg-position": {
           "0%": { backgroundPosition: "0% 50%" },
           "100%": { backgroundPosition: "100% 50%" },
+        },
+        "flip-words": {
+          "10%": { transform: "translateY(-112%)" },
+          "25%": { transform: "translateY(-100%)" },
+          "35%": { transform: "translateY(-212%)" },
+          "50%": { transform: "translateY(-200%)" },
+          "60%": { transform: "translateY(-312%)" },
+          "75%": { transform: "translateY(-300%)" },
+          "85%": { transform: "translateY(-412%)" },
+          "100%": { transform: "translateY(-400%)" },
         },
       },
     },
