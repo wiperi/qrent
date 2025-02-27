@@ -20,7 +20,7 @@ const Landing = () => {
           <div className="relative z-10">
             <Logo />
           </div>
-          <div className="relative flex items-center gap-6">
+          <div>
             <DropDownList />
           </div>
         </Container>

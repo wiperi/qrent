@@ -14,7 +14,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" className="bg-white">
+    <html lang="en" className="bg-white" suppressHydrationWarning>
       <body>
         <Landing />
         {children}
