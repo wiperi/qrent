@@ -1,5 +1,5 @@
 import type { Config } from "tailwindcss";
-const defaultTheme = require('tailwindcss/defaultTheme');
+const defaultTheme = require("tailwindcss/defaultTheme");
 
 export default {
   content: [
@@ -10,23 +10,26 @@ export default {
   theme: {
     extend: {
       fontFamily: {
-        sans:['Inter', ...defaultTheme.fontFamily.sans],
+        sans: ["Inter", ...defaultTheme.fontFamily.sans],
       },
       colors: {
         morandi: {
-          green: '#597A69',
-          blue: '#2A4C65',
-          gray: '#EBEBE9',
-          lightBlue: '#BFC2CB'
-        }
+          green: "#597A69",
+          blue: "#2A4C65",
+          gray: "#EBEBE9",
+          lightBlue: "#BFC2CB",
+        },
+        blue: {
+          primary: "#1E4F9C",
+        },
       },
       transitionTimingFunction: {
         "minor-spring": "cubic-bezier(0.18,0.89,0.82,1.04)",
       },
-      keyframes:{
+      keyframes: {
         "reveal-up": {
-        "0%": { opacity: "0", transform: "translateY(80%)" },
-        "100%": { opacity: "1", transform: "translateY(0)" },
+          "0%": { opacity: "0", transform: "translateY(80%)" },
+          "100%": { opacity: "1", transform: "translateY(0)" },
         },
         "reveal-down": {
           "0%": { opacity: "0", transform: "translateY(-80%)" },
@@ -37,7 +40,7 @@ export default {
           "100%": { filter: "blur(0)" },
         },
       },
-    }
+    },
   },
-  plugins: [require('tailwindcss-animate')],
+  plugins: [require("tailwindcss-animate"), require("daisyui")],
 } satisfies Config;
