@@ -1,12 +1,12 @@
 import React from "react";
 
-const about = () => {
+const Join = () => {
   return (
     <div>
-      <h1>About Us</h1>
+      <h1>Join Us</h1>
       <p>Welcome to our website! Here you can learn more about us.</p>
     </div>
   );
 };
 
-export default about;
+export default Join;
