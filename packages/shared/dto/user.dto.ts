@@ -1,3 +1,3 @@
-import { user } from "@prisma/client";
+import { User } from "@prisma/client";
 
-export type UserDTO = Omit<user, 'id'>;
+export type UserDTO = Omit<User, 'id'>;
