@@ -18,14 +18,14 @@ const Landing = () => {
     <>
       <header>
         <nav>
-          <Container className="relative z-50 flex justify-between py-8">
-            <div className="relative z-10">
+          <div className="relative z-50 flex justify-between py-8 p-10">
+            <div>
               <Logo />
             </div>
             <div>
               <DropDownList />
             </div>
-          </Container>
+          </div>
         </nav>
       </header>
     </>

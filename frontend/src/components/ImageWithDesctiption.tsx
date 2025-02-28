@@ -6,7 +6,7 @@ import image4 from "@/src/components/animata/carousel/mockImg/timothy-buck-psrlo
 
 const ImageWithDesctiption = () => {
   return (
-    <section className="bg-morandi-grey text-[#111] p-8 rounded-lg">
+    <section className="bg-morandi-grey text-[#111] p-10 rounded-lg">
       <div className="flex flex-col md:flex-row items-center gap-8">
         {/* First Block - Image & Text */}
         <div className="md:w-1/2 w-full relative">
