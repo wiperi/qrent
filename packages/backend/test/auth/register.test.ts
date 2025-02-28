@@ -11,6 +11,10 @@ beforeEach(async () => {
   await clearDb();
 });
 
+afterAll(async () => {
+  await clearDb();
+});
+
 describe('User Register', () => {
   it('should register a user', async () => {
     const res = await register({
@@ -25,4 +29,20 @@ describe('User Register', () => {
     expect(res).toBeDefined();
     expect(res.userId).toBeDefined();
   });
+
+  it('should not register same user', async () => {
+    const res = await register({
+      email: 'test@test.com',
+      password: 'test',
+      name: 'test2',
+      username: 'test',
+      gender: 1,
+      phone: '12345678901',
+    });
+
+    expect(res).toBeDefined();
+    expect(res.userId).toBeDefined();
+  });
 });
+
+
