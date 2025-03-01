@@ -13,10 +13,10 @@ const login = () => {
   return (
     <div className="max-w-md w-full mx-auto rounded-none md:rounded-2xl p-4 md:p-8 shadow-input bg-white dark:bg-black font-serif font-bold">
       <h2 className="font-bold text-3xl text-blue-primary dark:text-neutral-200">
-        Welcome back!
+        Welcome to Qrent!
       </h2>
       <p className="text-black text-sm max-w-sm mt-2 dark:text-neutral-300">
-        Please login to continue
+        Create an account to continue
       </p>
 
       <form className="my-8" onSubmit={handleSubmit}>
