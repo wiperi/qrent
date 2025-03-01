@@ -1,9 +1,12 @@
 import { Prisma, prisma, UserDTO } from '@qrent/shared';
 import HttpError from '@/error/HttpError';
+import { hashPassword, comparePassword } from '../utils/hash';
 
 class AuthService {
   async register(userData: UserDTO): Promise<void> {
     try {
+      const hashedPassword = await hashPassword(userData.password);
+      userData.password = hashedPassword;
       await prisma.user.create({
         data: userData,
       });
@@ -25,7 +28,8 @@ class AuthService {
     if (!user) {
       throw new HttpError(400, 'User not found');
     }
-    if (user.password !== userData.password) {
+    const isPasswordValid = await comparePassword(userData.password, user.password);
+    if (!isPasswordValid) {
       throw new HttpError(400, 'Invalid password');
     }
   }
