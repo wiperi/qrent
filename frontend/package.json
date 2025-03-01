@@ -11,6 +11,7 @@
   "dependencies": {
     "@headlessui/react": "^2.2.0",
     "@heroui/dropdown": "^2.3.13",
+    "@heroui/form": "^2.1.14",
     "@heroui/react": "^2.7.2",
     "@next/font": "^14.2.15",
     "clsx": "^2.1.1",

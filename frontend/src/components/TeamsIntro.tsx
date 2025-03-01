@@ -4,6 +4,7 @@ import React, { useEffect, useId, useRef, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import { useOutsideClick } from "@/src/hooks/use-outside-cilck";
 import tingBaiImage from "@/public/team/TingBai.jpg";
+import yibinZhangImage from "@/public/team/YibinZhang.jpg";
 
 export function ExpandableCardDemo() {
   const [active, setActive] = useState<(typeof cards)[number] | boolean | null>(
@@ -106,7 +107,7 @@ export function ExpandableCardDemo() {
                     exit={{ opacity: 0 }}
                     href={active.ctaLink}
                     target="_blank"
-                    className="px-4 py-3 text-sm rounded-full font-bold bg-green-500 text-white"
+                    className="px-4 py-3 text-sm rounded-full font-bold bg-blue-primary text-white"
                   >
                     {active.ctaText}
                   </motion.a>
@@ -204,7 +205,7 @@ export const CloseIcon = () => {
 
 const cards = [
   {
-    description: "Lana Del Rey",
+    description: "Founder",
     title: "Zhiyang Yu",
     src: tingBaiImage.src,
     ctaText: "Visit",
@@ -227,30 +228,33 @@ const cards = [
     },
   },
   {
-    description: "Babbu Maan",
+    description: "Frontend Developer",
     title: "Ting Bai",
     src: tingBaiImage.src,
-    ctaText: "Visit",
-    ctaLink: "https://ui.aceternity.com/templates",
+    ctaText: "Visit My Website",
+    ctaLink: "https://tingbai1028.github.io/tingbaiwebsite/",
     content: () => {
       return (
         <p>
-          Babu Maan, a legendary Punjabi singer, is renowned for his soulful
-          voice and profound lyrics that resonate deeply with his audience. Born
-          in the village of Khant Maanpur in Punjab, India, he has become a
-          cultural icon in the Punjabi music industry. <br /> <br /> His songs
-          often reflect the struggles and triumphs of everyday life, capturing
-          the essence of Punjabi culture and traditions. With a career spanning
-          over two decades, Babu Maan has released numerous hit albums and
-          singles that have garnered him a massive fan following both in India
-          and abroad.
+          I’m a second-year Computer Science student at UNSW with a WAM of 88
+          and an AWS Certified Cloud Practitioner certification. I thrive on
+          solving complex problems and bringing ideas to life through code,
+          whether it’s backend development or crafting seamless, user-centric
+          interfaces. My leadership and technical skills have been honed through
+          projects like the Toohak Backend JavaScript Server and a 3rd place
+          finish at UNSW’s Sun Ray Speed Way competition. I’m passionate about
+          UI and frontend development, and I recently built a translation app
+          using Hugging Face to explore machine learning. With a love for cloud
+          computing, efficient time management, and an ability to quickly adapt
+          and learn, I’m excited to apply my skills and continue growing in the
+          fast-paced tech industry.
         </p>
       );
     },
   },
 
   {
-    description: "Metallica",
+    description: "Backend Developer",
     title: "Tianyang Chen",
     src: tingBaiImage.src,
     ctaText: "Visit",
@@ -272,23 +276,19 @@ const cards = [
     },
   },
   {
-    description: "Lord Himesh",
+    description: "Backend Developer",
     title: "Yibin Zhang",
-    src: tingBaiImage.src,
-    ctaText: "Visit",
-    ctaLink: "https://ui.aceternity.com/templates",
+    src: yibinZhangImage.src,
+    ctaText: "Visit My Github",
+    ctaLink: "https://github.com/zach-moon",
     content: () => {
       return (
         <p>
-          Himesh Reshammiya, a renowned Indian music composer, singer, and
-          actor, is celebrated for his distinctive voice and innovative
-          compositions. Born in Mumbai, India, he has become a prominent figure
-          in the Bollywood music industry. <br /> <br /> His songs often feature
-          a blend of contemporary and traditional Indian music, capturing the
-          essence of modern Bollywood soundtracks. With a career spanning over
-          two decades, Himesh Reshammiya has released numerous hit albums and
-          singles that have garnered him a massive fan following both in India
-          and abroad.
+          I’m an undergraduate Computer Science student at UNSW, proficient in
+          C, MIPS, and JavaScript. I’m passionate about programming and love
+          tackling complex technical challenges. Outside of my studies, I enjoy
+          playing basketball and video games, which help me stay active and
+          unwind.
         </p>
       );
     },

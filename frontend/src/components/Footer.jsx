@@ -12,9 +12,6 @@ const Footer = () => {
           Meet our team
         </Link>
         <Link href="/contact" className="link link-hover font-serif">
-          Meet our team
-        </Link>
-        <Link href="/join" className="link link-hover font-serif">
           Get in touch
         </Link>
       </nav>
