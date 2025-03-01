@@ -9,22 +9,21 @@ export default function Home() {
     <main>
       <Hero />
 
-      {/* <Container className="grid grid-cols-1 md:grid-cols-2 gap-6 w-full max-w-5xl mt-12">
-        <MainFunction />
-        <LatestArrivals />
-      </Container>
+      <div>
+        <a href="rentalGuide">Rental Guide</a>
+      </div>
+      <div>
+        <a href="findAHome">Find a Home</a>
+      </div>
+      <div>
+        <a href="prepareDocuments">Prepare Documents</a>
+      </div>
 
-      <Container className="w-full">
-        <JustForYou />
-      </Container> */}
       <div>
-        <a>Main Function page</a>
+        <a>LatestArrivals component</a>
       </div>
       <div>
-        <a>LatestArrivals page</a>
-      </div>
-      <div>
-        <a>JustForYou page</a>
+        <a>JustForYou component</a>
       </div>
     </main>
   );
