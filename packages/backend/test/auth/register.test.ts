@@ -27,7 +27,6 @@ describe('User Register', () => {
     });
 
     expect(res).toBeDefined();
-    expect(res.userId).toBeDefined();
   });
 
   it('should not register same user', async () => {
@@ -41,7 +40,6 @@ describe('User Register', () => {
     });
 
     expect(res).toBeDefined();
-    expect(res.userId).toBeDefined();
   });
 });
 

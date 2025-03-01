@@ -25,7 +25,6 @@ describe('login', () => {
     });
 
     expect(res).toBeDefined();
-    expect(res.userId).toBeDefined();
     const result = await login({ email: 'test@test.com', password: 'test' });
     expect(result).toBeDefined();
   });

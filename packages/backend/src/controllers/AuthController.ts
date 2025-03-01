@@ -6,14 +6,14 @@ export class AuthController {
 
   async register(req: Request, res: Response, next: NextFunction) {
     const user = req.body as UserDTO;
-    const userId = await authService.register(user);
-    res.json({ userId });
+    await authService.register(user);
+    res.json({});
   };
 
 
   async login(req: Request, res: Response, next: NextFunction) {
     const user = req.body as UserDTO;
-    const userId = await authService.login(user);
-    res.json({ userId });
+    await authService.login({ email: user.email, password: user.password });
+    res.json({});
   };
 } 

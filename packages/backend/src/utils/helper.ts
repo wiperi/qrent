@@ -1,4 +1,4 @@
-import { NextFunction, Request, Response } from 'express';
+import { NextFunction, Request, RequestHandler, Response } from 'express';
 
 /**
  * Executes a function, if success, return the response
@@ -19,10 +19,11 @@ export async function tryCatch(fn: any, req: Request, res: Response, next: NextF
   }
 }
 
-export async function catchError(fn: Function): Promise<Function> {
+export function catchError(fn: Function): RequestHandler {
   return async (req: Request, res: Response, next: NextFunction) => {
     try {
-      return res.json(await fn(req, res, next));
+      const result = await fn(req, res, next);
+      res.json(result);
     } catch (error) {
       next(error);
     }
