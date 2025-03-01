@@ -3,15 +3,15 @@ import React from "react";
 
 const Footer = () => {
   return (
-    <footer className="footer footer-center bg-base-200 text-base-content rounded p-10">
+    <footer className="footer footer-center bg-base-200 text-base-content rounded p-10 mt-11">
       <nav className="grid grid-flow-col gap-4">
         <Link href="/about" className="link link-hover font-serif">
           About
         </Link>
-        <Link href="/contact" className="link link-hover font-serif">
+        <Link href="/team" className="link link-hover font-serif">
           Meet our team
         </Link>
-        <Link href="/join" className="link link-hover font-serif">
+        <Link href="/contact" className="link link-hover font-serif">
           Get in touch
         </Link>
       </nav>
