@@ -205,7 +205,7 @@ export const CloseIcon = () => {
 const cards = [
   {
     description: "Lana Del Rey",
-    title: "Summertime Sadness",
+    title: "Zhiyang Yu",
     src: tingBaiImage.src,
     ctaText: "Visit",
     ctaLink: "https://ui.aceternity.com/templates",
@@ -228,7 +228,7 @@ const cards = [
   },
   {
     description: "Babbu Maan",
-    title: "Mitran Di Chhatri",
+    title: "Ting Bai",
     src: tingBaiImage.src,
     ctaText: "Visit",
     ctaLink: "https://ui.aceternity.com/templates",
@@ -251,7 +251,7 @@ const cards = [
 
   {
     description: "Metallica",
-    title: "For Whom The Bell Tolls",
+    title: "Tianyang Chen",
     src: tingBaiImage.src,
     ctaText: "Visit",
     ctaLink: "https://ui.aceternity.com/templates",
@@ -273,7 +273,7 @@ const cards = [
   },
   {
     description: "Lord Himesh",
-    title: "Aap Ka Suroor",
+    title: "Yibin Zhang",
     src: tingBaiImage.src,
     ctaText: "Visit",
     ctaLink: "https://ui.aceternity.com/templates",
