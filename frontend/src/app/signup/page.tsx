@@ -48,7 +48,7 @@ const login = () => {
           className="bg-gradient-to-br relative group/btn from-morandi-blue dark:from-zinc-700 dark:to-zinc-700 to-neutral-800 block dark:bg-zinc-700 w-full text-white rounded-md h-10 font-medium shadow-[0px_1px_0px_0px_#ffffff40_inset,0px_-1px_0px_0px_#ffffff40_inset] dark:shadow-[0px_1px_0px_0px_var(--zinc-800)_inset,0px_-1px_0px_0px_var(--zinc-800)_inset]"
           type="submit"
         >
-          Login &rarr;
+          Sign up &rarr;
           <BottomGradient />
         </button>
 
