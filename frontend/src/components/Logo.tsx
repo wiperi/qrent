@@ -7,7 +7,7 @@ const dmSerifTextFont = DM_Serif_Text({
   weight: "400",
 });
 
-const Logo = ({ className, props }) => {
+const Logo = () => {
   return (
     <Link href={"/"}>
       <h2
@@ -15,7 +15,6 @@ const Logo = ({ className, props }) => {
           "text-5xl font-bold text-blue-primary hover:text-blue-950 duration-300",
           dmSerifTextFont.className
         )}
-        {...props}
       >
         Qrent
       </h2>

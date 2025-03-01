@@ -1,11 +1,13 @@
+import ImageWithDesctiption from "@/src/components/ImageWithDesctiption";
 import React from "react";
 
 const About = () => {
   return (
-    <div>
-      <h1>About Us</h1>
-      <p>Welcome to our website! Here you can learn more about us.</p>
-    </div>
+    <main>
+      <div>
+        <ImageWithDesctiption />
+      </div>
+    </main>
   );
 };
 

@@ -6,6 +6,7 @@ import Button from "./Button";
 import { Roboto_Flex } from "next/font/google";
 import User from "@/public/icons/User";
 import DropDownList from "./DropDownList";
+import Hero from "./Hero";
 
 const robotoFlexFont = Roboto_Flex({
   subsets: ["latin"],
@@ -14,18 +15,20 @@ const robotoFlexFont = Roboto_Flex({
 
 const Landing = () => {
   return (
-    <header>
-      <nav>
-        <Container className="relative z-50 flex justify-between py-8">
-          <div className="relative z-10">
-            <Logo />
+    <>
+      <header>
+        <nav>
+          <div className="relative z-50 flex justify-between py-8 p-10">
+            <div>
+              <Logo />
+            </div>
+            <div>
+              <DropDownList />
+            </div>
           </div>
-          <div>
-            <DropDownList />
-          </div>
-        </Container>
-      </nav>
-    </header>
+        </nav>
+      </header>
+    </>
   );
 };
 
