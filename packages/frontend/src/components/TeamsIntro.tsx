@@ -5,6 +5,7 @@ import { AnimatePresence, motion } from "framer-motion";
 
 import tingBaiImage from "@/public/team/TingBai.jpg";
 import yibinZhangImage from "@/public/team/YibinZhang.jpg";
+import zhiyangYuImage from "@/public/team/ZhiyangYu.jpg";
 import { useOutsideClick } from "../hooks/use-outside-click";
 
 export function ExpandableCardDemo() {
@@ -208,24 +209,12 @@ const cards = [
   {
     description: "Founder",
     title: "Zhiyang Yu",
-    src: tingBaiImage.src,
+    src: zhiyangYuImage.src,
     ctaText: "Visit",
-    ctaLink: "https://ui.aceternity.com/templates",
+    ctaLink:
+      "https://www.linkedin.com/in/%E5%BF%97%E6%B4%8B-%E4%BF%9E-558742234/",
     content: () => {
-      return (
-        <p>
-          Lana Del Rey, an iconic American singer-songwriter, is celebrated for
-          her melancholic and cinematic music style. Born Elizabeth Woolridge
-          Grant in New York City, she has captivated audiences worldwide with
-          her haunting voice and introspective lyrics. <br /> <br /> Her songs
-          often explore themes of tragic romance, glamour, and melancholia,
-          drawing inspiration from both contemporary and vintage pop culture.
-          With a career that has seen numerous critically acclaimed albums, Lana
-          Del Rey has established herself as a unique and influential figure in
-          the music industry, earning a dedicated fan base and numerous
-          accolades.
-        </p>
-      );
+      return <p>Leon / UNSW Postgraduate student / World deserve better.</p>;
     },
   },
   {

@@ -1,15 +1,27 @@
 "use client";
-import React from "react";
+import React, { useState } from "react";
 import { Label } from "@/src/components/label";
 import { Input } from "@/src/components/input";
 import { cn } from "@/src/lib/utils";
 import Link from "next/link";
+// import { register } from "@/qrent/shared/utils/requestHelpers";
 
-const login = () => {
-  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+const signup = () => {
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    console.log("Form submitted");
+
+    console.log(email, password);
+
+    // try {
+    //   const res = await register({ email, password });
+    // } catch (err) {
+    //   console.log("failed");
+    // }
   };
+
   return (
     <div className="max-w-md w-full mx-auto rounded-none md:rounded-2xl p-4 md:p-8 shadow-input bg-white dark:bg-black font-serif font-bold">
       <h2 className="font-bold text-3xl text-blue-primary dark:text-neutral-200">
@@ -27,21 +39,29 @@ const login = () => {
 
         <LabelInputContainer className="mb-4">
           <Label htmlFor="email">Email Address</Label>
-          <Input id="email" placeholder="projectmayhem@fc.com" type="email" />
+          <Input
+            id="email"
+            placeholder="projectmayhem@fc.com"
+            type="email"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+          />
         </LabelInputContainer>
 
         <LabelInputContainer className="mb-4">
           <Label htmlFor="password">Password</Label>
-          <Input id="password" placeholder="••••••••" type="password" />
+          <Input
+            id="password"
+            placeholder="••••••••"
+            type="password"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+          />
         </LabelInputContainer>
 
         <LabelInputContainer className="mb-4">
-          <Label htmlFor="password">Re-enter Password</Label>
-          <Input
-            id="reEnterPassword"
-            placeholder="••••••••"
-            type="reEnterPassword"
-          />
+          <Label htmlFor="re-password">Re-enter Password</Label>
+          <Input id="reEnterPassword" placeholder="••••••••" type="Password" />
         </LabelInputContainer>
 
         <button
@@ -67,7 +87,7 @@ const login = () => {
   );
 };
 
-export default login;
+export default signup;
 
 const BottomGradient = () => {
   return (
