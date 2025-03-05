@@ -1,12 +1,16 @@
 import { Prisma, prisma, UserDTO } from '@qrent/shared';
 import HttpError from '@/error/HttpError';
+import jwt from 'jsonwebtoken';
 
 class AuthService {
-  async register(userData: UserDTO): Promise<void> {
+  async register(userData: UserDTO): Promise<string> {
     try {
-      await prisma.user.create({
+      const user = await prisma.user.create({
         data: userData,
       });
+      
+      // Generate JWT token
+      return this.generateToken(String(user.id));
     } catch (error) {
       if (error instanceof Prisma.PrismaClientKnownRequestError) {
         if (error.code === 'P2002') {
@@ -17,7 +21,7 @@ class AuthService {
     }
   }
 
-  async login(userData: Pick<UserDTO, 'email' | 'password'>): Promise<void> {
+  async login(userData: Pick<UserDTO, 'email' | 'password'>): Promise<string> {
     const user = await prisma.user.findUnique({
       where: { email: userData.email },
     });
@@ -28,6 +32,23 @@ class AuthService {
     if (user.password !== userData.password) {
       throw new HttpError(400, 'Invalid password');
     }
+    
+    // Generate JWT token
+    return this.generateToken(String(user.id));
+  }
+  
+  private generateToken(userId: string): string {
+    const secret = process.env.JWT_SECRET;
+    
+    if (!secret) {
+      throw new HttpError(500, 'JWT secret is not configured');
+    }
+    
+    return jwt.sign(
+      { userId },
+      secret,
+      { expiresIn: '24h' }
+    );
   }
 }
 

@@ -1,19 +1,22 @@
-import { Request, Response, NextFunction } from 'express';
-import { UserDTO } from '@qrent/shared';
-import { authService } from '@/services/AuthService';
+import { Request, Response, NextFunction } from "express";
+import { UserDTO } from "@qrent/shared";
+import { authService } from "@/services/AuthService";
 
 export class AuthController {
-
   async register(req: Request, res: Response, next: NextFunction) {
     const user = req.body as UserDTO;
-    await authService.register(user);
-    res.json({});
-  };
-
+    const token = await authService.register(user);
+    res.status(201).json({ token });
+  }
 
   async login(req: Request, res: Response, next: NextFunction) {
     const user = req.body as UserDTO;
-    await authService.login({ email: user.email, password: user.password });
-    res.json({});
-  };
-} 
+    const token = await authService.login({
+      email: user.email,
+      password: user.password,
+    });
+    res.json({ token });
+  }
+}
+
+export const authController = new AuthController();

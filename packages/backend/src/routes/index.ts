@@ -1,9 +1,8 @@
 import { Router } from 'express';
-import { AuthController } from '@/controllers/AuthController';
+import { authController } from '@/controllers/AuthController';
 import { catchError } from '@/utils/helper';
 
 const router = Router();
-const authController = new AuthController();
 
 router.get('/hello', (req, res) => {
   res.json({ message: 'Hello, world!' });
