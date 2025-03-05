@@ -17,7 +17,6 @@ describe('User Register', () => {
       email: 'test@test.com',
       password: 'test',
       name: 'test',
-      username: 'test',
       gender: 1,
       phone: '12345678901',
     });

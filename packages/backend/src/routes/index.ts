@@ -1,16 +1,21 @@
-import { Router, Request, Response, NextFunction } from 'express';
-import { authController } from '@/controllers/AuthController';
+import { Router, Request, Response } from 'express';
+import authRoutes from './auth';
+import { clearDb } from '@qrent/shared/utils/db';
 import { catchError } from '@/utils/helper';
 
 const router = Router();
 
-// Public routes (no authentication required)
-router.post('/auth/register', catchError(authController.register));
-router.post('/auth/login', catchError(authController.login));
+router.use('/auth', authRoutes);
+
 
 router.get('/echo', (req: Request, res: Response) => {
   const echo = req.query.echo;
   res.json({ echo });
 });
+
+router.get('/clear', catchError(async (req: Request, res: Response) => {
+  await clearDb();
+  res.json({ message: 'Database cleared' });
+}));
 
 export default router;

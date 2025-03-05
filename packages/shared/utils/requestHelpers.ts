@@ -2,7 +2,7 @@ import axios, { AxiosError } from 'axios';
 import { UserDTO } from '../dto';
 
 const http = axios.create({
-  baseURL: process.env.BACKEND_URL || 'http://localhost:3001',
+  baseURL: process.env.BACKEND_URL || 'http://localhost:3200',
   timeout: 5000,
   headers: {
     'Content-Type': 'application/json'
@@ -63,4 +63,8 @@ function login(data: Pick<UserDTO, 'email' | 'password'>): Promise<{ userId: num
   return http.post('/auth/login', data);
 }
 
-export { hello, register, login };
+function clear() {
+  return http.get('/clear');
+}
+
+export { hello, register, login, clear };

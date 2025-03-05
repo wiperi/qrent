@@ -9,11 +9,88 @@ datasource db {
 
 /// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
 model User {
-  id       Int      @id @default(autoincrement()) @db.UnsignedInt
-  username String?  @unique(map: "username") @db.VarChar(20)
-  password String?  @db.VarChar(50)
-  name     String?  @db.VarChar(50)
-  gender   Int?     @db.UnsignedTinyInt
-  phone    String?  @unique(map: "phone") @db.Char(11)
-  email    String   @unique(map: "email") @db.VarChar(50)
+  id       Int     @id @default(autoincrement()) @db.UnsignedInt
+  password String? @db.VarChar(200)
+  name     String? @db.VarChar(50)
+  gender   Int?    @db.UnsignedTinyInt
+  phone    String? @unique(map: "phone") @db.Char(11)
+  email    String  @unique(map: "email") @db.VarChar(50)
+
+  properties  Property[]
+}
+
+model Property {
+  // Unique identifier for the property
+  id            Int       @id @default(autoincrement()) @db.UnsignedInt
+  // Weekly rental price in local currency
+  pricePerWeek  Float?
+  // Primary address line (street number and name)
+  addressLine1  String?   @db.VarChar(60)
+  // Secondary address information (apt/unit number, etc.)
+  addressLine2  String?   @db.VarChar(27)
+  // Number of bedrooms in the property
+  bedroomCount  Float?
+  // Number of bathrooms in the property
+  bathroomCount Float?
+  // Number of parking spaces available
+  parkingCount  Float?
+  // 1: House, 2: Apartment
+  propertyType  Int?      @db.UnsignedTinyInt
+  // External reference ID for the property
+  houseId       Int?
+  // Estimated commute time to target location in minutes
+  commuteTime   Float?
+  // Date when the property becomes available for move-in
+  availableDate String?   @db.VarChar(50)
+  // Searchable keywords related to the property
+  keywords      String?   @db.Text
+  // Overall rating score for the property
+  averageScore  Float?
+  // URL to the property listing
+  url           String?   @db.VarChar(255)
+  // Date and time when the property was published
+  publishedAt   DateTime? @db.DateTime
+
+  // Users who have saved or are interested in this property
+  users User[]
+}
+
+model UserPreference {
+  id        Int      @id @default(autoincrement()) @db.UnsignedInt
+
+  // Target school
+  targetSchool String? @db.VarChar(100)
+
+  // Price range (per week)
+  minPrice Int? @db.UnsignedInt
+  maxPrice Int? @db.UnsignedInt
+
+  // Bedroom count
+  minBedrooms Int? @db.UnsignedTinyInt
+  maxBedrooms Int? @db.UnsignedTinyInt
+
+  // Bathroom count
+  minBathrooms Int? @db.UnsignedTinyInt
+  maxBathrooms Int? @db.UnsignedTinyInt
+
+  // Location/Region
+  regions String? @db.Text // Stored as JSON array or comma-separated values
+
+  // 1: House, 2: Apartment
+  propertyType Int? @db.UnsignedTinyInt
+
+  // Property rating
+  minRating Float? @default(13) // Default to 13 as shown in the UI
+
+  // Commute time (in minutes)
+  minCommuteTime Int? @db.UnsignedInt
+  maxCommuteTime Int? @db.UnsignedInt
+
+  // Move-in date
+  moveInDate DateTime?
+
+  // Logical foreign key: User ID
+  userId Int  @unique @db.UnsignedInt
+
+  @@map("user_preference")
 }

@@ -2,7 +2,7 @@ import { NextFunction, Request, RequestHandler, Response } from 'express';
 import jwt from 'jsonwebtoken';
 import HttpError from '@/error/HttpError';
 
-export function catchError(fn: Function): RequestHandler {
+export function catchError(fn: (req: Request, res: Response, next: NextFunction) => any): RequestHandler {
   return async (req: Request, res: Response, next: NextFunction) => {
     try {
       const result = await fn(req, res, next);
