@@ -6,6 +6,7 @@ import router from '@/routes';
 import morgan from 'morgan';
 import dotenv from 'dotenv';
 import cors from 'cors';
+import { authenticate } from './utils/helper';
 
 const app = express();
 
@@ -48,6 +49,7 @@ app.use(morgan('dev'));
 // Routes
 /////////////////////////////////////////////////////////////////////
 
+app.use(authenticate);
 app.use('/', router);
 
 app.use((err: HttpError, req: Request, res: Response, next: NextFunction) => {

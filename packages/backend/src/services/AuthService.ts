@@ -1,6 +1,6 @@
 import { Prisma, prisma, UserDTO } from '@qrent/shared';
 import HttpError from '@/error/HttpError';
-import jwt from 'jsonwebtoken';
+import { generateToken } from '@/utils/helper';
 
 class AuthService {
   async register(userData: UserDTO): Promise<string> {
@@ -10,7 +10,7 @@ class AuthService {
       });
       
       // Generate JWT token
-      return this.generateToken(String(user.id));
+      return generateToken(String(user.id));
     } catch (error) {
       if (error instanceof Prisma.PrismaClientKnownRequestError) {
         if (error.code === 'P2002') {
@@ -34,22 +34,10 @@ class AuthService {
     }
     
     // Generate JWT token
-    return this.generateToken(String(user.id));
+    return generateToken(String(user.id));
   }
   
-  private generateToken(userId: string): string {
-    const secret = process.env.JWT_SECRET;
-    
-    if (!secret) {
-      throw new HttpError(500, 'JWT secret is not configured');
-    }
-    
-    return jwt.sign(
-      { userId },
-      secret,
-      { expiresIn: '24h' }
-    );
-  }
+
 }
 
 export const authService = new AuthService();
