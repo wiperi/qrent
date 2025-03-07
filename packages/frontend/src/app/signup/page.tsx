@@ -4,7 +4,6 @@ import { Label } from "@/src/components/label";
 import { Input } from "@/src/components/input";
 import { cn } from "@/src/lib/utils";
 import Link from "next/link";
-// import { register } from "@/qrent/shared/utils/requestHelpers";
 
 const signup = () => {
   const [email, setEmail] = useState("");
@@ -16,7 +15,14 @@ const signup = () => {
     console.log(email, password);
 
     // try {
-    //   const res = await register({ email, password });
+    //   console.log(email, password);
+    //   const res = await fetch("http://localhost:3001/auth/register", {
+    //     method: "POST",
+    //     headers: {
+    //       "Content-Type": "application/json",
+    //     },
+    //     body: JSON.stringify({ email, password }),
+    //   });
     // } catch (err) {
     //   console.log("failed");
     // }

@@ -1,12 +1,8 @@
 "use client";
 import React from "react";
-import Container from "./Container";
 import Logo from "./Logo";
-import Button from "./Button";
 import { Roboto_Flex } from "next/font/google";
-import User from "@/public/icons/User";
 import DropDownList from "./DropDownList";
-import Hero from "./Hero";
 
 const robotoFlexFont = Roboto_Flex({
   subsets: ["latin"],
@@ -18,11 +14,47 @@ const Landing = () => {
     <>
       <header>
         <nav>
-          <div className="relative z-50 flex justify-between py-8 p-10">
-            <div>
+          <div className="relative z-50 flex justify-between h-20 px-10">
+            <div className="h-full flex items-center">
               <Logo />
             </div>
-            <div>
+            <div className="h-full flex items-center">
+              <ul className="hidden md:flex space-x-4 text-lg font-serif font-semibold items-center justify-center">
+                {/* <li>
+                  <a
+                    href="filter.html"
+                    className="text-blue-primary hover:text-blue-600"
+                  >
+                    Efficient Filtering
+                  </a>
+                </li> */}
+                <li>
+                  <a
+                    href="/rentalGuide"
+                    className="text-blue-primary hover:text-blue-600"
+                  >
+                    Rental Guide
+                  </a>
+                </li>
+                <li>
+                  <a
+                    href="/prepareDocuments"
+                    className="text-blue-primary hover:text-blue-600"
+                  >
+                    Prepare Documents
+                  </a>
+                </li>
+                <li>
+                  <a
+                    href="/findAHome"
+                    className="text-blue-primary hover:text-blue-600"
+                  >
+                    Daily Listings
+                  </a>
+                </li>
+              </ul>
+            </div>
+            <div className="h-full flex items-center">
               <DropDownList />
             </div>
           </div>
