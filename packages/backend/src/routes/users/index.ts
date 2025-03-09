@@ -20,7 +20,7 @@ router.post("/preferences/search", catchError(async (req: Request, res: Response
     },
   });
   
-  return res.json({
+  return res.status(201).json({
     message: "Successfully created preferences",
   });
 }));
