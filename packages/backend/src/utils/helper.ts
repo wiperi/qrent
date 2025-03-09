@@ -6,7 +6,9 @@ export function catchError(fn: (req: Request, res: Response, next: NextFunction)
   return async (req: Request, res: Response, next: NextFunction) => {
     try {
       const result = await fn(req, res, next);
-      res.json(result);
+      if (!res.headersSent) {
+        res.json(result);
+      }
     } catch (error) {
       next(error);
     }
@@ -44,7 +46,7 @@ export const authenticate: RequestHandler = (req: Request, res: Response, next: 
     const decoded = jwt.verify(token, secret);
     
     // Add user data to request object
-    req.user = decoded;
+    req.user = decoded as JwtPayload;
     
     next();
   } catch (error) {
@@ -57,7 +59,7 @@ export const authenticate: RequestHandler = (req: Request, res: Response, next: 
   }
 };
 
-export function generateToken(userId: string): string {
+export function generateToken(userId: number): string {
   const secret = process.env.JWT_SECRET;
   
   if (!secret) {
