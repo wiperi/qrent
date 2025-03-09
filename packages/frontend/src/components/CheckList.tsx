@@ -2,83 +2,22 @@
 import React, { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 
-const stepsData = [
-  {
-    title: "1. Understanding Rental Options",
-    subtasks: [
-      "Get to know shared housing pros and cons",
-      "Understand whole property rentals",
-      "Check if you're eligible for student accommodation",
-      "Learn about private rentals and how they work",
-    ],
-  },
-  {
-    title: "2. Setting Your Rental Priorities",
-    subtasks: [
-      "Figure out your budget range",
-      "Decide how far you're willing to commute",
-      "List must-have amenities",
-    ],
-  },
-  {
-    title: "3. Researching Suburbs & Locations",
-    subtasks: [
-      "Look into different areas and their vibe",
-      "Check out local shops, public transport, and safety",
-      "Narrow down your preferred suburbs",
-    ],
-  },
-  {
-    title: "4. Finding the Right Rental Platforms",
-    subtasks: [
-      "Explore major rental websites",
-      "Understand average rental prices in your chosen areas",
-      "Read tenant reviews and experiences",
-    ],
-  },
-  {
-    title: "5. Getting Your Application Ready",
-    subtasks: [
-      "Organise necessary documents (ID, visa, proof of income)",
-      "Make sure you have rental history or references",
-      "Learn what to expect at property inspections",
-    ],
-  },
-  {
-    title: "6. Attending Inspections & Applying",
-    subtasks: [
-      "Book inspection appointments ASAP",
-      "Communicate clearly with agents and landlords",
-      "Take notes and photos of properties you visit",
-      "Keep track of applications and responses",
-    ],
-  },
-  {
-    title: "7. Understanding Lease Agreements",
-    subtasks: [
-      "Read through a standard rental contract carefully",
-      "Know the bond and deposit rules",
-      "Check acceptable payment methods and due dates",
-    ],
-  },
-  {
-    title: "8. Moving In & Post-Rental Tasks",
-    subtasks: [
-      "Inspect the property and report any existing damage",
-      "Set up electricity, water, and internet",
-      "Set up utilities",
-      "Understand maintenance requests and procedures",
-    ],
-  },
-];
+interface Step {
+  title: string;
+  subtasks: string[];
+}
 
-const CheckboxList: React.FC = () => {
+interface ChecklistProps {
+  title: string;
+  stepsData: Step[];
+}
+
+const Checklist: React.FC<ChecklistProps> = ({ title, stepsData }) => {
   const [openIndex, setOpenIndex] = useState<number | null>(null);
   const [checkedTasks, setCheckedTasks] = useState<{ [key: string]: boolean }>(
     {}
   );
 
-  // Toggle checkboxes and update progress
   const handleCheckboxChange = (task: string) => {
     setCheckedTasks((prev) => ({
       ...prev,
@@ -86,7 +25,6 @@ const CheckboxList: React.FC = () => {
     }));
   };
 
-  // Calculate progress
   const totalTasks = stepsData.reduce(
     (acc, step) => acc + step.subtasks.length,
     0
@@ -98,7 +36,7 @@ const CheckboxList: React.FC = () => {
     <div className="max-w-lg mx-auto p-5">
       {/* Header */}
       <h2 className="text-2xl font-bold text-center text-blue-primary mb-4">
-        Rental Process
+        {title}
       </h2>
 
       {/* Progress Bar */}
@@ -155,4 +93,4 @@ const CheckboxList: React.FC = () => {
   );
 };
 
-export default CheckboxList;
+export default Checklist;
