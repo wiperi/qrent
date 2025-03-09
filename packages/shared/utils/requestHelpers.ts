@@ -1,5 +1,5 @@
 import axios, { AxiosError } from 'axios';
-import { UserDTO } from '../dto';
+import { User } from '@prisma/client';
 
 const http = axios.create({
   baseURL: process.env.BACKEND_URL || 'http://localhost:3200',
@@ -55,11 +55,11 @@ function hello(): Promise<Record<string, string>> {
 }
 
 
-function register(data: UserDTO): Promise<{ userId: number }> {
+function register(data: User): Promise<{ userId: number }> {
   return http.post('/auth/register', data);
 }
 
-function login(data: Pick<UserDTO, 'email' | 'password'>): Promise<{ userId: number }> {
+function login(data: Pick<User, 'email' | 'password'>): Promise<{ userId: number }> {
   return http.post('/auth/login', data);
 }
 

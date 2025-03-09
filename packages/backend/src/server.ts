@@ -54,8 +54,9 @@ app.use('/', router);
 
 app.use((err: HttpError, req: Request, res: Response, next: NextFunction) => {
   const statusCode = err.statusCode || 500;
-  const message = err.message || 'Internal Server Error';
+  const message = err || 'Internal Server Error';
 
+  console.log(err.stack);
   res.status(statusCode);
   res.json({ error: message });
 });
