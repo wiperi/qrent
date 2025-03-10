@@ -1,0 +1,37 @@
+# Build outputs
+dist/
+build/
+coverage/
+
+# Package files
+node_modules/
+package-lock.json
+yarn.lock
+
+# Generated files
+.next/
+out/
+.cache/
+.vercel/
+
+# Misc
+.DS_Store
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+
+# Debug logs
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Specific file types to ignore
+*.min.js
+*.bundle.js
+*.d.ts
+
+# Specific files to ignore
+CHANGELOG.md
+LICENSE
