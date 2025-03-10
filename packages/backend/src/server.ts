@@ -21,26 +21,30 @@ dotenv.config();
 app.use(express.json());
 
 // Use middleware that allows for access from other domains
-const allowedOrigins = process.env.NODE_ENV === 'production' 
-  ? [process.env.FRONTEND_URL || 'https://yourdomain.com'] // Production origins
-  : ['http://localhost:3000']; // Development origins
+const allowedOrigins =
+  process.env.NODE_ENV === 'production'
+    ? [process.env.FRONTEND_URL || 'https://yourdomain.com'] // Production origins
+    : ['http://localhost:3000']; // Development origins
 
-app.use(cors({
-  origin: (origin, callback) => {
-    // Allow requests with no origin (like mobile apps, curl requests)
-    if (!origin) return callback(null, true);
-    
-    if (allowedOrigins.indexOf(origin) === -1) {
-      const msg = 'The CORS policy for this site does not allow access from the specified Origin.';
-      return callback(new Error(msg), false);
-    }
-    return callback(null, true);
-  },
-  methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
-  allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With'],
-  credentials: true, // Allow cookies to be sent with requests
-  maxAge: 86400, // Cache preflight request results for 24 hours (in seconds)
-}));
+app.use(
+  cors({
+    origin: (origin, callback) => {
+      // Allow requests with no origin (like mobile apps, curl requests)
+      if (!origin) return callback(null, true);
+
+      if (allowedOrigins.indexOf(origin) === -1) {
+        const msg =
+          'The CORS policy for this site does not allow access from the specified Origin.';
+        return callback(new Error(msg), false);
+      }
+      return callback(null, true);
+    },
+    methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
+    allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With'],
+    credentials: true, // Allow cookies to be sent with requests
+    maxAge: 86400, // Cache preflight request results for 24 hours (in seconds)
+  })
+);
 
 // Request logging middleware
 app.use(morgan('dev'));
@@ -52,13 +56,15 @@ app.use(morgan('dev'));
 app.use(authenticate);
 app.use('/', router);
 
-app.use((err: HttpError, req: Request, res: Response, next: NextFunction) => {
-  const statusCode = err.statusCode || 500;
-  const message = err || 'Internal Server Error';
+app.use((err: Error, req: Request, res: Response, next: NextFunction) => {
+  if (err instanceof HttpError) {
+    res.status(err.statusCode).json({ error: err.message });
+    return;
+  }
 
-  console.log(err.stack);
-  res.status(statusCode);
-  res.json({ error: message });
+  console.log(err);
+  res.status(500).json({ error: { ...err, message: err.message } });
+  return;
 });
 
 /////////////////////////////////////////////////////////////////////
