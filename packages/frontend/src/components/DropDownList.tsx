@@ -23,11 +23,8 @@ export default function DropDownList() {
         <DropdownItem key="signup" href="/signup" className="font-serif ">
           SignUp
         </DropdownItem>
-        <DropdownItem key="language" className="font-serif">
-          Language
-        </DropdownItem>
-        <DropdownItem key="help" href="/help" className="font-serif ">
-          Help
+        <DropdownItem key="settings" className="font-serif">
+          Settings
         </DropdownItem>
       </DropdownMenu>
     </Dropdown>

@@ -1,10 +1,14 @@
+"use client";
 import React from "react";
 import image1 from "@/src/components/animata/carousel/mockImg/kate-darmody-bZ3cOBjfQdE-unsplash.jpg";
 import image2 from "@/src/components/animata/carousel/mockImg/mykola-kolya-korzh-8jo4TvHtVKM-unsplash.jpg";
 import image3 from "@/src/components/animata/carousel/mockImg/chase-yi-0OvXOVkDaKo-unsplash.jpg";
 import image4 from "@/src/components/animata/carousel/mockImg/timothy-buck-psrloDbaZc8-unsplash.jpg";
+import { useTranslation } from "react-i18next";
 
 const ImageWithDesctiption = () => {
+  const { t } = useTranslation();
+
   return (
     <section className="bg-morandi-grey text-[#111] p-10 rounded-lg">
       <div className="flex flex-col md:flex-row items-center gap-8">
@@ -18,7 +22,7 @@ const ImageWithDesctiption = () => {
         </div>
         <div className="md:w-1/2 w-full text-center md:text-left">
           <h1 className="text-3xl font-serif font-bold text-blue-primary">
-            Your Trusted Rental Partner
+            {t("Your Trusted Rental Partner")}
           </h1>
           <p className="mt-4 text-xl text-morandi-blue font-serif">
             Welcome to Qrent, your trusted partner in finding the perfect home

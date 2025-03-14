@@ -3,6 +3,7 @@ import React from "react";
 import Logo from "./Logo";
 import { Roboto_Flex } from "next/font/google";
 import DropDownList from "./DropDownList";
+import LanguageSwitcher from "./LanguageSwitcher";
 
 const robotoFlexFont = Roboto_Flex({
   subsets: ["latin"],
@@ -55,6 +56,7 @@ const Landing = () => {
               </ul>
             </div>
             <div className="h-full flex items-center">
+              <LanguageSwitcher />
               <DropDownList />
             </div>
           </div>
