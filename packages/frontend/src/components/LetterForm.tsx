@@ -97,6 +97,50 @@ const LetterForm = () => {
     otherCommitments: "",
   });
 
+  const sourceOfFundsOpts = [
+    "Salary Income",
+    "Savings",
+    "Property Income",
+    "Investment Income",
+  ];
+
+  const handleSourceFundsCheckboxChange = (
+    event: React.ChangeEvent<HTMLInputElement>
+  ) => {
+    const { value, checked } = event.target;
+
+    setPLInfo((prevState) => {
+      // If checked, add the value to the proofOfFunds array, otherwise remove it
+      const source = checked
+        ? [...prevState.sourceOfFunds, value]
+        : prevState.sourceOfFunds.filter((item) => item !== value);
+
+      return { ...prevState, sourceOfFunds: source };
+    });
+  };
+
+  const proofDocsOpts = [
+    "Bank Statement",
+    "Income Proof/Pay Stub",
+    "Property Ownership Proof",
+    "Tax History",
+  ];
+
+  const handleProofDocsCheckboxChange = (
+    event: React.ChangeEvent<HTMLInputElement>
+  ) => {
+    const { value, checked } = event.target;
+
+    setPLInfo((prevState) => {
+      // If checked, add the value to the proofOfFunds array, otherwise remove it
+      const source = checked
+        ? [...prevState.proofDocs, value]
+        : prevState.proofDocs.filter((item) => item !== value);
+
+      return { ...prevState, proofDocs: source };
+    });
+  };
+
   const toggleAccordion = (index) => {
     setOpenAccordion(openAccordion === index ? null : index);
   };
@@ -502,61 +546,444 @@ const LetterForm = () => {
         <div className="space-y-6">
           {/* Guarantor Information */}
           <div className="pb-1">
-            <div>
-              {" "}
-              <h2 className="text-xl font-semibold">
-                <button
-                  className="w-full text-left py-3 px-4 bg-gray-100 rounded-md"
-                  onClick={() => toggleAccordion(1)}
-                >
-                  1. Guarantor Information
-                </button>
-              </h2>
+            <h2 className="text-xl font-semibold">
+              <button
+                className="w-full text-left py-3 px-4 bg-gray-100 rounded-md"
+                onClick={() => toggleAccordion(7)}
+              >
+                1. Guarantor Information
+              </button>
+            </h2>
+            <div
+              className={`transition-all duration-500 ease-in-out max-h-0 overflow-hidden ${
+                openAccordion === 7 ? "max-h-screen opacity-100" : "opacity-0"
+              }`}
+            >
+              {openAccordion === 7 && (
+                <div className="space-y-6 px-6 py-4">
+                  <div className="font-semibold">
+                    {/* Parent names */}
+                    <div className="pb-4">
+                      <div className="flex jusrify-between items-center mt-3 gap-3">
+                        {/* Father */}
+                        <div className="space-y-2 flex-1">
+                          <div className="text-sm text-gray-600">
+                            Father's Name
+                          </div>
+                          <textarea
+                            className="flex border rounded px-2 py-1 max-h-40 overflow-y-auto w-full"
+                            placeholder="e.g. Zhang Wei"
+                            value={PLInfo.fatherName}
+                            onChange={(e) =>
+                              setPLInfo({
+                                ...PLInfo,
+                                fatherName: e.target.value,
+                              })
+                            }
+                          />
+                        </div>
+
+                        {/* Mother */}
+                        <div className="space-y-2 flex-1">
+                          <div className="text-sm text-gray-600">
+                            Mother's Name
+                          </div>
+                          <textarea
+                            className="flex border rounded px-2 py-1 max-h-40 overflow-y-auto w-full"
+                            placeholder="e.g. Li Mei"
+                            value={PLInfo.motherName}
+                            onChange={(e) =>
+                              setPLInfo({
+                                ...PLInfo,
+                                motherName: e.target.value,
+                              })
+                            }
+                          />
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="font-semibold">
+                    {/* Parent tel */}
+                    <div className="pb-4">
+                      <div className="flex jusrify-between items-center mt-3 gap-3">
+                        {/* Father tel */}
+                        <div className="space-y-2 flex-1">
+                          <div className="text-sm text-gray-600">
+                            Father's Phone Number
+                          </div>
+                          <textarea
+                            className="flex border rounded px-2 py-1 max-h-40 overflow-y-auto w-full"
+                            placeholder="e.g. +86 138 xxxx xxxx"
+                            value={PLInfo.fatherContactNum}
+                            onChange={(e) =>
+                              setPLInfo({
+                                ...PLInfo,
+                                fatherContactNum: e.target.value,
+                              })
+                            }
+                          />
+                        </div>
+
+                        {/* Mother tel */}
+                        <div className="space-y-2 flex-1">
+                          <div className="text-sm text-gray-600">
+                            Mother's Phone Number
+                          </div>
+                          <textarea
+                            className="flex border rounded px-2 py-1 max-h-40 overflow-y-auto w-full"
+                            placeholder="e.g. +86 138 xxxx xxxx"
+                            value={PLInfo.motherContactNum}
+                            onChange={(e) =>
+                              setPLInfo({
+                                ...PLInfo,
+                                motherContactNum: e.target.value,
+                              })
+                            }
+                          />
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="font-semibold">
+                    <div className="pb-4">
+                      <div className="flex jusrify-between items-center mt-3 gap-3">
+                        {/* Contact email */}
+                        <div className="space-y-2 flex-1">
+                          <div className="text-sm text-gray-600">
+                            Contact Email
+                          </div>
+                          <textarea
+                            className="flex border rounded px-2 py-1 max-h-40 overflow-y-auto w-full"
+                            placeholder="e.g. parent@gmail.com"
+                            value={PLInfo.contactEmail}
+                            onChange={(e) =>
+                              setPLInfo({
+                                ...PLInfo,
+                                contactEmail: e.target.value,
+                              })
+                            }
+                          />
+                        </div>
+
+                        {/* name */}
+                        <div className="space-y-2 flex-1">
+                          <div className="text-sm text-gray-600">
+                            Student's Name
+                          </div>
+                          <textarea
+                            className="flex border rounded px-2 py-1 max-h-40 overflow-y-auto w-full"
+                            placeholder="e.g. Zhang Ming"
+                            value={PLInfo.studentName}
+                            onChange={(e) =>
+                              setPLInfo({
+                                ...PLInfo,
+                                studentName: e.target.value,
+                              })
+                            }
+                          />
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="font-semibold">
+                    <div className="pb-4">
+                      <div className="flex jusrify-between items-center mt-3 gap-3">
+                        {/* Father */}
+                        <div className="space-y-2 flex-1">
+                          <div className="text-sm text-gray-600">
+                            Home Address
+                          </div>
+                          <textarea
+                            className="flex border rounded px-2 py-1 max-h-40 overflow-y-auto w-full"
+                            placeholder="e.g. No.123, XiDan Street, Beijing, China"
+                            value={PLInfo.homeAddress}
+                            onChange={(e) =>
+                              setPLInfo({
+                                ...PLInfo,
+                                homeAddress: e.target.value,
+                              })
+                            }
+                          />
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              )}
             </div>
           </div>
 
           {/* Financial Support */}
           <div className="pb-1">
-            <div>
-              {" "}
-              <h2 className="text-xl font-semibold">
-                <button
-                  className="w-full text-left py-3 px-4 bg-gray-100 rounded-md"
-                  onClick={() => toggleAccordion(2)}
-                >
-                  2. Finalcial Support
-                </button>
-              </h2>
+            <h2 className="text-xl font-semibold">
+              <button
+                className="w-full text-left py-3 px-4 bg-gray-100 rounded-md"
+                onClick={() => toggleAccordion(8)}
+              >
+                2. Financial Support
+              </button>
+            </h2>
+            <div
+              className={`transition-all duration-500 ease-in-out max-h-0 overflow-hidden ${
+                openAccordion === 8 ? "max-h-screen opacity-100" : "opacity-0"
+              }`}
+            >
+              {openAccordion === 8 && (
+                <div className="space-y-6 px-6 py-4">
+                  <div>
+                    <div className="font-semibold">
+                      <div className="pb-4">
+                        <div className="flex jusrify-between items-center mt-3 gap-3">
+                          {/* Weekly Rent */}
+                          <div className="space-y-2 flex-1">
+                            <div className="text-sm text-gray-600">
+                              Weekly Rent
+                            </div>
+                            <textarea
+                              className="flex border rounded px-2 py-1 max-h-40 overflow-y-auto w-full"
+                              placeholder="e.g. 300$"
+                              value={PLInfo.weeklyRent}
+                              onChange={(e) =>
+                                setPLInfo({
+                                  ...PLInfo,
+                                  weeklyRent: e.target.value,
+                                })
+                              }
+                            />
+                          </div>
+
+                          {/* livingExpenses */}
+                          <div className="space-y-2 flex-1">
+                            <div className="text-sm text-gray-600">
+                              Living Expenses (Per Week)
+                            </div>
+                            <textarea
+                              className="flex border rounded px-2 py-1 max-h-40 overflow-y-auto w-full"
+                              placeholder="e.g. 800$"
+                              value={PLInfo.livingExpenses}
+                              onChange={(e) =>
+                                setPLInfo({
+                                  ...PLInfo,
+                                  livingExpenses: e.target.value,
+                                })
+                              }
+                            />
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="space-y-2 mt-4 font-semibold">
+                    <div className="text-sm text-gray-600">
+                      Source of Funds (Multiple selection allowed)
+                    </div>
+                    {sourceOfFundsOpts.map((option) => (
+                      <div key={option} className="flex items-center">
+                        <input
+                          type="checkbox"
+                          id={option}
+                          name="sourceOfFunds"
+                          value={option}
+                          checked={PLInfo.sourceOfFunds.includes(option)}
+                          onChange={handleSourceFundsCheckboxChange}
+                          className="mr-2"
+                        />
+                        <label htmlFor={option} className="text-sm">
+                          {option}
+                        </label>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
             </div>
           </div>
 
           {/* Proof of Guarantor's Ability */}
           <div className="pb-1">
-            <div>
-              {" "}
-              <h2 className="text-xl font-semibold">
-                <button
-                  className="w-full text-left py-3 px-4 bg-gray-100 rounded-md"
-                  onClick={() => toggleAccordion(3)}
-                >
-                  3. Proof of Guarantor's Ability
-                </button>
-              </h2>
+            <h2 className="text-xl font-semibold">
+              <button
+                className="w-full text-left py-3 px-4 bg-gray-100 rounded-md"
+                onClick={() => toggleAccordion(9)}
+              >
+                3. Proof of Guarantor's Ability
+              </button>
+            </h2>
+            <div
+              className={`transition-all duration-500 ease-in-out max-h-0 overflow-hidden ${
+                openAccordion === 9 ? "max-h-screen opacity-100" : "opacity-0"
+              }`}
+            >
+              {openAccordion === 9 && (
+                <div className="space-y-6 px-6 py-4">
+                  <div>
+                    <div className="font-semibold">
+                      <div className="pb-4">
+                        <div className="flex jusrify-between items-center mt-3 gap-3">
+                          {/* account balance */}
+                          <div className="space-y-2 flex-1">
+                            <div className="text-sm text-gray-600">
+                              Account Balance
+                            </div>
+                            <textarea
+                              className="flex border rounded px-2 py-1 max-h-40 overflow-y-auto w-full"
+                              placeholder="e.g. 500000"
+                              value={PLInfo.accountBalance}
+                              onChange={(e) =>
+                                setPLInfo({
+                                  ...PLInfo,
+                                  accountBalance: e.target.value,
+                                })
+                              }
+                            />
+                          </div>
+
+                          {/* annualIncome */}
+                          <div className="space-y-2 flex-1">
+                            <div className="text-sm text-gray-600">
+                              Annual Income
+                            </div>
+                            <textarea
+                              className="flex border rounded px-2 py-1 max-h-40 overflow-y-auto w-full"
+                              placeholder="e.g. 300000"
+                              value={PLInfo.annualIncome}
+                              onChange={(e) =>
+                                setPLInfo({
+                                  ...PLInfo,
+                                  annualIncome: e.target.value,
+                                })
+                              }
+                            />
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="space-y-2 mt-4 font-semibold">
+                    <div className="text-sm text-gray-600">
+                      Proof Documents (Multiple selection allowed)
+                    </div>
+                    {proofDocsOpts.map((option) => (
+                      <div key={option} className="flex items-center">
+                        <input
+                          type="checkbox"
+                          id={option}
+                          name="proofDocs"
+                          value={option}
+                          checked={PLInfo.proofDocs.includes(option)}
+                          onChange={handleProofDocsCheckboxChange}
+                          className="mr-2"
+                        />
+                        <label htmlFor={option} className="text-sm">
+                          {option}
+                        </label>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
             </div>
           </div>
 
           {/* Additional Commitment */}
           <div className="pb-1">
-            <div>
-              {" "}
-              <h2 className="text-xl font-semibold">
-                <button
-                  className="w-full text-left py-3 px-4 bg-gray-100 rounded-md"
-                  onClick={() => toggleAccordion(4)}
-                >
-                  4. Additional Commitment
-                </button>
-              </h2>
+            <h2 className="text-xl font-semibold">
+              <button
+                className="w-full text-left py-3 px-4 bg-gray-100 rounded-md"
+                onClick={() => toggleAccordion(10)}
+              >
+                4. Additional Commitment
+              </button>
+            </h2>
+            <div
+              className={`transition-all duration-500 ease-in-out max-h-0 overflow-hidden ${
+                openAccordion === 10 ? "max-h-screen opacity-100" : "opacity-0"
+              }`}
+            >
+              {openAccordion === 10 && (
+                <div className="space-y-6 px-6 py-4">
+                  <div className="font-semibold">
+                    <div className="pb-4">
+                      <div className="flex jusrify-between items-center mt-3 gap-3">
+                        {/* Prepay Rent */}
+                        <div className="space-y-2 flex-1">
+                          <div className="text-sm text-gray-600">
+                            Willingness to Prepay Rent
+                          </div>
+                          <select
+                            className="flex border rounded px-2 py-1 max-h-40 overflow-y-auto w-full"
+                            value={PLInfo.prepayRent}
+                            onChange={(e) =>
+                              setPLInfo({
+                                ...PLInfo,
+                                prepayRent: e.target.value,
+                              })
+                            }
+                          >
+                            <option>No Prepayment</option>
+                            <option>Willing to Prepay 1 Month's Rent</option>
+                            <option>Willing to Prepay 3 Month's Rent</option>
+                            <option>Willing to Prepay 6 Month's Rent</option>
+                            <option>Willing to Prepay 9 Month's Rent</option>
+                            <option>Willing to Prepay 12 Month's Rent</option>
+                          </select>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="space-y-2 mt-4">
+                    <div className="text-sm text-gray-600 font-semibold">
+                      Joint Liability Statement
+                    </div>
+                    <input
+                      type="checkbox"
+                      value={PLInfo.liabilityStatement}
+                      onChange={(e) =>
+                        setPLInfo({
+                          ...PLInfo,
+                          liabilityStatement: e.target.value,
+                        })
+                      }
+                      className="mr-2"
+                    />
+                    <label className="text-sm font-semibold">
+                      Willing to assume joint liability.
+                    </label>
+                    <div className="text-xs">
+                      If your child fails to fulfill the obligations of the
+                      lease, you are willing to assume the corresponding
+                      responsibility.
+                    </div>
+                  </div>
+                  <div className="space-y-2 mt-4">
+                    {" "}
+                    <label className="block text-sm font-medium mt-3">
+                      Additional commitment
+                    </label>
+                    <div className="relative p-4 border rounded-md mt-3">
+                      <textarea
+                        className="form-input block w-full rounded-md border-gray-300 focus:outline-none focus:ring-0 focus:border-gray-300"
+                        rows={3}
+                        placeholder="Add more commitment..."
+                        value={PLInfo.otherCommitments}
+                        onChange={(e) =>
+                          setPLInfo({
+                            ...PLInfo,
+                            otherCommitments: e.target.value,
+                          })
+                        }
+                      />
+                    </div>
+                  </div>
+                </div>
+              )}
             </div>
           </div>
         </div>
