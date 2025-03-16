@@ -104,7 +104,7 @@ const JustLanded = () => {
         </div>
 
         {/* Subscribe Button */}
-        <button className="flex items-center gap-2 bg-blue-700 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition">
+        <button className="flex items-center gap-2 bg-blue-primary text-white px-4 py-2 rounded-lg hover:bg-blue-900 transition">
           <FontAwesomeIcon icon={faBell} />
           Subscribe
         </button>

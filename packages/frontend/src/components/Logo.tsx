@@ -12,19 +12,11 @@ const dmSerifTextFont = DM_Serif_Text({
 const Logo = () => {
   return (
     <Link href={"/"}>
-      {/* <h2
-        className={clsx(
-          "text-5xl font-bold text-blue-primary hover:text-blue-950 duration-300",
-          dmSerifTextFont.className
-        )}
-      >
-        Qrent
-      </h2> */}
       <Image
         src={logo.src}
         alt="Qrent Logo"
-        width={150}
-        height={50}
+        width={100}
+        height={100}
         className="hover:opacity-80 duration-300"
       />
     </Link>

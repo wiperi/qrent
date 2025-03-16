@@ -1,7 +1,7 @@
 "use client";
 import type { Metadata } from "next";
 import "./globals.css";
-import Landing from "../components/Landing";
+import NavBar from "../components/NavBar";
 import Footer from "../components/Footer";
 import { I18nextProvider } from "react-i18next";
 import i18n from "../../i18n";
@@ -20,7 +20,7 @@ export default function RootLayout({
     <I18nextProvider i18n={i18n}>
       <html lang="en" className="bg-white" suppressHydrationWarning>
         <body>
-          <Landing />
+          <NavBar />
           {children}
           <Footer />
         </body>

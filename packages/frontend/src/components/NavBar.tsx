@@ -1,34 +1,20 @@
 "use client";
 import React from "react";
 import Logo from "./Logo";
-import { Roboto_Flex } from "next/font/google";
 import DropDownList from "./DropDownList";
 import LanguageSwitcher from "./LanguageSwitcher";
 
-const robotoFlexFont = Roboto_Flex({
-  subsets: ["latin"],
-  weight: "400",
-});
-
-const Landing = () => {
+const NavBar = () => {
   return (
     <>
       <header>
         <nav>
-          <div className="relative z-50 flex justify-between h-20 px-10">
+          <div className="relative z-50 flex h-20 px-10 border border-gray-200 rounded-lg p-4">
             <div className="h-full flex items-center">
               <Logo />
             </div>
             <div className="h-full flex items-center">
               <ul className="hidden md:flex space-x-4 text-lg font-serif font-semibold items-center justify-center">
-                {/* <li>
-                  <a
-                    href="filter.html"
-                    className="text-blue-primary hover:text-blue-600"
-                  >
-                    Efficient Filtering
-                  </a>
-                </li> */}
                 <li>
                   <a
                     href="/rentalGuide"
@@ -50,12 +36,12 @@ const Landing = () => {
                     href="/findAHome"
                     className="text-blue-primary hover:text-blue-600"
                   >
-                    Daily Listings
+                    Efficiency Filter
                   </a>
                 </li>
               </ul>
             </div>
-            <div className="h-full flex items-center">
+            <div className="h-full flex items-center ml-auto">
               <LanguageSwitcher />
               <DropDownList />
             </div>
@@ -66,4 +52,4 @@ const Landing = () => {
   );
 };
 
-export default Landing;
+export default NavBar;

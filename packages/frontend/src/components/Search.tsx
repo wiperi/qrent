@@ -1,61 +1,97 @@
-import React from "react";
+import { useState } from "react";
+import PriceDropdown from "./priceDropDown";
+import bgImg from "../../public/searchBG.jpg";
+import MoreFilterModal from "./MoreFilterModal";
 
-const Search = () => {
+export default function Search() {
+  const [filter, setFilter] = useState({
+    university: "Any",
+    priceMin: "Any",
+    priceMax: "Any",
+    travelTime: "Any",
+    bedroomMin: "Any",
+    bedroomMax: "Any",
+    bathroomMin: "Any",
+    bathroomMax: "Any",
+    propertyType: "Any",
+    area: "Any",
+    rate: 0,
+    avaliableDate: "Any",
+  });
+
   return (
-    <div className="bg-none py-8 px-6 border-b-0 mb-10 max-w-screen-lg mx-auto mt-8">
-      <div className="flex gap-4 bg-white p-4 rounded-lg shadow-md transition-transform duration-200 hover:translate-y-[-2px] hover:shadow-lg hover:border-primary">
-        {/* Area */}
-        <div className="flex-1 flex flex-col border-r border-gray-300 pr-4">
-          <label className="text-sm">Area</label>
-          <input
-            type="text"
-            className="mt-2 px-4 py-2 border border-gray-300 rounded-lg"
-            placeholder="Near UNSW, Kingsford, Kensington..."
-          />
-        </div>
+    <>
+      <section
+        className="hero bg-cover h-80 mt-8"
+        style={{
+          backgroundImage: `url(${bgImg.src})`,
+        }}
+      >
+        <div className="bg-white p-4 shadow rounded-lg flex gap-4 font-semibold justify-between flex-wrap mt-8 mx-auto max-w-screen-lg w-full">
+          <div className="flex-1">
+            <div className="text-sm text-gray-600">University</div>
+            <select
+              className="border rounded px-2 py-1 max-h-40 overflow-y-auto w-full"
+              value={filter.university}
+              onChange={(e) =>
+                setFilter({ ...filter, university: e.target.value })
+              }
+            >
+              <option>Any</option>
+              <option>UNSW</option>
+              <option>USYD</option>
+              <option>UTS</option>
+              <option>MQ Uni</option>
+            </select>
+          </div>
 
-        {/* Price Range */}
-        <div className="flex-1 flex flex-col border-r border-gray-300 pr-4">
-          <label className="text-sm">Price Range</label>
-          <input
-            type="text"
-            className="mt-2 px-4 py-2 border border-gray-300 rounded-lg"
-            placeholder="$300-$500/week"
-          />
-        </div>
+          <div className="flex-1">
+            <PriceDropdown
+              label="Price Min"
+              name="priceMin"
+              filter={filter}
+              setFilter={setFilter}
+            />
+          </div>
 
-        {/* Property Type */}
-        <div className="flex-1 flex flex-col border-r border-gray-300 pr-4">
-          <label className="text-sm">Property Type</label>
-          <input
-            type="text"
-            className="mt-2 px-4 py-2 border border-gray-300 rounded-lg"
-            placeholder="Studio, Master Bedroom, Independent Apartment..."
-          />
-        </div>
+          <div className="flex-1">
+            <PriceDropdown
+              label="Price Max"
+              name="priceMax"
+              filter={filter}
+              setFilter={setFilter}
+            />
+          </div>
 
-        {/* Keywords */}
-        <div className="flex-1 flex flex-col pr-4">
-          <label className="text-sm">Keywords</label>
-          <input
-            type="text"
-            className="mt-2 px-4 py-2 border border-gray-300 rounded-lg"
-            placeholder="Fully Furnished, All Bills Included, Quiet..."
-          />
-        </div>
+          <div className="flex-1">
+            <div className="text-sm text-gray-600">Travel Time</div>
+            <select
+              className="border rounded px-2 py-1 max-h-40 overflow-y-auto w-full"
+              value={filter.travelTime}
+              onChange={(e) =>
+                setFilter({ ...filter, travelTime: e.target.value })
+              }
+            >
+              <option>Any</option>
+              <option>10 min</option>
+              <option>20 min</option>
+              <option>30 min</option>
+              <option>40 min</option>
+              <option>50 min</option>
+              <option>1h</option>
+              <option>1.5h</option>
+              <option>2h</option>
+            </select>
+          </div>
 
-        {/* Filter Button */}
-        <div className="flex items-center justify-center w-full md:w-auto mt-4">
-          <button
-            className="px-6 py-3 bg-blue-primary text-white rounded-lg hover:bg-primary-dark"
-            onClick={() => (window.location.href = "housing-filter.html")}
-          >
-            <i className="fas fa-filter"></i> Filter Properties
-          </button>
+          <div className="flex gap-4">
+            <MoreFilterModal filter={filter} setFilter={setFilter} />
+            <button className="bg-blue-primary text-white px-4 py-1 rounded">
+              <a href="/findAHome">Go</a>
+            </button>
+          </div>
         </div>
-      </div>
-    </div>
+      </section>
+    </>
   );
-};
-
-export default Search;
+}
