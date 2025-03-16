@@ -1,106 +1,188 @@
-"use client";
-import { useState } from "react";
-import DatePicker from "react-datepicker";
-import "react-datepicker/dist/react-datepicker.css";
+import React from "react";
+import PriceDropdown from "./priceDropDown";
+import RatingSlider from "./Slider";
 
-const HousingFilter = ({ onFilterChange }) => {
-  const [filters, setFilters] = useState({
-    school: "unsw",
-    priceMin: "",
-    priceMax: "",
-    bedroomsMin: "",
-    bedroomsMax: "",
-    bathrooms: "",
-    propertyType: [],
-    minScore: 13,
-    commuteMin: "",
-    commuteMax: "",
-    moveInDate: null,
-  });
-
-  const handleChange = (e) => {
-    const { name, value, type, checked } = e.target;
-
-    if (type === "checkbox") {
-      setFilters((prev) => ({
-        ...prev,
-        propertyType: checked
-          ? [...prev.propertyType, value]
-          : prev.propertyType.filter((t) => t !== value),
-      }));
-    } else {
-      setFilters((prev) => ({ ...prev, [name]: value }));
-    }
-
-    onFilterChange(filters);
-  };
-
+const HousingFilter = ({ filter, setFilter }) => {
   return (
-    <div className="space-y-6">
-      <h2 className="text-lg font-bold">Filters</h2>
+    <>
+      <div className="flex gap-4 justify-center items-center">
+        {/* Header */}
+        <div className="flex flex-col gap-1 font-semibold text-2xl">
+          Filters
+        </div>
+      </div>
 
-      {/* School Selection */}
-      <div>
-        <label className="block text-sm font-medium">Target School</label>
+      {/* University */}
+      <div className="border-b pb-4 mt-3">
+        <div className="text-lg text-gray-600 font-semibold">University</div>
         <select
-          name="school"
-          className="w-full p-2 border rounded"
-          value={filters.school}
-          onChange={handleChange}
+          className="border rounded px-2 py-1 max-h-40 overflow-y-auto w-full"
+          value={filter.university}
+          onChange={(e) => setFilter({ ...filter, university: e.target.value })}
         >
-          <option value="unsw">University of New South Wales (UNSW)</option>
-          <option value="usyd">University of Sydney (USYD)</option>
+          <option>Any</option>
+          <option>UNSW</option>
+          <option>USYD</option>
+          <option>UTS</option>
+          <option>MQ UNI</option>
         </select>
       </div>
 
       {/* Price Range */}
-      <div>
-        <label className="block text-sm font-medium">
-          Price Range (per week)
-        </label>
-        <div className="flex gap-2">
-          <input
-            type="number"
-            name="priceMin"
-            placeholder="Min"
-            className="w-1/2 p-2 border rounded"
-            onChange={handleChange}
-          />
-          <input
-            type="number"
-            name="priceMax"
-            placeholder="Max"
-            className="w-1/2 p-2 border rounded"
-            onChange={handleChange}
-          />
+      <div className="border-b pb-4 mt-3">
+        <div className="text-lg text-gray-600 font-semibold">Price</div>
+        <div className="flex justify-between gap-4">
+          <div className="flex-1">
+            <PriceDropdown
+              label="Min"
+              name="priceMin"
+              filter={filter}
+              setFilter={setFilter}
+            />
+          </div>
+          <div className="flex-1">
+            <PriceDropdown
+              label="Max"
+              name="priceMax"
+              filter={filter}
+              setFilter={setFilter}
+            />
+          </div>
         </div>
       </div>
 
-      {/* Move-in Date */}
-      <div>
-        <label className="block text-sm font-medium">Move-in Date</label>
-        <DatePicker
-          selected={filters.moveInDate}
-          onChange={(date) => setFilters({ ...filters, moveInDate: date })}
-          className="w-full p-2 border rounded"
-        />
+      {/* BedroomNum */}
+      <div className="border-b pb-4 mt-3">
+        <div className="text-lg text-gray-600 font-semibold">Bedrooms</div>
+        <div className="flex justify-between gap-4">
+          <div className="flex-1">
+            <div className="text-sm text-gray-600">Min</div>
+            <select
+              className="border rounded px-2 py-1 max-h-40 overflow-y-auto w-full"
+              value={filter.bedroomMin}
+              onChange={(e) =>
+                setFilter({ ...filter, bedroomMin: e.target.value })
+              }
+            >
+              <option>Any</option>
+              <option>1</option>
+              <option>2</option>
+              <option>3</option>
+            </select>
+          </div>
+          <div className="flex-1">
+            <div className="text-sm text-gray-600">Max</div>
+            <select
+              className="border rounded px-2 py-1 max-h-40 overflow-y-auto w-full"
+              value={filter.bedroomMax}
+              onChange={(e) =>
+                setFilter({ ...filter, bedroomMax: e.target.value })
+              }
+            >
+              <option>Any</option>
+              <option>1</option>
+              <option>2</option>
+              <option>3</option>
+            </select>
+          </div>
+        </div>
+      </div>
+
+      {/* BathroomNum */}
+      <div className="border-b pb-4 mt-3">
+        <div className="text-lg text-gray-600 font-semibold">Bathrooms</div>
+        <div className="flex justify-between gap-4">
+          <div className="flex-1">
+            <div className="text-sm text-gray-600">Min</div>
+            <select
+              className="border rounded px-2 py-1 max-h-40 overflow-y-auto w-full"
+              value={filter.bathroomMin}
+              onChange={(e) =>
+                setFilter({ ...filter, bathroomMin: e.target.value })
+              }
+            >
+              <option>Any</option>
+              <option>1</option>
+              <option>2</option>
+              <option>3</option>
+            </select>
+          </div>
+          <div className="flex-1">
+            <div className="text-sm text-gray-600">Max</div>
+            <select
+              className="border rounded px-2 py-1 max-h-40 overflow-y-auto w-full"
+              value={filter.bathroomMax}
+              onChange={(e) =>
+                setFilter({ ...filter, bathroomMax: e.target.value })
+              }
+            >
+              <option>Any</option>
+              <option>1</option>
+              <option>2</option>
+              <option>3</option>
+            </select>
+          </div>
+        </div>
       </div>
 
       {/* Property Type */}
-      <div>
-        <label className="block text-sm font-medium">Property Type</label>
-        <div className="flex flex-wrap gap-2">
-          <label className="flex items-center gap-2">
-            <input type="checkbox" value="Apartment" onChange={handleChange} />
-            Apartment
-          </label>
-          <label className="flex items-center gap-2">
-            <input type="checkbox" value="House" onChange={handleChange} />
-            House
-          </label>
+      <div className="border-b pb-4 mt-3">
+        <div className="text-sm text-gray-600 font-semibold">Property Type</div>
+        <div className="flex justify-between items-center gap-3 mt-3">
+          <select
+            className="border rounded px-2 py-1 max-h-40 overflow-y-auto w-full"
+            value={filter.propertyType}
+            onChange={(e) =>
+              setFilter({ ...filter, propertyType: e.target.value })
+            }
+          >
+            <option>Any</option>
+            <option>House</option>
+            <option>Apartment/Unit</option>
+          </select>
         </div>
       </div>
-    </div>
+
+      {/* Rate */}
+      <div className="border-b pb-4 mt-3">
+        <div className="text-sm text-gray-600 font-semibold">Rate</div>
+        <RatingSlider filter={filter} setFilter={setFilter} />
+      </div>
+
+      <div className="border-b pb-4 mt-3">
+        <div className="text-sm text-gray-600">Travel Time</div>
+        <select
+          className="border rounded px-2 py-1 max-h-40 overflow-y-auto w-full"
+          value={filter.travelTime}
+          onChange={(e) => setFilter({ ...filter, travelTime: e.target.value })}
+        >
+          <option>Any</option>
+          <option>10 min</option>
+          <option>20 min</option>
+          <option>30 min</option>
+          <option>40 min</option>
+          <option>50 min</option>
+          <option>1h</option>
+          <option>1.5h</option>
+          <option>2h</option>
+        </select>
+      </div>
+
+      {/* Avaliable Date */}
+      <div className="pb-4 mt-3">
+        <div className="text-sm text-gray-600 font-semibold">
+          Avaliable Date
+        </div>
+        <input
+          type="date"
+          className="border rounded px-2 py-1 mt-2"
+          value={filter.avaliableDate}
+          onChange={(e) =>
+            setFilter({ ...filter, avaliableDate: e.target.value })
+          }
+        />
+      </div>
+    </>
   );
 };
 

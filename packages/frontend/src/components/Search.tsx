@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import PriceDropdown from "./priceDropDown";
 import bgImg from "../../public/searchBG.jpg";
 import MoreFilterModal from "./MoreFilterModal";
@@ -18,6 +18,19 @@ export default function Search() {
     rate: 0,
     avaliableDate: "Any",
   });
+
+  // Load saved filter from localStorage on first render
+  useEffect(() => {
+    const storedFilter = localStorage.getItem("filter");
+    if (storedFilter) {
+      setFilter(JSON.parse(storedFilter));
+    }
+  }, []);
+
+  // Save filter to localStorage whenever it changes
+  useEffect(() => {
+    localStorage.setItem("filter", JSON.stringify(filter));
+  }, [filter]);
 
   return (
     <>
