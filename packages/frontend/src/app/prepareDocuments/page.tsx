@@ -14,7 +14,7 @@ const rentalChecklist = [
 
 export default function Page() {
   return (
-    <div className="min-h-auto font-serif">
+    <div className="min-h-auto">
       <div className="flex flex-col lg:flex-row">
         {/* CheckList */}
         <section className="flex-[2] bg-gray-50 rounded-lg p-5 shadow-md h-auto overflow-y-auto">

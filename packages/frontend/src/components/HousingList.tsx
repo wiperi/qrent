@@ -1,7 +1,7 @@
 "use client";
 import { useState, useEffect } from "react";
 
-const HousingList = ({ filters }) => {
+const HousingList = ({ filter }) => {
   const [listings, setListings] = useState([]);
   const [loading, setLoading] = useState(true);
 
@@ -17,7 +17,7 @@ const HousingList = ({ filters }) => {
         setLoading(false);
       })
       .catch(() => setLoading(false));
-  }, [filters]);
+  }, [filter]);
 
   return (
     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">

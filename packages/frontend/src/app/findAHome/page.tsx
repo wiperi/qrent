@@ -50,8 +50,8 @@ const page = () => {
 
         {/* Right: Housing Listings */}
         <section className="flex-[7] col-span-2 bg-white shadow-lg rounded-lg p-6">
-          <h2 className="text-xl font-bold mb-4">Available Listings</h2>
-          <HousingList filters={filter} />
+          <h2 className="text-xl font-bold mb-4">Properties in Sydney</h2>
+          <HousingList filter={filter} />
         </section>
       </div>
     </div>

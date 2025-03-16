@@ -47,9 +47,9 @@ const CheckListWithoutSubTask: React.FC<CheckListWithoutSubTaskProps> = ({
       </p>
 
       {/* Checklist */}
-      <div className="space-y-2">
+      <div className="space-y-2 text-lg">
         {items.map((item, index) => (
-          <label key={index} className="flex items-center space-x-2">
+          <label key={index} className="flex items-center space-x-3 spce-y-5">
             <input
               type="checkbox"
               className="form-checkbox"
