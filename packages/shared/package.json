@@ -1,18 +1,21 @@
 {
   "name": "@qrent/shared",
   "version": "1.0.0",
-  "main": "index.ts",
-  "types": "index.ts",
+  "main": "dist/index.ts",
+  "types": "dist/index.ts",
+  "files": [
+    "dist"
+  ],
   "scripts": {
     "dev": "tsx watch index.ts",
     "db:generate": "prisma generate",
-    "db:push": "prisma db push"
+    "db:push": "prisma db push",
+    "build": "tsc"
   },
   "dependencies": {
     "@prisma/client": "6.3.1"
   },
   "devDependencies": {
     "prisma": "6.3.1"
-  },
-  "packageManager": "pnpm@10.4.1"
+  }
 }
