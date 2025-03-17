@@ -1,12 +1,16 @@
-import { Prisma, prisma, UserDTO } from '@qrent/shared';
+import { Prisma, prisma, User } from '@qrent/shared';
 import HttpError from '@/error/HttpError';
+import { generateToken } from '@/utils/helper';
 
 class AuthService {
-  async register(userData: UserDTO): Promise<void> {
+  async register(userData: User): Promise<string> {
     try {
-      await prisma.user.create({
+      const user = await prisma.user.create({
         data: userData,
       });
+      
+      // Generate JWT token
+      return generateToken(user.id);
     } catch (error) {
       if (error instanceof Prisma.PrismaClientKnownRequestError) {
         if (error.code === 'P2002') {
@@ -17,7 +21,7 @@ class AuthService {
     }
   }
 
-  async login(userData: Pick<UserDTO, 'email' | 'password'>): Promise<void> {
+  async login(userData: Pick<User, 'email' | 'password'>): Promise<string> {
     const user = await prisma.user.findUnique({
       where: { email: userData.email },
     });
@@ -28,7 +32,12 @@ class AuthService {
     if (user.password !== userData.password) {
       throw new HttpError(400, 'Invalid password');
     }
+    
+    // Generate JWT token
+    return generateToken(user.id);
   }
+  
+
 }
 
 export const authService = new AuthService();

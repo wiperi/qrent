@@ -1,11 +1,11 @@
-import axios, { AxiosError } from "axios";
-import { UserDTO } from "../dto";
+import axios, { AxiosError } from 'axios';
+import { User } from '@prisma/client';
 
 const http = axios.create({
-  baseURL: process.env.BACKEND_URL || "http://localhost:3001",
+  baseURL: process.env.BACKEND_URL || 'http://localhost:3200',
   timeout: 5000,
   headers: {
-    "Content-Type": "application/json",
+    'Content-Type': 'application/json',
   },
 });
 
@@ -18,49 +18,51 @@ function handleRequestError(error: unknown): never {
       console.log(axiosError.response.data);
       // 服务器返回错误
       const status = axiosError.response.status;
-      const message = axiosError.response.data?.error || "服务器错误";
+      const message = axiosError.response.data?.error || '服务器错误';
 
       console.error(`[API Error ${status}] ${message}`);
       throw new Error(message);
     }
 
-    if (axiosError.code === "ECONNABORTED") {
-      console.error("[API Timeout] 请求超时");
-      throw new Error("请求超时");
+    if (axiosError.code === 'ECONNABORTED') {
+      console.error('[API Timeout] 请求超时');
+      throw new Error('请求超时');
     }
 
-    if (axiosError.code === "ERR_NETWORK") {
-      console.error("[Network Error] 网络连接失败");
-      throw new Error("网络连接失败");
+    if (axiosError.code === 'ERR_NETWORK') {
+      console.error('[Network Error] 网络连接失败');
+      throw new Error('网络连接失败');
     }
 
-    console.error("[Unknown API Error]", axiosError.message);
+    console.error('[Unknown API Error]', axiosError.message);
     throw new Error(axiosError.message);
   }
 
   // 非 Axios 错误
-  console.error("[System Error]", error);
+  console.error('[System Error]', error);
   throw error;
 }
 
 // 响应拦截器
 http.interceptors.response.use(
-  (response) => response.data,
-  (error) => handleRequestError(error)
+  response => response.data,
+  error => handleRequestError(error)
 );
 
 function hello(): Promise<Record<string, string>> {
-  return http.get("/hello");
+  return http.get('/hello');
 }
 
-function register(data: UserDTO): Promise<{ userId: number }> {
-  return http.post("/auth/register", data);
+function register(data: User): Promise<{ userId: number }> {
+  return http.post('/auth/register', data);
 }
 
-function login(
-  data: Pick<UserDTO, "email" | "password">
-): Promise<{ userId: number }> {
-  return http.post("/auth/login", data);
+function login(data: Pick<User, 'email' | 'password'>): Promise<{ userId: number }> {
+  return http.post('/auth/login', data);
 }
 
-export { hello, register, login };
+function clear() {
+  return http.get('/clear');
+}
+
+export { hello, register, login, clear };
