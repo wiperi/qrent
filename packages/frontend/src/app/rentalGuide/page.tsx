@@ -1,100 +1,60 @@
 import CheckList from "@/src/components/CheckList";
+import Guides from "@/src/components/Guides";
 import React from "react";
-
-const guidesData = [
-  {
-    title: "Complete Guide to Australian Rental Types",
-    desc: "Detailed comparison of different rental options to help you find the best choice.",
-    image: "https://picsum.photos/400/300",
-    author: "Rental Expert",
-    avatar: "https://picsum.photos/50/50",
-    date: "2024-02-20",
-    category: "Rental Types",
-  },
-  {
-    title: "Sydney Area Guide: Complete Guide to Choosing the Right Location",
-    desc: "In-depth analysis of Sydney areas, including transport, facilities, and safety aspects.",
-    image: "https://picsum.photos/400/300",
-    author: "Area Expert",
-    avatar: "https://picsum.photos/50/50",
-    date: "2024-02-21",
-    category: "Area Selection",
-  },
-];
 
 const stepsData = [
   {
-    title: "1. Understanding Rental Options",
+    title: "1. 确定租房预算与需求（提前5-7周）",
     subtasks: [
-      "Get to know shared housing pros and cons",
-      "Understand whole property rentals",
-      "Check if you're eligible for student accommodation",
-      "Learn about private rentals and how they work",
+      "了解住宿的基本类型",
+      "了解整租与分租的优缺点",
+      "确定个人租房预算范围",
+      "确定个人对房源的其他要求",
     ],
   },
   {
-    title: "2. Setting Your Rental Priorities",
+    title: "2. 了解学校附近区域与租房平台",
     subtasks: [
-      "Figure out your budget range",
-      "Decide how far you're willing to commute",
-      "List must-have amenities",
+      "研究学校周边各区域特点",
+      "确定目标区域范围",
+      "了解相关租房网站的使用",
+      "了解房源价格水平",
     ],
   },
   {
-    title: "3. Researching Suburbs & Locations",
+    title: "3. 了解具体房源与准备申请材料（提前3-4周）",
     subtasks: [
-      "Look into different areas and their vibe",
-      "Check out local shops, public transport, and safety",
-      "Narrow down your preferred suburbs",
+      "了解预算内的房源市场情况",
+      "准备租房申请相关材料",
+      "了解看房/代看房注意事项",
+      "了解租房申请相关流程",
     ],
   },
   {
-    title: "4. Finding the Right Rental Platforms",
+    title: "4. 积极看房联系（提前两周）",
     subtasks: [
-      "Explore major rental websites",
-      "Understand average rental prices in your chosen areas",
-      "Read tenant reviews and experiences",
+      "确定起租日期合适的相关房源",
+      "预约安排看房行程",
+      "持续与中介保持沟通，及时跟进申请状态",
     ],
   },
   {
-    title: "5. Getting Your Application Ready",
+    title: "5. 完成签约与押金支付等（成功签约！）",
     subtasks: [
-      "Organise necessary documents (ID, visa, proof of income)",
-      "Make sure you have rental history or references",
-      "Learn what to expect at property inspections",
+      "了解标准租房合同",
+      "了解押金、定金支付与相关规则",
+      "支付押金、定金，完成合同签订等",
     ],
   },
   {
-    title: "6. Attending Inspections & Applying",
-    subtasks: [
-      "Book inspection appointments ASAP",
-      "Communicate clearly with agents and landlords",
-      "Take notes and photos of properties you visit",
-      "Keep track of applications and responses",
-    ],
-  },
-  {
-    title: "7. Understanding Lease Agreements",
-    subtasks: [
-      "Read through a standard rental contract carefully",
-      "Know the bond and deposit rules",
-      "Check acceptable payment methods and due dates",
-    ],
-  },
-  {
-    title: "8. Moving In & Post-Rental Tasks",
-    subtasks: [
-      "Inspect the property and report any existing damage",
-      "Set up electricity, water, and internet",
-      "Set up utilities",
-      "Understand maintenance requests and procedures",
-    ],
+    title: "6. 租后事项处理",
+    subtasks: ["提交房屋检查报告", "办理水电网络", "了解维修流程"],
   },
 ];
 
 const page = () => {
   return (
-    <div className="min-h-auto font-serif">
+    <div className="min-h-auto">
       {/* Main Content */}
 
       <div className="flex flex-col lg:flex-row">
@@ -104,68 +64,7 @@ const page = () => {
 
         {/* Guides Section */}
         <section className="flex-[7] col-span-2 bg-white shadow-lg rounded-lg p-6">
-          <div className="flex justify-between mb-6 ">
-            <div className="flex flex-wrap gap-4">
-              <span className="bg-blue-primary text-white px-4 py-1 rounded-full text-sm">
-                All
-              </span>
-              <span className="bg-gray-200 text-gray-600 px-4 py-1 rounded-full text-sm cursor-pointer hover:bg-blue-primary hover:text-white">
-                Rental types
-              </span>
-              <span className="bg-gray-200 text-gray-600 px-4 py-1 rounded-full text-sm cursor-pointer hover:bg-blue-primary hover:text-white">
-                Areas
-              </span>
-              <span className="bg-gray-200 text-gray-600 px-4 py-1 rounded-full text-sm cursor-pointer hover:bg-blue-primary hover:text-white">
-                Buget
-              </span>
-              <span className="bg-gray-200 text-gray-600 px-4 py-1 rounded-full text-sm cursor-pointer hover:bg-blue-primary hover:text-white">
-                Application
-              </span>
-              <span className="bg-gray-200 text-gray-600 px-4 py-1 rounded-full text-sm cursor-pointer hover:bg-blue-primary hover:text-white">
-                Viewing Tips
-              </span>
-              <span className="bg-gray-200 text-gray-600 px-4 py-1 rounded-full text-sm cursor-pointer hover:bg-blue-primary hover:text-white">
-                Signing the lease
-              </span>
-              <span className="bg-gray-200 text-gray-600 px-4 py-1 rounded-full text-sm cursor-pointer hover:bg-blue-primary hover:text-white">
-                Move-in & Setting
-              </span>
-            </div>
-          </div>
-
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
-            {guidesData.map((guide, index) => (
-              <div
-                key={index}
-                className="bg-white shadow-md rounded-lg overflow-hidden"
-              >
-                <div className="h-48 bg-gray-300">
-                  <img
-                    src={guide.image}
-                    alt={guide.title}
-                    className="object-cover w-full h-full"
-                  />
-                </div>
-                <div className="p-4">
-                  <h3 className="text-lg font-semibold">{guide.title}</h3>
-                  <p className="text-sm text-gray-500 mt-2">{guide.desc}</p>
-                  <div className="flex justify-between items-center mt-4">
-                    <div className="flex items-center">
-                      <img
-                        src={guide.avatar}
-                        alt={guide.author}
-                        className="w-6 h-6 rounded-full"
-                      />
-                      <span className="ml-2 text-sm text-gray-700">
-                        {guide.author}
-                      </span>
-                    </div>
-                    <span className="text-xs text-gray-400">{guide.date}</span>
-                  </div>
-                </div>
-              </div>
-            ))}
-          </div>
+          <Guides />
         </section>
       </div>
     </div>
