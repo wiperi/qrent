@@ -4,7 +4,7 @@ from tqdm import tqdm
 from datetime import datetime, timedelta
 
 API_BASE_URL = 'https://api.transport.nsw.gov.au/v1/tp/'
-API_KEY = 'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJqdGkiOiJBYm1PaEFPUXFaa3o3UGtSa01rTTkyZVJlVVI3OTdCOEpzTFNTQWh6cHpZIiwiaWF0IjoxNzM0MjIzNjM5fQ.4iT1WLICeO8GKoHRFDiYjj5XKtQxkssA0zFBWDwBP7s'
+API_KEY = 
 
 HEADERS = {
     'Authorization': f'apikey {API_KEY}'
