@@ -2,9 +2,12 @@ import requests
 import pandas as pd
 from tqdm import tqdm
 from datetime import datetime, timedelta
+import os
+from dotenv import load_dotenv
+load_dotenv('.env-public')
 
 API_BASE_URL = 'https://api.transport.nsw.gov.au/v1/tp/'
-API_KEY = 
+API_KEY =  os.getenv('API_KEY')
 
 HEADERS = {
     'Authorization': f'apikey {API_KEY}'
