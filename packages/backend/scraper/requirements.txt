@@ -4,3 +4,4 @@ selenium
 mysql-connector-python
 tqdm
 requests
+dotenv

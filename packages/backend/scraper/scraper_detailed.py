@@ -19,29 +19,29 @@ def scrape_property_data(university):
     today_data = pd.read_csv(today_file)
     if os.path.exists(yesterday_file):
         yesterday_data = pd.read_csv(yesterday_file)
-        yesterday_data = yesterday_data.drop_duplicates(subset=['Address Line 1'], keep='first')
+        yesterday_data = yesterday_data.drop_duplicates(subset=['addressLine1'], keep='first')
         if 'Property Description' not in today_data.columns:
             today_data['Property Description'] = None 
         if 'Property Description' not in yesterday_data.columns:
             yesterday_data['Property Description'] = None 
-        if 'Available Date' not in today_data.columns:
-            today_data['Available Date'] = None 
-        if 'Available Date' not in yesterday_data.columns:
-            yesterday_data['Available Date'] = None 
+        if 'availableDate' not in today_data.columns:
+            today_data['availableDate'] = None 
+        if 'availableDate' not in yesterday_data.columns:
+            yesterday_data['availableDate'] = None 
         # merge the data
-        today_data['Property Description'] = today_data['Address Line 1'].map(
-            yesterday_data.set_index('Address Line 1')['Property Description']
+        today_data['Property Description'] = today_data['addressLine1'].map(
+            yesterday_data.set_index('addressLine1')['Property Description']
         )
-        today_data['Available Date'] = today_data['Address Line 1'].map(
-            yesterday_data.set_index('Address Line 1')['Available Date']
+        today_data['availableDate'] = today_data['Address Line 1'].map(
+            yesterday_data.set_index('addressLine1')['availableDate']
         )
     else:
         print("do not have yesterday data")
     #find the missing data
     if 'Property Description' not in today_data.columns:
         today_data['Property Description'] = None
-    if 'Available Date' not in today_data.columns:
-        today_data['Available Date'] = None
+    if 'availableDate' not in today_data.columns:
+        today_data['availableDate'] = None
     missing_property_desc = today_data[today_data['Property Description'].isna()]
     num_missing = len(missing_property_desc)
     print(f"datamissing:{num_missing}")
@@ -89,7 +89,7 @@ def scrape_property_data(university):
         print(f": index={index}, URL={url}, description={description[:100]}, available_date={avail_date}")
 
         today_data.at[index, 'Property Description'] = description
-        today_data.at[index, 'Available Date'] = avail_date
+        today_data.at[index, 'availableDate'] = avail_date
     driver.quit()
 
     today_data.to_csv(output_file, index=False, encoding='utf-8')
@@ -97,8 +97,8 @@ def scrape_property_data(university):
 
     file_path = output_file
     df = pd.read_csv(file_path)
-    df['website'] = df['Combined Address'].apply(lambda address: f"https://www.domain.com.au/{address}")
-
+    df['url'] = df['Combined Address'].apply(lambda address: f"https://www.domain.com.au/{address}")
+    df.drop(columns=['Combined Address'], inplace=True)
     output_file = f"{university}_rentdata_{current_date}.csv"
     df.to_csv(output_file, index=False)
 

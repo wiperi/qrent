@@ -96,14 +96,14 @@ def scrape_data(driver, url, postcode, university):
 
     # Save data to CSV
     df = pd.DataFrame({
-        "Price": rental_prices,
-        "Address Line 1": address_line_1,
-        "Address Line 2": address_line_2,
-        "Number of Bedrooms": num_beds,
-        "Number of Bathrooms": num_baths,
-        "Number of Parkings": num_parkings,
-        "House Type": house_types,
-        "House ID": house_ids,
+        "pricePerWeek": rental_prices,
+        "addressLine1": address_line_1,
+        "addressLine2": address_line_2,
+        "bedroomCount": num_beds,
+        "bathroomCount": num_baths,
+        "parkingCount": num_parkings,
+        "propertyType": house_types,
+        "houseId": house_ids,
     })
     if university == 'UNSW':
         filename = f"UNSW_rentaldata_suburb_{postcode}.csv"

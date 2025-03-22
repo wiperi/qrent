@@ -109,43 +109,37 @@ if __name__ == "__main__":
     today_str = datetime.now().strftime('%y%m%d')
     update_commute_time('UNSW')
     update_commute_time('USYD')
+
     csv_file_1 = output_file1
     csv_file_2 = output_file2
-    sql_file_1 = f"data_unsw_{today_str}.sql"
-    sql_file_2 = f"data_usyd_{today_str}.sql"
-    table_name_1 = "UNSW"
-    table_name_2 = "USYD"
+
+    sql_file = f"data_property_{today_str}.sql"
+    merged_output_file = f"merged_rentdata_{current_date}.csv"
+    table_name = "property"
     #database connection details
-    HOST = "localhost"
-    USER = "root"
-    PASSWORD = "481516"
-    DATABASE = "qrent"
-    PORT = 3306
+    HOST = os.getenv("DB_HOST")
+    USER = os.getenv("DB_USER")
+    PASSWORD = os.getenv("DB_PASSWORD")
+    DATABASE = os.getenv("DB_DATABASE")
+    PORT = int(os.getenv("DB_PORT"))
+
     # Convert the cleaned CSV files to SQL files
     if os.path.exists(csv_file_1):
-        csv_to_sql(csv_file_1, table_name_1, sql_file_1)   
+        df1 = pd.read_csv(csv_file_1)
+        df2 = pd.read_csv(csv_file_2)
+        merged_df = pd.concat([df1, df2])
+        merged_df.to_csv(merged_output_file, index=False)
+        csv_to_sql(merged_output_file, table_name, sql_file)   
         import_sql_file_to_remote_db(
             host=HOST,
             user=USER,
             password=PASSWORD,
             database=DATABASE,
             port=PORT,
-            sql_file_path=sql_file_1
+            sql_file_path=sql_file
         )
     else:
         print(f"[ERROR]  '{csv_file_1}' does not exist. Please check the file path.")
-    if os.path.exists(csv_file_2):
-        csv_to_sql(csv_file_2, table_name_2, sql_file_2)   
-        import_sql_file_to_remote_db(
-            host=HOST,
-            user=USER,
-            password=PASSWORD,
-            database=DATABASE,
-            port=PORT,
-            sql_file_path=sql_file_2
-        )
-    else:
-        print(f"[ERROR]  '{csv_file_2}' does not exist. Please check the file path.")
     # Remove the temporary files
     current_date = datetime.now().strftime("%y%m%d")
     files_to_remove = [f'USYD_rentdata_cleaned_{current_date}.csv', 'USYD_full_rentaldata_uncleaned.csv', f'UNSW_rentdata_cleaned_{current_date}.csv', 'UNSW_full_rentaldata_uncleaned.csv']
