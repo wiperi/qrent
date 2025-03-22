@@ -1,4 +1,21 @@
 services:
+  backend:
+    build:
+      context: .
+      dockerfile: packages/backend/Dockerfile
+    ports:
+      - "3200:3200"
+    env_file:
+      - packages/backend/.env.docker
+    depends_on:
+      - db
+    restart: unless-stopped
+    volumes:
+      - ./packages/backend/src:/app/packages/backend/src
+      - ./packages/shared:/app/packages/shared
+    networks:
+      - qrent-network
+
   db:
     image: mysql:8.0
     restart: unless-stopped
@@ -11,31 +28,13 @@ services:
       - qrent-data:/var/lib/mysql
     networks:
       - qrent-network
-    healthcheck:
-      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "-p$$MYSQL_ROOT_PASSWORD"]
-      interval: 5s
-      timeout: 5s
-      retries: 20
-      start_period: 10s
-  backend:
-    build:
-      context: .
-      dockerfile: packages/backend/Dockerfile
-    ports:
-      - "3200:3200"
-    env_file:
-      - .env 
-    depends_on:
-      db:
-        condition: service_healthy
-    restart: unless-stopped
-    volumes:
-      - /app/packages/backend/node_modules
-      - /app/packages/shared/node_modules
-      - ./packages/backend/src:/app/packages/backend/src
-      - ./packages/shared:/app/packages/shared
-    networks:
-      - qrent-network
+#     healthcheck:
+#       test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "-p$$MYSQL_ROOT_PASSWORD"]
+#       interval: 5s
+#       timeout: 5s
+#       retries: 20
+#       start_period: 10s
+#     command: --default-authentication-plugin=mysql_native_password
 
 networks:
   qrent-network:

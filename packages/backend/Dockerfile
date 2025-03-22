@@ -28,9 +28,6 @@ COPY packages/shared ./packages/shared
 RUN cd packages/shared && pnpm db:generate
 # RUN cd packages/shared && pnpm db:push
 
-# Copy startup script
-COPY startup.sh ./
-RUN chmod +x ./startup.sh
-
-# Use the startup script as the entry point
-CMD ["./startup.sh"]
+# # Command to run the app with waiting for database
+# CMD ["/wait-for-db.sh", "db", "/startup.sh", "pnpm", "--filter", "@qrent/backend", "dev"] 
+CMD [ "pnpm", "--filter", "@qrent/backend", "dev" ]
