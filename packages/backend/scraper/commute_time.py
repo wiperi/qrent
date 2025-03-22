@@ -84,7 +84,7 @@ def update_commute_time(university):
 
     data = pd.read_csv(input_file)
 
-    missing_commute = data[data['Commute Time'].isna()]
+    missing_commute = data[data['commuteTime'].isna()]
 
     if university.lower() == 'unsw':
         destination_coord = "151.23143:-33.917129:EPSG:4326"  # UNSW Kensington
@@ -95,15 +95,15 @@ def update_commute_time(university):
 
 
     for index, row in tqdm(missing_commute.iterrows(), total=len(missing_commute), desc="Updating commute time"):
-        origin_address = row['Address Line 1']
+        origin_address = row['addressLine1']
         origin_coord = address_to_coord(origin_address)
 
         if origin_coord:
 
             travel_time = find_shortest_travel_time(origin_coord, destination_coord, time_="0900")
-            data.loc[index, 'Commute Time'] = travel_time if travel_time is not None else "N/A"
+            data.loc[index, 'commuteTime'] = travel_time if travel_time is not None else "N/A"
         else:
-            data.loc[index, 'Commute Time'] = "N/A"
+            data.loc[index, 'commuteTime'] = "N/A"
 
     data.to_csv(output_file, index=False)
     print(f"save data to:{output_file}")
