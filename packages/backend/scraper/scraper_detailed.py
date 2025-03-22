@@ -20,17 +20,17 @@ def scrape_property_data(university):
     if os.path.exists(yesterday_file):
         yesterday_data = pd.read_csv(yesterday_file)
         yesterday_data = yesterday_data.drop_duplicates(subset=['addressLine1'], keep='first')
-        if 'Property Description' not in today_data.columns:
-            today_data['Property Description'] = None 
-        if 'Property Description' not in yesterday_data.columns:
-            yesterday_data['Property Description'] = None 
+        if 'description' not in today_data.columns:
+            today_data['description'] = None 
+        if 'description' not in yesterday_data.columns:
+            yesterday_data['description'] = None 
         if 'availableDate' not in today_data.columns:
             today_data['availableDate'] = None 
         if 'availableDate' not in yesterday_data.columns:
             yesterday_data['availableDate'] = None 
         # merge the data
-        today_data['Property Description'] = today_data['addressLine1'].map(
-            yesterday_data.set_index('addressLine1')['Property Description']
+        today_data['description'] = today_data['addressLine1'].map(
+            yesterday_data.set_index('addressLine1')['description']
         )
         today_data['availableDate'] = today_data['Address Line 1'].map(
             yesterday_data.set_index('addressLine1')['availableDate']
@@ -38,11 +38,11 @@ def scrape_property_data(university):
     else:
         print("do not have yesterday data")
     #find the missing data
-    if 'Property Description' not in today_data.columns:
-        today_data['Property Description'] = None
+    if 'description' not in today_data.columns:
+        today_data['description'] = None
     if 'availableDate' not in today_data.columns:
         today_data['availableDate'] = None
-    missing_property_desc = today_data[today_data['Property Description'].isna()]
+    missing_property_desc = today_data[today_data['description'].isna()]
     num_missing = len(missing_property_desc)
     print(f"datamissing:{num_missing}")
     
@@ -88,7 +88,7 @@ def scrape_property_data(university):
         description, avail_date = scrape_data(url)  
         print(f": index={index}, URL={url}, description={description[:100]}, available_date={avail_date}")
 
-        today_data.at[index, 'Property Description'] = description
+        today_data.at[index, 'description'] = description
         today_data.at[index, 'availableDate'] = avail_date
     driver.quit()
 
