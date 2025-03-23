@@ -77,7 +77,9 @@ const HOST = process.env.HOST || 'localhost';
 const server = app.listen(PORT, HOST, async () => {
   console.log(`⚡️ Server started on port ${PORT} at ${HOST}`);
 
-  const userCount = await prisma.user.count();
+  const userCount = await prisma.user.count().catch((err) => {
+    console.log(err);
+  });
   console.log(`You have ${userCount} users in your database`);
 });
 
