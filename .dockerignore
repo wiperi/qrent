@@ -1,0 +1,39 @@
+# Dependencies
+node_modules
+.pnpm-store
+dist
+
+# Git
+.git
+.gitignore
+
+# Environment
+.env
+.env*.local
+.env.development
+.env.test
+
+# Editor directories and files
+.vscode
+.idea
+*.swp
+*.swo
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Logs
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# Build files
+build/
+*.tsbuildinfo
+
+# Other packages
+packages/frontend
+qrent-depreacated
+.venv 
