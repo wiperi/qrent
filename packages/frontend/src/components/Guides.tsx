@@ -275,11 +275,11 @@ const Guides = () => {
 
       {/* Guides (Articles Grid) */}
       <div className="h-[580px] overflow-y-auto">
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
           {/* Column 1 */}
           <div className="flex flex-col gap-8">
             {filteredArticles
-              .slice(0, Math.ceil(filteredArticles.length / 3))
+              .slice(0, Math.ceil(filteredArticles.length / 4))
               .map((guide, index) => (
                 <a
                   key={index}
@@ -292,31 +292,24 @@ const Guides = () => {
                     </div>
                   )}
                   {guide.admin && (
-                    <div className="absolute bottom-2 right-2 bg-[#FF9800] text-right text-white text-sm font-bold px-3 py-1 rounded-full shadow-md">
+                    <div className="absolute bottom-3 left-3 bg-[#FF9800] text-white text-sm font-bold px-3 py-1 rounded-full shadow-md">
                       官方
                     </div>
                   )}
-                  <div className="bg-gray-300">
-                    <img src={guide.image} alt={guide.title} className="object-cover w-full" />
-                  </div>
-                  <div className="p-4 flex-1 flex flex-col justify-between">
+                  <img src={guide.image} alt={guide.title} className="w-full object-cover" />
+                  <div className="p-4">
                     <h3 className="text-lg font-semibold">{guide.title}</h3>
-                    <div className="flex justify-between items-center mt-4">
-                      <div className="flex items-center">
-                        <span className="text-sm text-gray-700">{guide.author}</span>
-                      </div>
-                    </div>
+                    <p className="text-sm text-gray-600">{guide.author}</p>
                   </div>
                 </a>
               ))}
           </div>
-
           {/* Column 2 */}
           <div className="flex flex-col gap-8">
             {filteredArticles
               .slice(
-                Math.ceil(filteredArticles.length / 3),
-                Math.ceil((filteredArticles.length / 3) * 2)
+                Math.ceil(filteredArticles.length / 4),
+                Math.ceil(filteredArticles.length / 4) * 2
               )
               .map((guide, index) => (
                 <a
@@ -330,29 +323,25 @@ const Guides = () => {
                     </div>
                   )}
                   {guide.admin && (
-                    <div className="absolute bottom-3 right-3 bg-[#FF9800] text-right text-white text-sm font-bold px-3 py-1 rounded-full shadow-md">
+                    <div className="absolute bottom-3 left-3 bg-[#FF9800] text-white text-sm font-bold px-3 py-1 rounded-full shadow-md">
                       官方
                     </div>
                   )}
-                  <div className="bg-gray-300">
-                    <img src={guide.image} alt={guide.title} className="object-cover w-full" />
-                  </div>
-                  <div className="p-4 flex-1 flex flex-col justify-between">
+                  <img src={guide.image} alt={guide.title} className="w-full object-cover" />
+                  <div className="p-4">
                     <h3 className="text-lg font-semibold">{guide.title}</h3>
-                    <div className="flex justify-between items-center mt-4">
-                      <div className="flex items-center">
-                        <span className="text-sm text-gray-700">{guide.author}</span>
-                      </div>
-                    </div>
+                    <p className="text-sm text-gray-600">{guide.author}</p>
                   </div>
                 </a>
               ))}
           </div>
-
           {/* Column 3 */}
           <div className="flex flex-col gap-8">
             {filteredArticles
-              .slice(Math.ceil((filteredArticles.length / 3) * 2), filteredArticles.length)
+              .slice(
+                Math.ceil(filteredArticles.length / 4) * 2,
+                Math.ceil(filteredArticles.length / 4) * 3
+              )
               .map((guide, index) => (
                 <a
                   key={index}
@@ -365,20 +354,45 @@ const Guides = () => {
                     </div>
                   )}
                   {guide.admin && (
-                    <div className="absolute bottom-3 right-3 bg-[#FF9800] text-right text-white text-sm font-bold px-3 py-1 rounded-full shadow-md">
+                    <div className="absolute bottom-3 left-3 bg-[#FF9800] text-white text-sm font-bold px-3 py-1 rounded-full shadow-md">
                       官方
                     </div>
                   )}
-                  <div className="bg-gray-300">
-                    <img src={guide.image} alt={guide.title} className="object-cover w-full" />
-                  </div>
-                  <div className="p-4 flex-1 flex flex-col justify-between">
+                  <img src={guide.image} alt={guide.title} className="w-full object-cover" />
+                  <div className="p-4">
                     <h3 className="text-lg font-semibold">{guide.title}</h3>
-                    <div className="flex justify-between items-center mt-4">
-                      <div className="flex items-center">
-                        <span className="text-sm text-gray-700">{guide.author}</span>
-                      </div>
+                    <p className="text-sm text-gray-600">{guide.author}</p>
+                  </div>
+                </a>
+              ))}
+          </div>
+          {/* Column 4 */}
+          <div className="flex flex-col gap-8">
+            {filteredArticles
+              .slice(
+                Math.ceil(filteredArticles.length / 4) * 3,
+                Math.ceil(filteredArticles.length / 4) * 4
+              )
+              .map((guide, index) => (
+                <a
+                  key={index}
+                  href={guide.url}
+                  className="bg-white shadow-md rounded-lg overflow-hidden flex flex-col relative"
+                >
+                  {guide.recommended && (
+                    <div className="absolute bottom-3 right-3 bg-[#FF9800] text-right text-white text-sm font-bold px-3 py-1 rounded-full shadow-md">
+                      推荐
                     </div>
+                  )}
+                  {guide.admin && (
+                    <div className="absolute bottom-3 left-3 bg-[#FF9800] text-white text-sm font-bold px-3 py-1 rounded-full shadow-md">
+                      官方
+                    </div>
+                  )}
+                  <img src={guide.image} alt={guide.title} className="w-full object-cover" />
+                  <div className="p-4">
+                    <h3 className="text-lg font-semibold">{guide.title}</h3>
+                    <p className="text-sm text-gray-600">{guide.author}</p>
                   </div>
                 </a>
               ))}
