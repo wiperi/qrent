@@ -1,10 +1,11 @@
 import type { Metadata } from "next";
 import "./globals.css";
-import { geistSans, geistMono } from "./fonts";
-import Navbar from "@/components/Navbar";
+import NavBar from "../components/NavBar";
+import Footer from "../components/Footer";
+
 export const metadata: Metadata = {
-  title: "Qrent - Smooth Renting Experience",
-  description: "Qrent is a platform that allows you to rent and connect with others easily.",
+  title: "Qrent",
+  description: "Your Smart Rental Assistent",
 };
 
 export default function RootLayout({
@@ -13,12 +14,11 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en">
-      <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased`}
-      >
-        <Navbar />
+    <html lang="en" className="bg-white" suppressHydrationWarning>
+      <body>
+        <NavBar />
         {children}
+        <Footer />
       </body>
     </html>
   );
