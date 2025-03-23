@@ -1,27 +1,27 @@
-import { useEffect, useState } from "react";
-import PriceDropdown from "./priceDropDown";
-import bgImg from "../../public/searchBG.jpg";
-import MoreFilterModal from "./MoreFilterModal";
+import { useEffect, useState } from 'react';
+import PriceDropdown from './priceDropDown';
+import bgImg from '../../public/searchBG.jpg';
+import MoreFilterModal from './MoreFilterModal';
 
 export default function Search() {
   const [filter, setFilter] = useState({
-    university: "Any",
-    priceMin: "Any",
-    priceMax: "Any",
-    travelTime: "Any",
-    bedroomMin: "Any",
-    bedroomMax: "Any",
-    bathroomMin: "Any",
-    bathroomMax: "Any",
-    propertyType: "Any",
-    area: "Any",
+    university: 'UNSW',
+    priceMin: 'Any',
+    priceMax: 'Any',
+    travelTime: 'Any',
+    bedroomMin: 'Any',
+    bedroomMax: 'Any',
+    bathroomMin: 'Any',
+    bathroomMax: 'Any',
+    propertyType: 'Any',
+    area: 'Any',
     rate: 0,
-    avaliableDate: "Any",
+    avaliableDate: 'Any',
   });
 
   // Load saved filter from localStorage on first render
   useEffect(() => {
-    const storedFilter = localStorage.getItem("filter");
+    const storedFilter = localStorage.getItem('filter');
     if (storedFilter) {
       setFilter(JSON.parse(storedFilter));
     }
@@ -29,32 +29,31 @@ export default function Search() {
 
   // Save filter to localStorage whenever it changes
   useEffect(() => {
-    localStorage.setItem("filter", JSON.stringify(filter));
+    localStorage.setItem('filter', JSON.stringify(filter));
   }, [filter]);
 
   return (
     <>
       <section
-        className="hero bg-cover h-80 mt-8"
+        className="hero bg-cover h-56"
         style={{
           backgroundImage: `url(${bgImg.src})`,
         }}
       >
+        <h1 className="text-white drop-shadow-2xl absolute top-28 left-1/2 transform -translate-x-1/2 -translate-y-1/2 text-2xl font-bold font-serif">
+          Find Your Dream Home
+        </h1>
         <div className="bg-white p-4 shadow rounded-lg flex gap-4 font-semibold justify-between flex-wrap mt-8 mx-auto max-w-screen-lg w-full">
           <div className="flex-1">
             <div className="text-sm text-gray-600">University</div>
             <select
               className="border rounded px-2 py-1 max-h-40 overflow-y-auto w-full"
               value={filter.university}
-              onChange={(e) =>
-                setFilter({ ...filter, university: e.target.value })
-              }
+              onChange={e => setFilter({ ...filter, university: e.target.value })}
             >
-              <option>Any</option>
               <option>UNSW</option>
               <option>USYD</option>
               <option>UTS</option>
-              <option>MQ Uni</option>
             </select>
           </div>
 
@@ -81,9 +80,7 @@ export default function Search() {
             <select
               className="border rounded px-2 py-1 max-h-40 overflow-y-auto w-full"
               value={filter.travelTime}
-              onChange={(e) =>
-                setFilter({ ...filter, travelTime: e.target.value })
-              }
+              onChange={e => setFilter({ ...filter, travelTime: e.target.value })}
             >
               <option>Any</option>
               <option>10 min</option>
@@ -99,7 +96,7 @@ export default function Search() {
 
           <div className="flex gap-4">
             <MoreFilterModal filter={filter} setFilter={setFilter} />
-            <button className="bg-blue-primary text-white px-4 py-1 rounded">
+            <button className="bg-blue-primary text-white px-4 py-1 rounded mt-4">
               <a href="/findAHome">Go</a>
             </button>
           </div>
