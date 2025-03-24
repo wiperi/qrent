@@ -1,6 +1,6 @@
-"use client";
-import React, { useState } from "react";
-import { motion, AnimatePresence } from "framer-motion";
+'use client';
+import React, { useState } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
 
 interface Step {
   title: string;
@@ -14,36 +14,29 @@ interface ChecklistProps {
 
 const Checklist: React.FC<ChecklistProps> = ({ title, stepsData }) => {
   const [openIndex, setOpenIndex] = useState<number | null>(null);
-  const [checkedTasks, setCheckedTasks] = useState<{ [key: string]: boolean }>(
-    {}
-  );
+  const [checkedTasks, setCheckedTasks] = useState<{ [key: string]: boolean }>({});
 
   const handleCheckboxChange = (task: string) => {
-    setCheckedTasks((prev) => ({
+    setCheckedTasks(prev => ({
       ...prev,
       [task]: !prev[task],
     }));
   };
 
-  const totalTasks = stepsData.reduce(
-    (acc, step) => acc + step.subtasks.length,
-    0
-  );
+  const totalTasks = stepsData.reduce((acc, step) => acc + step.subtasks.length, 0);
   const completedTasks = Object.values(checkedTasks).filter(Boolean).length;
   const progress = (completedTasks / totalTasks) * 100;
 
   return (
-    <div className="max-w-lg mx-auto p-5">
+    <div className="max-w-lg mx-auto p-5 sticky">
       {/* Header */}
-      <h2 className="text-2xl font-bold text-center text-blue-primary mb-4">
-        {title}
-      </h2>
+      <h2 className="text-2xl font-bold text-left text-blue-primary mb-4">{title}</h2>
 
       {/* Progress Bar */}
       <div className="w-full bg-gray-200 rounded-full h-3 mb-6">
         <motion.div
           className="bg-blue-primary h-3 rounded-full"
-          initial={{ width: "0%" }}
+          initial={{ width: '0%' }}
           animate={{ width: `${progress}%` }}
           transition={{ duration: 0.3 }}
         />
@@ -68,9 +61,9 @@ const Checklist: React.FC<ChecklistProps> = ({ title, stepsData }) => {
             {openIndex === index && (
               <motion.div
                 initial={{ opacity: 0, height: 0 }}
-                animate={{ opacity: 1, height: "auto" }}
+                animate={{ opacity: 1, height: 'auto' }}
                 exit={{ opacity: 0, height: 0 }}
-                transition={{ duration: 0.3, ease: "easeInOut" }}
+                transition={{ duration: 0.3, ease: 'easeInOut' }}
                 className="mt-2 space-y-2 p-3 bg-gray-100 rounded-lg overflow-hidden"
               >
                 {step.subtasks.map((task, i) => (

@@ -1,15 +1,16 @@
-/*
-  Warnings:
+-- CreateTable
+CREATE TABLE `User` (
+    `id` INTEGER UNSIGNED NOT NULL AUTO_INCREMENT,
+    `password` VARCHAR(200) NULL,
+    `name` VARCHAR(50) NULL,
+    `gender` TINYINT UNSIGNED NULL,
+    `phone` CHAR(11) NULL,
+    `email` VARCHAR(50) NOT NULL,
 
-  - You are about to drop the column `username` on the `user` table. All the data in the column will be lost.
-
-*/
--- DropIndex
-DROP INDEX `username` ON `user`;
-
--- AlterTable
-ALTER TABLE `user` DROP COLUMN `username`,
-    MODIFY `password` VARCHAR(200) NULL;
+    UNIQUE INDEX `phone`(`phone`),
+    UNIQUE INDEX `email`(`email`),
+    PRIMARY KEY (`id`)
+) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
 -- CreateTable
 CREATE TABLE `Property` (
@@ -33,7 +34,7 @@ CREATE TABLE `Property` (
 ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
 -- CreateTable
-CREATE TABLE `UserPreference` (
+CREATE TABLE `user_preference` (
     `id` INTEGER UNSIGNED NOT NULL AUTO_INCREMENT,
     `targetSchool` VARCHAR(100) NULL,
     `minPrice` INTEGER UNSIGNED NULL,
@@ -50,7 +51,7 @@ CREATE TABLE `UserPreference` (
     `moveInDate` DATETIME(3) NULL,
     `userId` INTEGER UNSIGNED NOT NULL,
 
-    UNIQUE INDEX `UserPreference_userId_key`(`userId`),
+    UNIQUE INDEX `user_preference_userId_key`(`userId`),
     PRIMARY KEY (`id`)
 ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
@@ -62,9 +63,6 @@ CREATE TABLE `_PropertyToUser` (
     UNIQUE INDEX `_PropertyToUser_AB_unique`(`A`, `B`),
     INDEX `_PropertyToUser_B_index`(`B`)
 ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
-
--- AddForeignKey
-ALTER TABLE `UserPreference` ADD CONSTRAINT `UserPreference_userId_fkey` FOREIGN KEY (`userId`) REFERENCES `User`(`id`) ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE `_PropertyToUser` ADD CONSTRAINT `_PropertyToUser_A_fkey` FOREIGN KEY (`A`) REFERENCES `Property`(`id`) ON DELETE CASCADE ON UPDATE CASCADE;
