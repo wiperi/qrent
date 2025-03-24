@@ -1,11 +1,6 @@
 {
   "name": "@qrent/shared",
   "version": "1.0.0",
-  "main": "dist/index.ts",
-  "types": "dist/index.ts",
-  "files": [
-    "dist"
-  ],
   "scripts": {
     "dev": "tsx watch index.ts",
     "db:generate": "prisma generate",
@@ -13,9 +8,7 @@
     "build": "tsc"
   },
   "dependencies": {
-    "@prisma/client": "6.3.1"
-  },
-  "devDependencies": {
+    "@prisma/client": "6.3.1",
     "prisma": "6.3.1"
   }
 }

@@ -29,5 +29,6 @@ RUN cd packages/shared && pnpm db:generate
 # RUN cd packages/shared && pnpm db:push
 
 # # Command to run the app with waiting for database
-# CMD ["/wait-for-db.sh", "db", "/startup.sh", "pnpm", "--filter", "@qrent/backend", "dev"] 
+# CMD ["/wait-for-db.sh", "db", "/startup.sh", "pnpm", "--filter", "@qrent/backend", "dev"]
+# RUN pnpm prisma db push
 CMD [ "pnpm", "--filter", "@qrent/backend", "dev" ]
