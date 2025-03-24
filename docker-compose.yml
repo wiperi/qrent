@@ -30,6 +30,8 @@ services:
         condition: service_healthy
     restart: unless-stopped
     volumes:
+      - /app/packages/backend/node_modules
+      - /app/packages/shared/node_modules
       - ./packages/backend/src:/app/packages/backend/src
       - ./packages/shared:/app/packages/shared
     networks:
