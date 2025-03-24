@@ -57,6 +57,9 @@ const Footer = () => {
           Copyright © {new Date().getFullYear()} - All right reserved by Qrent Industries Ltd
         </p>
       </aside>
+      <Link href="https://beian.miit.gov.cn/#/Integrated/index" className="link link-hover">
+        网页备案号:粤ICP备2025363367号-1
+      </Link>
     </footer>
   );
 };

@@ -3,10 +3,10 @@ import { Dropdown, DropdownTrigger, DropdownMenu, DropdownItem, Button } from '@
 import { FaGlobe } from 'react-icons/fa';
 import i18n from '../../i18n'; // Import i18n
 import { useState } from 'react';
-import { useTranslation } from 'react-i18next';
+// import { useTranslation } from 'react-i18next';
 
 export default function LanguageSwitcher() {
-  const { t, i18n } = useTranslation();
+  // const { t, i18n } = useTranslation();
 
   const handleLanguageChange = (lang: string) => {
     i18n.changeLanguage(lang);
@@ -27,14 +27,16 @@ export default function LanguageSwitcher() {
           className="font-serif"
           onClick={() => handleLanguageChange('en')}
         >
-          {t('english')}
+          {/* {t('english')} */}
+          English
         </DropdownItem>
         <DropdownItem
           key="ChineseSim"
           className="font-serif"
           onClick={() => handleLanguageChange('zh')}
         >
-          {t('chinese_simplified')}
+          {/* {t('chinese_simplified')} */}
+          Chinese (Simplified)
         </DropdownItem>
       </DropdownMenu>
     </Dropdown>
