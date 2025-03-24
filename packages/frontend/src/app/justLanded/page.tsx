@@ -15,7 +15,7 @@ const page = () => {
     bathroomMax: 'Any',
     propertyType: 'Any',
     area: 'Any',
-    rate: 0,
+    rate: 13,
     avaliableDate: 'Any',
   });
 
