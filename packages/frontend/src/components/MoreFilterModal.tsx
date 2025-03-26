@@ -9,16 +9,17 @@ import {
   useDisclosure,
 } from '@heroui/react';
 import RatingSlider from './Slider';
+import { useTranslations } from 'next-intl';
 
 const MoreFilterModal = ({ filter, setFilter }) => {
   const { isOpen, onOpen, onOpenChange } = useDisclosure();
   const [scrollBehavior, setScrollBehavior] =
     React.useState<ModalProps['scrollBehavior']>('inside');
-
+  const t = useTranslations('Search');
   return (
     <div className="flex gap-4">
       <button className="text-blue-primary mt-4" onClick={onOpen}>
-        More Filters
+        {t('more-filters')}
       </button>
 
       <Modal isOpen={isOpen} scrollBehavior={scrollBehavior} onOpenChange={onOpenChange}>
@@ -26,14 +27,14 @@ const MoreFilterModal = ({ filter, setFilter }) => {
           <ModalContent className="bg-white rounded-lg shadow-lg">
             {onClose => (
               <>
-                <ModalHeader className="flex flex-col gap-1">Filters</ModalHeader>
+                <ModalHeader className="flex flex-col gap-1">{t('more-filters')}</ModalHeader>
                 <ModalBody>
                   {/* Bedrooms */}
                   <div className="border-b pb-4">
-                    <div className="text-sm text-gray-600 font-semibold">Bedrooms</div>
+                    <div className="text-sm text-gray-600 font-semibold">{t('bedrooms')}</div>
                     <div className="flex justify-between items-center gap-3 mt-3">
                       {/* bedroomMin */}
-                      <div className="text-sm text-gray-600">Min</div>
+                      <div className="text-sm text-gray-600">{t('min')}</div>
                       <select
                         className="border rounded px-2 py-1 max-h-40 overflow-y-auto w-full"
                         value={filter.bedroomMin}
@@ -46,7 +47,7 @@ const MoreFilterModal = ({ filter, setFilter }) => {
                       </select>
 
                       {/* bedroomMax */}
-                      <div className="text-sm text-gray-600">Max</div>
+                      <div className="text-sm text-gray-600">{t('max')}</div>
                       <select
                         className="border rounded px-2 py-1 max-h-40 overflow-y-auto w-full"
                         value={filter.bedroomMax}
@@ -62,10 +63,10 @@ const MoreFilterModal = ({ filter, setFilter }) => {
 
                   {/* Bathrooms */}
                   <div className="border-b pb-4">
-                    <div className="text-sm text-gray-600 font-semibold">Bathrooms</div>
+                    <div className="text-sm text-gray-600 font-semibold">{t('bathrooms')}</div>
                     <div className="flex justify-between items-center gap-3 mt-3">
                       {/* bathroomMin */}
-                      <div className="text-sm text-gray-600">Min</div>
+                      <div className="text-sm text-gray-600">{t('min')}</div>
                       <select
                         className="border rounded px-2 py-1 max-h-40 overflow-y-auto w-full"
                         value={filter.bathroomMin}
@@ -78,7 +79,7 @@ const MoreFilterModal = ({ filter, setFilter }) => {
                       </select>
 
                       {/* bathroomMax */}
-                      <div className="text-sm text-gray-600">Max</div>
+                      <div className="text-sm text-gray-600">{t('max')}</div>
                       <select
                         className="border rounded px-2 py-1 max-h-40 overflow-y-auto w-full"
                         value={filter.bathroomMax}
@@ -94,7 +95,7 @@ const MoreFilterModal = ({ filter, setFilter }) => {
 
                   {/* Property Type */}
                   <div className="border-b pb-4">
-                    <div className="text-sm text-gray-600 font-semibold">Property Type</div>
+                    <div className="text-sm text-gray-600 font-semibold">{t('property-type')}</div>
                     <div className="flex justify-between items-center gap-3 mt-3">
                       <select
                         className="border rounded px-2 py-1 max-h-40 overflow-y-auto w-full"
@@ -110,13 +111,13 @@ const MoreFilterModal = ({ filter, setFilter }) => {
 
                   {/* Rate */}
                   <div className="border-b pb-4">
-                    <div className="text-sm text-gray-600 font-semibold">Rate</div>
+                    <div className="text-sm text-gray-600 font-semibold">{t('rate')}</div>
                     <RatingSlider filter={filter} setFilter={setFilter} />
                   </div>
 
                   {/* Avaliable Date */}
                   <div className="pb-4">
-                    <div className="text-sm text-gray-600 font-semibold">Avaliable Date</div>
+                    <div className="text-sm text-gray-600 font-semibold">{t('avaliable-date')}</div>
                     <input
                       type="date"
                       className="border rounded px-2 py-1 mt-2"
@@ -127,7 +128,7 @@ const MoreFilterModal = ({ filter, setFilter }) => {
                 </ModalBody>
                 <ModalFooter>
                   <button className="text-blue-primary font-semibold" onClick={onClose}>
-                    Save
+                    {t('save')}
                   </button>
                 </ModalFooter>
               </>

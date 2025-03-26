@@ -3,8 +3,11 @@ import React from 'react';
 import Logo from './Logo';
 import DropDownList from './DropDownList';
 import LanguageSwitcher from './LanguageSwitcher';
+import { useTranslations } from 'next-intl';
 
 const NavBar = () => {
+  const t = useTranslations('NavBar');
+
   return (
     <>
       <header>
@@ -14,20 +17,20 @@ const NavBar = () => {
               <Logo />
             </div>
             <div className="h-full flex items-center mt-1.5 ml-16 pl-2">
-              <ul className="hidden md:flex space-x-4 text-lg font-serif font-semibold items-center justify-center tracking-wide whitespace-nowrap">
+              <ul className="hidden md:flex space-x-4 text-lg font-sans font-semibold items-center justify-center tracking-wide whitespace-nowrap">
                 <li>
                   <a href="/rentalGuide" className="text-blue-primary hover:text-blue-600">
-                    Rental-Guide
+                    {t('rental-guide')}
                   </a>
                 </li>
                 <li>
                   <a href="/prepareDocuments" className="text-blue-primary hover:text-blue-600">
-                    Prepare-Documents
+                    {t('prepare-documents')}
                   </a>
                 </li>
                 <li>
                   <a href="/findAHome" className="text-blue-primary hover:text-blue-600">
-                    Efficiency-Filter
+                    {t('efficiency-filter')}
                   </a>
                 </li>
               </ul>
