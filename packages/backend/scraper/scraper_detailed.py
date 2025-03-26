@@ -32,7 +32,7 @@ def scrape_property_data(university):
         today_data['description'] = today_data['addressLine1'].map(
             yesterday_data.set_index('addressLine1')['description']
         )
-        today_data['availableDate'] = today_data['Address Line 1'].map(
+        today_data['availableDate'] = today_data['addressLine1'].map(
             yesterday_data.set_index('addressLine1')['availableDate']
         )
     else:
