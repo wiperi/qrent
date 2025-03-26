@@ -10,6 +10,7 @@ import {
   faArrowRight,
 } from '@fortawesome/free-solid-svg-icons';
 import HouseCard from './HouseCard';
+import { useTranslations } from 'next-intl';
 
 async function getApiBaseUrl() {
   return process.env.NEXT_PUBLIC_API_BASE_URL || 'http://localhost:5000';
@@ -64,6 +65,8 @@ const JustLanded = () => {
     fetchListings();
   }, [school]);
 
+  const t = useTranslations('JustLanded');
+
   return (
     <div className="max-w-screen-lg mx-auto mt-10 px-6">
       {/* Section Header */}
@@ -72,7 +75,7 @@ const JustLanded = () => {
         <div className="flex items-center gap-3">
           <h2 className="text-2xl font-bold flex items-center gap-3">
             <FontAwesomeIcon icon={faHome} className="text-blue-primary" />
-            Just Landed
+            {t('just-landed')}
           </h2>
           {/* School Toggle Buttons */}
           <div className="flex border rounded-lg overflow-hidden">
@@ -96,19 +99,23 @@ const JustLanded = () => {
           {/* Subscribe Button */}
           <button className="flex items-center gap-2 bg-blue-primary text-white px-4 py-2 rounded-lg hover:bg-blue-900 transition">
             <FontAwesomeIcon icon={faBell} />
-            Subscribe
+            {t('subscribe')}
           </button>
         </div>
         <div className="ml-auto flex items-center gap-3">
-          <span className="bg-gray-200 px-3 py-1 rounded-full text-sm">Updates: {updateCount}</span>
+          <span className="bg-gray-200 px-3 py-1 rounded-full text-sm">
+            {t('updates')}: {updateCount}
+          </span>
         </div>
         <Link
           href="/justLanded"
           className="text-blue-primary hover:underline flex items-center ml-2"
         >
-          View All <FontAwesomeIcon icon={faArrowRight} className="ml-2" />
+          {t('view-all')} <FontAwesomeIcon icon={faArrowRight} className="ml-2" />
         </Link>
       </div>
+
+      {/* Section Actions */}
 
       {/* Section Actions */}
 

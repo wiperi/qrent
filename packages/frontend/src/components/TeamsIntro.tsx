@@ -1,35 +1,79 @@
-"use client";
-import Image from "next/image";
-import React, { useEffect, useId, useRef, useState } from "react";
-import { AnimatePresence, motion } from "framer-motion";
+'use client';
+import Image from 'next/image';
+import React, { useEffect, useId, useRef, useState } from 'react';
+import { AnimatePresence, motion } from 'framer-motion';
 
-import tingBaiImage from "@/public/team/TingBai.jpg";
-import yibinZhangImage from "@/public/team/YibinZhang.jpg";
-import zhiyangYuImage from "@/public/team/ZhiyangYu.jpg";
-import { useOutsideClick } from "../hooks/use-outside-click";
+import tingBaiImage from '@/public/team/TingBai.jpg';
+import yibinZhangImage from '@/public/team/YibinZhang.jpg';
+import zhiyangYuImage from '@/public/team/ZhiyangYu.jpg';
+import { useOutsideClick } from '../hooks/use-outside-click';
+import { useTranslations } from 'next-intl';
 
 export function ExpandableCardDemo() {
-  const [active, setActive] = useState<(typeof cards)[number] | boolean | null>(
-    null
-  );
+  const t = useTranslations('Team');
+  const cards = [
+    {
+      description: 'Founder',
+      title: 'Zhiyang Yu',
+      src: zhiyangYuImage.src,
+      ctaText: 'Visit',
+      ctaLink: 'https://www.linkedin.com/in/%E5%BF%97%E6%B4%8B-%E4%BF%9E-558742234/',
+      content: () => {
+        return <p>{t('zyy-des')}</p>;
+      },
+    },
+    {
+      description: 'Frontend Developer',
+      title: 'Ting Bai',
+      src: tingBaiImage.src,
+      ctaText: 'Visit',
+      ctaLink: 'https://tingbai1028.github.io/tingbaiwebsite/',
+      content: () => {
+        return <p>{t('tb-des')}</p>;
+      },
+    },
+
+    {
+      description: 'Backend Developer  ',
+      title: 'Tianyang Chen',
+      src: tingBaiImage.src,
+      ctaText: 'Visit',
+      ctaLink: 'https://ui.aceternity.com/templates',
+      content: () => {
+        return <p>{t('tc-des')} </p>;
+      },
+    },
+    {
+      description: 'Backend Developer',
+      title: 'Yibin Zhang',
+      src: yibinZhangImage.src,
+      ctaText: 'Visit',
+      ctaLink: 'https://github.com/zach-moon',
+      content: () => {
+        return <p>{t('ybz-des')}</p>;
+      },
+    },
+  ];
+
+  const [active, setActive] = useState<(typeof cards)[number] | boolean | null>(null);
   const id = useId();
   const ref = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     function onKeyDown(event: KeyboardEvent) {
-      if (event.key === "Escape") {
+      if (event.key === 'Escape') {
         setActive(false);
       }
     }
 
-    if (active && typeof active === "object") {
-      document.body.style.overflow = "hidden";
+    if (active && typeof active === 'object') {
+      document.body.style.overflow = 'hidden';
     } else {
-      document.body.style.overflow = "auto";
+      document.body.style.overflow = 'auto';
     }
 
-    window.addEventListener("keydown", onKeyDown);
-    return () => window.removeEventListener("keydown", onKeyDown);
+    window.addEventListener('keydown', onKeyDown);
+    return () => window.removeEventListener('keydown', onKeyDown);
   }, [active]);
 
   useOutsideClick(ref, () => setActive(null));
@@ -37,7 +81,7 @@ export function ExpandableCardDemo() {
   return (
     <>
       <AnimatePresence>
-        {active && typeof active === "object" && (
+        {active && typeof active === 'object' && (
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
@@ -47,7 +91,7 @@ export function ExpandableCardDemo() {
         )}
       </AnimatePresence>
       <AnimatePresence>
-        {active && typeof active === "object" ? (
+        {active && typeof active === 'object' ? (
           <div className="fixed inset-0  grid place-items-center z-[100]">
             <motion.button
               key={`button-${active.title}-${id}`}
@@ -122,9 +166,7 @@ export function ExpandableCardDemo() {
                     exit={{ opacity: 0 }}
                     className="text-neutral-600 text-xs md:text-sm lg:text-base h-40 md:h-fit pb-10 flex flex-col items-start gap-4 overflow-auto dark:text-neutral-400 [mask:linear-gradient(to_bottom,white,white,transparent)] [scrollbar-width:none] [-ms-overflow-style:none] [-webkit-overflow-scrolling:touch]"
                   >
-                    {typeof active.content === "function"
-                      ? active.content()
-                      : active.content}
+                    {typeof active.content === 'function' ? active.content() : active.content}
                   </motion.div>
                 </div>
               </div>
@@ -204,83 +246,3 @@ export const CloseIcon = () => {
     </motion.svg>
   );
 };
-
-const cards = [
-  {
-    description: "Founder",
-    title: "Zhiyang Yu",
-    src: zhiyangYuImage.src,
-    ctaText: "Visit",
-    ctaLink:
-      "https://www.linkedin.com/in/%E5%BF%97%E6%B4%8B-%E4%BF%9E-558742234/",
-    content: () => {
-      return <p>Leon / UNSW Postgraduate student / World deserve better.</p>;
-    },
-  },
-  {
-    description: "Frontend Developer",
-    title: "Ting Bai",
-    src: tingBaiImage.src,
-    ctaText: "Visit My Website",
-    ctaLink: "https://tingbai1028.github.io/tingbaiwebsite/",
-    content: () => {
-      return (
-        <p>
-          I’m a second-year Computer Science student at UNSW with a WAM of 88
-          and an AWS Certified Cloud Practitioner certification. I thrive on
-          solving complex problems and bringing ideas to life through code,
-          whether it’s backend development or crafting seamless, user-centric
-          interfaces. My leadership and technical skills have been honed through
-          projects like the Toohak Backend JavaScript Server and a 3rd place
-          finish at UNSW’s Sun Ray Speed Way competition. I’m passionate about
-          UI and frontend development, and I recently built a translation app
-          using Hugging Face to explore machine learning. With a love for cloud
-          computing, efficient time management, and an ability to quickly adapt
-          and learn, I’m excited to apply my skills and continue growing in the
-          fast-paced tech industry.
-        </p>
-      );
-    },
-  },
-
-  {
-    description: "Backend Developer",
-    title: "Tianyang Chen",
-    src: tingBaiImage.src,
-    ctaText: "Visit",
-    ctaLink: "https://ui.aceternity.com/templates",
-    content: () => {
-      return (
-        <p>
-          Metallica, an iconic American heavy metal band, is renowned for their
-          powerful sound and intense performances that resonate deeply with
-          their audience. Formed in Los Angeles, California, they have become a
-          cultural icon in the heavy metal music industry. <br /> <br /> Their
-          songs often reflect themes of aggression, social issues, and personal
-          struggles, capturing the essence of the heavy metal genre. With a
-          career spanning over four decades, Metallica has released numerous hit
-          albums and singles that have garnered them a massive fan following
-          both in the United States and abroad.
-        </p>
-      );
-    },
-  },
-  {
-    description: "Backend Developer",
-    title: "Yibin Zhang",
-    src: yibinZhangImage.src,
-    ctaText: "Visit My Github",
-    ctaLink: "https://github.com/zach-moon",
-    content: () => {
-      return (
-        <p>
-          I’m an undergraduate Computer Science student at UNSW, proficient in
-          C, MIPS, and JavaScript. I’m passionate about programming and love
-          tackling complex technical challenges. Outside of my studies, I enjoy
-          playing basketball and video games, which help me stay active and
-          unwind.
-        </p>
-      );
-    },
-  },
-];

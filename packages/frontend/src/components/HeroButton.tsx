@@ -1,28 +1,31 @@
-"use client";
-import Link from "next/link";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faBookOpen, faFileAlt } from "@fortawesome/free-solid-svg-icons";
-
-const navItems = [
-  {
-    href: "/rentalGuide",
-    icon: faBookOpen,
-    title: "Rental Guide",
-    description: "All the rental information you need",
-    progress: 7.14, // Progress percentage
-    progressText: "2/28",
-  },
-  {
-    href: "/prepareDocuments",
-    icon: faFileAlt,
-    title: "Application Materials",
-    description: "Preparation and generation of all materials",
-    progress: 28.6,
-    progressText: "2/7",
-  },
-];
+'use client';
+import Link from 'next/link';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faBookOpen, faFileAlt } from '@fortawesome/free-solid-svg-icons';
+import { useTranslations } from 'next-intl';
 
 const HeroButton = () => {
+  const t = useTranslations('HeroButton');
+
+  const navItems = [
+    {
+      href: '/rentalGuide',
+      icon: faBookOpen,
+      title: t('rental-guide'),
+      description: t('rental-guide-des'),
+      progress: 7.14, // Progress percentage
+      progressText: '2/28',
+    },
+    {
+      href: '/prepareDocuments',
+      icon: faFileAlt,
+      title: t('application-materials'),
+      description: t('application-materials-des'),
+      progress: 28.6,
+      progressText: '2/7',
+    },
+  ];
+
   return (
     <div className="max-w-screen-lg mx-auto mt-8 px-6">
       <nav className="flex flex-wrap gap-6">
@@ -50,9 +53,7 @@ const HeroButton = () => {
                     style={{ width: `${item.progress}%` }}
                   ></div>
                 </div>
-                <span className="text-xs text-gray-500">
-                  {item.progressText}
-                </span>
+                <span className="text-xs text-gray-500">{item.progressText}</span>
               </div>
             </div>
           </Link>
