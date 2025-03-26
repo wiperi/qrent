@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import PriceDropdown from './priceDropDown';
 import bgImg from '../../public/searchBG.jpg';
 import MoreFilterModal from './MoreFilterModal';
+import { useTranslations } from 'next-intl';
 
 export default function Search() {
   const [filter, setFilter] = useState({
@@ -32,6 +33,8 @@ export default function Search() {
     localStorage.setItem('filter', JSON.stringify(filter));
   }, [filter]);
 
+  const t = useTranslations('Search');
+
   return (
     <>
       <section
@@ -45,7 +48,7 @@ export default function Search() {
         </h1>
         <div className="bg-white p-4 shadow rounded-lg flex gap-4 font-semibold justify-between flex-wrap mt-8 mx-auto max-w-screen-lg w-full">
           <div className="flex-1">
-            <div className="text-sm text-gray-600">University</div>
+            <div className="text-sm text-gray-600">{t('university')}</div>
             <select
               className="border rounded px-2 py-1 max-h-40 overflow-y-auto w-full"
               value={filter.university}
@@ -53,13 +56,12 @@ export default function Search() {
             >
               <option>UNSW</option>
               <option>USYD</option>
-              <option>UTS</option>
             </select>
           </div>
 
           <div className="flex-1">
             <PriceDropdown
-              label="Price Min"
+              label={t('price-min')}
               name="priceMin"
               filter={filter}
               setFilter={setFilter}
@@ -68,7 +70,7 @@ export default function Search() {
 
           <div className="flex-1">
             <PriceDropdown
-              label="Price Max"
+              label={t('price-max')}
               name="priceMax"
               filter={filter}
               setFilter={setFilter}
@@ -76,7 +78,7 @@ export default function Search() {
           </div>
 
           <div className="flex-1">
-            <div className="text-sm text-gray-600">Travel Time</div>
+            <div className="text-sm text-gray-600">{t('travel-time')}</div>
             <select
               className="border rounded px-2 py-1 max-h-40 overflow-y-auto w-full"
               value={filter.travelTime}

@@ -1,13 +1,15 @@
 import React from 'react';
 import PriceDropdown from './priceDropDown';
 import RatingSlider from './Slider';
+import { useTranslations } from 'next-intl';
 
 const HousingFilter = ({ filter, setFilter }) => {
+  const t = useTranslations('Search');
   return (
     <>
       {/* University */}
       <div className="mt-4">
-        <div className="text-lg text-gray-600 font-bold">University</div>
+        <div className="text-lg text-gray-600 font-bold">{t('university')}</div>
         <select
           className="border rounded px-2 py-1 max-h-40 overflow-y-auto w-full"
           value={filter.university}
@@ -21,7 +23,7 @@ const HousingFilter = ({ filter, setFilter }) => {
 
       {/* Price Range */}
       <div className="mt-4">
-        <div className="text-lg text-gray-600 font-bold">Price</div>
+        <div className="text-lg text-gray-600 font-bold">{t('price')}</div>
         <div className="flex justify-between gap-4">
           <div className="flex-1">
             <PriceDropdown label="Min" name="priceMin" filter={filter} setFilter={setFilter} />
@@ -34,7 +36,7 @@ const HousingFilter = ({ filter, setFilter }) => {
 
       {/* BedroomNum */}
       <div className="mt-4">
-        <div className="text-lg text-gray-600 font-bold">Bedrooms</div>
+        <div className="text-lg text-gray-600 font-bold">{t('bedrooms')}s</div>
         <div className="flex justify-between gap-4">
           <div className="flex-1">
             <div className="text-sm text-gray-600">Min</div>
@@ -67,7 +69,7 @@ const HousingFilter = ({ filter, setFilter }) => {
 
       {/* BathroomNum */}
       <div className="mt-4">
-        <div className="text-lg text-gray-600 font-bold">Bathrooms</div>
+        <div className="text-lg text-gray-600 font-bold">{t('bathrooms')}</div>
         <div className="flex justify-between gap-4">
           <div className="flex-1">
             <div className="text-sm text-gray-600">Min</div>
@@ -100,7 +102,7 @@ const HousingFilter = ({ filter, setFilter }) => {
 
       {/* Property Type */}
       <div className="mt-4">
-        <div className="text-lg text-gray-600 font-bold">Property Type</div>
+        <div className="text-lg text-gray-600 font-bold">{t('property-type')}</div>
         <div className="flex justify-between items-center gap-3 mt-3">
           <select
             className="border rounded px-2 py-1 max-h-40 overflow-y-auto w-full"
@@ -116,12 +118,12 @@ const HousingFilter = ({ filter, setFilter }) => {
 
       {/* Rate */}
       <div className="mt-4">
-        <div className="text-lg text-gray-600 font-bold">Rate</div>
+        <div className="text-lg text-gray-600 font-bold">{t('rate')}</div>
         <RatingSlider filter={filter} setFilter={setFilter} />
       </div>
 
       <div className="mt-4">
-        <div className="text-lg text-gray-600 font-bold">Travel Time</div>
+        <div className="text-lg text-gray-600 font-bold">{t('travel-time')}</div>
         <select
           className="border rounded px-2 py-1 max-h-40 overflow-y-auto w-full"
           value={filter.travelTime}
@@ -141,7 +143,7 @@ const HousingFilter = ({ filter, setFilter }) => {
 
       {/* Avaliable Date */}
       <div className="pb-4 mt-4">
-        <div className="text-lg text-gray-600 font-bold">Avaliable Date</div>
+        <div className="text-lg text-gray-600 font-bold">{t('avaliable-date')}</div>
         <input
           type="date"
           className="border rounded px-2 py-1 mt-2"
