@@ -5,7 +5,9 @@
     "build": "pnpm -r build",
     "dev": "pnpm -r dev",
     "lint": "pnpm -r lint",
-    "test": "pnpm -r test"
+    "test": "pnpm -r test",
+    "test:backend": "pnpm --filter backend test",
+    "test:dev": "pnpm --filter backend dev"
   },
   "devDependencies": {
     "@types/jest": "^29.5.14",
