@@ -1,151 +1,140 @@
-"use client";
+'use client';
 
-import { useState } from "react";
-import "react-datepicker/dist/react-datepicker.css";
+import { useTranslations } from 'next-intl';
+import { useState } from 'react';
+import 'react-datepicker/dist/react-datepicker.css';
 
 const LetterForm = () => {
   const [openAccordion, setOpenAccordion] = useState(null);
   const [isCoverLetter, setIsCoverLetter] = useState(true);
 
+  const t = useTranslations('PrepareDocuments');
+
   const [CLInfo, setCLInfo] = useState({
-    name: "",
-    university: "",
-    major: "",
-    moveInDate: "",
-    leaseTerm: "",
-    budget: "",
+    name: '',
+    university: '',
+    major: '',
+    moveInDate: '',
+    leaseTerm: '',
+    budget: '',
     financialStatement: [],
-    rentalHistory: "",
+    rentalHistory: '',
     previousExperiences: [],
     personality: [],
-    bgInfo: "",
+    bgInfo: '',
     // listOfDoc: "",
   });
 
   const financialStatementOpts = [
-    "Parent Letter",
-    "Account Balance",
-    "Proof of Income",
-    "Scholarship",
+    'Parent Letter',
+    t('account-balance'),
+    t('proof-of-income'),
+    t('scholarship'),
   ];
 
   const handleCheckboxChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const { value, checked } = event.target;
 
-    setCLInfo((prevState) => {
+    setCLInfo(prevState => {
       // If checked, add the value to the proofOfFunds array, otherwise remove it
       const newProofOfFunds = checked
         ? [...prevState.financialStatement, value]
-        : prevState.financialStatement.filter((item) => item !== value);
+        : prevState.financialStatement.filter(item => item !== value);
 
       return { ...prevState, financialStatement: newProofOfFunds };
     });
   };
 
   const personalityOpts = [
-    "I don't smoke",
-    "I don't have pets",
-    "I prefer a quiet lifestyle",
-    "I'm tidy and organized",
-    "I don't host parties",
-    "I follow a regular schedule",
+    t('no-smoke'),
+    t('no-pets'),
+    t('quiet-lifestyle'),
+    t('tidy'),
+    t('no-party'),
+    t('regular-schedule'),
   ];
 
-  const handlePersonalityCheckboxChange = (
-    event: React.ChangeEvent<HTMLInputElement>
-  ) => {
+  const handlePersonalityCheckboxChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const { value, checked } = event.target;
 
-    setCLInfo((prevState) => {
+    setCLInfo(prevState => {
       // If checked, add the value to the proofOfFunds array, otherwise remove it
       const personalities = checked
         ? [...prevState.personality, value]
-        : prevState.personality.filter((item) => item !== value);
+        : prevState.personality.filter(item => item !== value);
 
       return { ...prevState, personality: personalities };
     });
   };
 
-  const handleRentalHistoryChange = (
-    event: React.ChangeEvent<HTMLInputElement>
-  ) => {
+  const handleRentalHistoryChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const value = event.target.value;
-    setCLInfo((prevState) => ({
+    setCLInfo(prevState => ({
       ...prevState,
       rentalHistory: value,
-      previousExperience:
-        value === "first-time" ? "" : prevState.previousExperiences, // Clear if first-time
+      previousExperience: value === 'first-time' ? '' : prevState.previousExperiences, // Clear if first-time
     }));
   };
 
   const [PLInfo, setPLInfo] = useState({
-    fatherName: "",
-    motherName: "",
-    fatherContactNum: "",
-    motherContactNum: "",
-    contactEmail: "",
-    studentName: "",
-    homeAddress: "",
-    weeklyRent: "",
-    livingExpenses: "",
-    sourceOfFunds: "",
-    accountBalance: "",
-    annualIncome: "",
-    proofDocs: "",
-    prepayRent: "",
-    liabilityStatement: "",
-    otherCommitments: "",
+    fatherName: '',
+    motherName: '',
+    fatherContactNum: '',
+    motherContactNum: '',
+    contactEmail: '',
+    studentName: '',
+    homeAddress: '',
+    weeklyRent: '',
+    livingExpenses: '',
+    sourceOfFunds: '',
+    accountBalance: '',
+    annualIncome: '',
+    proofDocs: '',
+    prepayRent: '',
+    liabilityStatement: '',
+    otherCommitments: '',
   });
 
   const sourceOfFundsOpts = [
-    "Salary Income",
-    "Savings",
-    "Property Income",
-    "Investment Income",
+    t('salary-income'),
+    t('savings'),
+    t('property-income'),
+    t('investment-income'),
   ];
 
-  const handleSourceFundsCheckboxChange = (
-    event: React.ChangeEvent<HTMLInputElement>
-  ) => {
+  const handleSourceFundsCheckboxChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const { value, checked } = event.target;
 
-    setPLInfo((prevState) => {
+    setPLInfo(prevState => {
       // If checked, add the value to the proofOfFunds array, otherwise remove it
       const source = checked
         ? [...prevState.sourceOfFunds, value]
-        : prevState.sourceOfFunds.filter((item) => item !== value);
+        : prevState.sourceOfFunds.filter(item => item !== value);
 
       return { ...prevState, sourceOfFunds: source };
     });
   };
 
-  const proofDocsOpts = [
-    "Bank Statement",
-    "Income Proof/Pay Stub",
-    "Property Ownership Proof",
-    "Tax History",
-  ];
+  const proofDocsOpts = [t('bank-statement'), t('income-proof'), t('property-proof'), t('tax')];
 
-  const handleProofDocsCheckboxChange = (
-    event: React.ChangeEvent<HTMLInputElement>
-  ) => {
+  const handleProofDocsCheckboxChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const { value, checked } = event.target;
 
-    setPLInfo((prevState) => {
+    setPLInfo(prevState => {
       // If checked, add the value to the proofOfFunds array, otherwise remove it
       const source = checked
         ? [...prevState.proofDocs, value]
-        : prevState.proofDocs.filter((item) => item !== value);
+        : prevState.proofDocs.filter(item => item !== value);
 
       return { ...prevState, proofDocs: source };
     });
   };
 
-  const toggleAccordion = (index) => {
+  const toggleAccordion = index => {
     setOpenAccordion(openAccordion === index ? null : index);
   };
 
-  const handleToggleForm = (isCoverLetter) => {
+  const handleToggleForm = isCoverLetter => {
     setIsCoverLetter(isCoverLetter);
   };
 
@@ -153,7 +142,7 @@ const LetterForm = () => {
   const addExperience = () => {
     setCLInfo({
       ...CLInfo,
-      previousExperiences: [...CLInfo.previousExperiences, ""],
+      previousExperiences: [...CLInfo.previousExperiences, ''],
     });
   };
 
@@ -165,10 +154,8 @@ const LetterForm = () => {
   };
 
   // Remove an experience at a specific index
-  const removeExperience = (index) => {
-    const updatedExperiences = CLInfo.previousExperiences.filter(
-      (_, i) => i !== index
-    );
+  const removeExperience = index => {
+    const updatedExperiences = CLInfo.previousExperiences.filter((_, i) => i !== index);
     setCLInfo({ ...CLInfo, previousExperiences: updatedExperiences });
   };
 
@@ -178,9 +165,7 @@ const LetterForm = () => {
         <button
           onClick={() => handleToggleForm(true)}
           className={`px-6 py-3 rounded-md text-lg font-semibold ${
-            isCoverLetter
-              ? "bg-blue-primary text-white shadow-md"
-              : "bg-gray-300 text-gray-800"
+            isCoverLetter ? 'bg-blue-primary text-white shadow-md' : 'bg-gray-300 text-gray-800'
           }`}
         >
           Cover Letter
@@ -188,9 +173,7 @@ const LetterForm = () => {
         <button
           onClick={() => handleToggleForm(false)}
           className={`px-6 py-3 rounded-md text-lg font-semibold ${
-            !isCoverLetter
-              ? "bg-blue-primary text-white shadow-md"
-              : "bg-gray-300 text-gray-800"
+            !isCoverLetter ? 'bg-blue-primary text-white shadow-md' : 'bg-gray-300 text-gray-800'
           }`}
         >
           Parent Letter
@@ -206,57 +189,45 @@ const LetterForm = () => {
                 className="w-full text-left py-3 px-4 bg-gray-100 rounded-md"
                 onClick={() => toggleAccordion(1)}
               >
-                1. Student Information
+                1. {t('student-info')}
               </button>
             </h2>
             <div
               className={`transition-all duration-500 ease-in-out max-h-0 overflow-hidden ${
-                openAccordion === 1 ? "max-h-screen opacity-100" : "opacity-0"
+                openAccordion === 1 ? 'max-h-screen opacity-100' : 'opacity-0'
               }`}
             >
               {openAccordion === 1 && (
                 <div className="space-y-6 px-6 py-4">
                   <div>
-                    <label className="block text-sm font-medium">
-                      Legal Full Name
-                    </label>
+                    <label className="block text-sm font-medium">{t('full-name')}</label>
                     <input
                       type="text"
                       className="form-input mt-2 block w-full rounded-md border-gray-300"
-                      value={CLInfo.name ?? ""}
+                      value={CLInfo.name ?? ''}
                       placeholder="e.g. Zhang Ming"
-                      onChange={(e) =>
-                        setCLInfo({ ...CLInfo, name: e.target.value })
-                      }
+                      onChange={e => setCLInfo({ ...CLInfo, name: e.target.value })}
                     />
                   </div>
                   <div>
-                    <label className="block text-sm font-medium">
-                      University
-                    </label>
+                    <label className="block text-sm font-medium">{t('uni')}</label>
                     <select
                       className="form-select mt-2 block w-full rounded-md border-gray-300"
-                      value={CLInfo.university ?? ""}
-                      onChange={(e) =>
-                        setCLInfo({ ...CLInfo, university: e.target.value })
-                      }
+                      value={CLInfo.university ?? ''}
+                      onChange={e => setCLInfo({ ...CLInfo, university: e.target.value })}
                     >
                       <option value="unsw">UNSW</option>
                       <option value="usyd">USYD</option>
-                      <option value="uts">UTS</option>
-                      <option value="macquarie">MQ UNI</option>
                     </select>
                   </div>
                   <div>
-                    <label className="block text-sm font-medium">Major</label>
+                    <label className="block text-sm font-medium">{t('major')}</label>
                     <input
                       type="text"
                       className="form-input mt-2 block w-full rounded-md border-gray-300"
                       placeholder="e.g. Computer Science"
                       value={CLInfo.major}
-                      onChange={(e) =>
-                        setCLInfo({ ...CLInfo, major: e.target.value })
-                      }
+                      onChange={e => setCLInfo({ ...CLInfo, major: e.target.value })}
                     />
                   </div>
                 </div>
@@ -271,33 +242,27 @@ const LetterForm = () => {
                 className="w-full text-left py-3 px-4 bg-gray-100 rounded-md"
                 onClick={() => toggleAccordion(2)}
               >
-                2. Living Plan
+                2. {t('living-plan')}
               </button>
             </h2>
             <div
               className={`transition-all duration-500 ease-in-out max-h-0 overflow-hidden ${
-                openAccordion === 2 ? "max-h-screen opacity-100" : "opacity-0"
+                openAccordion === 2 ? 'max-h-screen opacity-100' : 'opacity-0'
               }`}
             >
               {openAccordion === 2 && (
                 <div className="space-y-6 px-6 py-4">
                   <div>
-                    <label className="block text-sm font-medium">
-                      Move-in Date
-                    </label>
+                    <label className="block text-sm font-medium">{t('move-in-date')}</label>
                     <input
                       type="date"
                       value={CLInfo.moveInDate}
-                      onChange={(e) =>
-                        setCLInfo({ ...CLInfo, moveInDate: e.target.value })
-                      }
+                      onChange={e => setCLInfo({ ...CLInfo, moveInDate: e.target.value })}
                       className="form-input mt-2 block w-full rounded-md border-gray-300"
                     />
                   </div>
                   <div>
-                    <label className="block text-sm font-medium">
-                      Lease Term (Month)
-                    </label>
+                    <label className="block text-sm font-medium">{t('lease-term')}</label>
                     <input
                       type="number"
                       className="form-input mt-2 block w-full rounded-md border-gray-300"
@@ -305,24 +270,18 @@ const LetterForm = () => {
                       max="24"
                       required
                       value={CLInfo.leaseTerm}
-                      onChange={(e) =>
-                        setCLInfo({ ...CLInfo, leaseTerm: e.target.value })
-                      }
+                      onChange={e => setCLInfo({ ...CLInfo, leaseTerm: e.target.value })}
                     />
                   </div>
                   <div>
-                    <label className="block text-sm font-medium">
-                      Rent Budget (Per Week)
-                    </label>
+                    <label className="block text-sm font-medium">{t('rent-budget')}</label>
                     <input
                       type="number"
                       className="form-input block w-full rounded-md border-gray-300"
                       min="100"
                       required
                       value={CLInfo.budget}
-                      onChange={(e) =>
-                        setCLInfo({ ...CLInfo, budget: e.target.value })
-                      }
+                      onChange={e => setCLInfo({ ...CLInfo, budget: e.target.value })}
                     />
                   </div>
                 </div>
@@ -337,23 +296,21 @@ const LetterForm = () => {
                 className="w-full text-left py-3 px-4 bg-gray-100 rounded-md"
                 onClick={() => toggleAccordion(3)}
               >
-                3. Financial Statement
+                3. {t('financial-statement')}
               </button>
             </h2>
             <div
               className={`transition-all duration-500 ease-in-out max-h-0 overflow-hidden ${
-                openAccordion === 3 ? "max-h-screen opacity-100" : "opacity-0"
+                openAccordion === 3 ? 'max-h-screen opacity-100' : 'opacity-0'
               }`}
             >
               {openAccordion === 3 && (
                 <div className="space-y-6 px-6 py-4">
                   <div>
-                    <label className="block text-sm font-medium">
-                      Proof of Funds Avaliable (Multiple selection allowed)
-                    </label>
+                    <label className="block text-sm font-medium">{t('proof-of-funds')}</label>
                     <div className="space-y-2 mt-4">
                       {/* Render checkboxes dynamically */}
-                      {financialStatementOpts.map((option) => (
+                      {financialStatementOpts.map(option => (
                         <div key={option} className="flex items-center">
                           <input
                             type="checkbox"
@@ -383,13 +340,13 @@ const LetterForm = () => {
                 className="w-full text-left py-3 px-4 bg-gray-100 rounded-md"
                 onClick={() => toggleAccordion(4)}
               >
-                4. Rental History
+                4. {t('rental-history')}
               </button>
             </h2>
 
             <div
               className={`transition-all duration-500 ease-in-out max-h-0 overflow-hidden ${
-                openAccordion === 4 ? "max-h-screen opacity-100" : "opacity-0"
+                openAccordion === 4 ? 'max-h-screen opacity-100' : 'opacity-0'
               }`}
             >
               {openAccordion === 4 && (
@@ -401,11 +358,11 @@ const LetterForm = () => {
                         type="radio"
                         name="rentalHistory"
                         value="first-time"
-                        checked={CLInfo.rentalHistory === "first-time"}
+                        checked={CLInfo.rentalHistory === 'first-time'}
                         onChange={handleRentalHistoryChange}
                         className="mr-2"
                       />
-                      This is my first time
+                      {t('first-time')}
                     </label>
 
                     <label className="flex items-center">
@@ -413,41 +370,34 @@ const LetterForm = () => {
                         type="radio"
                         name="rentalHistory"
                         value="not-first-time"
-                        checked={CLInfo.rentalHistory === "not-first-time"}
+                        checked={CLInfo.rentalHistory === 'not-first-time'}
                         onChange={handleRentalHistoryChange}
                         className="mr-2"
                       />
-                      This is not my first time
+                      {t('not-first-time')}
                     </label>
                   </div>
 
                   {/* Additional Section for Previous Rental Experience */}
-                  {CLInfo.rentalHistory === "not-first-time" && (
+                  {CLInfo.rentalHistory === 'not-first-time' && (
                     <div className="mt-4 space-y-4 transition-all duration-500">
-                      <label className="block text-sm font-medium">
-                        Previous Rental Experience
-                      </label>
+                      <label className="block text-sm font-medium">{t('rental-experience')}</label>
 
                       {/* Map through the rental history array */}
                       {CLInfo.previousExperiences.map((experience, index) => (
-                        <div
-                          key={index}
-                          className="relative p-4 border rounded-md"
-                        >
+                        <div key={index} className="relative p-4 border rounded-md">
                           <textarea
                             className="form-input block w-full rounded-md border-gray-300 focus:outline-none focus:ring-0 focus:border-gray-300"
                             rows={3}
                             placeholder="Describe your previous rental experience. (Address, rental duration, rent, landlord reference letter.)"
                             value={experience}
-                            onChange={(e) =>
-                              handleExperienceChange(index, e.target.value)
-                            }
+                            onChange={e => handleExperienceChange(index, e.target.value)}
                           />
                           <button
                             className="absolute top-1 right-1 text-red-500"
                             onClick={() => removeExperience(index)}
                           >
-                            Delete
+                            {t('delete')}
                           </button>
                         </div>
                       ))}
@@ -457,7 +407,7 @@ const LetterForm = () => {
                         className="mt-2 px-4 py-2 bg-blue-primary text-white rounded-md"
                         onClick={addExperience}
                       >
-                        Add More Experience
+                        {t('add-more-experience')}
                       </button>
                     </div>
                   )}
@@ -473,23 +423,21 @@ const LetterForm = () => {
                 className="w-full text-left py-3 px-4 bg-gray-100 rounded-md"
                 onClick={() => toggleAccordion(5)}
               >
-                5. Backgound
+                5. {t('background')}
               </button>
             </h2>
             <div
               className={`transition-all duration-500 ease-in-out max-h-0 overflow-hidden ${
-                openAccordion === 5 ? "max-h-screen opacity-100" : "opacity-0"
+                openAccordion === 5 ? 'max-h-screen opacity-100' : 'opacity-0'
               }`}
             >
               {openAccordion === 5 && (
                 <div className="space-y-6 px-6 py-4">
                   <div>
-                    <label className="block text-sm font-medium">
-                      Personality (Multiple selection allowed)
-                    </label>
+                    <label className="block text-sm font-medium">{t('personality')}</label>
                     <div className="space-y-2 mt-4">
                       {/* Render checkboxes dynamically */}
-                      {personalityOpts.map((option) => (
+                      {personalityOpts.map(option => (
                         <div key={option} className="flex items-center">
                           <input
                             type="checkbox"
@@ -507,18 +455,14 @@ const LetterForm = () => {
                       ))}
                     </div>
 
-                    <label className="block text-sm font-medium mt-3">
-                      Additional Information
-                    </label>
+                    <label className="block text-sm font-medium mt-3">{t('additional-info')}</label>
                     <div className="relative p-4 border rounded-md mt-3">
                       <textarea
                         className="form-input block w-full rounded-md border-gray-300 focus:outline-none focus:ring-0 focus:border-gray-300"
                         rows={3}
-                        placeholder="Add more information about yourself..."
+                        placeholder={t('additional-info-ph')}
                         value={CLInfo.bgInfo}
-                        onChange={(e) =>
-                          setCLInfo({ ...CLInfo, bgInfo: e.target.value })
-                        }
+                        onChange={e => setCLInfo({ ...CLInfo, bgInfo: e.target.value })}
                       />
                     </div>
                   </div>
@@ -551,12 +495,12 @@ const LetterForm = () => {
                 className="w-full text-left py-3 px-4 bg-gray-100 rounded-md"
                 onClick={() => toggleAccordion(7)}
               >
-                1. Guarantor Information
+                1. {t('guarantor-info')}
               </button>
             </h2>
             <div
               className={`transition-all duration-500 ease-in-out max-h-0 overflow-hidden ${
-                openAccordion === 7 ? "max-h-screen opacity-100" : "opacity-0"
+                openAccordion === 7 ? 'max-h-screen opacity-100' : 'opacity-0'
               }`}
             >
               {openAccordion === 7 && (
@@ -567,14 +511,12 @@ const LetterForm = () => {
                       <div className="flex jusrify-between items-center mt-3 gap-3">
                         {/* Father */}
                         <div className="space-y-2 flex-1">
-                          <div className="text-sm text-gray-600">
-                            Father's Name
-                          </div>
+                          <div className="text-sm text-gray-600">{t('dad-name')}</div>
                           <textarea
                             className="flex border rounded px-2 py-1 max-h-40 overflow-y-auto w-full"
                             placeholder="e.g. Zhang Wei"
                             value={PLInfo.fatherName}
-                            onChange={(e) =>
+                            onChange={e =>
                               setPLInfo({
                                 ...PLInfo,
                                 fatherName: e.target.value,
@@ -585,14 +527,12 @@ const LetterForm = () => {
 
                         {/* Mother */}
                         <div className="space-y-2 flex-1">
-                          <div className="text-sm text-gray-600">
-                            Mother's Name
-                          </div>
+                          <div className="text-sm text-gray-600">{t('mom-name')}</div>
                           <textarea
                             className="flex border rounded px-2 py-1 max-h-40 overflow-y-auto w-full"
                             placeholder="e.g. Li Mei"
                             value={PLInfo.motherName}
-                            onChange={(e) =>
+                            onChange={e =>
                               setPLInfo({
                                 ...PLInfo,
                                 motherName: e.target.value,
@@ -610,14 +550,12 @@ const LetterForm = () => {
                       <div className="flex jusrify-between items-center mt-3 gap-3">
                         {/* Father tel */}
                         <div className="space-y-2 flex-1">
-                          <div className="text-sm text-gray-600">
-                            Father's Phone Number
-                          </div>
+                          <div className="text-sm text-gray-600">{t('dad-tel')}</div>
                           <textarea
                             className="flex border rounded px-2 py-1 max-h-40 overflow-y-auto w-full"
                             placeholder="e.g. +86 138 xxxx xxxx"
                             value={PLInfo.fatherContactNum}
-                            onChange={(e) =>
+                            onChange={e =>
                               setPLInfo({
                                 ...PLInfo,
                                 fatherContactNum: e.target.value,
@@ -628,14 +566,12 @@ const LetterForm = () => {
 
                         {/* Mother tel */}
                         <div className="space-y-2 flex-1">
-                          <div className="text-sm text-gray-600">
-                            Mother's Phone Number
-                          </div>
+                          <div className="text-sm text-gray-600">{t('mom-tel')}</div>
                           <textarea
                             className="flex border rounded px-2 py-1 max-h-40 overflow-y-auto w-full"
                             placeholder="e.g. +86 138 xxxx xxxx"
                             value={PLInfo.motherContactNum}
-                            onChange={(e) =>
+                            onChange={e =>
                               setPLInfo({
                                 ...PLInfo,
                                 motherContactNum: e.target.value,
@@ -652,14 +588,12 @@ const LetterForm = () => {
                       <div className="flex jusrify-between items-center mt-3 gap-3">
                         {/* Contact email */}
                         <div className="space-y-2 flex-1">
-                          <div className="text-sm text-gray-600">
-                            Contact Email
-                          </div>
+                          <div className="text-sm text-gray-600">{t('email')}</div>
                           <textarea
                             className="flex border rounded px-2 py-1 max-h-40 overflow-y-auto w-full"
                             placeholder="e.g. parent@gmail.com"
                             value={PLInfo.contactEmail}
-                            onChange={(e) =>
+                            onChange={e =>
                               setPLInfo({
                                 ...PLInfo,
                                 contactEmail: e.target.value,
@@ -670,14 +604,12 @@ const LetterForm = () => {
 
                         {/* name */}
                         <div className="space-y-2 flex-1">
-                          <div className="text-sm text-gray-600">
-                            Student's Name
-                          </div>
+                          <div className="text-sm text-gray-600">{t('student-name')}</div>
                           <textarea
                             className="flex border rounded px-2 py-1 max-h-40 overflow-y-auto w-full"
                             placeholder="e.g. Zhang Ming"
                             value={PLInfo.studentName}
-                            onChange={(e) =>
+                            onChange={e =>
                               setPLInfo({
                                 ...PLInfo,
                                 studentName: e.target.value,
@@ -694,14 +626,12 @@ const LetterForm = () => {
                       <div className="flex jusrify-between items-center mt-3 gap-3">
                         {/* Father */}
                         <div className="space-y-2 flex-1">
-                          <div className="text-sm text-gray-600">
-                            Home Address
-                          </div>
+                          <div className="text-sm text-gray-600">{t('home-address')}</div>
                           <textarea
                             className="flex border rounded px-2 py-1 max-h-40 overflow-y-auto w-full"
                             placeholder="e.g. No.123, XiDan Street, Beijing, China"
                             value={PLInfo.homeAddress}
-                            onChange={(e) =>
+                            onChange={e =>
                               setPLInfo({
                                 ...PLInfo,
                                 homeAddress: e.target.value,
@@ -724,12 +654,12 @@ const LetterForm = () => {
                 className="w-full text-left py-3 px-4 bg-gray-100 rounded-md"
                 onClick={() => toggleAccordion(8)}
               >
-                2. Financial Support
+                2. {t('financial-support')}
               </button>
             </h2>
             <div
               className={`transition-all duration-500 ease-in-out max-h-0 overflow-hidden ${
-                openAccordion === 8 ? "max-h-screen opacity-100" : "opacity-0"
+                openAccordion === 8 ? 'max-h-screen opacity-100' : 'opacity-0'
               }`}
             >
               {openAccordion === 8 && (
@@ -740,14 +670,12 @@ const LetterForm = () => {
                         <div className="flex jusrify-between items-center mt-3 gap-3">
                           {/* Weekly Rent */}
                           <div className="space-y-2 flex-1">
-                            <div className="text-sm text-gray-600">
-                              Weekly Rent
-                            </div>
+                            <div className="text-sm text-gray-600">{t('weekly-rent')}</div>
                             <textarea
                               className="flex border rounded px-2 py-1 max-h-40 overflow-y-auto w-full"
                               placeholder="e.g. 300$"
                               value={PLInfo.weeklyRent}
-                              onChange={(e) =>
+                              onChange={e =>
                                 setPLInfo({
                                   ...PLInfo,
                                   weeklyRent: e.target.value,
@@ -758,14 +686,12 @@ const LetterForm = () => {
 
                           {/* livingExpenses */}
                           <div className="space-y-2 flex-1">
-                            <div className="text-sm text-gray-600">
-                              Living Expenses (Per Week)
-                            </div>
+                            <div className="text-sm text-gray-600">{t('living-expen')}</div>
                             <textarea
                               className="flex border rounded px-2 py-1 max-h-40 overflow-y-auto w-full"
                               placeholder="e.g. 800$"
                               value={PLInfo.livingExpenses}
-                              onChange={(e) =>
+                              onChange={e =>
                                 setPLInfo({
                                   ...PLInfo,
                                   livingExpenses: e.target.value,
@@ -779,10 +705,8 @@ const LetterForm = () => {
                   </div>
 
                   <div className="space-y-2 mt-4 font-semibold">
-                    <div className="text-sm text-gray-600">
-                      Source of Funds (Multiple selection allowed)
-                    </div>
-                    {sourceOfFundsOpts.map((option) => (
+                    <div className="text-sm text-gray-600">{t('source-funds')}</div>
+                    {sourceOfFundsOpts.map(option => (
                       <div key={option} className="flex items-center">
                         <input
                           type="checkbox"
@@ -811,12 +735,12 @@ const LetterForm = () => {
                 className="w-full text-left py-3 px-4 bg-gray-100 rounded-md"
                 onClick={() => toggleAccordion(9)}
               >
-                3. Proof of Guarantor's Ability
+                3. {t('proof-guarantor-ability')}
               </button>
             </h2>
             <div
               className={`transition-all duration-500 ease-in-out max-h-0 overflow-hidden ${
-                openAccordion === 9 ? "max-h-screen opacity-100" : "opacity-0"
+                openAccordion === 9 ? 'max-h-screen opacity-100' : 'opacity-0'
               }`}
             >
               {openAccordion === 9 && (
@@ -827,14 +751,12 @@ const LetterForm = () => {
                         <div className="flex jusrify-between items-center mt-3 gap-3">
                           {/* account balance */}
                           <div className="space-y-2 flex-1">
-                            <div className="text-sm text-gray-600">
-                              Account Balance
-                            </div>
+                            <div className="text-sm text-gray-600">{t('account-balance')}</div>
                             <textarea
                               className="flex border rounded px-2 py-1 max-h-40 overflow-y-auto w-full"
                               placeholder="e.g. 500000"
                               value={PLInfo.accountBalance}
-                              onChange={(e) =>
+                              onChange={e =>
                                 setPLInfo({
                                   ...PLInfo,
                                   accountBalance: e.target.value,
@@ -845,14 +767,12 @@ const LetterForm = () => {
 
                           {/* annualIncome */}
                           <div className="space-y-2 flex-1">
-                            <div className="text-sm text-gray-600">
-                              Annual Income
-                            </div>
+                            <div className="text-sm text-gray-600">{t('annual-income')}</div>
                             <textarea
                               className="flex border rounded px-2 py-1 max-h-40 overflow-y-auto w-full"
                               placeholder="e.g. 300000"
                               value={PLInfo.annualIncome}
-                              onChange={(e) =>
+                              onChange={e =>
                                 setPLInfo({
                                   ...PLInfo,
                                   annualIncome: e.target.value,
@@ -866,10 +786,8 @@ const LetterForm = () => {
                   </div>
 
                   <div className="space-y-2 mt-4 font-semibold">
-                    <div className="text-sm text-gray-600">
-                      Proof Documents (Multiple selection allowed)
-                    </div>
-                    {proofDocsOpts.map((option) => (
+                    <div className="text-sm text-gray-600">{t('proof-docs')}</div>
+                    {proofDocsOpts.map(option => (
                       <div key={option} className="flex items-center">
                         <input
                           type="checkbox"
@@ -898,12 +816,12 @@ const LetterForm = () => {
                 className="w-full text-left py-3 px-4 bg-gray-100 rounded-md"
                 onClick={() => toggleAccordion(10)}
               >
-                4. Additional Commitment
+                4. {t('additional-commitment')}
               </button>
             </h2>
             <div
               className={`transition-all duration-500 ease-in-out max-h-0 overflow-hidden ${
-                openAccordion === 10 ? "max-h-screen opacity-100" : "opacity-0"
+                openAccordion === 10 ? 'max-h-screen opacity-100' : 'opacity-0'
               }`}
             >
               {openAccordion === 10 && (
@@ -913,25 +831,23 @@ const LetterForm = () => {
                       <div className="flex jusrify-between items-center mt-3 gap-3">
                         {/* Prepay Rent */}
                         <div className="space-y-2 flex-1">
-                          <div className="text-sm text-gray-600">
-                            Willingness to Prepay Rent
-                          </div>
+                          <div className="text-sm text-gray-600">{t('willingness')}</div>
                           <select
                             className="flex border rounded px-2 py-1 max-h-40 overflow-y-auto w-full"
                             value={PLInfo.prepayRent}
-                            onChange={(e) =>
+                            onChange={e =>
                               setPLInfo({
                                 ...PLInfo,
                                 prepayRent: e.target.value,
                               })
                             }
                           >
-                            <option>No Prepayment</option>
-                            <option>Willing to Prepay 1 Month's Rent</option>
-                            <option>Willing to Prepay 3 Month's Rent</option>
-                            <option>Willing to Prepay 6 Month's Rent</option>
-                            <option>Willing to Prepay 9 Month's Rent</option>
-                            <option>Willing to Prepay 12 Month's Rent</option>
+                            <option>{t('no-prepayment')}</option>
+                            <option>{t('pay-1-month')}</option>
+                            <option>{t('pay-3-month')}</option>
+                            <option>{t('pay-6-month')}</option>
+                            <option>{t('pay-9-month')}</option>
+                            <option>{t('pay-12-month')}</option>
                           </select>
                         </div>
                       </div>
@@ -940,12 +856,12 @@ const LetterForm = () => {
 
                   <div className="space-y-2 mt-4">
                     <div className="text-sm text-gray-600 font-semibold">
-                      Joint Liability Statement
+                      {t('joint-liability')}
                     </div>
                     <input
                       type="checkbox"
                       value={PLInfo.liabilityStatement}
-                      onChange={(e) =>
+                      onChange={e =>
                         setPLInfo({
                           ...PLInfo,
                           liabilityStatement: e.target.value,
@@ -953,27 +869,21 @@ const LetterForm = () => {
                       }
                       className="mr-2"
                     />
-                    <label className="text-sm font-semibold">
-                      Willing to assume joint liability.
-                    </label>
-                    <div className="text-xs">
-                      If your child fails to fulfill the obligations of the
-                      lease, you are willing to assume the corresponding
-                      responsibility.
-                    </div>
+                    <label className="text-sm font-semibold">{t('will-joint-liability')}</label>
+                    <div className="text-xs">{t('will-joint-msg')}</div>
                   </div>
                   <div className="space-y-2 mt-4">
-                    {" "}
+                    {' '}
                     <label className="block text-sm font-medium mt-3">
-                      Additional commitment
+                      {t('additional-commitment')}
                     </label>
                     <div className="relative p-4 border rounded-md mt-3">
                       <textarea
                         className="form-input block w-full rounded-md border-gray-300 focus:outline-none focus:ring-0 focus:border-gray-300"
                         rows={3}
-                        placeholder="Add more commitment..."
+                        placeholder={t('additional-commitment-ph')}
                         value={PLInfo.otherCommitments}
-                        onChange={(e) =>
+                        onChange={e =>
                           setPLInfo({
                             ...PLInfo,
                             otherCommitments: e.target.value,

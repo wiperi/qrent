@@ -25,6 +25,7 @@
     "@mui/icons-material": "^6.4.7",
     "@mui/material": "^6.4.7",
     "@mui/styled-engine-sc": "^6.4.6",
+    "@next/env": "^15.2.3",
     "@next/font": "^14.2.15",
     "@prisma/client": "^6.4.1",
     "@qrent/shared": "file:../shared",

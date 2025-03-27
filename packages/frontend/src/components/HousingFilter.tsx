@@ -1,68 +1,49 @@
-import React from "react";
-import PriceDropdown from "./priceDropDown";
-import RatingSlider from "./Slider";
+import React from 'react';
+import PriceDropdown from './priceDropDown';
+import RatingSlider from './Slider';
+import { useTranslations } from 'next-intl';
 
 const HousingFilter = ({ filter, setFilter }) => {
+  const t = useTranslations('Search');
   return (
     <>
-      <div className="flex gap-4 justify-center items-center">
-        {/* Header */}
-        <div className="flex flex-col gap-1 font-semibold text-2xl">
-          Filters
-        </div>
-      </div>
-
       {/* University */}
-      <div className="border-b pb-4 mt-3">
-        <div className="text-lg text-gray-600 font-semibold">University</div>
+      <div className="mt-4">
+        <div className="text-lg text-gray-600 font-bold">{t('university')}</div>
         <select
           className="border rounded px-2 py-1 max-h-40 overflow-y-auto w-full"
           value={filter.university}
-          onChange={(e) => setFilter({ ...filter, university: e.target.value })}
+          onChange={e => setFilter({ ...filter, university: e.target.value })}
         >
           <option>Any</option>
           <option>UNSW</option>
           <option>USYD</option>
-          <option>UTS</option>
-          <option>MQ UNI</option>
         </select>
       </div>
 
       {/* Price Range */}
-      <div className="border-b pb-4 mt-3">
-        <div className="text-lg text-gray-600 font-semibold">Price</div>
+      <div className="mt-4">
+        <div className="text-lg text-gray-600 font-bold">{t('price')}</div>
         <div className="flex justify-between gap-4">
           <div className="flex-1">
-            <PriceDropdown
-              label="Min"
-              name="priceMin"
-              filter={filter}
-              setFilter={setFilter}
-            />
+            <PriceDropdown label="Min" name="priceMin" filter={filter} setFilter={setFilter} />
           </div>
           <div className="flex-1">
-            <PriceDropdown
-              label="Max"
-              name="priceMax"
-              filter={filter}
-              setFilter={setFilter}
-            />
+            <PriceDropdown label="Max" name="priceMax" filter={filter} setFilter={setFilter} />
           </div>
         </div>
       </div>
 
       {/* BedroomNum */}
-      <div className="border-b pb-4 mt-3">
-        <div className="text-lg text-gray-600 font-semibold">Bedrooms</div>
+      <div className="mt-4">
+        <div className="text-lg text-gray-600 font-bold">{t('bedrooms')}s</div>
         <div className="flex justify-between gap-4">
           <div className="flex-1">
             <div className="text-sm text-gray-600">Min</div>
             <select
               className="border rounded px-2 py-1 max-h-40 overflow-y-auto w-full"
               value={filter.bedroomMin}
-              onChange={(e) =>
-                setFilter({ ...filter, bedroomMin: e.target.value })
-              }
+              onChange={e => setFilter({ ...filter, bedroomMin: e.target.value })}
             >
               <option>Any</option>
               <option>1</option>
@@ -75,9 +56,7 @@ const HousingFilter = ({ filter, setFilter }) => {
             <select
               className="border rounded px-2 py-1 max-h-40 overflow-y-auto w-full"
               value={filter.bedroomMax}
-              onChange={(e) =>
-                setFilter({ ...filter, bedroomMax: e.target.value })
-              }
+              onChange={e => setFilter({ ...filter, bedroomMax: e.target.value })}
             >
               <option>Any</option>
               <option>1</option>
@@ -89,17 +68,15 @@ const HousingFilter = ({ filter, setFilter }) => {
       </div>
 
       {/* BathroomNum */}
-      <div className="border-b pb-4 mt-3">
-        <div className="text-lg text-gray-600 font-semibold">Bathrooms</div>
+      <div className="mt-4">
+        <div className="text-lg text-gray-600 font-bold">{t('bathrooms')}</div>
         <div className="flex justify-between gap-4">
           <div className="flex-1">
             <div className="text-sm text-gray-600">Min</div>
             <select
               className="border rounded px-2 py-1 max-h-40 overflow-y-auto w-full"
               value={filter.bathroomMin}
-              onChange={(e) =>
-                setFilter({ ...filter, bathroomMin: e.target.value })
-              }
+              onChange={e => setFilter({ ...filter, bathroomMin: e.target.value })}
             >
               <option>Any</option>
               <option>1</option>
@@ -112,9 +89,7 @@ const HousingFilter = ({ filter, setFilter }) => {
             <select
               className="border rounded px-2 py-1 max-h-40 overflow-y-auto w-full"
               value={filter.bathroomMax}
-              onChange={(e) =>
-                setFilter({ ...filter, bathroomMax: e.target.value })
-              }
+              onChange={e => setFilter({ ...filter, bathroomMax: e.target.value })}
             >
               <option>Any</option>
               <option>1</option>
@@ -126,15 +101,13 @@ const HousingFilter = ({ filter, setFilter }) => {
       </div>
 
       {/* Property Type */}
-      <div className="border-b pb-4 mt-3">
-        <div className="text-sm text-gray-600 font-semibold">Property Type</div>
+      <div className="mt-4">
+        <div className="text-lg text-gray-600 font-bold">{t('property-type')}</div>
         <div className="flex justify-between items-center gap-3 mt-3">
           <select
             className="border rounded px-2 py-1 max-h-40 overflow-y-auto w-full"
             value={filter.propertyType}
-            onChange={(e) =>
-              setFilter({ ...filter, propertyType: e.target.value })
-            }
+            onChange={e => setFilter({ ...filter, propertyType: e.target.value })}
           >
             <option>Any</option>
             <option>House</option>
@@ -144,17 +117,17 @@ const HousingFilter = ({ filter, setFilter }) => {
       </div>
 
       {/* Rate */}
-      <div className="border-b pb-4 mt-3">
-        <div className="text-sm text-gray-600 font-semibold">Rate</div>
+      <div className="mt-4">
+        <div className="text-lg text-gray-600 font-bold">{t('rate')}</div>
         <RatingSlider filter={filter} setFilter={setFilter} />
       </div>
 
-      <div className="border-b pb-4 mt-3">
-        <div className="text-sm text-gray-600">Travel Time</div>
+      <div className="mt-4">
+        <div className="text-lg text-gray-600 font-bold">{t('travel-time')}</div>
         <select
           className="border rounded px-2 py-1 max-h-40 overflow-y-auto w-full"
           value={filter.travelTime}
-          onChange={(e) => setFilter({ ...filter, travelTime: e.target.value })}
+          onChange={e => setFilter({ ...filter, travelTime: e.target.value })}
         >
           <option>Any</option>
           <option>10 min</option>
@@ -169,17 +142,13 @@ const HousingFilter = ({ filter, setFilter }) => {
       </div>
 
       {/* Avaliable Date */}
-      <div className="pb-4 mt-3">
-        <div className="text-sm text-gray-600 font-semibold">
-          Avaliable Date
-        </div>
+      <div className="pb-4 mt-4">
+        <div className="text-lg text-gray-600 font-bold">{t('avaliable-date')}</div>
         <input
           type="date"
           className="border rounded px-2 py-1 mt-2"
           value={filter.avaliableDate}
-          onChange={(e) =>
-            setFilter({ ...filter, avaliableDate: e.target.value })
-          }
+          onChange={e => setFilter({ ...filter, avaliableDate: e.target.value })}
         />
       </div>
     </>
