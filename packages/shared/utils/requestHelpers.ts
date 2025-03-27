@@ -53,11 +53,11 @@ function hello(): Promise<Record<string, string>> {
   return http.get('/hello');
 }
 
-function register(data: User): Promise<{ userId: number }> {
+function register(data: { email: string; password: string } & Partial<Omit<User, 'email' | 'password'>>): Promise<{ token: string }> {
   return http.post('/auth/register', data);
 }
 
-function login(data: Pick<User, 'email' | 'password'>): Promise<{ userId: number }> {
+function login(data: Pick<User, 'email' | 'password'>): Promise<{ token: string }> {
   return http.post('/auth/login', data);
 }
 
