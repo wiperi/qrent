@@ -11,7 +11,7 @@ const DocumentPreview = () => {
     <div className="p-4 bg-white rounded-lg shadow-md">
       <h4 className="mb-3 text-xl font-semibold">{t('document-preview')}</h4>
       <div
-        className="border p-5 rounded-md min-h-auto flex items-center justify-center text-gray-500"
+        className="border p-5 min-h-[750px] rounded-md min-h-auto flex items-center justify-center text-gray-500"
         id="letterPreview"
       >
         {previewContent ? (
