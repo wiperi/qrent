@@ -32,7 +32,7 @@ services:
     volumes:
       - /app/packages/backend/node_modules
       - /app/packages/shared/node_modules
-      - ./packages/backend/src:/app/packages/backend/src
+      - ./packages/backend:/app/packages/backend
       - ./packages/shared:/app/packages/shared
     networks:
       - qrent-network
