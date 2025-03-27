@@ -21,10 +21,10 @@ services:
     build:
       context: .
       dockerfile: packages/backend/Dockerfile
-    ports:
-      - "3200:3200"
     env_file:
       - .env 
+    ports:
+      - "${EXPOSE_PORT:-3200}:${PORT:-3200}"
     depends_on:
       db:
         condition: service_healthy
