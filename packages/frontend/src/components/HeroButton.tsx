@@ -4,28 +4,29 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faBookOpen, faFileAlt } from '@fortawesome/free-solid-svg-icons';
 import { useTranslations } from 'next-intl';
 import { useRentalGuideProgressStore } from '../store/rentalGuideProgressStore';
+import { usePrepareDocProgressStore } from '../store/prepareDocProgressStore';
 
 const HeroButton = () => {
   const t = useTranslations('HeroButton');
 
-  const checkedItems = useRentalGuideProgressStore(state => state.checkedItem);
-
+  const checkedItemsRentalGuide = useRentalGuideProgressStore(state => state.checkedItem);
+  const checkedItemsPrepareDoc = usePrepareDocProgressStore(state => state.checkedItem);
   const navItems = [
     {
       href: '/rentalGuide',
       icon: faBookOpen,
       title: t('rental-guide'),
       description: t('rental-guide-des'),
-      progress: (checkedItems / 28) * 100, // Progress percentage
-      progressText: `${checkedItems}/28`,
+      progress: (checkedItemsRentalGuide / 28) * 100, // Progress percentage
+      progressText: `${checkedItemsRentalGuide}/28`,
     },
     {
       href: '/prepareDocuments',
       icon: faFileAlt,
       title: t('application-materials'),
       description: t('application-materials-des'),
-      progress: 28.6,
-      progressText: '2/7',
+      progress: (checkedItemsPrepareDoc / 7) * 100,
+      progressText: `${checkedItemsPrepareDoc}/7`,
     },
   ];
 
