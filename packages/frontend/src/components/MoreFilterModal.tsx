@@ -37,29 +37,21 @@ const MoreFilterModal = ({ filter, setFilter }) => {
                     <div className="flex justify-between items-center gap-3 mt-3">
                       {/* bedroomMin */}
                       <div className="text-sm text-gray-600">{t('min')}</div>
-                      <select
+                      <input
+                        type="number"
                         className="border rounded px-2 py-1 max-h-40 overflow-y-auto w-full"
                         value={filter.bedroomMin}
                         onChange={e => setFilter({ ...filter, bedroomMin: e.target.value })}
-                      >
-                        <option>Any</option>
-                        <option>1</option>
-                        <option>2</option>
-                        <option>3</option>
-                      </select>
+                      />
 
                       {/* bedroomMax */}
                       <div className="text-sm text-gray-600">{t('max')}</div>
-                      <select
+                      <input
+                        type="number"
                         className="border rounded px-2 py-1 max-h-40 overflow-y-auto w-full"
                         value={filter.bedroomMax}
                         onChange={e => setFilter({ ...filter, bedroomMax: e.target.value })}
-                      >
-                        <option>Any</option>
-                        <option>1</option>
-                        <option>2</option>
-                        <option>3</option>
-                      </select>
+                      />
                     </div>
                   </div>
 
@@ -69,29 +61,20 @@ const MoreFilterModal = ({ filter, setFilter }) => {
                     <div className="flex justify-between items-center gap-3 mt-3">
                       {/* bathroomMin */}
                       <div className="text-sm text-gray-600">{t('min')}</div>
-                      <select
+                      <input
+                        type="number"
                         className="border rounded px-2 py-1 max-h-40 overflow-y-auto w-full"
                         value={filter.bathroomMin}
                         onChange={e => setFilter({ ...filter, bathroomMin: e.target.value })}
-                      >
-                        <option>Any</option>
-                        <option>1</option>
-                        <option>2</option>
-                        <option>3</option>
-                      </select>
-
+                      />
                       {/* bathroomMax */}
                       <div className="text-sm text-gray-600">{t('max')}</div>
-                      <select
+                      <input
+                        type="number"
                         className="border rounded px-2 py-1 max-h-40 overflow-y-auto w-full"
                         value={filter.bathroomMax}
                         onChange={e => setFilter({ ...filter, bathroomMax: e.target.value })}
-                      >
-                        <option>Any</option>
-                        <option>1</option>
-                        <option>2</option>
-                        <option>3</option>
-                      </select>
+                      />
                     </div>
                   </div>
 
