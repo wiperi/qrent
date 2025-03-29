@@ -39,7 +39,7 @@ const HousingFilter = ({ filter, setFilter }) => {
 
       {/* BedroomNum */}
       <div className="mt-4">
-        <div className="text-lg text-gray-600 font-bold">{t('bedrooms')}s</div>
+        <div className="text-lg text-gray-600 font-bold">{t('bedrooms')}</div>
         <div className="flex justify-between gap-4">
           <div className="flex-1">
             <div className="text-sm text-gray-600">Min</div>

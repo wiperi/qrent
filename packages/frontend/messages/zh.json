@@ -162,5 +162,14 @@
     "will-joint-liability": "愿意承担连带责任",
     "will-joint-msg": "如果您的子女未履行租赁义务，您愿意承担相应责任。",
     "additional-commitment-ph": "添加更多承诺..."
+  },
+  "LanguageSwitcher": {
+    "english": "英文",
+    "chinese": "中文"
+  },
+  "HouseCard": {
+    "points": "分",
+    "top": "顶级好房 ",
+    "good": "高分好房 "
   }
 }

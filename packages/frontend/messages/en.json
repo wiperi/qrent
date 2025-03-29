@@ -169,5 +169,14 @@
     "will-joint-liability": "Willing to assume joint liability.",
     "will-joint-msg": "If your child fails to fulfill the obligations of the lease, you are willing to assume the corresponding responsibility.",
     "additional-commitment-ph": "Add more commitment..."
+  },
+  "LanguageSwitcher": {
+    "english": "English",
+    "chinese": "Chinese"
+  },
+  "HouseCard": {
+    "points": "Points",
+    "top": "Top / ",
+    "good": "Good / "
   }
 }

@@ -42,7 +42,7 @@ const CheckListWithoutSubTask: React.FC<CheckListWithoutSubTaskProps> = ({ title
   const progress = (completedItems / totalItems) * 100;
 
   return (
-    <div className="max-w-lg mx-auto p-5">
+    <div className="max-w-sm mx-auto p-2">
       {/* Header */}
       <h2 className="text-xl font-bold text-center mb-4">{title}</h2>
 

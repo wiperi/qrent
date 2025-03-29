@@ -3,9 +3,12 @@ import Link from 'next/link';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faBookOpen, faFileAlt } from '@fortawesome/free-solid-svg-icons';
 import { useTranslations } from 'next-intl';
+import { useRentalGuideProgressStore } from '../store/rentalGuideProgressStore';
 
 const HeroButton = () => {
   const t = useTranslations('HeroButton');
+
+  const checkedItems = useRentalGuideProgressStore(state => state.checkedItem);
 
   const navItems = [
     {
@@ -13,8 +16,8 @@ const HeroButton = () => {
       icon: faBookOpen,
       title: t('rental-guide'),
       description: t('rental-guide-des'),
-      progress: 7.14, // Progress percentage
-      progressText: '2/28',
+      progress: (checkedItems / 28) * 100, // Progress percentage
+      progressText: `${checkedItems}/28`,
     },
     {
       href: '/prepareDocuments',
