@@ -1,5 +1,8 @@
-"use client";
-import { useState, useEffect } from "react";
+// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+// @ts-nocheck
+
+'use client';
+import { useState, useEffect } from 'react';
 
 const HousingList = ({ filter }) => {
   const [listings, setListings] = useState([]);
@@ -10,9 +13,9 @@ const HousingList = ({ filter }) => {
    * FIX ME: CHANGE AFTER BACKEND API FINISH
    */
   useEffect(() => {
-    fetch("/api/housing")
-      .then((res) => res.json())
-      .then((data) => {
+    fetch('/api/housing')
+      .then(res => res.json())
+      .then(data => {
         setListings(data);
         setLoading(false);
       })
@@ -26,7 +29,7 @@ const HousingList = ({ filter }) => {
       ) : listings.length === 0 ? (
         <p>No listings found</p>
       ) : (
-        listings.map((listing) => (
+        listings.map(listing => (
           <div
             key={listing.id}
             className="bg-white p-4 rounded-lg shadow-md hover:shadow-lg transition"

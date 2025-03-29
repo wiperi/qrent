@@ -6,7 +6,7 @@ import { cn } from '@/src/lib/utils';
 import Link from 'next/link';
 import { useTranslations } from 'next-intl';
 
-const signup = () => {
+const Signup = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
 
@@ -91,7 +91,7 @@ const signup = () => {
   );
 };
 
-export default signup;
+export default Signup;
 
 const BottomGradient = () => {
   return (

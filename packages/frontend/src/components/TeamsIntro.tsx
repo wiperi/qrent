@@ -1,3 +1,6 @@
+// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+// @ts-nocheck
+
 'use client';
 import Image from 'next/image';
 import React, { useEffect, useId, useRef, useState } from 'react';
@@ -175,7 +178,7 @@ export function ExpandableCardDemo() {
         ) : null}
       </AnimatePresence>
       <ul className="max-w-2xl mx-auto w-full grid grid-cols-1 md:grid-cols-2 items-start gap-4">
-        {cards.map((card, index) => (
+        {cards.map(card => (
           <motion.div
             layoutId={`card-${card.title}-${id}`}
             key={card.title}

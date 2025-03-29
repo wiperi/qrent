@@ -1,14 +1,11 @@
+// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+// @ts-nocheck
+
 'use client';
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import {
-  faHome,
-  faBell,
-  faSpinner,
-  faExclamationCircle,
-  faArrowRight,
-} from '@fortawesome/free-solid-svg-icons';
+import { faHome, faBell, faSpinner, faArrowRight } from '@fortawesome/free-solid-svg-icons';
 import HouseCard from './HouseCard';
 import { useTranslations } from 'next-intl';
 

@@ -3,6 +3,7 @@ import PriceDropdown from './priceDropDown';
 import bgImg from '../../public/searchBG.jpg';
 import MoreFilterModal from './MoreFilterModal';
 import { useTranslations } from 'next-intl';
+import Link from 'next/link';
 
 export default function Search() {
   const [filter, setFilter] = useState({
@@ -99,7 +100,7 @@ export default function Search() {
           <div className="flex gap-4">
             <MoreFilterModal filter={filter} setFilter={setFilter} />
             <button className="bg-blue-primary text-white px-4 py-1 rounded mt-4">
-              <a href="/findAHome">Go</a>
+              <Link href="/findAHome">Go</Link>
             </button>
           </div>
         </div>
