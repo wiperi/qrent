@@ -1,6 +1,7 @@
 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
 // @ts-nocheck
 
+import { useTranslations } from 'next-intl';
 import React from 'react';
 import { FaBath, FaBed, FaMapMarkerAlt } from 'react-icons/fa';
 interface House {
@@ -24,6 +25,7 @@ interface HouseCardProps {
 }
 
 const HouseCard: React.FC<HouseCardProps> = ({ house }) => {
+  const t = useTranslations('HouseCard');
   const price = house.Price || 0;
   const scoreValue =
     house['Average Score'] !== null && house['Average Score'] !== undefined
@@ -31,17 +33,22 @@ const HouseCard: React.FC<HouseCardProps> = ({ house }) => {
       : 'N/A';
 
   let scoreClass = '';
-  let scoreText = `${scoreValue} Points`;
+  const point = t('points');
+
+  let scoreText = `${scoreValue} ${point}`;
+
+  const top = t('top');
+  const good = t('good');
 
   // Adjusted text for top-rated houses
   if (scoreValue !== 'N/A') {
     const numScore = Number(scoreValue);
     if (numScore >= 18.3) {
       scoreClass = 'bg-orange-500 text-white shadow-md shadow-orange-400';
-      scoreText = `TOP / ${scoreText}`; // Shortened text
+      scoreText = `${top} ${scoreText}`; // Shortened text
     } else if (numScore >= 18.0) {
       scoreClass = 'bg-orange-400 text-white shadow-md shadow-orange-400';
-      scoreText = `GOOD / ${scoreText}`; // Shortened text
+      scoreText = `${good} ${scoreText}`; // Shortened text
     } else {
       scoreClass = 'border border-blue-primary text-blue-primary bg-white';
       scoreText = `${scoreText}`; // Shortened text

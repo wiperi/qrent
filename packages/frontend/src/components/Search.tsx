@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import PriceDropdown from './priceDropDown';
+import Textbox from './priceDropDown';
 import bgImg from '../../public/searchBG.jpg';
 import MoreFilterModal from './MoreFilterModal';
 import { useTranslations } from 'next-intl';
@@ -17,7 +17,7 @@ export default function Search() {
     bathroomMax: 'Any',
     propertyType: 'Any',
     area: 'Any',
-    rate: 0,
+    rate: 13,
     avaliableDate: 'Any',
   });
 
@@ -61,21 +61,51 @@ export default function Search() {
           </div>
 
           <div className="flex-1">
-            <PriceDropdown
-              label={t('price-min')}
-              name="priceMin"
-              filter={filter}
-              setFilter={setFilter}
-            />
+            <div className="text-sm text-gray-600">{t('price-range')}</div>
+
+            <div className="flex items-center space-x-1">
+              <Textbox
+                label=""
+                name="priceMin"
+                filter={filter}
+                setFilter={setFilter}
+                ph={t('min')}
+              />
+
+              <span className="text-lg">-</span>
+
+              <Textbox
+                label=""
+                name="priceMax"
+                filter={filter}
+                setFilter={setFilter}
+                ph={t('max')}
+              />
+            </div>
           </div>
 
           <div className="flex-1">
-            <PriceDropdown
-              label={t('price-max')}
-              name="priceMax"
-              filter={filter}
-              setFilter={setFilter}
-            />
+            <div className="text-sm text-gray-600">{t('bedrooms')}</div>
+
+            <div className="flex items-center space-x-1">
+              <Textbox
+                label=""
+                name="bedroomMin"
+                filter={filter}
+                setFilter={setFilter}
+                ph={t('min')}
+              />
+
+              <span className="text-lg">-</span>
+
+              <Textbox
+                label=""
+                name="bedroomMax"
+                filter={filter}
+                setFilter={setFilter}
+                ph={t('max')}
+              />
+            </div>
           </div>
 
           <div className="flex-1">
