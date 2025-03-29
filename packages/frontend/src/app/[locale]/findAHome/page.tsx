@@ -3,7 +3,7 @@ import HousingFilter from '@/src/components/HousingFilter';
 import HousingList from '@/src/components/HousingList';
 import React, { useEffect, useState } from 'react';
 
-const page = () => {
+const Page = () => {
   const [filter, setFilter] = useState({
     university: 'Any',
     priceMin: 'Any',
@@ -58,4 +58,4 @@ const page = () => {
   );
 };
 
-export default page;
+export default Page;

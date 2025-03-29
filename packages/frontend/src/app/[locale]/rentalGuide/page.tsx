@@ -52,7 +52,7 @@ const stepsData = [
   },
 ];
 
-const page = () => {
+const Page = () => {
   return (
     <div className="flex flex-col lg:flex-row">
       {/* Main Content */}
@@ -71,4 +71,4 @@ const page = () => {
   );
 };
 
-export default page;
+export default Page;

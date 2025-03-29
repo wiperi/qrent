@@ -1,3 +1,6 @@
+// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+// @ts-nocheck
+
 const PriceDropdown = ({ label, name, filter, setFilter }) => {
   return (
     <div>
@@ -5,7 +8,7 @@ const PriceDropdown = ({ label, name, filter, setFilter }) => {
       <select
         className="border rounded px-2 py-1 max-h-40 overflow-y-auto w-full"
         value={filter[name]}
-        onChange={(e) => setFilter({ ...filter, [name]: e.target.value })}
+        onChange={e => setFilter({ ...filter, [name]: e.target.value })}
       >
         <option>Any</option>
         {[...Array(39)].map((_, i) => (

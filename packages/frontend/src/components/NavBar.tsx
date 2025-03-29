@@ -4,6 +4,7 @@ import Logo from './Logo';
 import DropDownList from './DropDownList';
 import LanguageSwitcher from './LanguageSwitcher';
 import { useTranslations } from 'next-intl';
+import Link from 'next/link';
 
 const NavBar = () => {
   const t = useTranslations('NavBar');
@@ -19,19 +20,19 @@ const NavBar = () => {
             <div className="h-full flex items-center mt-1.5 ml-16 pl-2">
               <ul className="hidden md:flex space-x-4 text-lg font-sans font-semibold items-center justify-center tracking-wide whitespace-nowrap">
                 <li>
-                  <a href="/rentalGuide" className="text-blue-primary hover:text-blue-600">
+                  <Link href="/rentalGuide" className="text-blue-primary hover:text-blue-600">
                     {t('rental-guide')}
-                  </a>
+                  </Link>
                 </li>
                 <li>
-                  <a href="/prepareDocuments" className="text-blue-primary hover:text-blue-600">
+                  <Link href="/prepareDocuments" className="text-blue-primary hover:text-blue-600">
                     {t('prepare-documents')}
-                  </a>
+                  </Link>
                 </li>
                 <li>
-                  <a href="/findAHome" className="text-blue-primary hover:text-blue-600">
+                  <Link href="/findAHome" className="text-blue-primary hover:text-blue-600">
                     {t('efficiency-filter')}
-                  </a>
+                  </Link>
                 </li>
               </ul>
             </div>

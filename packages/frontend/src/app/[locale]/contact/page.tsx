@@ -2,7 +2,7 @@ import { useTranslations } from 'next-intl';
 import Link from 'next/link';
 import React from 'react';
 
-const page = () => {
+const Page = () => {
   const t = useTranslations('Contact');
   return (
     <main>
@@ -29,4 +29,4 @@ const page = () => {
   );
 };
 
-export default page;
+export default Page;

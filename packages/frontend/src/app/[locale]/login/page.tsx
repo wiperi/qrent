@@ -6,7 +6,7 @@ import { cn } from '@/src/lib/utils';
 import Link from 'next/link';
 import { useTranslations } from 'next-intl';
 
-const login = () => {
+const Login = () => {
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     console.log('Form submitted');
@@ -57,7 +57,7 @@ const login = () => {
   );
 };
 
-export default login;
+export default Login;
 
 const BottomGradient = () => {
   return (

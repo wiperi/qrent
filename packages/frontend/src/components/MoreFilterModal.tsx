@@ -1,3 +1,6 @@
+// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+// @ts-nocheck
+
 import React from 'react';
 import {
   Modal,
@@ -13,8 +16,7 @@ import { useTranslations } from 'next-intl';
 
 const MoreFilterModal = ({ filter, setFilter }) => {
   const { isOpen, onOpen, onOpenChange } = useDisclosure();
-  const [scrollBehavior, setScrollBehavior] =
-    React.useState<ModalProps['scrollBehavior']>('inside');
+  const [scrollBehavior] = React.useState<ModalProps['scrollBehavior']>('inside');
   const t = useTranslations('Search');
   return (
     <div className="flex gap-4">

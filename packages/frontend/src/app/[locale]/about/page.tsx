@@ -1,5 +1,5 @@
-import ImageWithDesctiption from "@/src/components/ImageWithDesctiption";
-import React from "react";
+import ImageWithDesctiption from '@/src/components/ImageWithDesctiption';
+import React from 'react';
 
 const About = () => {
   return (

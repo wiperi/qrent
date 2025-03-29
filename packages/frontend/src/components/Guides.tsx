@@ -27,6 +27,7 @@ import image24 from '@/public/GuideDocImg/image (20).jpg';
 import image25 from '@/public/GuideDocImg/image (21).jpg';
 import image26 from '@/public/GuideDocImg/image (22).jpg';
 import qrent from '@/public/qrent.jpg';
+// import Image from "next/image";
 
 // Guides data:
 //      tag
@@ -296,6 +297,7 @@ const Guides = () => {
                       官方
                     </div>
                   )}
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
                   <img src={guide.image} alt={guide.title} className="w-full object-cover" />
                   <div className="p-4">
                     <h3 className="text-lg font-semibold">{guide.title}</h3>
@@ -327,6 +329,7 @@ const Guides = () => {
                       官方
                     </div>
                   )}
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
                   <img src={guide.image} alt={guide.title} className="w-full object-cover" />
                   <div className="p-4">
                     <h3 className="text-lg font-semibold">{guide.title}</h3>
@@ -358,6 +361,7 @@ const Guides = () => {
                       官方
                     </div>
                   )}
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
                   <img src={guide.image} alt={guide.title} className="w-full object-cover" />
                   <div className="p-4">
                     <h3 className="text-lg font-semibold">{guide.title}</h3>
@@ -389,6 +393,7 @@ const Guides = () => {
                       官方
                     </div>
                   )}
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
                   <img src={guide.image} alt={guide.title} className="w-full object-cover" />
                   <div className="p-4">
                     <h3 className="text-lg font-semibold">{guide.title}</h3>
