@@ -17,6 +17,8 @@ model User {
   email    String  @unique(map: "email") @db.VarChar(50)
 
   properties  Property[]
+
+  @@map("user")
 }
 
 model Property {
@@ -46,6 +48,8 @@ model Property {
   keywords      String?   @db.Text
   // Overall rating score for the property
   averageScore  Float?
+  // Property description text
+  description   String?   @db.VarChar(1024)
   // URL to the property listing
   url           String?   @db.VarChar(255)
   // Date and time when the property was published
@@ -53,6 +57,8 @@ model Property {
 
   // Users who have saved or are interested in this property
   users User[]
+
+  @@map("property")
 }
 
 model UserPreference {
