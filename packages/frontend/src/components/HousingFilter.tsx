@@ -2,7 +2,7 @@
 // @ts-nocheck
 
 import React from 'react';
-import PriceDropdown from './priceDropDown';
+import Textbox from './priceDropDown';
 import RatingSlider from './Slider';
 import { useTranslations } from 'next-intl';
 
@@ -26,79 +26,61 @@ const HousingFilter = ({ filter, setFilter }) => {
 
       {/* Price Range */}
       <div className="mt-4">
-        <div className="text-lg text-gray-600 font-bold">{t('price')}</div>
+        <div className="text-lg text-gray-600 font-bold">{t('price-range')}</div>
         <div className="flex justify-between gap-4">
           <div className="flex-1">
-            <PriceDropdown label="Min" name="priceMin" filter={filter} setFilter={setFilter} />
+            <Textbox label="" name="priceMin" filter={filter} setFilter={setFilter} ph={t('min')} />
           </div>
           <div className="flex-1">
-            <PriceDropdown label="Max" name="priceMax" filter={filter} setFilter={setFilter} />
+            <Textbox label="" name="priceMax" filter={filter} setFilter={setFilter} ph={t('max')} />
           </div>
         </div>
       </div>
 
-      {/* BedroomNum */}
       <div className="mt-4">
-        <div className="text-lg text-gray-600 font-bold">{t('bedrooms')}s</div>
+        <div className="text-lg text-gray-600 font-bold">{t('bedrooms')}</div>
         <div className="flex justify-between gap-4">
           <div className="flex-1">
-            <div className="text-sm text-gray-600">Min</div>
-            <select
-              className="border rounded px-2 py-1 max-h-40 overflow-y-auto w-full"
-              value={filter.bedroomMin}
-              onChange={e => setFilter({ ...filter, bedroomMin: e.target.value })}
-            >
-              <option>Any</option>
-              <option>1</option>
-              <option>2</option>
-              <option>3</option>
-            </select>
+            <Textbox
+              label=""
+              name="bedroomMin"
+              filter={filter}
+              setFilter={setFilter}
+              ph={t('min')}
+            />
           </div>
           <div className="flex-1">
-            <div className="text-sm text-gray-600">Max</div>
-            <select
-              className="border rounded px-2 py-1 max-h-40 overflow-y-auto w-full"
-              value={filter.bedroomMax}
-              onChange={e => setFilter({ ...filter, bedroomMax: e.target.value })}
-            >
-              <option>Any</option>
-              <option>1</option>
-              <option>2</option>
-              <option>3</option>
-            </select>
+            <Textbox
+              label=""
+              name="bedroomMax"
+              filter={filter}
+              setFilter={setFilter}
+              ph={t('max')}
+            />
           </div>
         </div>
       </div>
 
-      {/* BathroomNum */}
       <div className="mt-4">
         <div className="text-lg text-gray-600 font-bold">{t('bathrooms')}</div>
         <div className="flex justify-between gap-4">
           <div className="flex-1">
-            <div className="text-sm text-gray-600">Min</div>
-            <select
-              className="border rounded px-2 py-1 max-h-40 overflow-y-auto w-full"
-              value={filter.bathroomMin}
-              onChange={e => setFilter({ ...filter, bathroomMin: e.target.value })}
-            >
-              <option>Any</option>
-              <option>1</option>
-              <option>2</option>
-              <option>3</option>
-            </select>
+            <Textbox
+              label=""
+              name="bathroomMin"
+              filter={filter}
+              setFilter={setFilter}
+              ph={t('min')}
+            />
           </div>
           <div className="flex-1">
-            <div className="text-sm text-gray-600">Max</div>
-            <select
-              className="border rounded px-2 py-1 max-h-40 overflow-y-auto w-full"
-              value={filter.bathroomMax}
-              onChange={e => setFilter({ ...filter, bathroomMax: e.target.value })}
-            >
-              <option>Any</option>
-              <option>1</option>
-              <option>2</option>
-              <option>3</option>
-            </select>
+            <Textbox
+              label=""
+              name="bathroomMax"
+              filter={filter}
+              setFilter={setFilter}
+              ph={t('max')}
+            />
           </div>
         </div>
       </div>

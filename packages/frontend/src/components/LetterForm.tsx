@@ -8,7 +8,7 @@ import { useState } from 'react';
 import 'react-datepicker/dist/react-datepicker.css';
 
 const LetterForm = () => {
-  const [openAccordion, setOpenAccordion] = useState(null);
+  const [openAccordion, setOpenAccordion] = useState(1);
   const [isCoverLetter, setIsCoverLetter] = useState(true);
 
   const t = useTranslations('PrepareDocuments');

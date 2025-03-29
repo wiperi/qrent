@@ -1,5 +1,5 @@
 'use client';
-import React, { useState } from 'react';
+import React from 'react';
 import { motion } from 'framer-motion';
 import {
   Book,
@@ -11,7 +11,7 @@ import {
   Check,
   Newspaper,
 } from 'lucide-react';
-
+import { usePrepareDocProgressStore } from '../store/prepareDocProgressStore';
 interface CheckListWithoutSubTaskProps {
   title: string;
   items: string[];
@@ -28,21 +28,18 @@ const iconMap = {
 };
 
 const CheckListWithoutSubTask: React.FC<CheckListWithoutSubTaskProps> = ({ title, items }) => {
-  const [checkedItems, setCheckedItems] = useState<{ [key: string]: boolean }>({});
-
-  const handleCheckboxChange = (item: string) => {
-    setCheckedItems(prev => ({
-      ...prev,
-      [item]: !prev[item],
-    }));
+  const { checkedTasks, updateProgress } = usePrepareDocProgressStore();
+  const handleCheckboxChange = (task: string) => {
+    const isChecked = !checkedTasks[task];
+    updateProgress(task, isChecked);
   };
 
   const totalItems = items.length;
-  const completedItems = Object.values(checkedItems).filter(Boolean).length;
+  const completedItems = Object.values(checkedTasks).filter(Boolean).length;
   const progress = (completedItems / totalItems) * 100;
 
   return (
-    <div className="max-w-lg mx-auto p-5">
+    <div className="max-w-sm mx-auto p-2">
       {/* Header */}
       <h2 className="text-xl font-bold text-center mb-4">{title}</h2>
 
@@ -76,11 +73,11 @@ const CheckListWithoutSubTask: React.FC<CheckListWithoutSubTaskProps> = ({ title
             <input
               type="checkbox"
               className="peer hidden"
-              checked={checkedItems[item] || false}
+              checked={checkedTasks[item] || false}
               onChange={() => handleCheckboxChange(item)}
             />
             <div className="w-6 h-6 ml-auto flex items-center justify-center rounded-md border border-gray-400 peer-checked:bg-blue-primary peer-checked:border-blue-primary transition">
-              {checkedItems[item] && <Check className="w-4 h-4 text-white" />}
+              {checkedTasks[item] && <Check className="w-4 h-4 text-white" />}
             </div>
           </label>
         </div>

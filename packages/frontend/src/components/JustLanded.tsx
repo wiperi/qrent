@@ -111,11 +111,6 @@ const JustLanded = () => {
           {t('view-all')} <FontAwesomeIcon icon={faArrowRight} className="ml-2" />
         </Link>
       </div>
-
-      {/* Section Actions */}
-
-      {/* Section Actions */}
-
       {/* Loading State */}
       {loading && (
         <div className="flex items-center gap-2 text-gray-500">
