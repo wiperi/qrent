@@ -6,7 +6,6 @@ import {
   FileText,
   CreditCard,
   Banknote,
-  Mail,
   File,
   PenTool,
   Check,
@@ -68,7 +67,9 @@ const CheckListWithoutSubTask: React.FC<CheckListWithoutSubTaskProps> = ({ title
           <label className="flex items-center py-2">
             {/* Item text & icon (Left) */}
             <span className="text-md flex items-center space-x-2">
-              {iconMap[item] || <span className="w-5 h-5 bg-gray-300 rounded-full"></span>}
+              {iconMap[item as keyof typeof iconMap] || (
+                <span className="w-5 h-5 bg-gray-300 rounded-full"></span>
+              )}
               <span>{item}</span>
             </span>
             {/* Checkbox (Rightmost) */}

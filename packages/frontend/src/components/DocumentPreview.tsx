@@ -5,7 +5,7 @@ import { FileText, Wand, Clipboard } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 
 const DocumentPreview = () => {
-  const [previewContent, setPreviewContent] = useState('');
+  const [previewContent] = useState('');
   const t = useTranslations('PrepareDocuments');
   return (
     <div className="p-4 bg-white rounded-lg shadow-md">

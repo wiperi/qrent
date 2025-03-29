@@ -1,17 +1,10 @@
-import clsx from "clsx";
-import Link from "next/link";
-import { DM_Serif_Text } from "next/font/google";
-import Image from "next/image";
-import logo from "../../public/QrentLogo.jpg";
-
-const dmSerifTextFont = DM_Serif_Text({
-  subsets: ["latin"],
-  weight: "400",
-});
+import Link from 'next/link';
+import Image from 'next/image';
+import logo from '../../public/QrentLogo.jpg';
 
 const Logo = () => {
   return (
-    <Link href={"/"}>
+    <Link href={'/'}>
       <Image
         src={logo.src}
         alt="Qrent Logo"
