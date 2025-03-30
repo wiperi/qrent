@@ -27,17 +27,10 @@ const Page = () => {
     }
   }, []);
 
+  // Update filter in localStorage whenever it changes
   useEffect(() => {
-    const handleStorageChange = () => {
-      const updatedFilter = localStorage.getItem('filter');
-      if (updatedFilter) {
-        setFilter(JSON.parse(updatedFilter));
-      }
-    };
-
-    window.addEventListener('storage', handleStorageChange);
-    return () => window.removeEventListener('storage', handleStorageChange);
-  }, []);
+    localStorage.setItem('filter', JSON.stringify(filter));
+  }, [filter]);
 
   return (
     <div className="min-h-auto">
@@ -50,7 +43,6 @@ const Page = () => {
 
         {/* Right: Housing Listings */}
         <section className="flex-[8] col-span-2 bg-white shadow-lg rounded-lg p-6">
-          <h2 className="text-xl font-bold mb-4">Properties in Sydney</h2>
           <HousingList filter={filter} />
         </section>
       </div>
