@@ -3,7 +3,7 @@
 import { Dropdown, DropdownTrigger, DropdownMenu, DropdownItem, Button } from '@heroui/react';
 import { FaGlobe } from 'react-icons/fa';
 import { useRouter, usePathname } from '@/src/i18n/navigation';
-import { useLocale, useTranslations } from 'next-intl';
+import { useLocale } from 'next-intl';
 
 export default function LanguageSwitcher() {
   const router = useRouter();
@@ -15,8 +15,6 @@ export default function LanguageSwitcher() {
       router.replace({ pathname }, { locale: lang }); // Change the locale
     }
   };
-
-  const t = useTranslations('LanguageSwitcher');
 
   return (
     <Dropdown>
@@ -31,14 +29,14 @@ export default function LanguageSwitcher() {
           className="font-serif"
           onClick={() => handleLanguageChange('en')}
         >
-          {t('english')}
+          English
         </DropdownItem>
         <DropdownItem
           key="chinese_simplified"
           className="font-serif"
           onClick={() => handleLanguageChange('zh')}
         >
-          {t('chinese')}
+          简体中文
         </DropdownItem>
       </DropdownMenu>
     </Dropdown>
