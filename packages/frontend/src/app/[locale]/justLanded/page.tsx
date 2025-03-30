@@ -1,36 +1,11 @@
 'use client';
 import HousingFilter from '@/src/components/HousingFilter';
 import HousingList from '@/src/components/HousingList';
-import React, { useEffect, useState } from 'react';
+import { useFilterStore } from '@/src/store/useFilterStore';
+import React from 'react';
 
 const Page = () => {
-  const [filter, setFilter] = useState({
-    university: 'Any',
-    priceMin: 'Any',
-    priceMax: 'Any',
-    travelTime: 'Any',
-    bedroomMin: 'Any',
-    bedroomMax: 'Any',
-    bathroomMin: 'Any',
-    bathroomMax: 'Any',
-    propertyType: 'Any',
-    area: 'Any',
-    rate: 13,
-    avaliableDate: 'Any',
-  });
-
-  // Load filter from localStorage when the component mounts
-  useEffect(() => {
-    const storedFilter = localStorage.getItem('filter');
-    if (storedFilter) {
-      setFilter(JSON.parse(storedFilter));
-    }
-  }, []);
-
-  // Update filter in localStorage whenever it changes
-  useEffect(() => {
-    localStorage.setItem('filter', JSON.stringify(filter));
-  }, [filter]);
+  const { filter, updateFilter } = useFilterStore();
 
   return (
     <div className="min-h-auto">
@@ -38,7 +13,7 @@ const Page = () => {
       <div className="flex flex-col lg:flex-row">
         {/* Left: Filter Sidebar */}
         <section className="flex-[2] bg-gray-50 rounded-lg p-5 shadow-md h-auto overflow-y-auto">
-          <HousingFilter filter={filter} setFilter={setFilter} />
+          <HousingFilter filter={filter} setFilter={updateFilter} />
         </section>
 
         {/* Right: Housing Listings */}
