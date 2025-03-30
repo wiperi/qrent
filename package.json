@@ -4,10 +4,10 @@
   "scripts": {
     "build": "pnpm -r build",
     "dev": "pnpm -r dev",
+    "dev:backend": "pnpm --filter backend dev",
     "lint": "pnpm -r lint",
     "test": "pnpm -r test",
-    "test:backend": "pnpm --filter backend test",
-    "test:dev": "pnpm --filter backend dev"
+    "test:backend": "pnpm --filter backend test"
   },
   "devDependencies": {
     "@types/jest": "^29.5.14",
