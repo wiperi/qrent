@@ -10,7 +10,7 @@ import HouseCard from './HouseCard';
 import { useTranslations } from 'next-intl';
 
 async function getApiBaseUrl() {
-  return process.env.NEXT_PUBLIC_API_BASE_URL || 'http://localhost:5000';
+  return process.env.NEXT_PUBLIC_BACKEND_URL_OLD || 'http://localhost:5000';
 }
 
 const JustLanded = () => {
@@ -137,7 +137,7 @@ const JustLanded = () => {
       {error && <p className="text-red-500">{error}</p>}
       {!loading && !error && listings.length === 0 && <p>No new listings available.</p>}
 
-      <div className="max-w-screen-lg mx-auto mt-10 mb-20 px-6">
+      <div className="max-w-screen-lg mx-auto mt-10 mb-20 px-6 overflow-y-auto">
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
           {listings.map((house, index) => (
             <HouseCard key={index} house={house} />
