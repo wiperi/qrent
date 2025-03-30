@@ -80,7 +80,11 @@ const server = app.listen(PORT, HOST, async () => {
   const userCount = await prisma.user.count().catch((err) => {
     console.log(err);
   });
+  const propertyCount = await prisma.property.count().catch((err) => {
+    console.log(err);
+  });
   console.log(`You have ${userCount} users in your database`);
+  console.log(`You have ${propertyCount} properties in your database`);
 });
 
 // Handle shutdown gracefully
