@@ -18,7 +18,7 @@ const Page = () => {
 
         {/* Right: Housing Listings */}
         <section className="flex-[8] col-span-2 bg-white shadow-lg rounded-lg p-6">
-          <HousingList filter={filter} />
+          <HousingList />
         </section>
       </div>
     </div>

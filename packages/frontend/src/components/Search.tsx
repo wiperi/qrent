@@ -1,4 +1,3 @@
-import { useEffect, useState } from 'react';
 import Textbox from './priceDropDown';
 import bgImg from '../../public/searchBG.jpg';
 import MoreFilterModal from './MoreFilterModal';

@@ -10,9 +10,9 @@ async function getApiBaseUrl() {
   return process.env.NEXT_PUBLIC_BACKEND_URL_OLD || 'http://localhost:5000';
 }
 
-const HousingList = ({ filter }) => {
+const HousingList = () => {
   const t = useTranslations('JustLanded');
-  const [school, setSchool] = useState('unsw');
+  const [school] = useState('unsw');
   const [listings, setListings] = useState([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);

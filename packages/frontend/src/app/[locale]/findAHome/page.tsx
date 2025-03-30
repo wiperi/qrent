@@ -6,7 +6,7 @@ import React from 'react';
 
 const Page = () => {
   const { filter, updateFilter } = useFilterStore();
-
+  // TODO: Housing list add filter filtering
   return (
     <div className="min-h-auto">
       {/* Main Content Layout */}
@@ -19,7 +19,7 @@ const Page = () => {
         {/* Right: Housing Listings */}
         <section className="flex-[8] col-span-2 bg-white shadow-lg rounded-lg p-6">
           <h2 className="text-xl font-bold mb-4">Properties in Sydney</h2>
-          <HousingList filter={filter} />
+          <HousingList />
         </section>
       </div>
     </div>
