@@ -1,15 +1,57 @@
 'use client';
-import React from 'react';
+import React, { useState } from 'react';
 import { Label } from '@/src/components/label';
 import { Input } from '@/src/components/input';
 import { cn } from '@/src/lib/utils';
 import Link from 'next/link';
 import { useTranslations } from 'next-intl';
+import NotificationCard from '@/src/components/NotificationCard';
+
+async function getApiBaseUrl() {
+  return process.env.NEXT_PUBLIC_BACKEND_URL || 'http://localhost:5000';
+}
 
 const Login = () => {
-  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [notification, setNotification] = useState<{
+    message: string;
+    description: string;
+    type: 'success' | 'error';
+  } | null>(null);
+
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    console.log('Form submitted');
+    try {
+      console.log(email, password);
+      const baseurl = await getApiBaseUrl();
+      console.log(baseurl);
+
+      const res = await fetch(`${baseurl}/auth/login`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ email, password }),
+      });
+      if (!res.ok) {
+        throw new Error('Signup failed');
+      }
+
+      console.log('Signup successful');
+      setNotification({
+        message: 'Registration Successful',
+        description: 'You have successfully registered!',
+        type: 'success',
+      });
+    } catch (err) {
+      console.log(err);
+      setNotification({
+        message: 'Registration Failed',
+        description: 'Something went wrong. Please try again!',
+        type: 'error',
+      });
+    }
   };
 
   const t = useTranslations('Login');
@@ -29,12 +71,24 @@ const Login = () => {
 
         <LabelInputContainer className="mb-4">
           <Label htmlFor="email">{t('email-address')}</Label>
-          <Input id="email" placeholder="projectmayhem@fc.com" type="email" />
+          <Input
+            id="email"
+            placeholder="projectmayhem@fc.com"
+            type="email"
+            value={email}
+            onChange={e => setEmail(e.target.value)}
+          />
         </LabelInputContainer>
 
         <LabelInputContainer className="mb-4">
           <Label htmlFor="password">{t('pwd')}</Label>
-          <Input id="password" placeholder="••••••••" type="password" />
+          <Input
+            id="password"
+            placeholder="••••••••"
+            type="password"
+            value={password}
+            onChange={e => setPassword(e.target.value)}
+          />
         </LabelInputContainer>
 
         <button
@@ -53,6 +107,14 @@ const Login = () => {
           </Link>
         </div>
       </form>
+
+      {notification && (
+        <NotificationCard
+          message={notification.message}
+          description={notification.description}
+          type={notification.type}
+        />
+      )}
     </div>
   );
 };
