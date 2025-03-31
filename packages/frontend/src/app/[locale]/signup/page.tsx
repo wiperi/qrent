@@ -35,7 +35,6 @@ const Signup = () => {
         },
         body: JSON.stringify({ email, password }),
       });
-
       if (!res.ok) {
         throw new Error('Signup failed');
       }
