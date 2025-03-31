@@ -27,6 +27,7 @@
   "include": [
     "next-env.d.ts",
     "**/*.ts",
+    "**/*.js",
     "**/*.tsx",
     ".next/types/**/*.ts",
     "src/app/about.js"

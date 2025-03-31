@@ -1,36 +1,14 @@
-import { useEffect, useState } from 'react';
-import PriceDropdown from './priceDropDown';
+import Textbox from './priceDropDown';
 import bgImg from '../../public/searchBG.jpg';
 import MoreFilterModal from './MoreFilterModal';
+import { useTranslations } from 'next-intl';
+import Link from 'next/link';
+import { useFilterStore } from '../store/useFilterStore';
 
 export default function Search() {
-  const [filter, setFilter] = useState({
-    university: 'UNSW',
-    priceMin: 'Any',
-    priceMax: 'Any',
-    travelTime: 'Any',
-    bedroomMin: 'Any',
-    bedroomMax: 'Any',
-    bathroomMin: 'Any',
-    bathroomMax: 'Any',
-    propertyType: 'Any',
-    area: 'Any',
-    rate: 0,
-    avaliableDate: 'Any',
-  });
+  const { filter, updateFilter } = useFilterStore();
 
-  // Load saved filter from localStorage on first render
-  useEffect(() => {
-    const storedFilter = localStorage.getItem('filter');
-    if (storedFilter) {
-      setFilter(JSON.parse(storedFilter));
-    }
-  }, []);
-
-  // Save filter to localStorage whenever it changes
-  useEffect(() => {
-    localStorage.setItem('filter', JSON.stringify(filter));
-  }, [filter]);
+  const t = useTranslations('Search');
 
   return (
     <>
@@ -45,42 +23,71 @@ export default function Search() {
         </h1>
         <div className="bg-white p-4 shadow rounded-lg flex gap-4 font-semibold justify-between flex-wrap mt-8 mx-auto max-w-screen-lg w-full">
           <div className="flex-1">
-            <div className="text-sm text-gray-600">University</div>
+            <div className="text-sm text-gray-600">{t('university')}</div>
             <select
               className="border rounded px-2 py-1 max-h-40 overflow-y-auto w-full"
               value={filter.university}
-              onChange={e => setFilter({ ...filter, university: e.target.value })}
+              onChange={e => updateFilter({ ...filter, university: e.target.value })}
             >
               <option>UNSW</option>
               <option>USYD</option>
-              <option>UTS</option>
             </select>
           </div>
 
           <div className="flex-1">
-            <PriceDropdown
-              label="Price Min"
-              name="priceMin"
-              filter={filter}
-              setFilter={setFilter}
-            />
+            <div className="text-sm text-gray-600">{t('price-range')}</div>
+
+            <div className="flex items-center space-x-1">
+              <Textbox
+                label=""
+                name="priceMin"
+                filter={filter}
+                setFilter={updateFilter}
+                ph={t('min')}
+              />
+
+              <span className="text-lg">-</span>
+
+              <Textbox
+                label=""
+                name="priceMax"
+                filter={filter}
+                setFilter={updateFilter}
+                ph={t('max')}
+              />
+            </div>
           </div>
 
           <div className="flex-1">
-            <PriceDropdown
-              label="Price Max"
-              name="priceMax"
-              filter={filter}
-              setFilter={setFilter}
-            />
+            <div className="text-sm text-gray-600">{t('bedrooms')}</div>
+
+            <div className="flex items-center space-x-1">
+              <Textbox
+                label=""
+                name="bedroomMin"
+                filter={filter}
+                setFilter={updateFilter}
+                ph={t('min')}
+              />
+
+              <span className="text-lg">-</span>
+
+              <Textbox
+                label=""
+                name="bedroomMax"
+                filter={filter}
+                setFilter={updateFilter}
+                ph={t('max')}
+              />
+            </div>
           </div>
 
           <div className="flex-1">
-            <div className="text-sm text-gray-600">Travel Time</div>
+            <div className="text-sm text-gray-600">{t('travel-time')}</div>
             <select
               className="border rounded px-2 py-1 max-h-40 overflow-y-auto w-full"
               value={filter.travelTime}
-              onChange={e => setFilter({ ...filter, travelTime: e.target.value })}
+              onChange={e => updateFilter({ ...filter, travelTime: e.target.value })}
             >
               <option>Any</option>
               <option>10 min</option>
@@ -95,9 +102,9 @@ export default function Search() {
           </div>
 
           <div className="flex gap-4">
-            <MoreFilterModal filter={filter} setFilter={setFilter} />
+            <MoreFilterModal filter={filter} setFilter={updateFilter} />
             <button className="bg-blue-primary text-white px-4 py-1 rounded mt-4">
-              <a href="/findAHome">Go</a>
+              <Link href="/findAHome">Go</Link>
             </button>
           </div>
         </div>

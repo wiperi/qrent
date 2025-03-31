@@ -1,7 +1,31 @@
+// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+// @ts-nocheck
+
+import { useTranslations } from 'next-intl';
 import React from 'react';
 import { FaBath, FaBed, FaMapMarkerAlt } from 'react-icons/fa';
+interface House {
+  Price?: number;
+  'Average Score'?: number;
+  Address?: string;
+  Bedrooms?: number;
+  Bathrooms?: number;
+  Keywords: string[];
+  'Address Line 1'?: string;
+  'Address Line 2'?: string;
+  'House Type'?: string;
+  'Number of Bedrooms'?: number;
+  'Number of Bathrooms'?: number;
+  update_time?: string; // assuming update_time is a string (ISO 8601 format or similar)
+  website?: string; // assuming website is a string (URL)
+}
 
-const HouseCard = ({ house }) => {
+interface HouseCardProps {
+  house: House;
+}
+
+const HouseCard: React.FC<HouseCardProps> = ({ house }) => {
+  const t = useTranslations('HouseCard');
   const price = house.Price || 0;
   const scoreValue =
     house['Average Score'] !== null && house['Average Score'] !== undefined
@@ -9,28 +33,34 @@ const HouseCard = ({ house }) => {
       : 'N/A';
 
   let scoreClass = '';
-  let scoreText = `${scoreValue} Points`;
+  const point = t('points');
+
+  let scoreText = `${scoreValue} ${point}`;
+
+  const top = t('top');
+  const good = t('good');
 
   // Adjusted text for top-rated houses
   if (scoreValue !== 'N/A') {
     const numScore = Number(scoreValue);
     if (numScore >= 18.3) {
       scoreClass = 'bg-orange-500 text-white shadow-md shadow-orange-400';
-      scoreText = `TOP / ${scoreText}`; // Shortened text
+      scoreText = `${top} ${scoreText}`; // Shortened text
     } else if (numScore >= 18.0) {
       scoreClass = 'bg-orange-400 text-white shadow-md shadow-orange-400';
-      scoreText = `GOOD / ${scoreText}`; // Shortened text
+      scoreText = `${good} ${scoreText}`; // Shortened text
     } else {
       scoreClass = 'border border-blue-primary text-blue-primary bg-white';
       scoreText = `${scoreText}`; // Shortened text
     }
   }
 
-  const isToday = new Date(house.update_time).toDateString() === new Date().toDateString();
+  const isToday =
+    house.update_time && new Date(house.update_time).toDateString() === new Date().toDateString();
 
   let keywordsHtml = '';
   if (house['Keywords']) {
-    let keywordsArray = house['Keywords'];
+    let keywordsArray: string | string[] = house['Keywords'];
     // Check if the keywords are a string
     if (typeof keywordsArray === 'string') {
       // Split based on common English delimiters like commas, spaces, or periods

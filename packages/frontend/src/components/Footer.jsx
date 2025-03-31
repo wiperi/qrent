@@ -1,18 +1,20 @@
+import { useTranslations } from 'next-intl';
 import Link from 'next/link';
 import React from 'react';
 
 const Footer = () => {
+  const t = useTranslations('Footer');
   return (
     <footer className="footer footer-center bg-base-200 text-base-content rounded p-10">
       <nav className="grid grid-flow-col gap-4">
         <Link href="/about" className="link link-hover font-serif">
-          About
+          {t('about')}
         </Link>
         <Link href="/team" className="link link-hover font-serif">
-          Meet our team
+          {t('meet-our-team')}
         </Link>
         <Link href="/contact" className="link link-hover font-serif">
-          Get in touch
+          {t('get-in-touch')}
         </Link>
       </nav>
       <nav>
