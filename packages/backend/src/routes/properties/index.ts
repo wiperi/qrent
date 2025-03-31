@@ -1,3 +1,4 @@
+import { propertyController } from '@/controllers/PropertyController';
 import { catchError } from '@/utils/helper';
 import { prisma, UserPreference } from '@qrent/shared';
 import { Router } from 'express';
@@ -59,5 +60,7 @@ router.post(
     res.json(properties);
   })
 );
+
+router.post('/:propertyId/subscribe', catchError(propertyController.handleProperty));
 
 export default router;
