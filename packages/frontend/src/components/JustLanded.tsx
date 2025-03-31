@@ -30,7 +30,7 @@ const JustLanded = () => {
         const endpoint =
           school === 'unsw' ? '/api/daily-houses/list' : '/api/daily-houses/usyd/list';
 
-        const response = await fetch(`http://${baseUrl}${endpoint}`, {
+        const response = await fetch(endpoint, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ min_score: 14, limit: 9 }),
@@ -44,7 +44,7 @@ const JustLanded = () => {
         // Fetch update count
         const statsEndpoint =
           school === 'unsw' ? '/api/daily-houses/stats' : '/api/daily-houses/usyd/stats';
-        const statsResponse = await fetch(`${baseUrl}${statsEndpoint}`);
+        const statsResponse = await fetch(statsEndpoint);
 
         if (statsResponse.ok) {
           const stats = await statsResponse.json();
