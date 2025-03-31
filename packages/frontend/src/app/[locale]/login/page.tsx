@@ -27,7 +27,7 @@ const Login = () => {
       const baseurl = await getApiBaseUrl();
       console.log(baseurl);
 
-      const res = await fetch(`${baseurl}/auth/login`, {
+      const res = await fetch(`http://${baseurl}/auth/login`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -40,14 +40,14 @@ const Login = () => {
 
       console.log('Signup successful');
       setNotification({
-        message: 'Registration Successful',
-        description: 'You have successfully registered!',
+        message: 'Login Successful',
+        description: 'You have successfully login!',
         type: 'success',
       });
     } catch (err) {
       console.log(err);
       setNotification({
-        message: 'Registration Failed',
+        message: 'Login Failed',
         description: 'Something went wrong. Please try again!',
         type: 'error',
       });

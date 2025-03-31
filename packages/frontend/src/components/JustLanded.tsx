@@ -30,7 +30,7 @@ const JustLanded = () => {
         const endpoint =
           school === 'unsw' ? '/api/daily-houses/list' : '/api/daily-houses/usyd/list';
 
-        const response = await fetch(`${baseUrl}${endpoint}`, {
+        const response = await fetch(`http://${baseUrl}${endpoint}`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ min_score: 14, limit: 9 }),
