@@ -115,7 +115,7 @@ if __name__ == "__main__":
 
     sql_file = f"data_property_{today_str}.sql"
     merged_output_file = f"merged_rentdata_{current_date}.csv"
-    table_name = "property"
+    table_name = "Property"
     #database connection details
     HOST = os.getenv("DB_HOST")
     USER = os.getenv("DB_USER")
