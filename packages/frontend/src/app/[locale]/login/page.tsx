@@ -21,15 +21,6 @@ const Login = () => {
   } | null>(null);
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [notification, setNotification] = useState<{
-    message: string;
-    description: string;
-    type: 'success' | 'error';
-  } | null>(null);
-
-  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     try {
       console.log(email, password);
