@@ -28,7 +28,7 @@ const Signup = () => {
       const baseurl = await getApiBaseUrl();
       console.log(baseurl);
 
-      const res = await fetch(`http://${baseurl}/auth/register`, {
+      const res = await fetch(`/auth/register`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

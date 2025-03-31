@@ -27,7 +27,7 @@ const Login = () => {
       const baseurl = await getApiBaseUrl();
       console.log(baseurl);
 
-      const res = await fetch(`http://${baseurl}/auth/login`, {
+      const res = await fetch('/auth/login', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
