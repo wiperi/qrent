@@ -54,7 +54,6 @@ model Property {
   url           String?   @db.VarChar(255)
   // Date and time when the property was published
   publishedAt   DateTime? @db.DateTime
-
   // Users who have saved or are interested in this property
   users User[]
 
