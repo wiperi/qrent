@@ -34,11 +34,12 @@ const Login = () => {
         },
         body: JSON.stringify({ email, password }),
       });
+
       if (!res.ok) {
-        throw new Error('Signup failed');
+        throw new Error('Login failed');
       }
 
-      console.log('Signup successful');
+      console.log('Login successful');
       setNotification({
         message: 'Login Successful',
         description: 'You have successfully login!',
