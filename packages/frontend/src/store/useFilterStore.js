@@ -25,7 +25,7 @@ export const useFilterStore = create()(
     }),
     {
       name: 'filter-progress', // Unique name for the filter state storage
-      storage: createJSONStorage(() => sessionStorage), // Using sessionStorage for persistence
+      storage: createJSONStorage(() => localStorage), // Using sessionStorage for persistence
     }
   )
 );

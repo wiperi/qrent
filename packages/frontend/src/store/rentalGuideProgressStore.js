@@ -19,7 +19,7 @@ export const useRentalGuideProgressStore = create()(
     }),
     {
       name: 'rental-guide-progress', // Unique name for the progress storage
-      storage: createJSONStorage(() => sessionStorage), // Using sessionStorage for progress persistence
+      storage: createJSONStorage(() => localStorage), // Using sessionStorage for progress persistence
     }
   )
 );
