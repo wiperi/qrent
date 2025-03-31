@@ -76,7 +76,8 @@ def scrape_property_data(university):
                     else:
                         available_date = "N/A"
 
-            return description, available_date
+            published_at = datetime.now().strftime('%Y-%m-%d')
+            return description, available_date, published_at
 
         except Exception as e:
             print(f"Error scraping URL {url}: {e}")
@@ -90,6 +91,7 @@ def scrape_property_data(university):
 
         today_data.at[index, 'description'] = description
         today_data.at[index, 'availableDate'] = avail_date
+        today_data.at[index, 'publishedAt'] = published_at
     driver.quit()
 
     today_data.to_csv(output_file, index=False, encoding='utf-8')

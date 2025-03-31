@@ -89,7 +89,7 @@ def update_commute_time(university):
     if university.lower() == 'unsw':
         destination_coord = "151.23143:-33.917129:EPSG:4326"  # UNSW Kensington
     elif university.lower() == 'usyd':
-        destination_coord = "151.186:33.888:EPSG:4326"  # USYD
+        destination_coord = "151.18672:-33.888333:EPSG:4326"  # USYD
     else:
         raise ValueError("Unsupported university. Please use 'unsw' or 'usyd'.")
 
