@@ -5,28 +5,54 @@ import { Input } from '@/src/components/input';
 import { cn } from '@/src/lib/utils';
 import Link from 'next/link';
 import { useTranslations } from 'next-intl';
+import NotificationCard from '@/src/components/NotificationCard';
+
+async function getApiBaseUrl() {
+  return process.env.NEXT_PUBLIC_BACKEND_URL || 'http://localhost:5000';
+}
 
 const Signup = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [notification, setNotification] = useState<{
+    message: string;
+    description: string;
+    type: 'success' | 'error';
+  } | null>(null);
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
-    console.log(email, password);
+    try {
+      console.log(email, password);
+      const baseurl = await getApiBaseUrl();
+      console.log(baseurl);
 
-    // try {
-    //   console.log(email, password);
-    //   const res = await fetch("http://localhost:3001/auth/register", {
-    //     method: "POST",
-    //     headers: {
-    //       "Content-Type": "application/json",
-    //     },
-    //     body: JSON.stringify({ email, password }),
-    //   });
-    // } catch (err) {
-    //   console.log("failed");
-    // }
+      const res = await fetch(`${baseurl}/auth/register`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ email, password }),
+      });
+      if (!res.ok) {
+        throw new Error('Signup failed');
+      }
+
+      console.log('Signup successful');
+      setNotification({
+        message: 'Registration Successful',
+        description: 'You have successfully registered!',
+        type: 'success',
+      });
+    } catch (err) {
+      console.log(err);
+      setNotification({
+        message: 'Registration Failed',
+        description: 'Something went wrong. Please try again!',
+        type: 'error',
+      });
+    }
   };
 
   const t = useTranslations('Signup');
@@ -87,6 +113,14 @@ const Signup = () => {
           </Link>
         </div>
       </form>
+
+      {notification && (
+        <NotificationCard
+          message={notification.message}
+          description={notification.description}
+          type={notification.type}
+        />
+      )}
     </div>
   );
 };
