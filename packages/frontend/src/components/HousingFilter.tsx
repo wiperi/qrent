@@ -1,13 +1,69 @@
 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
 // @ts-nocheck
 
-import React from 'react';
+import React, { useState } from 'react';
 import Textbox from './priceDropDown';
 import RatingSlider from './Slider';
 import { useTranslations } from 'next-intl';
+import { useFilterStore } from '../store/useFilterStore';
 
-const HousingFilter = ({ filter, setFilter }) => {
+const SUBURB_OPTIONS = {
+  unsw: [
+    'Alexandria',
+    'Bondi',
+    'Botany',
+    'Coogee',
+    'Eastgardens',
+    'Eastlakes',
+    'Hillsdale',
+    'Kensington',
+    'Kingsford',
+    'Maroubra',
+    'Mascot',
+    'Matraville',
+    'Paddington',
+    'Randwick',
+    'Redfern',
+    'Rosebery',
+    'Waterloo',
+    'WolliCreek',
+    'Zetland',
+  ],
+  usyd: [
+    'Burwood',
+    'Chippendale',
+    'City',
+    'Glebe',
+    'Haymarket',
+    'Hurstville',
+    'Mascot',
+    'Newtown',
+    'Ultimo',
+    'Waterloo',
+    'WolliCreek',
+    'Zetland',
+  ],
+};
+
+const HousingFilter = () => {
   const t = useTranslations('Search');
+
+  const [isAccordionOpen, setAccordionOpen] = useState(true);
+
+  const { filter, updateFilter } = useFilterStore();
+
+  const checkboxOptions = ['Any', ...SUBURB_OPTIONS.unsw, ...SUBURB_OPTIONS.usyd];
+
+  const handleCheckboxChange = area => {
+    if (filter.area.includes(area)) {
+      // If the area is already selected, remove it
+      updateFilter({ area: filter.area.filter(item => item !== area) });
+    } else {
+      // If the area is not selected, add it
+      updateFilter({ area: [...filter.area, area] });
+    }
+  };
+
   return (
     <>
       {/* University */}
@@ -16,7 +72,7 @@ const HousingFilter = ({ filter, setFilter }) => {
         <select
           className="border rounded px-2 py-1 max-h-40 overflow-y-auto w-full"
           value={filter.university}
-          onChange={e => setFilter({ ...filter, university: e.target.value })}
+          onChange={e => updateFilter({ ...filter, university: e.target.value })}
         >
           <option>Any</option>
           <option>UNSW</option>
@@ -29,10 +85,22 @@ const HousingFilter = ({ filter, setFilter }) => {
         <div className="text-lg text-gray-600 font-bold">{t('price-range')}</div>
         <div className="flex justify-between gap-4">
           <div className="flex-1">
-            <Textbox label="" name="priceMin" filter={filter} setFilter={setFilter} ph={t('min')} />
+            <Textbox
+              label=""
+              name="priceMin"
+              filter={filter}
+              updateFilter={updateFilter}
+              ph={t('min')}
+            />
           </div>
           <div className="flex-1">
-            <Textbox label="" name="priceMax" filter={filter} setFilter={setFilter} ph={t('max')} />
+            <Textbox
+              label=""
+              name="priceMax"
+              filter={filter}
+              updateFilter={updateFilter}
+              ph={t('max')}
+            />
           </div>
         </div>
       </div>
@@ -45,7 +113,7 @@ const HousingFilter = ({ filter, setFilter }) => {
               label=""
               name="bedroomMin"
               filter={filter}
-              setFilter={setFilter}
+              setFilter={updateFilter}
               ph={t('min')}
             />
           </div>
@@ -54,7 +122,7 @@ const HousingFilter = ({ filter, setFilter }) => {
               label=""
               name="bedroomMax"
               filter={filter}
-              setFilter={setFilter}
+              setFilter={updateFilter}
               ph={t('max')}
             />
           </div>
@@ -69,7 +137,7 @@ const HousingFilter = ({ filter, setFilter }) => {
               label=""
               name="bathroomMin"
               filter={filter}
-              setFilter={setFilter}
+              setFilter={updateFilter}
               ph={t('min')}
             />
           </div>
@@ -78,7 +146,7 @@ const HousingFilter = ({ filter, setFilter }) => {
               label=""
               name="bathroomMax"
               filter={filter}
-              setFilter={setFilter}
+              setFilter={updateFilter}
               ph={t('max')}
             />
           </div>
@@ -92,7 +160,7 @@ const HousingFilter = ({ filter, setFilter }) => {
           <select
             className="border rounded px-2 py-1 max-h-40 overflow-y-auto w-full"
             value={filter.propertyType}
-            onChange={e => setFilter({ ...filter, propertyType: e.target.value })}
+            onChange={e => updateFilter({ ...filter, propertyType: e.target.value })}
           >
             <option>Any</option>
             <option>House</option>
@@ -101,10 +169,39 @@ const HousingFilter = ({ filter, setFilter }) => {
         </div>
       </div>
 
+      <div className="mt-4">
+        <div
+          className="text-lg text-gray-600 font-bold cursor-pointer"
+          onClick={() => setAccordionOpen(!isAccordionOpen)}
+        >
+          Area
+        </div>
+
+        {isAccordionOpen && (
+          <div className="mt-2 max-h-52 overflow-y-auto  grid grid-cols-2 gap-2">
+            {checkboxOptions.map((option, index) => (
+              <div key={index} className="flex items-center">
+                <input
+                  type="checkbox"
+                  id={`checkbox-${index}`}
+                  value={option}
+                  checked={filter.area.includes(option)}
+                  onChange={() => handleCheckboxChange(option)}
+                  className="mr-2"
+                />
+                <label htmlFor={`checkbox-${index}`} className="text-gray-600">
+                  {option}
+                </label>
+              </div>
+            ))}
+          </div>
+        )}
+      </div>
+
       {/* Rate */}
       <div className="mt-4">
         <div className="text-lg text-gray-600 font-bold">{t('rate')}</div>
-        <RatingSlider filter={filter} setFilter={setFilter} />
+        <RatingSlider filter={filter} updateFilter={updateFilter} />
       </div>
 
       <div className="mt-4">
@@ -112,7 +209,7 @@ const HousingFilter = ({ filter, setFilter }) => {
         <select
           className="border rounded px-2 py-1 max-h-40 overflow-y-auto w-full"
           value={filter.travelTime}
-          onChange={e => setFilter({ ...filter, travelTime: e.target.value })}
+          onChange={e => updateFilter({ ...filter, travelTime: e.target.value })}
         >
           <option>Any</option>
           <option>10 min</option>
@@ -133,7 +230,7 @@ const HousingFilter = ({ filter, setFilter }) => {
           type="date"
           className="border rounded px-2 py-1 mt-2"
           value={filter.avaliableDate}
-          onChange={e => setFilter({ ...filter, avaliableDate: e.target.value })}
+          onChange={e => updateFilter({ ...filter, avaliableDate: e.target.value })}
         />
       </div>
     </>

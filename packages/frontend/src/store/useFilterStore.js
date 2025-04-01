@@ -15,7 +15,7 @@ export const useFilterStore = create()(
         bathroomMin: 'Any',
         bathroomMax: 'Any',
         propertyType: 'Any',
-        area: 'Any',
+        area: [],
         rate: 13,
         avaliableDate: 'Any',
       },
