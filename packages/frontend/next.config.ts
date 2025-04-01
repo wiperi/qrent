@@ -10,14 +10,12 @@ const nextConfig: NextConfig = {
         destination: 'http://134.175.168.147:5000/api/:path*',
       },
       {
-        source: '/:locale/auth/login',
+        source: '/:locale?/auth/login',
         destination: 'http://139.180.164.78:3201/auth/login',
-        basePath: false,
       },
       {
-        source: '/:locale/auth/register',
+        source: '/:locale?/auth/register',
         destination: 'http://139.180.164.78:3201/auth/register',
-        basePath: false,
       },
     ];
   },

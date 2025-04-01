@@ -1,6 +1,6 @@
 'use client';
 import HousingFilter from '@/src/components/HousingFilter';
-import HousingList from '@/src/components/HousingList';
+import HousingListInEfficiencyFilter from '@/src/components/HousingListInEfficiencyFilter';
 import { useFilterStore } from '@/src/store/useFilterStore';
 import React from 'react';
 
@@ -18,8 +18,7 @@ const Page = () => {
 
         {/* Right: Housing Listings */}
         <section className="flex-[8] col-span-2 bg-white shadow-lg rounded-lg p-6">
-          <h2 className="text-xl font-bold mb-4">Properties in Sydney</h2>
-          <HousingList />
+          <HousingListInEfficiencyFilter />
         </section>
       </div>
     </div>
