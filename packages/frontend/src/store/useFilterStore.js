@@ -18,6 +18,8 @@ export const useFilterStore = create()(
         area: [],
         rate: 13,
         avaliableDate: 'Any',
+        page: 1,
+        page_size: 10,
       },
       updateFilter: newFilter => {
         set({ filter: { ...get().filter, ...newFilter } });

@@ -174,7 +174,7 @@ const HousingFilter = () => {
           className="text-lg text-gray-600 font-bold cursor-pointer"
           onClick={() => setAccordionOpen(!isAccordionOpen)}
         >
-          Area
+          {t('area')}
         </div>
 
         {isAccordionOpen && (

@@ -1,12 +1,9 @@
 'use client';
 import HousingFilter from '@/src/components/HousingFilter';
 import HousingListInEfficiencyFilter from '@/src/components/HousingListInEfficiencyFilter';
-import { useFilterStore } from '@/src/store/useFilterStore';
 import React from 'react';
 
 const Page = () => {
-  const { filter, updateFilter } = useFilterStore();
-  // TODO: Housing list add filter filtering
   return (
     <div className="min-h-auto">
       {/* Main Content Layout */}

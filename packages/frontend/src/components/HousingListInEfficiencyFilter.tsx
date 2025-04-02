@@ -4,30 +4,15 @@
 'use client';
 import { useState, useEffect } from 'react';
 import JustLandedHouseCard from './JustLandedHouseCard';
-import { useTranslations } from 'next-intl';
-
-async function getApiBaseUrl() {
-  return process.env.NEXT_PUBLIC_BACKEND_URL_OLD || 'http://localhost:5000';
-}
+import { useFilterStore } from '../store/useFilterStore';
 
 const HousingListInEfficiencyFilter = () => {
-  const t = useTranslations('JustLanded');
-  const [school] = useState('unsw');
   const [listings, setListings] = useState([]);
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState(null);
+  const [error] = useState(null);
   const [currentPage, setCurrentPage] = useState(1);
-  const [pageSize, setPageSize] = useState(10);
   const [totalPages, setTotalPages] = useState(1);
-
-  const getFilterValues = () => {
-    const filters = {
-      page: currentPage,
-      page_size: pageSize,
-    };
-
-    return filters;
-  };
+  const { filter, updateFilter } = useFilterStore();
 
   const buildApiUrl = async filters => {
     const endpoint = '/api/data';
@@ -48,10 +33,9 @@ const HousingListInEfficiencyFilter = () => {
 
   const fetchData = async () => {
     setLoading(true);
-    const filters = getFilterValues();
 
     try {
-      const apiUrl = await buildApiUrl(filters);
+      const apiUrl = await buildApiUrl(filter);
       const response = await fetch(apiUrl);
 
       const result = await response.json();
@@ -66,18 +50,20 @@ const HousingListInEfficiencyFilter = () => {
 
   const handleNextPage = () => {
     setCurrentPage(prevPage => prevPage + 1);
+    updateFilter({ ...filter, page: currentPage });
   };
 
   const handlePrevPage = () => {
     setCurrentPage(prevPage => (prevPage > 1 ? prevPage - 1 : 1));
+    updateFilter({ ...filter, page: currentPage });
   };
 
   useEffect(() => {
     fetchData();
-  }, [currentPage, pageSize]);
+  }, [currentPage, filter]);
 
   return (
-    <div className="grid grid-cols-1 gap-4 overflow-y-auto max-h-[700px]">
+    <div className="grid grid-cols-1 gap-4 overflow-y-auto max-h-[900px]">
       {/* Error Message */}
       {error && <p className="text-red-500">{error}</p>}
       {!loading && !error && listings.length === 0 && <p>No new listings available.</p>}
