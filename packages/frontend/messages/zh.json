@@ -24,7 +24,8 @@
     "min": "最少",
     "max": "最多",
     "save": "保存",
-    "price": "价格"
+    "price": "价格",
+    "area": "地区"
   },
   "HeroButton": {
     "rental-guide": "租房指南",
