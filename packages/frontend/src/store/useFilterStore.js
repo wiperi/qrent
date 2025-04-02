@@ -15,9 +15,11 @@ export const useFilterStore = create()(
         bathroomMin: 'Any',
         bathroomMax: 'Any',
         propertyType: 'Any',
-        area: 'Any',
+        area: [],
         rate: 13,
         avaliableDate: 'Any',
+        page: 1,
+        page_size: 10,
       },
       updateFilter: newFilter => {
         set({ filter: { ...get().filter, ...newFilter } });
