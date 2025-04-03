@@ -15,9 +15,11 @@ export const useFilterStore = create()(
         bathroomMin: 'Any',
         bathroomMax: 'Any',
         propertyType: 'Any',
-        area: 'Any',
+        area: [],
         rate: 13,
         avaliableDate: 'Any',
+        page: 1,
+        page_size: 10,
       },
       updateFilter: newFilter => {
         set({ filter: { ...get().filter, ...newFilter } });
@@ -25,7 +27,7 @@ export const useFilterStore = create()(
     }),
     {
       name: 'filter-progress', // Unique name for the filter state storage
-      storage: createJSONStorage(() => sessionStorage), // Using sessionStorage for persistence
+      storage: createJSONStorage(() => localStorage), // Using sessionStorage for persistence
     }
   )
 );

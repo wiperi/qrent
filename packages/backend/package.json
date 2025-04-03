@@ -4,7 +4,8 @@
   "main": "index.js",
   "scripts": {
     "test": "jest",
-    "dev": "ts-node-dev -r tsconfig-paths/register -T src/server.ts"
+    "dev": "ts-node-dev -r tsconfig-paths/register -T src/server.ts",
+    "start": "ts-node -r tsconfig-paths/register -T src/server.ts"
   },
   "dependencies": {
     "@qrent/shared": "workspace:*",

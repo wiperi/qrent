@@ -31,7 +31,8 @@
     "min": "Min",
     "max": "Max",
     "save": "Save",
-    "price": "Price"
+    "price": "Price",
+    "area": "Area"
   },
   "HeroButton": {
     "rental-guide": "Rental Guide",
