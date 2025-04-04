@@ -4,7 +4,7 @@ from tqdm import tqdm
 from datetime import datetime, timedelta
 import os
 from dotenv import load_dotenv
-load_dotenv('.env-public')
+load_dotenv('.env')
 
 API_BASE_URL = 'https://api.transport.nsw.gov.au/v1/tp/'
 API_KEY =  os.getenv('API_KEY')
@@ -103,7 +103,7 @@ def update_commute_time(university):
             travel_time = find_shortest_travel_time(origin_coord, destination_coord, time_="0900")
             data.loc[index, 'commuteTime'] = travel_time if travel_time is not None else "N/A"
         else:
-            data.loc[index, 'commuteTime'] = "N/A"
+            data.loc[index, 'commuteTime'] = 0
 
     data.to_csv(output_file, index=False)
     print(f"save data to:{output_file}")
