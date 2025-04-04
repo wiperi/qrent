@@ -20,31 +20,33 @@ dotenv.config();
 // Middleware to parse JSON bodies
 app.use(express.json());
 
-// Use middleware that allows for access from other domains
-const allowedOrigins =
-  process.env.NODE_ENV === 'production'
-    ? [process.env.FRONTEND_URL || 'https://yourdomain.com'] // Production origins
-    : ['http://localhost:3000']; // Development origins
+// // Use middleware that allows for access from other domains
+// const allowedOrigins =
+//   process.env.NODE_ENV === 'production'
+//     ? [process.env.FRONTEND_URL || 'https://yourdomain.com'] // Production origins
+//     : ['http://localhost:3000']; // Development origins
 
-app.use(
-  cors({
-    origin: (origin, callback) => {
-      // Allow requests with no origin (like mobile apps, curl requests)
-      if (!origin) return callback(null, true);
+// app.use(
+//   cors({
+//     origin: (origin, callback) => {
+//       // Allow requests with no origin (like mobile apps, curl requests)
+//       if (!origin) return callback(null, true);
 
-      if (allowedOrigins.indexOf(origin) === -1) {
-        const msg =
-          'The CORS policy for this site does not allow access from the specified Origin.';
-        return callback(new Error(msg), false);
-      }
-      return callback(null, true);
-    },
-    methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
-    allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With'],
-    credentials: true, // Allow cookies to be sent with requests
-    maxAge: 86400, // Cache preflight request results for 24 hours (in seconds)
-  })
-);
+//       if (allowedOrigins.indexOf(origin) === -1) {
+//         const msg =
+//           'The CORS policy for this site does not allow access from the specified Origin.';
+//         return callback(new Error(msg), false);
+//       }
+//       return callback(null, true);
+//     },
+//     methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
+//     allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With'],
+//     credentials: true, // Allow cookies to be sent with requests
+//     maxAge: 86400, // Cache preflight request results for 24 hours (in seconds)
+//   })
+// );
+
+app.use(cors());
 
 // Request logging middleware
 app.use(morgan('dev'));
