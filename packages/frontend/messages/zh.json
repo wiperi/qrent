@@ -174,7 +174,8 @@
     "partner": "伴侣",
     "relatives": "亲戚",
     "other-information": "其他信息",
-    "other-info-ph": "e.g. 喜欢做饭，上夜班"
+    "other-info-ph": "e.g. 喜欢做饭，上夜班",
+    "feature-in-progress": "此功能仍在开发中，暂不可用。"
   },
   "LanguageSwitcher": {
     "english": "英文",

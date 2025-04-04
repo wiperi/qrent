@@ -181,7 +181,8 @@
     "partner": "Partner",
     "relatives": "Relatives",
     "other-information": "Other Information",
-    "other-info-ph": "e.g. Likes to cook, works night shifts"
+    "other-info-ph": "e.g. Likes to cook, works night shifts",
+    "feature-in-progress": "This feature is currently under development and not yet functional."
   },
   "LanguageSwitcher": {
     "english": "English",

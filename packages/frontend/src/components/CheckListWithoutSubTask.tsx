@@ -20,13 +20,13 @@ interface CheckListWithoutSubTaskProps {
 
 const CheckListWithoutSubTask: React.FC<CheckListWithoutSubTaskProps> = ({ title, items }) => {
   const iconMap = [
-    <Book className="text-blue-primary" />,
-    <FileText className="text-blue-primary" />,
-    <CreditCard className="text-blue-primary" />,
-    <Banknote className="text-blue-primary" />,
-    <Newspaper className="text-blue-primary" />,
-    <File className="text-blue-primary" />,
-    <PenTool className="text-blue-primary" />,
+    <Book key="book" className="text-blue-primary" />,
+    <FileText key="filetext" className="text-blue-primary" />,
+    <CreditCard key="creditcard" className="text-blue-primary" />,
+    <Banknote key="banknote" className="text-blue-primary" />,
+    <Newspaper key="newspaper" className="text-blue-primary" />,
+    <File key="file" className="text-blue-primary" />,
+    <PenTool key="pentool" className="text-blue-primary" />,
   ];
 
   const { checkedTasks, updateProgress } = usePrepareDocProgressStore();
@@ -61,7 +61,7 @@ const CheckListWithoutSubTask: React.FC<CheckListWithoutSubTaskProps> = ({ title
 
       {/* Checklist */}
       {items.map((item, index) => (
-        <div key={index} className="bg-gray-100 rounded-xl p-4 shadow-md mt-4 max-w-[300px]">
+        <div key={item} className="bg-gray-100 rounded-xl p-4 shadow-md mt-4 max-w-[300px]">
           <label className="flex items-center py-2">
             {/* Item text & icon (Left) */}
             <span className="text-md flex items-center space-x-2">
