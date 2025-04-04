@@ -3,6 +3,7 @@
 
 'use client';
 
+import { ChevronDown } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 import { useState } from 'react';
 import 'react-datepicker/dist/react-datepicker.css';
@@ -191,10 +192,15 @@ const LetterForm = () => {
           <div className="pb-1">
             <h2 className="text-xl font-semibold">
               <button
-                className="w-full text-left py-3 px-4 bg-gray-100 rounded-md"
+                className="w-full text-left py-3 px-4 bg-gray-100 rounded-md flex items-center justify-between"
                 onClick={() => toggleAccordion(1)}
               >
-                1. {t('student-info')}
+                <span>{t('student-info')}</span>
+                <ChevronDown
+                  className={`w-5 h-5 transform transition-transform duration-300 ${
+                    openAccordion === 1 ? 'rotate-180' : 'rotate-0'
+                  }`}
+                />
               </button>
             </h2>
             <div
@@ -307,10 +313,15 @@ const LetterForm = () => {
           <div className="pb-1">
             <h2 className="text-xl font-semibold">
               <button
-                className="w-full text-left py-3 px-4 bg-gray-100 rounded-md"
+                className="w-full text-left py-3 px-4 bg-gray-100 rounded-md flex items-center justify-between"
                 onClick={() => toggleAccordion(2)}
               >
-                2. {t('living-plan')}
+                <span>2. {t('living-plan')}</span>
+                <ChevronDown
+                  className={`w-5 h-5 transform transition-transform duration-300 ${
+                    openAccordion === 1 ? 'rotate-180' : 'rotate-0'
+                  }`}
+                />
               </button>
             </h2>
             <div
@@ -361,10 +372,15 @@ const LetterForm = () => {
           <div className="pb-1">
             <h2 className="text-xl font-semibold">
               <button
-                className="w-full text-left py-3 px-4 bg-gray-100 rounded-md"
+                className="w-full text-left py-3 px-4 bg-gray-100 rounded-md flex items-center justify-between"
                 onClick={() => toggleAccordion(3)}
               >
-                3. {t('financial-statement')}
+                <span>3. {t('financial-statement')}</span>
+                <ChevronDown
+                  className={`w-5 h-5 transform transition-transform duration-300 ${
+                    openAccordion === 1 ? 'rotate-180' : 'rotate-0'
+                  }`}
+                />
               </button>
             </h2>
             <div
@@ -405,10 +421,15 @@ const LetterForm = () => {
           <div className="pb-1">
             <h2 className="text-xl font-semibold">
               <button
-                className="w-full text-left py-3 px-4 bg-gray-100 rounded-md"
+                className="w-full text-left py-3 px-4 bg-gray-100 rounded-md flex items-center justify-between"
                 onClick={() => toggleAccordion(4)}
               >
-                4. {t('rental-history')}
+                <span>4. {t('rental-history')}</span>
+                <ChevronDown
+                  className={`w-5 h-5 transform transition-transform duration-300 ${
+                    openAccordion === 1 ? 'rotate-180' : 'rotate-0'
+                  }`}
+                />
               </button>
             </h2>
 
@@ -488,10 +509,15 @@ const LetterForm = () => {
           <div className="pb-1">
             <h2 className="text-xl font-semibold">
               <button
-                className="w-full text-left py-3 px-4 bg-gray-100 rounded-md"
+                className="w-full text-left py-3 px-4 bg-gray-100 rounded-md flex items-center justify-between"
                 onClick={() => toggleAccordion(5)}
               >
-                5. {t('background')}
+                <span>5. {t('background')}</span>
+                <ChevronDown
+                  className={`w-5 h-5 transform transition-transform duration-300 ${
+                    openAccordion === 1 ? 'rotate-180' : 'rotate-0'
+                  }`}
+                />
               </button>
             </h2>
             <div
@@ -560,10 +586,15 @@ const LetterForm = () => {
           <div className="pb-1">
             <h2 className="text-xl font-semibold">
               <button
-                className="w-full text-left py-3 px-4 bg-gray-100 rounded-md"
+                className="w-full text-left py-3 px-4 bg-gray-100 rounded-md flex items-center justify-between"
                 onClick={() => toggleAccordion(7)}
               >
-                1. {t('guarantor-info')}
+                <span>1. {t('guarantor-info')}</span>
+                <ChevronDown
+                  className={`w-5 h-5 transform transition-transform duration-300 ${
+                    openAccordion === 1 ? 'rotate-180' : 'rotate-0'
+                  }`}
+                />
               </button>
             </h2>
             <div
@@ -719,10 +750,15 @@ const LetterForm = () => {
           <div className="pb-1">
             <h2 className="text-xl font-semibold">
               <button
-                className="w-full text-left py-3 px-4 bg-gray-100 rounded-md"
+                className="w-full text-left py-3 px-4 bg-gray-100 rounded-md flex items-center justify-between"
                 onClick={() => toggleAccordion(8)}
               >
-                2. {t('financial-support')}
+                <span>2. {t('financial-support')}</span>
+                <ChevronDown
+                  className={`w-5 h-5 transform transition-transform duration-300 ${
+                    openAccordion === 1 ? 'rotate-180' : 'rotate-0'
+                  }`}
+                />
               </button>
             </h2>
             <div
@@ -800,10 +836,15 @@ const LetterForm = () => {
           <div className="pb-1">
             <h2 className="text-xl font-semibold">
               <button
-                className="w-full text-left py-3 px-4 bg-gray-100 rounded-md"
+                className="w-full text-left py-3 px-4 bg-gray-100 rounded-md flex items-center justify-between"
                 onClick={() => toggleAccordion(9)}
               >
-                3. {t('proof-guarantor-ability')}
+                <span>3. {t('proof-guarantor-ability')}</span>
+                <ChevronDown
+                  className={`w-5 h-5 transform transition-transform duration-300 ${
+                    openAccordion === 1 ? 'rotate-180' : 'rotate-0'
+                  }`}
+                />
               </button>
             </h2>
             <div
@@ -881,10 +922,15 @@ const LetterForm = () => {
           <div className="pb-1">
             <h2 className="text-xl font-semibold">
               <button
-                className="w-full text-left py-3 px-4 bg-gray-100 rounded-md"
+                className="w-full text-left py-3 px-4 bg-gray-100 rounded-md flex items-center justify-between"
                 onClick={() => toggleAccordion(10)}
               >
-                4. {t('additional-commitment')}
+                <span>4. {t('additional-commitment')}</span>
+                <ChevronDown
+                  className={`w-5 h-5 transform transition-transform duration-300 ${
+                    openAccordion === 1 ? 'rotate-180' : 'rotate-0'
+                  }`}
+                />
               </button>
             </h2>
             <div
