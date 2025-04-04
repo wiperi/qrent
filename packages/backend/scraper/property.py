@@ -9,8 +9,9 @@ from target_areas import postcodes_unsw, postcodes_usyd
 from datetime import datetime
 from scraper_detailed import scrape_property_data
 from data_cleaner import clean_rental_data
-from change_to_sql import csv_to_sql, import_sql_file_to_remote_db
 from commute_time import update_commute_time
+from point import main as process_missing_fields
+from change_to_sql import push_delta_to_remote_db
 # Base URL template for rental listings
 base_url = "https://www.domain.com.au/rent/{}/?excludedeposittaken=1"
 
@@ -109,6 +110,7 @@ if __name__ == "__main__":
     today_str = datetime.now().strftime('%y%m%d')
     update_commute_time('UNSW')
     update_commute_time('USYD')
+    process_missing_fields()
 
     csv_file_1 = output_file1
     csv_file_2 = output_file2
@@ -129,15 +131,8 @@ if __name__ == "__main__":
         df2 = pd.read_csv(csv_file_2)
         merged_df = pd.concat([df1, df2])
         merged_df.to_csv(merged_output_file, index=False)
-        csv_to_sql(merged_output_file, table_name, sql_file)   
-        import_sql_file_to_remote_db(
-            host=HOST,
-            user=USER,
-            password=PASSWORD,
-            database=DATABASE,
-            port=PORT,
-            sql_file_path=sql_file
-        )
+        key_column = "houseId"
+        push_delta_to_remote_db(merged_output_file, table_name, key_column, HOST, USER, PASSWORD, DATABASE, PORT) 
     else:
         print(f"[ERROR]  '{csv_file_1}' does not exist. Please check the file path.")
     # Remove the temporary files
