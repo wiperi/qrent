@@ -162,6 +162,8 @@ const LetterForm = () => {
     setCLInfo({ ...CLInfo, previousExperiences: updatedExperiences });
   };
 
+  const [showFlatmate, setShowFlatmate] = useState(false);
+
   return (
     <div className="space-y-6">
       <div className="flex space-x-4 mb-6">
@@ -232,6 +234,69 @@ const LetterForm = () => {
                       value={CLInfo.major}
                       onChange={e => setCLInfo({ ...CLInfo, major: e.target.value })}
                     />
+                  </div>
+
+                  {/* flatmate information (if have) */}
+                  <div>
+                    <div className="flex items-center mt-4">
+                      <span className="mr-3 text-sm font-medium">{t('add-flatmate')}</span>
+                      <button
+                        type="button"
+                        onClick={() => setShowFlatmate(!showFlatmate)}
+                        className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors duration-300 ${
+                          showFlatmate ? 'bg-blue-primary' : 'bg-gray-300'
+                        }`}
+                      >
+                        <span
+                          className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform duration-300 ${
+                            showFlatmate ? 'translate-x-6' : 'translate-x-1'
+                          }`}
+                        />
+                      </button>
+                    </div>
+
+                    {showFlatmate && (
+                      <div className="mt-4 space-y-4 pl-4 ">
+                        <div>
+                          <label className="block text-sm font-medium">
+                            {t('name-of-flatmate')}
+                          </label>
+                          <input
+                            type="text"
+                            className="form-input mt-1 block w-full rounded-md border-gray-300"
+                            placeholder="e.g. Li Hua"
+                            value={CLInfo.flatmateName ?? ''}
+                            onChange={e => setCLInfo({ ...CLInfo, flatmateName: e.target.value })}
+                          />
+                        </div>
+                        <div>
+                          <label className="block text-sm font-medium">{t('relationship')}</label>
+                          <select
+                            className="form-select mt-1 block w-full rounded-md border-gray-300"
+                            value={CLInfo.relationship ?? ''}
+                            onChange={e => setCLInfo({ ...CLInfo, relationship: e.target.value })}
+                          >
+                            <option value="">{t('please-select')}</option>
+                            <option value="friend">{t('friend')}</option>
+                            <option value="classmate">{t('classmate')}</option>
+                            <option value="partner">{t('partner')}</option>
+                            <option value="other">{t('relatives')}</option>
+                          </select>
+                        </div>
+                        <div>
+                          <label className="block text-sm font-medium">
+                            {t('other-information')}
+                          </label>
+                          <input
+                            type="text"
+                            className="form-input mt-1 block w-full rounded-md border-gray-300"
+                            placeholder={t('other-info-ph')}
+                            value={CLInfo.otherInfo ?? ''}
+                            onChange={e => setCLInfo({ ...CLInfo, otherInfo: e.target.value })}
+                          />
+                        </div>
+                      </div>
+                    )}
                   </div>
                 </div>
               )}
