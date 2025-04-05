@@ -164,7 +164,18 @@
     "joint-liability": "连带责任声明",
     "will-joint-liability": "愿意承担连带责任",
     "will-joint-msg": "如果您的子女未履行租赁义务，您愿意承担相应责任。",
-    "additional-commitment-ph": "添加更多承诺..."
+    "additional-commitment-ph": "添加更多承诺...",
+    "add-flatmate": "添加合租人信息",
+    "name-of-flatmate": "合租人姓名",
+    "relationship": "关系",
+    "please-select": "请选择",
+    "friend": "朋友",
+    "classmate": "同学",
+    "partner": "伴侣",
+    "relatives": "亲戚",
+    "other-information": "其他信息",
+    "other-info-ph": "e.g. 喜欢做饭，上夜班",
+    "feature-in-progress": "此功能仍在开发中，暂不可用。"
   },
   "LanguageSwitcher": {
     "english": "英文",

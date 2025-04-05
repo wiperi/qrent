@@ -20,6 +20,7 @@ const DocumentPreview = () => {
           <div className="text-center">
             <FileText className="w-12 h-12 mx-auto" />
             <p className="mt-3">{t('doc-preview-intro')}</p>
+            <p className="mt-2 text-sm text-red-500">{t('feature-in-progress')}</p>
           </div>
         )}
       </div>
