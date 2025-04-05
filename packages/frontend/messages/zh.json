@@ -192,5 +192,39 @@
     "points": "分",
     "top": "顶级好房 ",
     "good": "高分好房 "
+  },
+  "CheckList": {
+    "budget_requirements": "确定租房预算与需求（提前5-7周）",
+    "basic_accommodation": "了解住宿的基本类型",
+    "rent_vs_share": "了解整租与分租的优缺点",
+    "budget_range": "确定个人租房预算范围",
+    "personal_requirements": "确定个人对房源的其他要求",
+    "research_area": "了解学校附近区域与租房平台",
+    "area_characteristics": "研究学校周边各区域特点",
+    "target_area": "确定目标区域范围",
+    "rental_websites": "了解相关租房网站的使用",
+    "price_range": "了解房源价格水平",
+    "explore_properties": "了解具体房源与准备申请材料（提前3-4周）",
+    "housing_market": "了解预算内的房源市场情况",
+    "application_materials": "准备租房申请相关材料",
+    "viewing_process": "了解看房/代看房注意事项",
+    "application_process": "了解租房申请相关流程",
+    "view_contact_agents": "积极看房联系（提前两周）",
+    "suitable_start_date": "确定起租日期合适的相关房源",
+    "schedule_viewings": "预约安排看房行程",
+    "follow_up_status": "持续与中介保持沟通，及时跟进申请状态",
+    "sign_deposit_payment": "完成签约与押金支付等（成功签约！）",
+    "rental_contract": "了解标准租房合同",
+    "payment_rules": "了解押金、定金支付与相关规则",
+    "complete_contract": "支付押金、定金，完成合同签订等",
+    "post_rental": "租后事项处理",
+    "inspection_report": "提交房屋检查报告",
+    "utilities_internet": "办理水电网络",
+    "maintenance": "了解维修流程",
+    "completed": "完成",
+    "tasks": "任务"
+  },
+  "RentalGuide": {
+    "rental-process": "租房流程"
   }
 }

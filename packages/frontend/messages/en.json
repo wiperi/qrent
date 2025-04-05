@@ -199,5 +199,39 @@
     "points": "Points",
     "top": "Top / ",
     "good": "Good / "
+  },
+  "CheckList": {
+    "budget_requirements": "Define rental budget and requirements （5-7 weeks in advance）",
+    "basic_accommodation": "Understand basic types of accommodation",
+    "rent_vs_share": "Understand the pros and cons of renting an entire place vs. sharing",
+    "budget_range": "Define personal rental budget range",
+    "personal_requirements": "Define other personal requirements for housing",
+    "research_area": "Research the school area and rental platforms",
+    "area_characteristics": "Research the characteristics of surrounding areas near the school",
+    "target_area": "Determine target area range",
+    "rental_websites": "Understand how to use rental websites",
+    "price_range": "Understand the price range of properties",
+    "explore_properties": "Explore specific properties and prepare application materials （3-4 weeks in advance）",
+    "housing_market": "Understand the housing market within your budget",
+    "application_materials": "Prepare rental application materials",
+    "viewing_process": "Learn about property viewing and representative viewing",
+    "application_process": "Understand rental application processes",
+    "view_contact_agents": "Actively view properties and contact agents （2 weeks in advance）",
+    "suitable_start_date": "Find properties with a suitable start date",
+    "schedule_viewings": "Schedule property viewings",
+    "follow_up_status": "Keep communication with agents and follow up on application status",
+    "sign_deposit_payment": "Complete the signing and deposit payment （successful signing!）",
+    "rental_contract": "Understand standard rental contracts",
+    "payment_rules": "Understand deposit, advance payment rules, and payment processes",
+    "complete_contract": "Pay the deposit and complete contract signing",
+    "post_rental": "Post-rental procedures",
+    "inspection_report": "Submit housing inspection report",
+    "utilities_internet": "Set up utilities and internet",
+    "maintenance": "Learn about maintenance procedures",
+    "completed": "Completed",
+    "tasks": "tasks"
+  },
+  "RentalGuide": {
+    "rental-process": "Rental Process"
   }
 }

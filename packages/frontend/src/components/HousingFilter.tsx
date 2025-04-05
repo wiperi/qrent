@@ -6,6 +6,7 @@ import Textbox from './priceDropDown';
 import RatingSlider from './Slider';
 import { useTranslations } from 'next-intl';
 import { useFilterStore } from '../store/useFilterStore';
+import { ChevronDown } from 'lucide-react';
 
 const SUBURB_OPTIONS = {
   unsw: [
@@ -53,6 +54,8 @@ const HousingFilter = () => {
   const { filter, updateFilter } = useFilterStore();
 
   const checkboxOptions = ['Any', ...SUBURB_OPTIONS.unsw, ...SUBURB_OPTIONS.usyd];
+  const unswAreaOptions = ['Any', ...SUBURB_OPTIONS.unsw];
+  const usydAreaOptions = ['Any', ...SUBURB_OPTIONS.usyd];
 
   const handleCheckboxChange = area => {
     if (filter.area.includes(area)) {
@@ -74,7 +77,6 @@ const HousingFilter = () => {
           value={filter.university}
           onChange={e => updateFilter({ ...filter, university: e.target.value })}
         >
-          <option>Any</option>
           <option>UNSW</option>
           <option>USYD</option>
         </select>
@@ -171,15 +173,40 @@ const HousingFilter = () => {
 
       <div className="mt-4">
         <div
-          className="text-lg text-gray-600 font-bold cursor-pointer"
+          className="text-lg text-gray-600 font-bold cursor-pointer flex items-center justify-between"
           onClick={() => setAccordionOpen(!isAccordionOpen)}
         >
-          {t('area')}
+          <span>{t('area')}</span>
+          <ChevronDown
+            className={`w-5 h-5 transform transition-transform duration-300 ${
+              isAccordionOpen ? 'rotate-180' : 'rotate-0'
+            }`}
+          />
         </div>
 
-        {isAccordionOpen && (
+        {isAccordionOpen && filter.university == 'UNSW' && (
           <div className="mt-2 max-h-52 overflow-y-auto  grid grid-cols-2 gap-2">
-            {checkboxOptions.map((option, index) => (
+            {unswAreaOptions.map((option, index) => (
+              <div key={index} className="flex items-center">
+                <input
+                  type="checkbox"
+                  id={`checkbox-${index}`}
+                  value={option}
+                  checked={filter.area.includes(option)}
+                  onChange={() => handleCheckboxChange(option)}
+                  className="mr-2"
+                />
+                <label htmlFor={`checkbox-${index}`} className="text-gray-600">
+                  {option}
+                </label>
+              </div>
+            ))}
+          </div>
+        )}
+
+        {isAccordionOpen && filter.university == 'USYD' && (
+          <div className="mt-2 max-h-52 overflow-y-auto  grid grid-cols-2 gap-2">
+            {usydAreaOptions.map((option, index) => (
               <div key={index} className="flex items-center">
                 <input
                   type="checkbox"

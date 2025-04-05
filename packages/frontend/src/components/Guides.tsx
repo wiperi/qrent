@@ -27,7 +27,6 @@ import image24 from '@/public/GuideDocImg/image (20).jpg';
 import image25 from '@/public/GuideDocImg/image (21).jpg';
 import image26 from '@/public/GuideDocImg/image (22).jpg';
 import qrent from '@/public/qrent.jpg';
-// import Image from "next/image";
 
 // Guides data:
 //      tag
@@ -293,7 +292,7 @@ const Guides = () => {
                     </div>
                   )}
                   {guide.admin && (
-                    <div className="absolute bottom-3 left-3 bg-[#FF9800] text-white text-sm font-bold px-3 py-1 rounded-full shadow-md">
+                    <div className="absolute bottom-3 right-3 bg-[#FF9800] text-right text-white text-sm font-bold px-3 py-1 rounded-full shadow-md">
                       官方
                     </div>
                   )}
@@ -325,7 +324,7 @@ const Guides = () => {
                     </div>
                   )}
                   {guide.admin && (
-                    <div className="absolute bottom-3 left-3 bg-[#FF9800] text-white text-sm font-bold px-3 py-1 rounded-full shadow-md">
+                    <div className="absolute bottom-3 right-3 bg-[#FF9800] text-right text-white text-sm font-bold px-3 py-1 rounded-full shadow-md">
                       官方
                     </div>
                   )}
@@ -357,7 +356,7 @@ const Guides = () => {
                     </div>
                   )}
                   {guide.admin && (
-                    <div className="absolute bottom-3 left-3 bg-[#FF9800] text-white text-sm font-bold px-3 py-1 rounded-full shadow-md">
+                    <div className="absolute bottom-3 right-3 bg-[#FF9800] text-right text-white text-sm font-bold px-3 py-1 rounded-full shadow-md">
                       官方
                     </div>
                   )}
@@ -389,7 +388,7 @@ const Guides = () => {
                     </div>
                   )}
                   {guide.admin && (
-                    <div className="absolute bottom-3 left-3 bg-[#FF9800] text-white text-sm font-bold px-3 py-1 rounded-full shadow-md">
+                    <div className="absolute bottom-3 right-3 bg-[#FF9800] text-right text-white text-sm font-bold px-3 py-1 rounded-full shadow-md">
                       官方
                     </div>
                   )}
