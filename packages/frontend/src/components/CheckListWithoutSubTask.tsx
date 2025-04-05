@@ -12,22 +12,23 @@ import {
   Newspaper,
 } from 'lucide-react';
 import { usePrepareDocProgressStore } from '../store/prepareDocProgressStore';
+
 interface CheckListWithoutSubTaskProps {
   title: string;
   items: string[];
 }
 
-const iconMap = {
-  Passport: <Book className="text-blue-primary" />,
-  COE: <FileText className="text-blue-primary" />,
-  Visa: <CreditCard className="text-blue-primary" />,
-  'Financial Statement': <Banknote className="text-blue-primary" />,
-  'Cover Letter': <Newspaper className="text-blue-primary" />,
-  'Parent Letter': <File className="text-blue-primary" />,
-  'Recommendation Letter': <PenTool className="text-blue-primary" />,
-};
-
 const CheckListWithoutSubTask: React.FC<CheckListWithoutSubTaskProps> = ({ title, items }) => {
+  const iconMap = [
+    <Book key="book" className="text-blue-primary" />,
+    <FileText key="filetext" className="text-blue-primary" />,
+    <CreditCard key="creditcard" className="text-blue-primary" />,
+    <Banknote key="banknote" className="text-blue-primary" />,
+    <Newspaper key="newspaper" className="text-blue-primary" />,
+    <File key="file" className="text-blue-primary" />,
+    <PenTool key="pentool" className="text-blue-primary" />,
+  ];
+
   const { checkedTasks, updateProgress } = usePrepareDocProgressStore();
   const handleCheckboxChange = (task: string) => {
     const isChecked = !checkedTasks[task];
@@ -60,13 +61,11 @@ const CheckListWithoutSubTask: React.FC<CheckListWithoutSubTaskProps> = ({ title
 
       {/* Checklist */}
       {items.map((item, index) => (
-        <div key={index} className="bg-gray-100 rounded-xl p-4 shadow-md mt-4 max-w-[300px]">
+        <div key={item} className="bg-gray-100 rounded-xl p-4 shadow-md mt-4 max-w-[300px]">
           <label className="flex items-center py-2">
             {/* Item text & icon (Left) */}
             <span className="text-md flex items-center space-x-2">
-              {iconMap[item as keyof typeof iconMap] || (
-                <span className="w-5 h-5 bg-gray-300 rounded-full"></span>
-              )}
+              {iconMap[index] || <span className="w-5 h-5 bg-gray-300 rounded-full"></span>}
               <span>{item}</span>
             </span>
             {/* Checkbox (Rightmost) */}

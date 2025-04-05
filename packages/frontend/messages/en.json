@@ -171,7 +171,18 @@
     "joint-liability": "Joint Liability Statement",
     "will-joint-liability": "Willing to assume joint liability.",
     "will-joint-msg": "If your child fails to fulfill the obligations of the lease, you are willing to assume the corresponding responsibility.",
-    "additional-commitment-ph": "Add more commitment..."
+    "additional-commitment-ph": "Add more commitment...",
+    "add-flatmate": "Add Flatmate Info",
+    "name-of-flatmate": "Name of Flatmate",
+    "relationship": "Relationship",
+    "please-select": "Please select",
+    "friend": "Friend",
+    "classmate": "Classmate",
+    "partner": "Partner",
+    "relatives": "Relatives",
+    "other-information": "Other Information",
+    "other-info-ph": "e.g. Likes to cook, works night shifts",
+    "feature-in-progress": "This feature is currently under development and not yet functional."
   },
   "LanguageSwitcher": {
     "english": "English",
