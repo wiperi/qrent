@@ -5,7 +5,7 @@ import { Input } from '@/src/components/input';
 import { cn } from '@/src/lib/utils';
 import Link from 'next/link';
 import { useTranslations } from 'next-intl';
-import NotificationCard from '@/src/components/NotificationCard';
+import { Alert } from '@heroui/react';
 
 async function getApiBaseUrl() {
   return process.env.NEXT_PUBLIC_BACKEND_URL || 'http://localhost:5000';
@@ -14,11 +14,14 @@ async function getApiBaseUrl() {
 const Signup = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [notification, setNotification] = useState<{
-    message: string;
-    description: string;
-    type: 'success' | 'error';
-  } | null>(null);
+
+  const [isSuccVisible, setisSuccVisible] = useState(false);
+  const succTitle = 'SignUp successful!';
+  const succDes = 'Please login to continue.';
+
+  const [isFailVisible, setisFailVisible] = useState(false);
+  const failTitle = 'SignUp failed!';
+  const failDes = 'Please try again.';
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -41,18 +44,10 @@ const Signup = () => {
       }
 
       console.log('Signup successful');
-      setNotification({
-        message: 'Registration Successful',
-        description: 'You have successfully registered!',
-        type: 'success',
-      });
+      setisSuccVisible(true);
     } catch (err) {
       console.log(err);
-      setNotification({
-        message: 'Registration Failed',
-        description: 'Something went wrong. Please try again!',
-        type: 'error',
-      });
+      setisFailVisible(true);
     }
   };
 
@@ -115,13 +110,37 @@ const Signup = () => {
         </div>
       </form>
 
-      {notification && (
-        <NotificationCard
-          message={notification.message}
-          description={notification.description}
-          type={notification.type}
-        />
-      )}
+      <div className="flex flex-col gap-4">
+        {isSuccVisible && (
+          <Alert
+            color="success"
+            description={
+              <>
+                {succDes}
+                <div className="mt-2">
+                  <Link href="/login" className="text-blue-primary font-semibold hover:underline">
+                    Go to Login
+                  </Link>
+                </div>
+              </>
+            }
+            isVisible={isSuccVisible}
+            title={succTitle}
+            variant="faded"
+            onClose={() => setisSuccVisible(false)}
+          />
+        )}
+        {isFailVisible && (
+          <Alert
+            color="warning"
+            description={<>{failDes}</>}
+            isVisible={isFailVisible}
+            title={failTitle}
+            variant="faded"
+            onClose={() => setisFailVisible(false)}
+          />
+        )}
+      </div>
     </div>
   );
 };

@@ -5,7 +5,7 @@
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faHome, faBell, faSpinner, faArrowRight } from '@fortawesome/free-solid-svg-icons';
+import { faHome, faSpinner, faArrowRight } from '@fortawesome/free-solid-svg-icons';
 import HouseCard from './HouseCard';
 import { useTranslations } from 'next-intl';
 
@@ -94,10 +94,10 @@ const JustLanded = () => {
             </button>
           </div>
           {/* Subscribe Button */}
-          <button className="flex items-center gap-2 bg-blue-primary text-white px-4 py-2 rounded-lg hover:bg-blue-900 transition">
+          {/* <button className="flex items-center gap-2 bg-blue-primary text-white px-4 py-2 rounded-lg hover:bg-blue-900 transition">
             <FontAwesomeIcon icon={faBell} />
             {t('subscribe')}
-          </button>
+          </button> */}
         </div>
         <div className="ml-auto flex items-center gap-3">
           <span className="bg-gray-200 px-3 py-1 rounded-full text-sm">
