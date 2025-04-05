@@ -86,7 +86,10 @@
     "pwd": "Password",
     "login": "Login",
     "dont-have-acc": "Don't have an account?",
-    "sign-up": "Sign up"
+    "sign-up": "Sign up",
+    "succ-title": "Login successful!",
+    "fail-title": "Login failed!",
+    "fail-des": "Please try again."
   },
   "Signup": {
     "welcome": "Welcome to Qrent!",
@@ -97,7 +100,11 @@
     "re-pwd": "Re-enter Password",
     "signup": "Sign up",
     "already-have-acc": "Already have an account?",
-    "login": "Login"
+    "login": "Login",
+    "succ-title": "SignUp successful!",
+    "succ-des": "Please login to continue.",
+    "fail-title": "SignUp failed!",
+    "fail-des": "Please try again."
   },
   "PrepareDocuments": {
     "rental-checklist": "Rental Process Checklist",

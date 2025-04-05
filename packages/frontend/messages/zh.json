@@ -79,7 +79,10 @@
     "pwd": "密码",
     "login": "登录",
     "dont-have-acc": "还没有账户？",
-    "sign-up": "注册"
+    "sign-up": "注册",
+    "succ-title": "登录成功！",
+    "fail-title": "登录失败！",
+    "fail-des": "请再试一次。"
   },
   "Signup": {
     "welcome": "欢迎加入 Qrent！",
@@ -90,7 +93,11 @@
     "re-pwd": "确认密码",
     "signup": "注册",
     "already-have-acc": "已经有账户？",
-    "login": "登录"
+    "login": "登录",
+    "succ-title": "注册成功！",
+    "succ-des": "请登录继续。",
+    "fail-title": "注册失败！",
+    "fail-des": "请再试一次。"
   },
   "PrepareDocuments": {
     "rental-checklist": "租房流程清单",

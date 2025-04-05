@@ -12,16 +12,18 @@ async function getApiBaseUrl() {
 }
 
 const Login = () => {
+  const t = useTranslations('Login');
+
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
 
   const [isSuccVisible, setisSuccVisible] = useState(false);
-  const succTitle = 'Login successful!';
+  const succTitle = t('succ-title');
   const succDes = '';
 
   const [isFailVisible, setisFailVisible] = useState(false);
-  const failTitle = 'Login failed!';
-  const failDes = 'Please try again.';
+  const failTitle = t('fail-title');
+  const failDes = t('fail-des');
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -49,8 +51,6 @@ const Login = () => {
       setisFailVisible(true);
     }
   };
-
-  const t = useTranslations('Login');
 
   return (
     <div className="max-w-md w-full mx-auto rounded-none md:rounded-2xl p-4 md:p-8 shadow-input bg-white dark:bg-black font-serif font-bold">
