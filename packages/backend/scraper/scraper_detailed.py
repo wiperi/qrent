@@ -21,7 +21,7 @@ def scrape_property_data(university):
         yesterday_data = pd.read_csv(yesterday_file)
         yesterday_data = yesterday_data.drop_duplicates(subset=['addressLine1'], keep='first')
         # 保证所需字段存在
-        for col in ['description', 'availableDate', 'commuteTime', 'publishedAt', 'keywords', 'Average Score', 'url']:
+        for col in ['description', 'availableDate', 'commuteTime', 'publishedAt', 'keywords', 'averageScore', 'url', 'descriptionCN']:
             if col not in today_data.columns:
                 today_data[col] = None 
             if col not in yesterday_data.columns:
@@ -42,11 +42,14 @@ def scrape_property_data(university):
         today_data['keywords'] = today_data['addressLine1'].map(
             yesterday_data.set_index('addressLine1')['keywords']
         )
-        today_data['Average Score'] = today_data['addressLine1'].map(
-            yesterday_data.set_index('addressLine1')['Average Score']
+        today_data['averageScore'] = today_data['addressLine1'].map(
+            yesterday_data.set_index('addressLine1')['averageScore']
         )
         today_data['url'] = today_data['addressLine1'].map(
             yesterday_data.set_index('addressLine1')['url']
+        )
+        today_data['descriptionCN'] = today_data['addressLine1'].map(
+            yesterday_data.set_index('addressLine1')['descriptionCN']
         )
     else:
         print("do not have yesterday data")
