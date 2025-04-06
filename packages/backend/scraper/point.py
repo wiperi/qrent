@@ -210,6 +210,68 @@ def extract_keywords_parallel(df: pd.DataFrame, max_workers=5) -> pd.DataFrame:
     for (idx, kw) in results:
         df.at[idx, 'keywords'] = str(kw)
     return df
+def call_model_for_keywords_cn(description: str) -> str:
+    messages = [
+        {
+            'role': 'system',
+            'content': (
+                "从给定的房屋描述中提取关键词，关键词请用中文输出。"
+                "要求关键词应包含房屋的位置、特征和可用设施。"
+                "只输出关键词，用逗号分隔，不要包含其他文字。"
+            )
+        },
+        {
+            'role': 'user',
+            'content': description
+        }
+    ]
+    try:
+        response = dashscope.Generation.call(
+            api_key=API_KEY_POINT,
+            model=MODEL_NAME,
+            messages=messages,
+            result_format='message',
+            parameters={
+                "temperature": 0.7,
+                "max_tokens": 150,
+                "top_p": 0.9
+            }
+        )
+        if response and response.output and response.output.get("choices"):
+            assistant_msg = response.output["choices"][0]["message"]["content"].strip()
+            if assistant_msg.lower().startswith("关键词:"):
+                assistant_msg = assistant_msg[len("关键词:"):].strip()
+            return assistant_msg
+    except Exception as e:
+        print(f"[Description:{description[:20]}...] Chinese keyword extraction failed: {e}")
+    return "N/A"
+
+def process_one_row_keywords_cn(idx: int, row: pd.Series) -> (int, str):
+    desc = row.get('description', '')
+    if pd.isna(desc) or not desc.strip():
+        return idx, "N/A"
+    kw_cn = call_model_for_keywords_cn(desc)
+    return idx, kw_cn
+
+def extract_keywords_cn_parallel(df: pd.DataFrame, max_workers=5) -> pd.DataFrame:
+    if 'descriptionCN' not in df.columns:
+        df['descriptionCN'] = pd.Series(dtype="string")
+    else:
+        df['descriptionCN'] = df['descriptionCN'].astype("string")
+    to_extract = df[df['descriptionCN'].isna()]
+    print(f"num of the Chinese keywords: {len(to_extract)}")
+    if len(to_extract) == 0:
+        return df
+    results = []
+    with ThreadPoolExecutor(max_workers=max_workers) as executor:
+        futures = []
+        for idx, row in to_extract.iterrows():
+            futures.append(executor.submit(process_one_row_keywords_cn, idx, row))
+        for f in tqdm(as_completed(futures), total=len(futures), desc="finding Chinese keywords"):
+            results.append(f.result())
+    for (idx, kw_cn) in results:
+        df.at[idx, 'descriptionCN'] = str(kw_cn)
+    return df
 
 def process_missing_scores_and_keywords(file_path: str):
     if not os.path.exists(file_path):
@@ -220,7 +282,22 @@ def process_missing_scores_and_keywords(file_path: str):
         df = score_properties_parallel(df, max_workers=2)
     if 'keywords' not in df.columns or df['keywords'].isna().all():
         df = extract_keywords_parallel(df, max_workers=2)
+    if 'descriptionCN' not in df.columns:
+        df['descriptionCN'] = pd.Series(dtype="string")
+    df = extract_keywords_cn_parallel(df, max_workers=2)
+    
+    # 调整列顺序：将 descriptionCN 插入到 description 与 publishedAt 之间
+    cols = list(df.columns)
+    if "description" in cols and "publishedAt" in cols:
+        if "descriptionCN" in cols:
+            cols.remove("descriptionCN")
+        idx = cols.index("description") + 1
+        cols.insert(idx, "descriptionCN")
+        df = df[cols]
+    
     score_cols = [col for col in df.columns if col.startswith("Score_")]
+    if "Average Score" in df.columns:
+        score_cols.append("Average Score")
     if score_cols:
         df.drop(columns=score_cols, inplace=True)
     df.to_csv(file_path, index=False, encoding="utf-8-sig")

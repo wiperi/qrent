@@ -50,6 +50,8 @@ model Property {
   averageScore  Float?
   // Property description text
   description   String?   @db.VarChar(1024)
+  // Property description text(Chinese)
+  descriptionCN String?   @db.VarChar(1024)
   // URL to the property listing
   url           String?   @db.VarChar(255)
   // Date and time when the property was published
