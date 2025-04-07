@@ -1,6 +1,6 @@
-import { Request, Response, NextFunction } from "express";
-import { User } from "@qrent/shared";
-import { authService } from "@/services/AuthService";
+import { Request, Response, NextFunction } from 'express';
+import { User } from '@qrent/shared';
+import { authService } from '@/services/AuthService';
 
 export class AuthController {
   async register(req: Request, res: Response, next: NextFunction) {
@@ -16,6 +16,15 @@ export class AuthController {
       password: user.password,
     });
     res.json({ token });
+  }
+
+  async changePassword(req: Request, res: Response, next: NextFunction) {
+    const userId = req.user!.userId;
+    const { oldPassword, newPassword } = req.body;
+
+    await authService.changePassword(userId, oldPassword, newPassword);
+
+    res.json({ message: 'Password changed successfully' });
   }
 }
 
