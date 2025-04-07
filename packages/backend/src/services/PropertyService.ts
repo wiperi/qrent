@@ -57,7 +57,7 @@ class PropertyService {
    * @returns Promise resolving to the filtered properties
    */
   async getPropertiesByPreferences(
-    preferences: UserPreference & { page: number; pageSize: number }
+    preferences: UserPreference & { page: number; pageSize: number; publishedAt?: string }
   ): Promise<Property[]> {
     const page = preferences.page;
     const pageSize = preferences.pageSize;
@@ -110,6 +110,12 @@ class PropertyService {
               },
             }
           : {}),
+
+        averageScore: {
+          gte: preferences.minRating ?? 0,
+        },
+
+        ...(preferences.publishedAt ? { publishedAt: { gte: new Date(preferences.publishedAt) } } : {}),
       },
       take: pageSize,
       skip,

@@ -1,6 +1,5 @@
 import { propertyController } from '@/controllers/PropertyController';
 import { catchError } from '@/utils/helper';
-import { prisma, UserPreference } from '@qrent/shared';
 import { Router } from 'express';
 
 const router = Router();
