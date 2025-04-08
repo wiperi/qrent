@@ -121,14 +121,17 @@ export function ExpandableCardDemo() {
               ref={ref}
               className="w-full max-w-[500px]  h-full md:h-fit md:max-h-[90%]  flex flex-col bg-white dark:bg-neutral-900 sm:rounded-3xl overflow-hidden"
             >
-              <motion.div layoutId={`image-${active.title}-${id}`}>
+              <motion.div
+                layoutId={`image-${active.title}-${id}`}
+                className="bg-gray-50 flex items-center justify-center"
+              >
                 <Image
                   priority
-                  width={200}
-                  height={200}
+                  width={300}
+                  height={300}
                   src={active.src}
                   alt={active.title}
-                  className="w-full h-80 lg:h-80 sm:rounded-tr-lg sm:rounded-tl-lg object-cover object-top"
+                  className="w-auto h-80 sm:rounded-tr-lg sm:rounded-tl-lg object-contain py-2"
                 />
               </motion.div>
 
@@ -186,13 +189,16 @@ export function ExpandableCardDemo() {
             className="p-4 flex flex-col  hover:bg-neutral-50 dark:hover:bg-neutral-800 rounded-xl cursor-pointer"
           >
             <div className="flex gap-4 flex-col  w-full">
-              <motion.div layoutId={`image-${card.title}-${id}`}>
+              <motion.div
+                layoutId={`image-${card.title}-${id}`}
+                className="bg-gray-50 flex items-center justify-center"
+              >
                 <Image
-                  width={100}
-                  height={100}
+                  width={200}
+                  height={200}
                   src={card.src}
                   alt={card.title}
-                  className="h-60 w-full  rounded-lg object-cover object-top"
+                  className="h-60 w-auto rounded-lg object-contain py-2"
                 />
               </motion.div>
               <div className="flex justify-center items-center flex-col">

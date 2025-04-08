@@ -53,7 +53,6 @@ const HousingFilter = () => {
 
   const { filter, updateFilter } = useFilterStore();
 
-  const checkboxOptions = ['Any', ...SUBURB_OPTIONS.unsw, ...SUBURB_OPTIONS.usyd];
   const unswAreaOptions = ['Any', ...SUBURB_OPTIONS.unsw];
   const usydAreaOptions = ['Any', ...SUBURB_OPTIONS.usyd];
 
@@ -91,7 +90,7 @@ const HousingFilter = () => {
               label=""
               name="priceMin"
               filter={filter}
-              updateFilter={updateFilter}
+              setFilter={updateFilter}
               ph={t('min')}
             />
           </div>
@@ -100,7 +99,7 @@ const HousingFilter = () => {
               label=""
               name="priceMax"
               filter={filter}
-              updateFilter={updateFilter}
+              setFilter={updateFilter}
               ph={t('max')}
             />
           </div>
@@ -166,7 +165,9 @@ const HousingFilter = () => {
           >
             <option>Any</option>
             <option>House</option>
-            <option>Apartment/Unit</option>
+            <option>Apartment/Unit/Flat</option>
+            <option>Studio</option>
+            <option>Semi-detached</option>
           </select>
         </div>
       </div>
@@ -230,24 +231,28 @@ const HousingFilter = () => {
         <div className="text-lg text-gray-600 font-bold">{t('rate')}</div>
         <RatingSlider filter={filter} updateFilter={updateFilter} />
       </div>
-
       <div className="mt-4">
-        <div className="text-lg text-gray-600 font-bold">{t('travel-time')}</div>
-        <select
-          className="border rounded px-2 py-1 max-h-40 overflow-y-auto w-full"
-          value={filter.travelTime}
-          onChange={e => updateFilter({ ...filter, travelTime: e.target.value })}
-        >
-          <option>Any</option>
-          <option>10 min</option>
-          <option>20 min</option>
-          <option>30 min</option>
-          <option>40 min</option>
-          <option>50 min</option>
-          <option>1h</option>
-          <option>1.5h</option>
-          <option>2h</option>
-        </select>
+        <div className="text-lg text-gray-600 font-bold">{t('travel-time')} (Minutes)</div>
+        <div className="flex justify-between gap-4">
+          <div className="flex-1">
+            <Textbox
+              label=""
+              name="commuteTimeMin"
+              filter={filter}
+              setFilter={updateFilter}
+              ph={t('min')}
+            />
+          </div>
+          <div className="flex-1">
+            <Textbox
+              label=""
+              name="commuteTimeMax"
+              filter={filter}
+              setFilter={updateFilter}
+              ph={t('max')}
+            />
+          </div>
+        </div>
       </div>
 
       {/* Avaliable Date */}

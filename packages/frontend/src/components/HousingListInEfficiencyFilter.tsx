@@ -14,37 +14,149 @@ const HousingListInEfficiencyFilter = () => {
   const [totalPages, setTotalPages] = useState(1);
   const { filter, updateFilter } = useFilterStore();
 
-  const buildApiUrl = async filters => {
-    const endpoint = '/api/data';
+  // const buildApiUrl = async filters => {
+  //   const endpoint = '/api/data';
 
-    const queryParams = new URLSearchParams();
-    Object.entries(filters).forEach(([key, value]) => {
-      if (value !== null && value !== undefined && value !== '') {
-        if (Array.isArray(value)) {
-          value.forEach(v => queryParams.append(key, v));
-        } else {
-          queryParams.append(key, value);
-        }
-      }
-    });
+  //   const queryParams = new URLSearchParams();
+  //   Object.entries(filters).forEach(([key, value]) => {
+  //     if (value !== null && value !== undefined && value !== '') {
+  //       if (Array.isArray(value)) {
+  //         value.forEach(v => queryParams.append(key, v));
+  //       } else {
+  //         queryParams.append(key, value);
+  //       }
+  //     }
+  //   });
 
-    return `${endpoint}?${queryParams.toString()}`;
-  };
+  //   return `${endpoint}?${queryParams.toString()}`;
+  // };
+
+  // const fetchData = async () => {
+  //   setLoading(true);
+
+  //   try {
+  //     const apiUrl = await buildApiUrl(filter);
+  //     const response = await fetch(apiUrl);
+
+  //     const result = await response.json();
+  //     setListings(result.data);
+  //     setTotalPages(result.total_pages);
+  //   } catch (error) {
+  //     console.error('Error fetching data:', error);
+  //   } finally {
+  //     setLoading(false);
+  //   }
+  // };
 
   const fetchData = async () => {
-    setLoading(true);
-
     try {
-      const apiUrl = await buildApiUrl(filter);
-      const response = await fetch(apiUrl);
+      const requestBody = {};
 
-      const result = await response.json();
-      setListings(result.data);
-      setTotalPages(result.total_pages);
+      if (
+        filter.university !== 'Any' &&
+        filter.university !== '' &&
+        filter.university !== undefined
+      ) {
+        requestBody.targetSchool = filter.university;
+      }
+
+      if (filter.priceMin !== 'Any' && filter.priceMin !== '' && filter.priceMin !== undefined) {
+        requestBody.minPrice = filter.priceMin;
+      }
+
+      if (filter.priceMax !== 'Any' && filter.priceMax !== '' && filter.priceMax !== undefined) {
+        requestBody.maxPrice = filter.priceMax;
+      }
+
+      if (
+        filter.bedroomMin !== 'Any' &&
+        filter.bedroomMin !== '' &&
+        filter.bedroomMin !== undefined
+      ) {
+        requestBody.minBedrooms = filter.bedroomMin;
+      }
+
+      if (
+        filter.bedroomMax !== 'Any' &&
+        filter.bedroomMax !== '' &&
+        filter.bedroomMax !== undefined
+      ) {
+        requestBody.maxBedrooms = filter.bedroomMax;
+      }
+
+      if (
+        filter.bathroomMin !== 'Any' &&
+        filter.bathroomMin !== '' &&
+        filter.bathroomMin !== undefined
+      ) {
+        requestBody.minBathrooms = filter.bathroomMin;
+      }
+
+      if (
+        filter.bathroomMax !== 'Any' &&
+        filter.bathroomMax !== '' &&
+        filter.bathroomMax !== undefined
+      ) {
+        requestBody.maxBathrooms = filter.bathroomMax;
+      }
+
+      if (filter.area && filter.area.length > 0) {
+        requestBody.regions = filter.area.join(' ');
+      }
+
+      if (
+        filter.propertyType !== 'Any' &&
+        filter.propertyType !== '' &&
+        filter.propertyType !== undefined
+      ) {
+        switch (filter.propertyType) {
+          case 'House':
+            requestBody.propertyType = 1;
+            break;
+          case 'Apartment/Unit/Flat':
+            requestBody.propertyType = 2;
+            break;
+          case 'Studio':
+            requestBody.propertyType = 3;
+            break;
+          case 'Semi-detached':
+            requestBody.propertyType = 4;
+            break;
+        }
+      }
+
+      if (
+        filter.commuteTimeMin !== 'Any' &&
+        filter.commuteTimeMin !== '' &&
+        filter.commuteTimeMin !== undefined
+      ) {
+        requestBody.minCommuteTime = filter.commuteTimeMin;
+      }
+
+      if (
+        filter.commuteTimeMax !== 'Any' &&
+        filter.commuteTimeMax !== '' &&
+        filter.commuteTimeMax !== undefined
+      ) {
+        requestBody.maxCommuteTime = filter.commuteTimeMax;
+      }
+
+      requestBody.page = filter.page;
+      requestBody.pageSize = 10;
+
+      console.log(requestBody);
+
+      const response = await fetch('/api/properties/search', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(requestBody),
+      });
+      const results = await response.json();
+      console.log(results);
     } catch (error) {
-      console.error('Error fetching data:', error);
-    } finally {
-      setLoading(false);
+      console.error('Error fetching properties:', error);
     }
   };
 

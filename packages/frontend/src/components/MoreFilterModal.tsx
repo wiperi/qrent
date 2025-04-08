@@ -56,7 +56,8 @@ const MoreFilterModal = ({ filter, setFilter }) => {
   const { isOpen, onOpen, onOpenChange } = useDisclosure();
   const [scrollBehavior] = React.useState<ModalProps['scrollBehavior']>('inside');
   const [isAccordionOpen, setAccordionOpen] = useState(true);
-  const checkboxOptions = ['Any', ...SUBURB_OPTIONS.unsw, ...SUBURB_OPTIONS.usyd];
+  const unswAreaOptions = ['Any', ...SUBURB_OPTIONS.unsw];
+  const usydAreaOptions = ['Any', ...SUBURB_OPTIONS.usyd];
 
   const handleCheckboxChange = area => {
     if (filter.area.includes(area)) {
@@ -140,7 +141,9 @@ const MoreFilterModal = ({ filter, setFilter }) => {
                       >
                         <option>Any</option>
                         <option>House</option>
-                        <option>Apartment/Unit</option>
+                        <option>Apartment/Unit/Flat</option>
+                        <option>Studio</option>
+                        <option>Semi-detached</option>
                       </select>
                     </div>
                   </div>
@@ -153,9 +156,29 @@ const MoreFilterModal = ({ filter, setFilter }) => {
                       Area
                     </div>
 
-                    {isAccordionOpen && (
-                      <div className="mt-2 max-h-44 overflow-y-auto  grid grid-cols-2 gap-2">
-                        {checkboxOptions.map((option, index) => (
+                    {isAccordionOpen && filter.university == 'UNSW' && (
+                      <div className="mt-2 max-h-52 overflow-y-auto  grid grid-cols-2 gap-2">
+                        {unswAreaOptions.map((option, index) => (
+                          <div key={index} className="flex items-center">
+                            <input
+                              type="checkbox"
+                              id={`checkbox-${index}`}
+                              value={option}
+                              checked={filter.area.includes(option)}
+                              onChange={() => handleCheckboxChange(option)}
+                              className="mr-2"
+                            />
+                            <label htmlFor={`checkbox-${index}`} className="text-gray-600">
+                              {option}
+                            </label>
+                          </div>
+                        ))}
+                      </div>
+                    )}
+
+                    {isAccordionOpen && filter.university == 'USYD' && (
+                      <div className="mt-2 max-h-52 overflow-y-auto  grid grid-cols-2 gap-2">
+                        {usydAreaOptions.map((option, index) => (
                           <div key={index} className="flex items-center">
                             <input
                               type="checkbox"
