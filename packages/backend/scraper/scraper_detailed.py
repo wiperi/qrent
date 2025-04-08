@@ -5,6 +5,7 @@ from bs4 import BeautifulSoup
 from tqdm import tqdm
 import time
 from datetime import datetime, timedelta
+import re
 
 def scrape_property_data(university):
     current_date = datetime.now().strftime('%y%m%d')
@@ -93,7 +94,17 @@ def scrape_property_data(university):
                         available_date = strong_tag.text.strip() if strong_tag else "N/A"
                     else:
                         available_date = "N/A"
-            published_at = datetime.now().strftime('%Y-%m-%d')
+            if available_date == "Available Now":
+                available_date = datetime.now()
+            else:
+                try:
+                    cleaned = re.sub(r'(\d+)(st|nd|rd|th)', r'\1', available_date)
+                    available_date = datetime.strptime(cleaned, "%A, %d %B %Y")
+                except Exception as e:
+                    available_date = None
+
+            published_at = datetime.now()
+
             return description, available_date, published_at
 
         except Exception as e:
