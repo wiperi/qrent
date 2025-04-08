@@ -37,7 +37,27 @@ class AuthService {
     return generateToken(user.id);
   }
   
+  async changePassword(userId: number, oldPassword: string, newPassword: string) {
+    const user = await prisma.user.findUnique({
+      where: { id: userId },
+    });
 
+    if (!user) {
+      throw new HttpError(400, 'User not found');
+    }
+
+    if (user.password !== oldPassword) {
+      throw new HttpError(400, 'Invalid old password');
+    }
+
+    if (newPassword === oldPassword) {
+      throw new HttpError(400, 'New password cannot be the same as the old password');
+    }
+
+    await prisma.user.update({
+      where: { id: userId },
+      data: { password: newPassword },
+    });
+  }
 }
-
 export const authService = new AuthService();
