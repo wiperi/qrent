@@ -43,13 +43,15 @@ model Property {
   // Estimated commute time to target location in minutes
   commuteTime   Float?
   // Date when the property becomes available for move-in
-  availableDate String?   @db.VarChar(50)
+  availableDate DateTime? @db.DateTime
   // Searchable keywords related to the property
   keywords      String?   @db.Text
   // Overall rating score for the property
   averageScore  Float?
   // Property description text
   description   String?   @db.VarChar(1024)
+  // Property description text(Chinese)
+  descriptionCN String?   @db.VarChar(1024)
   // URL to the property listing
   url           String?   @db.VarChar(255)
   // Date and time when the property was published
