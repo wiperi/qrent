@@ -5,6 +5,7 @@ import { NextIntlClientProvider, hasLocale } from 'next-intl';
 import { notFound } from 'next/navigation';
 import Script from 'next/script';
 
+// Layout component for locale-based routing
 export default async function LocaleLayout({
   children,
   params,
