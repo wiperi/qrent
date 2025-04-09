@@ -14,7 +14,13 @@ export default function ImageWithDesctiption() {
       <div className="flex flex-col md:flex-row items-center gap-8">
         {/* First Block - Image & Text */}
         <div className="md:w-1/2 w-full relative">
-          <Image src={image1.src} alt="Travel Image" className="w-auto h-auto object-cover" />
+          <Image
+            height={300}
+            width={700}
+            src={image1.src}
+            alt="Travel Image"
+            className="w-auto h-auto object-cover"
+          />
         </div>
         <div className="md:w-1/2 w-full text-center md:text-left">
           <h1 className="text-3xl font-serif font-bold text-blue-primary">{t('h1')}</h1>
@@ -25,7 +31,13 @@ export default function ImageWithDesctiption() {
       <div className="flex flex-col md:flex-row-reverse items-center gap-8 mt-12">
         {/* Second Block - Image & Text */}
         <div className="md:w-1/2 w-full relative">
-          <Image src={image2.src} alt="Luggage Image" className="w-auto h-auto" />
+          <Image
+            height={300}
+            width={700}
+            src={image2.src}
+            alt="Luggage Image"
+            className="w-auto h-auto"
+          />
         </div>
         <div className="md:w-1/2 w-full text-center md:text-left">
           <h1 className="text-3xl font-serif font-bold text-blue-primary">{t('h2')}</h1>
@@ -35,7 +47,13 @@ export default function ImageWithDesctiption() {
       <div className="flex flex-col md:flex-row items-center gap-8">
         {/* First Block - Image & Text */}
         <div className="md:w-1/2 w-full relative">
-          <Image src={image4.src} alt="Travel Image" className="w-auto h-auto" />
+          <Image
+            height={300}
+            width={700}
+            src={image4.src}
+            alt="Travel Image"
+            className="w-auto h-auto"
+          />
         </div>
         <div className="md:w-1/2 w-full text-center md:text-left">
           <h1 className="text-3xl font-serif font-bold text-blue-primary">{t('h3')}</h1>
@@ -46,7 +64,13 @@ export default function ImageWithDesctiption() {
       <div className="flex flex-col md:flex-row-reverse items-center gap-8 mt-12">
         {/* Second Block - Image & Text */}
         <div className="md:w-1/2 w-full relative">
-          <Image src={image3.src} alt="Luggage Image" className="w-auto h-auto" />
+          <Image
+            height={300}
+            width={700}
+            src={image3.src}
+            alt="Luggage Image"
+            className="w-auto h-auto"
+          />
         </div>
         <div className="md:w-1/2 w-full text-center md:text-left">
           <h1 className="text-3xl font-serif font-bold text-blue-primary">{t('h4')}</h1>

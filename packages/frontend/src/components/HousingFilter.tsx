@@ -231,6 +231,8 @@ const HousingFilter = () => {
         <div className="text-lg text-gray-600 font-bold">{t('rate')}</div>
         <RatingSlider filter={filter} updateFilter={updateFilter} />
       </div>
+
+      {/* commute time */}
       <div className="mt-4">
         <div className="text-lg text-gray-600 font-bold">{t('travel-time')} (Minutes)</div>
         <div className="flex justify-between gap-4">

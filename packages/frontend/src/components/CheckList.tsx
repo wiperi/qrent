@@ -4,11 +4,6 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { useRentalGuideProgressStore } from '../store/rentalGuideProgressStore';
 import { useTranslations } from 'next-intl';
 
-interface Step {
-  title: string;
-  subtasks: string[];
-}
-
 interface ChecklistProps {
   title: string;
 }

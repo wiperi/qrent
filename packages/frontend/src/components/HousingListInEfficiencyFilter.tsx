@@ -3,52 +3,19 @@
 
 'use client';
 import { useState, useEffect } from 'react';
-import JustLandedHouseCard from './JustLandedHouseCard';
 import { useFilterStore } from '../store/useFilterStore';
+import HouseCard from './HouseCard';
 
 const HousingListInEfficiencyFilter = () => {
   const [listings, setListings] = useState([]);
   const [loading, setLoading] = useState(false);
   const [error] = useState(null);
   const [currentPage, setCurrentPage] = useState(1);
-  const [totalPages, setTotalPages] = useState(1);
   const { filter, updateFilter } = useFilterStore();
-
-  // const buildApiUrl = async filters => {
-  //   const endpoint = '/api/data';
-
-  //   const queryParams = new URLSearchParams();
-  //   Object.entries(filters).forEach(([key, value]) => {
-  //     if (value !== null && value !== undefined && value !== '') {
-  //       if (Array.isArray(value)) {
-  //         value.forEach(v => queryParams.append(key, v));
-  //       } else {
-  //         queryParams.append(key, value);
-  //       }
-  //     }
-  //   });
-
-  //   return `${endpoint}?${queryParams.toString()}`;
-  // };
-
-  // const fetchData = async () => {
-  //   setLoading(true);
-
-  //   try {
-  //     const apiUrl = await buildApiUrl(filter);
-  //     const response = await fetch(apiUrl);
-
-  //     const result = await response.json();
-  //     setListings(result.data);
-  //     setTotalPages(result.total_pages);
-  //   } catch (error) {
-  //     console.error('Error fetching data:', error);
-  //   } finally {
-  //     setLoading(false);
-  //   }
-  // };
+  const [hasMore, setHasMore] = useState(true);
 
   const fetchData = async () => {
+    setLoading(true);
     try {
       const requestBody = {};
 
@@ -61,11 +28,11 @@ const HousingListInEfficiencyFilter = () => {
       }
 
       if (filter.priceMin !== 'Any' && filter.priceMin !== '' && filter.priceMin !== undefined) {
-        requestBody.minPrice = filter.priceMin;
+        requestBody.minPrice = parseInt(filter.priceMin);
       }
 
       if (filter.priceMax !== 'Any' && filter.priceMax !== '' && filter.priceMax !== undefined) {
-        requestBody.maxPrice = filter.priceMax;
+        requestBody.maxPrice = parseInt(filter.priceMax);
       }
 
       if (
@@ -73,7 +40,7 @@ const HousingListInEfficiencyFilter = () => {
         filter.bedroomMin !== '' &&
         filter.bedroomMin !== undefined
       ) {
-        requestBody.minBedrooms = filter.bedroomMin;
+        requestBody.minBedrooms = parseInt(filter.bedroomMin);
       }
 
       if (
@@ -81,7 +48,7 @@ const HousingListInEfficiencyFilter = () => {
         filter.bedroomMax !== '' &&
         filter.bedroomMax !== undefined
       ) {
-        requestBody.maxBedrooms = filter.bedroomMax;
+        requestBody.maxBedrooms = parseInt(filter.bedroomMax);
       }
 
       if (
@@ -89,7 +56,7 @@ const HousingListInEfficiencyFilter = () => {
         filter.bathroomMin !== '' &&
         filter.bathroomMin !== undefined
       ) {
-        requestBody.minBathrooms = filter.bathroomMin;
+        requestBody.minBathrooms = parseInt(filter.bathroomMin);
       }
 
       if (
@@ -97,7 +64,7 @@ const HousingListInEfficiencyFilter = () => {
         filter.bathroomMax !== '' &&
         filter.bathroomMax !== undefined
       ) {
-        requestBody.maxBathrooms = filter.bathroomMax;
+        requestBody.maxBathrooms = parseInt(filter.bathroomMax);
       }
 
       if (filter.area && filter.area.length > 0) {
@@ -130,7 +97,7 @@ const HousingListInEfficiencyFilter = () => {
         filter.commuteTimeMin !== '' &&
         filter.commuteTimeMin !== undefined
       ) {
-        requestBody.minCommuteTime = filter.commuteTimeMin;
+        requestBody.minCommuteTime = parseInt(filter.commuteTimeMin);
       }
 
       if (
@@ -138,7 +105,17 @@ const HousingListInEfficiencyFilter = () => {
         filter.commuteTimeMax !== '' &&
         filter.commuteTimeMax !== undefined
       ) {
-        requestBody.maxCommuteTime = filter.commuteTimeMax;
+        requestBody.maxCommuteTime = parseInt(filter.commuteTimeMax);
+      }
+
+      requestBody.minRating = parseInt(filter.rate);
+
+      if (
+        filter.avaliableDate !== 'Any' &&
+        filter.avaliableDate !== '' &&
+        filter.avaliableDate !== undefined
+      ) {
+        requestBody.moveInDate = filter.avaliableDate;
       }
 
       requestBody.page = filter.page;
@@ -154,9 +131,15 @@ const HousingListInEfficiencyFilter = () => {
         body: JSON.stringify(requestBody),
       });
       const results = await response.json();
-      console.log(results);
+
+      if (results.length == 0) {
+        setHasMore(false);
+      }
+      setListings(results);
     } catch (error) {
       console.error('Error fetching properties:', error);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -182,7 +165,7 @@ const HousingListInEfficiencyFilter = () => {
 
       {/* Display Current Listings */}
       {listings.map((house, index) => (
-        <JustLandedHouseCard key={index} house={house} />
+        <HouseCard key={index} house={house} />
       ))}
 
       {/* Pagination Controls */}
@@ -194,12 +177,9 @@ const HousingListInEfficiencyFilter = () => {
         >
           &lt;
         </button>
-        <span className="px-4 py-2">
-          {currentPage} / {totalPages}
-        </span>
         <button
           onClick={handleNextPage}
-          disabled={currentPage === totalPages}
+          disabled={!hasMore}
           className="px-4 py-2 border rounded disabled:opacity-50"
         >
           &gt;
