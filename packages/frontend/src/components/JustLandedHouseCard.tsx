@@ -4,21 +4,21 @@
 import { useTranslations } from 'next-intl';
 import React from 'react';
 import { FaBath, FaBed, FaMapMarkerAlt } from 'react-icons/fa';
-// interface House {
-//   Price?: number;
-//   'Average Score'?: number;
-//   Address?: string;
-//   Bedrooms?: number;
-//   Bathrooms?: number;
-//   Keywords: string[];
-//   'Address Line 1'?: string;
-//   'Address Line 2'?: string;
-//   'House Type'?: string;
-//   'Number of Bedrooms'?: number;
-//   'Number of Bathrooms'?: number;
-//   update_time?: string; // assuming update_time is a string (ISO 8601 format or similar)
-//   website?: string; // assuming website is a string (URL)
-// }
+interface House {
+  Price?: number;
+  'Average Score'?: number;
+  Address?: string;
+  Bedrooms?: number;
+  Bathrooms?: number;
+  Keywords: string[];
+  'Address Line 1'?: string;
+  'Address Line 2'?: string;
+  'House Type'?: string;
+  'Number of Bedrooms'?: number;
+  'Number of Bathrooms'?: number;
+  update_time?: string; // assuming update_time is a string (ISO 8601 format or similar)
+  website?: string; // assuming website is a string (URL)
+}
 
 interface HouseCardProps {
   house: House;
@@ -26,8 +26,11 @@ interface HouseCardProps {
 
 const JustLandedHouseCard: React.FC<HouseCardProps> = ({ house }) => {
   const t = useTranslations('HouseCard');
-  const price = house.PricePerWeek || 0;
-  const scoreValue = house.averageScore;
+  const price = house.Price || 0;
+  const scoreValue =
+    house['Average Score'] !== null && house['Average Score'] !== undefined
+      ? Number(house['Average Score']).toFixed(1)
+      : 'N/A';
 
   let scoreClass = '';
   const point = t('points');

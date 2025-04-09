@@ -3,78 +3,192 @@
 
 'use client';
 import { useState, useEffect } from 'react';
-import JustLandedHouseCard from './JustLandedHouseCard';
-import { useTranslations } from 'next-intl';
+import { useFilterStore } from '../store/useFilterStore';
+import HouseCard from './HouseCard';
 
-async function getApiBaseUrl() {
-  return process.env.NEXT_PUBLIC_BACKEND_URL_OLD || 'http://localhost:5000';
-}
-
-const HousingList = () => {
-  const t = useTranslations('JustLanded');
-  const [school] = useState('unsw');
+const HousingListInEfficiencyFilter = () => {
   const [listings, setListings] = useState([]);
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState(null);
-  const [updateCount, setUpdateCount] = useState(0);
+  const [error] = useState(null);
+  const [currentPage, setCurrentPage] = useState(1);
+  const { filter, updateFilter } = useFilterStore();
+  const [hasMore, setHasMore] = useState(true);
+
+  const fetchData = async () => {
+    setLoading(true);
+    try {
+      const requestBody = {};
+
+      if (
+        filter.university !== 'Any' &&
+        filter.university !== '' &&
+        filter.university !== undefined
+      ) {
+        requestBody.targetSchool = filter.university;
+      }
+
+      if (filter.priceMin !== 'Any' && filter.priceMin !== '' && filter.priceMin !== undefined) {
+        requestBody.minPrice = parseInt(filter.priceMin);
+      }
+
+      if (filter.priceMax !== 'Any' && filter.priceMax !== '' && filter.priceMax !== undefined) {
+        requestBody.maxPrice = parseInt(filter.priceMax);
+      }
+
+      if (
+        filter.bedroomMin !== 'Any' &&
+        filter.bedroomMin !== '' &&
+        filter.bedroomMin !== undefined
+      ) {
+        requestBody.minBedrooms = parseInt(filter.bedroomMin);
+      }
+
+      if (
+        filter.bedroomMax !== 'Any' &&
+        filter.bedroomMax !== '' &&
+        filter.bedroomMax !== undefined
+      ) {
+        requestBody.maxBedrooms = parseInt(filter.bedroomMax);
+      }
+
+      if (
+        filter.bathroomMin !== 'Any' &&
+        filter.bathroomMin !== '' &&
+        filter.bathroomMin !== undefined
+      ) {
+        requestBody.minBathrooms = parseInt(filter.bathroomMin);
+      }
+
+      if (
+        filter.bathroomMax !== 'Any' &&
+        filter.bathroomMax !== '' &&
+        filter.bathroomMax !== undefined
+      ) {
+        requestBody.maxBathrooms = parseInt(filter.bathroomMax);
+      }
+
+      if (filter.area && filter.area.length > 0) {
+        requestBody.regions = filter.area.join(' ');
+      }
+
+      if (
+        filter.propertyType !== 'Any' &&
+        filter.propertyType !== '' &&
+        filter.propertyType !== undefined
+      ) {
+        switch (filter.propertyType) {
+          case 'House':
+            requestBody.propertyType = 1;
+            break;
+          case 'Apartment/Unit/Flat':
+            requestBody.propertyType = 2;
+            break;
+          case 'Studio':
+            requestBody.propertyType = 3;
+            break;
+          case 'Semi-detached':
+            requestBody.propertyType = 4;
+            break;
+        }
+      }
+
+      if (
+        filter.commuteTimeMin !== 'Any' &&
+        filter.commuteTimeMin !== '' &&
+        filter.commuteTimeMin !== undefined
+      ) {
+        requestBody.minCommuteTime = parseInt(filter.commuteTimeMin);
+      }
+
+      if (
+        filter.commuteTimeMax !== 'Any' &&
+        filter.commuteTimeMax !== '' &&
+        filter.commuteTimeMax !== undefined
+      ) {
+        requestBody.maxCommuteTime = parseInt(filter.commuteTimeMax);
+      }
+
+      requestBody.minRating = parseInt(filter.rate);
+
+      if (
+        filter.avaliableDate !== 'Any' &&
+        filter.avaliableDate !== '' &&
+        filter.avaliableDate !== undefined
+      ) {
+        requestBody.moveInDate = filter.avaliableDate;
+      }
+
+      requestBody.page = filter.page;
+      requestBody.pageSize = 10;
+
+      requestBody.publishedAt = new Date().toDateString();
+
+      console.log(requestBody);
+
+      const response = await fetch('/api/properties/search', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(requestBody),
+      });
+      const results = await response.json();
+
+      if (results.length == 0) {
+        setHasMore(false);
+      }
+      setListings(results);
+    } catch (error) {
+      console.error('Error fetching properties:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleNextPage = () => {
+    setCurrentPage(prevPage => prevPage + 1);
+    updateFilter({ ...filter, page: currentPage });
+  };
+
+  const handlePrevPage = () => {
+    setCurrentPage(prevPage => (prevPage > 1 ? prevPage - 1 : 1));
+    updateFilter({ ...filter, page: currentPage });
+  };
 
   useEffect(() => {
-    const fetchListings = async () => {
-      setLoading(true);
-      setError(null);
-
-      try {
-        const baseUrl = await getApiBaseUrl();
-        console.log(baseUrl);
-        const endpoint =
-          school === 'unsw' ? '/api/daily-houses/list' : '/api/daily-houses/usyd/list';
-
-        const response = await fetch(endpoint, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({}),
-        });
-
-        if (!response.ok) throw new Error('Failed to fetch listings');
-
-        const houses = await response.json();
-        setListings(houses);
-
-        // Fetch update count
-        const statsEndpoint =
-          school === 'unsw' ? '/api/daily-houses/stats' : '/api/daily-houses/usyd/stats';
-        const statsResponse = await fetch(statsEndpoint);
-
-        if (statsResponse.ok) {
-          const stats = await statsResponse.json();
-          setUpdateCount(stats.todayCount || houses.length);
-        } else {
-          setUpdateCount(houses.length);
-        }
-      } catch (err) {
-        setError(err.message);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchListings();
-  }, [school]);
+    fetchData();
+  }, [currentPage, filter]);
 
   return (
     <div className="grid grid-cols-1 gap-4 overflow-y-auto max-h-[900px]">
-      <span className="text-gray-800 px-4 py-2 border-b border-gray-200 text-center text-lg font-semibold mb-3">
-        <span className="text-3xl font-bold">{updateCount}</span> {t('n-properties-update')}!
-      </span>
-      {/* Content */}
+      {/* Error Message */}
       {error && <p className="text-red-500">{error}</p>}
       {!loading && !error && listings.length === 0 && <p>No new listings available.</p>}
 
+      {/* Display Current Listings */}
       {listings.map((house, index) => (
-        <JustLandedHouseCard key={index} house={house} />
+        <HouseCard key={index} house={house} />
       ))}
+
+      {/* Pagination Controls */}
+      <div className="flex justify-center space-x-2 mt-4">
+        <button
+          onClick={handlePrevPage}
+          disabled={currentPage === 1}
+          className="px-4 py-2 border rounded disabled:opacity-50"
+        >
+          &lt;
+        </button>
+        <button
+          onClick={handleNextPage}
+          disabled={!hasMore}
+          className="px-4 py-2 border rounded disabled:opacity-50"
+        >
+          &gt;
+        </button>
+      </div>
     </div>
   );
 };
 
-export default HousingList;
+export default HousingListInEfficiencyFilter;

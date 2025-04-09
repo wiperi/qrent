@@ -52,9 +52,6 @@ const HouseCard = ({ house }) => {
   }
   house.publishedAt = house.publishedAt.split('T')[0];
 
-  const isToday =
-    house.publishedAt && new Date(house.publishedAt).toDateString() === new Date().toDateString();
-
   let description = '';
   if (locale == 'en') {
     description = house.description;
@@ -80,12 +77,6 @@ const HouseCard = ({ house }) => {
       rel="noopener noreferrer"
       className="block border border-gray-300 rounded-lg shadow-lg hover:shadow-2xl transition duration-300 p-6 bg-white hover:bg-gray-50"
     >
-      {isToday && (
-        <div className="bg-green-200 text-green-700 text-xs font-semibold rounded-full px-2 py-1 absolute top-2 right-2">
-          Updated Today
-        </div>
-      )}
-
       <div className="mb-4">
         <h3 className="text-xl font-semibold text-gray-800">
           {house.addressLine1 || 'Unknown Address'}

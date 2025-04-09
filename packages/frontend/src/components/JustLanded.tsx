@@ -6,8 +6,8 @@ import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faHome, faSpinner, faArrowRight } from '@fortawesome/free-solid-svg-icons';
-import HouseCard from './HouseCard';
 import { useTranslations } from 'next-intl';
+import JustLandedHouseCard from './JustLandedHouseCard';
 
 async function getApiBaseUrl() {
   return process.env.NEXT_PUBLIC_BACKEND_URL_OLD || 'http://localhost:5000';
@@ -140,7 +140,7 @@ const JustLanded = () => {
       <div className="max-w-screen-lg mx-auto mt-10 mb-20 px-6 overflow-y-auto">
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
           {listings.map((house, index) => (
-            <HouseCard key={index} house={house} />
+            <JustLandedHouseCard key={index} house={house} />
           ))}
         </div>
       </div>
