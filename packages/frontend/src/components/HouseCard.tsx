@@ -6,7 +6,7 @@ import { usePathname } from 'next/navigation';
 import React from 'react';
 import { FaBath, FaBed, FaMapMarkerAlt } from 'react-icons/fa';
 
-const HouseCard = ({ house }) => {
+const JustLandedHouseCard = ({ house }) => {
   let locale = '';
   if (usePathname().startsWith('/en')) {
     locale = 'en';
@@ -16,7 +16,13 @@ const HouseCard = ({ house }) => {
 
   const t = useTranslations('HouseCard');
   const price = house.pricePerWeek;
-  const scoreValue = house.averageScore;
+  const scoreValue = house.averageScore.toFixed(1);
+  if (house.addressLine1 == null) {
+    house.addressLine1 = '';
+  }
+  if (house.addressLine2 == null) {
+    house.addressLine2 = '';
+  }
   house.addressLine1 = house.addressLine1
     .replace('-', ' ')
     .split(' ')
@@ -54,9 +60,9 @@ const HouseCard = ({ house }) => {
 
   let description = '';
   if (locale == 'en') {
-    description = house.description;
+    description = house.keywords.split(',');
   } else {
-    description = house.descriptionCN;
+    description = house.descriptionCN.split(',');
   }
 
   let propertyType = '';
@@ -75,7 +81,7 @@ const HouseCard = ({ house }) => {
       href={house.url}
       target="_blank"
       rel="noopener noreferrer"
-      className="block border border-gray-300 rounded-lg shadow-lg hover:shadow-2xl transition duration-300 p-6 bg-white hover:bg-gray-50"
+      className="block border border-gray-300 rounded-lg shadow-lg hover:shadow-2xl transition duration-300 p-6 bg-white hover:bg-gray-50 relative"
     >
       <div className="mb-4">
         <h3 className="text-xl font-semibold text-gray-800">
@@ -92,8 +98,11 @@ const HouseCard = ({ house }) => {
           {`$${price}`}{' '}
           <span className="text-xs font-normal text-gray-600 whitespace-nowrap">/week</span>
         </span>
-        <span className={`text-xs ${scoreClass} rounded-full px-2 py-1`}>{scoreText}</span>
       </div>
+
+      <span className={`text-md ${scoreClass} rounded-full px-2 py-1 absolute top-4 right-4`}>
+        {scoreText}
+      </span>
 
       <div className="flex space-x-4 mt-4">
         <div className="flex items-center space-x-1 bg-gray-100 text-blue-primary px-3 py-1 rounded-sm">
@@ -111,9 +120,21 @@ const HouseCard = ({ house }) => {
         </div>
       </div>
 
-      <div className="mt-4">{description}</div>
+      <div className="mt-4">
+        {' '}
+        <div className="mt-2">
+          {description.map((kw, index) => (
+            <span
+              key={index} // always use a unique key if you map through an array
+              className="inline-block bg-gray-200 text-gray-700 px-2 py-1 rounded-full text-xs mr-2"
+            >
+              {kw}
+            </span>
+          ))}
+        </div>
+      </div>
     </a>
   );
 };
 
-export default HouseCard;
+export default JustLandedHouseCard;
