@@ -121,10 +121,7 @@ export function ExpandableCardDemo() {
               ref={ref}
               className="w-full max-w-[500px]  h-full md:h-fit md:max-h-[90%]  flex flex-col bg-white dark:bg-neutral-900 sm:rounded-3xl overflow-hidden"
             >
-              <motion.div
-                layoutId={`image-${active.title}-${id}`}
-                className="bg-gray-50 flex items-center justify-center"
-              >
+              <motion.div layoutId={`image-${active.title}-${id}`}>
                 <Image
                   priority
                   width={300}
@@ -189,10 +186,7 @@ export function ExpandableCardDemo() {
             className="p-4 flex flex-col  hover:bg-neutral-50 dark:hover:bg-neutral-800 rounded-xl cursor-pointer"
           >
             <div className="flex gap-4 flex-col  w-full">
-              <motion.div
-                layoutId={`image-${card.title}-${id}`}
-                className="bg-gray-50 flex items-center justify-center"
-              >
+              <motion.div layoutId={`image-${card.title}-${id}`}>
                 <Image
                   width={200}
                   height={200}
