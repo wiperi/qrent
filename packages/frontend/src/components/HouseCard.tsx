@@ -24,12 +24,12 @@ const JustLandedHouseCard = ({ house }) => {
     house.addressLine2 = '';
   }
   house.addressLine1 = house.addressLine1
-    .replace('-', ' ')
+    .replaceAll('-', ' ')
     .split(' ')
     .map(word => word.charAt(0).toUpperCase() + word.slice(1))
     .join(' ');
   house.addressLine2 = house.addressLine2
-    .replace('-', ' ')
+    .replaceAll('-', ' ')
     .split(' ')
     .map(word => word.charAt(0).toUpperCase() + word.slice(1))
     .join(' ');
