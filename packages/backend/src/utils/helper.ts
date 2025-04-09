@@ -21,7 +21,7 @@ export function catchError(fn: (req: Request, res: Response, next: NextFunction)
  */
 export const authenticate: RequestHandler = (req: Request, res: Response, next: NextFunction) => {
   // Define whitelist paths that bypass authentication
-  const whitelistPaths = ['/auth/login', '/auth/register', '/echo'];
+  const whitelistPaths = ['/auth/login', '/auth/register', '/echo', '/properties/search'];
   
   // Check if the path is in the whitelist
   if (whitelistPaths.some(path => req.path.includes(path))) {
