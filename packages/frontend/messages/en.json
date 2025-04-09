@@ -198,7 +198,8 @@
   "HouseCard": {
     "points": "Points",
     "top": "Top / ",
-    "good": "Good / "
+    "good": "Good / ",
+    "unknown": "Unknown"
   },
   "CheckList": {
     "budget_requirements": "Define rental budget and requirements （5-7 weeks in advance）",

@@ -4,7 +4,7 @@
 import { useTranslations } from 'next-intl';
 import { usePathname } from 'next/navigation';
 import React from 'react';
-import { FaBath, FaBed, FaMapMarkerAlt } from 'react-icons/fa';
+import { FaBath, FaBed, FaCalendarAlt, FaCar, FaMapMarkerAlt } from 'react-icons/fa';
 
 const JustLandedHouseCard = ({ house }) => {
   let locale = '';
@@ -57,6 +57,10 @@ const JustLandedHouseCard = ({ house }) => {
     }
   }
   house.publishedAt = house.publishedAt.split('T')[0];
+
+  if (house.availableDate != null) {
+    house.availableDate = house.availableDate.split('T')[0];
+  }
 
   let description = '';
   if (locale == 'en') {
@@ -117,6 +121,14 @@ const JustLandedHouseCard = ({ house }) => {
           <span className="inline-block bg-gray-100 text-gray-800 rounded-full text-xs">
             {propertyType}
           </span>
+        </div>
+        <div className="flex items-center space-x-1 bg-gray-100 text-blue-primary px-3 py-1 rounded-sm">
+          <FaCar className="text-blue-primary" />
+          <span className="text-sm">{house.commuteTime}</span>
+        </div>
+        <div className="flex items-center space-x-1 bg-gray-100 text-blue-primary px-3 py-1 rounded-sm">
+          <FaCalendarAlt className="text-blue-primary" />
+          <span className="text-sm">{house.availableDate || t('unknown')}</span>
         </div>
       </div>
 

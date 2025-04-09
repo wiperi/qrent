@@ -191,7 +191,8 @@
   "HouseCard": {
     "points": "分",
     "top": "顶级好房 ",
-    "good": "高分好房 "
+    "good": "高分好房 ",
+    "unknown": "未知"
   },
   "CheckList": {
     "budget_requirements": "确定租房预算与需求（提前5-7周）",
