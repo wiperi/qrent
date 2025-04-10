@@ -1,7 +1,7 @@
 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
 // @ts-nocheck
 
-export default function RatingSlider({ filter, setFilter }) {
+export default function RatingSlider({ filter, updateFilter }) {
   return (
     <div className="space-y-2">
       <input
@@ -10,7 +10,7 @@ export default function RatingSlider({ filter, setFilter }) {
         max="20"
         step="0.5"
         value={filter.rate ?? 13}
-        onChange={e => setFilter({ ...filter, rate: e.target.value })}
+        onChange={e => updateFilter({ ...filter, rate: e.target.value })}
         className="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer 
         [&::-webkit-slider-thumb]:appearance-none 
         [&::-webkit-slider-thumb]:w-4 

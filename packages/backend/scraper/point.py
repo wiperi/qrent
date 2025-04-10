@@ -278,13 +278,9 @@ def process_missing_scores_and_keywords(file_path: str):
         print(f" {file_path} do not exist.")
         return
     df = pd.read_csv(file_path, encoding="utf-8-sig")
-    if 'averageScore' not in df.columns or df['averageScore'].isna().all():
-        df = score_properties_parallel(df, max_workers=2)
-    if 'keywords' not in df.columns or df['keywords'].isna().all():
-        df = extract_keywords_parallel(df, max_workers=2)
-    if 'descriptionCN' not in df.columns:
-        df['descriptionCN'] = pd.Series(dtype="string")
+    df = score_properties_parallel(df, max_workers=2)
     df = extract_keywords_cn_parallel(df, max_workers=2)
+    df = extract_keywords_parallel(df, max_workers=2)
     
     # 调整列顺序：将 descriptionCN 插入到 description 与 publishedAt 之间
     cols = list(df.columns)
