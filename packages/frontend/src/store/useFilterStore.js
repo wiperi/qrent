@@ -6,10 +6,11 @@ export const useFilterStore = create()(
   persist(
     (set, get) => ({
       filter: {
-        university: 'Any',
+        university: 'UNSW',
         priceMin: 'Any',
         priceMax: 'Any',
-        travelTime: 'Any',
+        commuteTimeMin: 'Any',
+        commuteTimeMax: 'Any',
         bedroomMin: 'Any',
         bedroomMax: 'Any',
         bathroomMin: 'Any',

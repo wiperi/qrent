@@ -6,6 +6,7 @@ import Textbox from './priceDropDown';
 import RatingSlider from './Slider';
 import { useTranslations } from 'next-intl';
 import { useFilterStore } from '../store/useFilterStore';
+import { ChevronDown } from 'lucide-react';
 
 const SUBURB_OPTIONS = {
   unsw: [
@@ -52,7 +53,8 @@ const HousingFilter = () => {
 
   const { filter, updateFilter } = useFilterStore();
 
-  const checkboxOptions = ['Any', ...SUBURB_OPTIONS.unsw, ...SUBURB_OPTIONS.usyd];
+  const unswAreaOptions = ['Any', ...SUBURB_OPTIONS.unsw];
+  const usydAreaOptions = ['Any', ...SUBURB_OPTIONS.usyd];
 
   const handleCheckboxChange = area => {
     if (filter.area.includes(area)) {
@@ -74,7 +76,6 @@ const HousingFilter = () => {
           value={filter.university}
           onChange={e => updateFilter({ ...filter, university: e.target.value })}
         >
-          <option>Any</option>
           <option>UNSW</option>
           <option>USYD</option>
         </select>
@@ -89,7 +90,7 @@ const HousingFilter = () => {
               label=""
               name="priceMin"
               filter={filter}
-              updateFilter={updateFilter}
+              setFilter={updateFilter}
               ph={t('min')}
             />
           </div>
@@ -98,7 +99,7 @@ const HousingFilter = () => {
               label=""
               name="priceMax"
               filter={filter}
-              updateFilter={updateFilter}
+              setFilter={updateFilter}
               ph={t('max')}
             />
           </div>
@@ -164,22 +165,49 @@ const HousingFilter = () => {
           >
             <option>Any</option>
             <option>House</option>
-            <option>Apartment/Unit</option>
+            <option>Apartment/Unit/Flat</option>
+            <option>Studio</option>
+            <option>Semi-detached</option>
           </select>
         </div>
       </div>
 
       <div className="mt-4">
         <div
-          className="text-lg text-gray-600 font-bold cursor-pointer"
+          className="text-lg text-gray-600 font-bold cursor-pointer flex items-center justify-between"
           onClick={() => setAccordionOpen(!isAccordionOpen)}
         >
-          {t('area')}
+          <span>{t('area')}</span>
+          <ChevronDown
+            className={`w-5 h-5 transform transition-transform duration-300 ${
+              isAccordionOpen ? 'rotate-180' : 'rotate-0'
+            }`}
+          />
         </div>
 
-        {isAccordionOpen && (
+        {isAccordionOpen && filter.university == 'UNSW' && (
           <div className="mt-2 max-h-52 overflow-y-auto  grid grid-cols-2 gap-2">
-            {checkboxOptions.map((option, index) => (
+            {unswAreaOptions.map((option, index) => (
+              <div key={index} className="flex items-center">
+                <input
+                  type="checkbox"
+                  id={`checkbox-${index}`}
+                  value={option}
+                  checked={filter.area.includes(option)}
+                  onChange={() => handleCheckboxChange(option)}
+                  className="mr-2"
+                />
+                <label htmlFor={`checkbox-${index}`} className="text-gray-600">
+                  {option}
+                </label>
+              </div>
+            ))}
+          </div>
+        )}
+
+        {isAccordionOpen && filter.university == 'USYD' && (
+          <div className="mt-2 max-h-52 overflow-y-auto  grid grid-cols-2 gap-2">
+            {usydAreaOptions.map((option, index) => (
               <div key={index} className="flex items-center">
                 <input
                   type="checkbox"
@@ -204,23 +232,29 @@ const HousingFilter = () => {
         <RatingSlider filter={filter} updateFilter={updateFilter} />
       </div>
 
+      {/* commute time */}
       <div className="mt-4">
-        <div className="text-lg text-gray-600 font-bold">{t('travel-time')}</div>
-        <select
-          className="border rounded px-2 py-1 max-h-40 overflow-y-auto w-full"
-          value={filter.travelTime}
-          onChange={e => updateFilter({ ...filter, travelTime: e.target.value })}
-        >
-          <option>Any</option>
-          <option>10 min</option>
-          <option>20 min</option>
-          <option>30 min</option>
-          <option>40 min</option>
-          <option>50 min</option>
-          <option>1h</option>
-          <option>1.5h</option>
-          <option>2h</option>
-        </select>
+        <div className="text-lg text-gray-600 font-bold">{t('travel-time')} (Minutes)</div>
+        <div className="flex justify-between gap-4">
+          <div className="flex-1">
+            <Textbox
+              label=""
+              name="commuteTimeMin"
+              filter={filter}
+              setFilter={updateFilter}
+              ph={t('min')}
+            />
+          </div>
+          <div className="flex-1">
+            <Textbox
+              label=""
+              name="commuteTimeMax"
+              filter={filter}
+              setFilter={updateFilter}
+              ph={t('max')}
+            />
+          </div>
+        </div>
       </div>
 
       {/* Avaliable Date */}

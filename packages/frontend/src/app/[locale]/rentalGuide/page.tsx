@@ -1,5 +1,6 @@
 import CheckList from '@/src/components/CheckList';
 import Guides from '@/src/components/Guides';
+import { useTranslations } from 'next-intl';
 import React from 'react';
 import { getTranslations } from 'next-intl/server';
 

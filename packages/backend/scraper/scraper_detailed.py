@@ -5,6 +5,7 @@ from bs4 import BeautifulSoup
 from tqdm import tqdm
 import time
 from datetime import datetime, timedelta
+import re
 
 def scrape_property_data(university):
     current_date = datetime.now().strftime('%y%m%d')
@@ -21,7 +22,7 @@ def scrape_property_data(university):
         yesterday_data = pd.read_csv(yesterday_file)
         yesterday_data = yesterday_data.drop_duplicates(subset=['addressLine1'], keep='first')
         # 保证所需字段存在
-        for col in ['description', 'availableDate', 'commuteTime', 'publishedAt', 'keywords', 'Average Score', 'url']:
+        for col in ['description', 'availableDate', 'commuteTime', 'publishedAt', 'keywords', 'averageScore', 'url', 'descriptionCN']:
             if col not in today_data.columns:
                 today_data[col] = None 
             if col not in yesterday_data.columns:
@@ -42,11 +43,14 @@ def scrape_property_data(university):
         today_data['keywords'] = today_data['addressLine1'].map(
             yesterday_data.set_index('addressLine1')['keywords']
         )
-        today_data['Average Score'] = today_data['addressLine1'].map(
-            yesterday_data.set_index('addressLine1')['Average Score']
+        today_data['averageScore'] = today_data['addressLine1'].map(
+            yesterday_data.set_index('addressLine1')['averageScore']
         )
         today_data['url'] = today_data['addressLine1'].map(
             yesterday_data.set_index('addressLine1')['url']
+        )
+        today_data['descriptionCN'] = today_data['addressLine1'].map(
+            yesterday_data.set_index('addressLine1')['descriptionCN']
         )
     else:
         print("do not have yesterday data")
@@ -90,7 +94,17 @@ def scrape_property_data(university):
                         available_date = strong_tag.text.strip() if strong_tag else "N/A"
                     else:
                         available_date = "N/A"
-            published_at = datetime.now().strftime('%Y-%m-%d')
+            if available_date == "Available Now":
+                available_date = datetime.now()
+            else:
+                try:
+                    cleaned = re.sub(r'(\d+)(st|nd|rd|th)', r'\1', available_date)
+                    available_date = datetime.strptime(cleaned, "%A, %d %B %Y")
+                except Exception as e:
+                    available_date = None
+
+            published_at = datetime.now()
+
             return description, available_date, published_at
 
         except Exception as e:
