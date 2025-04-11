@@ -1,74 +1,87 @@
 import CheckList from '@/src/components/CheckList';
 import Guides from '@/src/components/Guides';
 import React from 'react';
+import { getTranslations } from 'next-intl/server';
 
-const stepsData = [
-  {
-    title: '1. 确定租房预算与需求（提前5-7周）',
-    subtasks: [
-      '了解住宿的基本类型',
-      '了解整租与分租的优缺点',
-      '确定个人租房预算范围',
-      '确定个人对房源的其他要求',
-    ],
-  },
-  {
-    title: '2. 了解学校附近区域与租房平台',
-    subtasks: [
-      '研究学校周边各区域特点',
-      '确定目标区域范围',
-      '了解相关租房网站的使用',
-      '了解房源价格水平',
-    ],
-  },
-  {
-    title: '3. 了解具体房源与准备申请材料（提前3-4周）',
-    subtasks: [
-      '了解预算内的房源市场情况',
-      '准备租房申请相关材料',
-      '了解看房/代看房注意事项',
-      '了解租房申请相关流程',
-    ],
-  },
-  {
-    title: '4. 积极看房联系（提前两周）',
-    subtasks: [
-      '确定起租日期合适的相关房源',
-      '预约安排看房行程',
-      '持续与中介保持沟通，及时跟进申请状态',
-    ],
-  },
-  {
-    title: '5. 完成签约与押金支付等（成功签约！）',
-    subtasks: [
-      '了解标准租房合同',
-      '了解押金、定金支付与相关规则',
-      '支付押金、定金，完成合同签订等',
-    ],
-  },
-  {
-    title: '6. 租后事项处理',
-    subtasks: ['提交房屋检查报告', '办理水电网络', '了解维修流程'],
-  },
-];
+export async function generateMetadata({ params }: { params: { locale: string } }) {
+  const t = await getTranslations({ locale: params.locale, namespace: 'RentalGuide' });
+  
+  return {
+    title: t('checklist-title'),
+  };
+}
 
-const Page = () => {
+export default async function Page() {
+  const t = await getTranslations('RentalGuide');
+  
+  const stepsData = [
+    {
+      title: `1. ${t('budget-title')}`,
+      subtasks: [
+        t('budget-subtask-1'),
+        t('budget-subtask-2'),
+        t('budget-subtask-3'),
+        t('budget-subtask-4'),
+      ],
+    },
+    {
+      title: `2. ${t('area-title')}`,
+      subtasks: [
+        t('area-subtask-1'),
+        t('area-subtask-2'),
+        t('area-subtask-3'),
+        t('area-subtask-4'),
+      ],
+    },
+    {
+      title: `3. ${t('prepare-title')}`,
+      subtasks: [
+        t('prepare-subtask-1'),
+        t('prepare-subtask-2'),
+        t('prepare-subtask-3'),
+        t('prepare-subtask-4'),
+      ],
+    },
+    {
+      title: `4. ${t('view-title')}`,
+      subtasks: [
+        t('view-subtask-1'),
+        t('view-subtask-2'),
+        t('view-subtask-3'),
+      ],
+    },
+    {
+      title: `5. ${t('contract-title')}`,
+      subtasks: [
+        t('contract-subtask-1'),
+        t('contract-subtask-2'),
+        t('contract-subtask-3'),
+      ],
+    },
+    {
+      title: `6. ${t('after-title')}`,
+      subtasks: [
+        t('after-subtask-1'),
+        t('after-subtask-2'),
+        t('after-subtask-3'),
+      ],
+    },
+  ];
+
   return (
     <div className="flex flex-col lg:flex-row">
       {/* Main Content */}
 
       <div className="flex flex-col lg:flex-row">
-        <section className="flex-[2] bg-gray-50 rounded-lg p-5 shadow-md h-[700px] overflow-y-auto">
-          <CheckList title="租房流程" stepsData={stepsData} />
+        <section className="flex-[2] bg-gray-50 rounded-lg p-5 shadow-md h-[800px] overflow-y-auto">
+          <CheckList title={t('checklist-title')} stepsData={stepsData} />
         </section>
 
         {/* Guides Section */}
-        <section className="flex-[8] col-span-2 bg-white shadow-lg rounded-lg p-6 h-[700px]">
+        <section className="flex-[8] col-span-2 bg-white shadow-lg rounded-lg p-6 h-[800px]">
           <Guides />
         </section>
       </div>
     </div>
   );
-};
-
-export default Page;
+}
