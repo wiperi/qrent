@@ -22,7 +22,8 @@
     "paths": {
       "@/*": ["./*"],
       "@/qrent/shared/*": ["../shared/*"]
-    }
+    },
+    "noStrictGenericChecks": true
   },
   "include": [
     "next-env.d.ts",
@@ -31,6 +32,6 @@
     "**/*.tsx",
     ".next/types/**/*.ts",
     "src/app/about.js"
-  ],
+, "src/components/TeamsIntro"  ],
   "exclude": ["node_modules"]
 }
