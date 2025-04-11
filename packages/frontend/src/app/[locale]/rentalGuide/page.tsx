@@ -1,18 +1,24 @@
 import CheckList from '@/src/components/CheckList';
 import Guides from '@/src/components/Guides';
-import { useTranslations } from 'next-intl';
-import React from 'react';
 import { getTranslations } from 'next-intl/server';
+import React from 'react';
 
-export async function generateMetadata({ params }: { params: { locale: string } }) {
-  const t = await getTranslations({ locale: params.locale, namespace: 'RentalGuide' });
-  
+export async function generateMetadata({
+  params: { locale },
+}: {
+  params: { locale: string };
+}) {
+  const t = await getTranslations({ locale, namespace: 'RentalGuide' });
   return {
     title: t('checklist-title'),
   };
 }
 
-export default async function Page() {
+export default async function Page({
+  params: { locale },
+}: {
+  params: { locale: string };
+}) {
   const t = await getTranslations('RentalGuide');
   
   const stepsData = [
@@ -72,7 +78,6 @@ export default async function Page() {
   return (
     <div className="flex flex-col lg:flex-row">
       {/* Main Content */}
-
       <div className="flex flex-col lg:flex-row">
         <section className="flex-[2] bg-gray-50 rounded-lg p-5 shadow-md h-[800px] overflow-y-auto">
           <CheckList title={t('checklist-title')} stepsData={stepsData} />

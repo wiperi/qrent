@@ -22,7 +22,8 @@
     "paths": {
       "@/*": ["./*"],
       "@/qrent/shared/*": ["../shared/*"]
-    }
+    },
+    "noStrictGenericChecks": true
   },
   "include": [
     "next-env.d.ts",

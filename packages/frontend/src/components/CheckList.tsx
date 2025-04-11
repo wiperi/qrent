@@ -6,52 +6,14 @@ import { useTranslations } from 'next-intl';
 
 interface ChecklistProps {
   title: string;
+  stepsData: {
+    title: string;
+    subtasks: string[];
+  }[];
 }
 
-const Checklist: React.FC<ChecklistProps> = ({ title }) => {
+const Checklist: React.FC<ChecklistProps> = ({ title, stepsData }) => {
   const t = useTranslations('CheckList');
-
-  const stepsData = [
-    {
-      title: t('budget_requirements'),
-      subtasks: [
-        t('basic_accommodation'),
-        t('rent_vs_share'),
-        t('budget_range'),
-        t('personal_requirements'),
-      ],
-    },
-    {
-      title: t('research_area'),
-      subtasks: [
-        t('area_characteristics'),
-        t('target_area'),
-        t('rental_websites'),
-        t('price_range'),
-      ],
-    },
-    {
-      title: t('explore_properties'),
-      subtasks: [
-        t('housing_market'),
-        t('application_materials'),
-        t('viewing_process'),
-        t('application_process'),
-      ],
-    },
-    {
-      title: t('view_contact_agents'),
-      subtasks: [t('suitable_start_date'), t('schedule_viewings'), t('follow_up_status')],
-    },
-    {
-      title: t('sign_deposit_payment'),
-      subtasks: [t('rental_contract'), t('payment_rules'), t('complete_contract')],
-    },
-    {
-      title: t('post_rental'),
-      subtasks: [t('inspection_report'), t('utilities_internet'), t('maintenance')],
-    },
-  ];
 
   const { checkedTasks, updateProgress } = useRentalGuideProgressStore();
 
