@@ -81,7 +81,7 @@ model UserPreference {
   maxBathrooms Int? @db.UnsignedTinyInt
 
   // Location/Region
-  regions String? @db.Text // Stored as JSON array or comma-separated values
+  regions String? @db.Text // eg. "kingsford zetland redfern"
 
   // 1: House, 2: Apartment
   propertyType Int? @db.UnsignedTinyInt
