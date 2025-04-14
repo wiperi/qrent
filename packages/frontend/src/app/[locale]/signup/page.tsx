@@ -16,6 +16,7 @@ const Signup = () => {
 
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [reEnterPassword, setReEnterPassword] = useState('');
 
   const [isSuccVisible, setisSuccVisible] = useState(false);
   const succTitle = t('succ-title');
@@ -29,6 +30,9 @@ const Signup = () => {
     e.preventDefault();
 
     try {
+      if (password != reEnterPassword) {
+        throw new Error('different password');
+      }
       console.log(email, password);
       const baseurl = await getApiBaseUrl();
       console.log(baseurl);
@@ -90,7 +94,12 @@ const Signup = () => {
 
         <LabelInputContainer className="mb-4">
           <Label htmlFor="re-password">{t('re-pwd')}</Label>
-          <Input id="reEnterPassword" placeholder="••••••••" type="Password" />
+          <Input
+            id="reEnterPassword"
+            placeholder="••••••••"
+            type="Password"
+            onChange={e => setReEnterPassword(e.target.value)}
+          />
         </LabelInputContainer>
 
         <button
