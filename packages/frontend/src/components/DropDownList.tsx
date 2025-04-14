@@ -1,7 +1,7 @@
 'use client';
 import { Dropdown, DropdownTrigger, DropdownMenu, DropdownItem, Button } from '@heroui/react';
 import { User } from 'lucide-react';
-import { useTranslations } from 'use-intl';
+import { useTranslations } from '../i18n/use-intl-adapter';
 
 export default function DropDownList() {
   const t = useTranslations('DropDownList');

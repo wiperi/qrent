@@ -16,14 +16,22 @@ const HouseCard = ({ house }) => {
 
   const t = useTranslations('HouseCard');
   const price = house.pricePerWeek;
-  const scoreValue = house.averageScore;
+  const scoreValue = house.averageScore.toFixed(1);
+  if (house.addressLine1 == null) {
+    house.addressLine1 = 'Unknown';
+  }
+
+  if (house.addressLine2 == null) {
+    house.addressLine2 = 'Unknown';
+  }
+
   house.addressLine1 = house.addressLine1
-    .replace('-', ' ')
+    .replaceAll('-', ' ')
     .split(' ')
     .map(word => word.charAt(0).toUpperCase() + word.slice(1))
     .join(' ');
   house.addressLine2 = house.addressLine2
-    .replace('-', ' ')
+    .replaceAll('-', ' ')
     .split(' ')
     .map(word => word.charAt(0).toUpperCase() + word.slice(1))
     .join(' ');
@@ -52,6 +60,14 @@ const HouseCard = ({ house }) => {
   }
   house.publishedAt = house.publishedAt.split('T')[0];
 
+  if (house.keywords == null) {
+    house.keywords = '';
+  }
+
+  if (house.descriptionCN == null) {
+    house.descriptionCN = '';
+  }
+
   let description = '';
   if (locale == 'en') {
     description = house.keywords.split(',').splice(0, 5);
@@ -68,6 +84,8 @@ const HouseCard = ({ house }) => {
     propertyType = 'Studio';
   } else if (house.propertyType == 4) {
     propertyType = 'Semi-detached';
+  } else {
+    propertyType = 'Unknown';
   }
 
   return (
