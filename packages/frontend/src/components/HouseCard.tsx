@@ -4,7 +4,7 @@
 import { useTranslations } from 'next-intl';
 import { usePathname } from 'next/navigation';
 import React from 'react';
-import { FaBath, FaBed, FaCalendarAlt, FaCar, FaMapMarkerAlt } from 'react-icons/fa';
+import { FaBath, FaBed, FaCalendarAlt, FaCar, FaMapMarkerAlt, FaRegClock } from 'react-icons/fa';
 
 const JustLandedHouseCard = ({ house }) => {
   let locale = '';
@@ -100,9 +100,17 @@ const JustLandedHouseCard = ({ house }) => {
       className="block border border-gray-300 rounded-lg shadow-lg hover:shadow-2xl transition duration-300 p-6 bg-white hover:bg-gray-50 relative"
     >
       <div className="mb-4">
-        <h3 className="text-xl font-semibold text-gray-800">
-          {house.addressLine1 || 'Unknown Address'}
-        </h3>
+        <div className="flex space-x-4">
+          <h3 className="text-xl font-semibold text-gray-800">
+            {house.addressLine1 || 'Unknown Address'}
+          </h3>
+          {propertyType != '' && (
+            <div className="flex items-center space-x-1 bg-gray-100 text-blue-primary px-3 py-1 rounded-sm">
+              <span className="inline-block rounded-full text-md">{propertyType}</span>
+            </div>
+          )}
+        </div>
+
         <div className="flex items-center space-x-1 mt-2 mb-4">
           <FaMapMarkerAlt className="text-gray-700 text-sm" />
           <span className="text-sm text-gray-500">{house.addressLine2 || 'Unknown Location'}</span>
@@ -121,27 +129,38 @@ const JustLandedHouseCard = ({ house }) => {
       </span>
 
       <div className="flex space-x-4 mt-4">
-        <div className="flex items-center space-x-1 bg-gray-100 text-blue-primary px-3 py-1 rounded-sm">
-          <FaBed className="text-blue-primary" />
-          <span className="text-sm ">{house.bedroomCount}</span>
-        </div>
-        <div className="flex items-center space-x-1 bg-gray-100 text-blue-primary px-3 py-1 rounded-sm">
-          <FaBath className="text-blue-primary" />
-          <span className="text-sm ">{house.bathroomCount}</span>
-        </div>
-        <div className="flex items-center space-x-1 bg-gray-100 text-blue-primary px-3 py-1 rounded-sm">
-          <span className="inline-block bg-gray-100 text-gray-800 rounded-full text-xs">
-            {propertyType}
-          </span>
-        </div>
-        <div className="flex items-center space-x-1 bg-gray-100 text-blue-primary px-3 py-1 rounded-sm">
-          <FaCar className="text-blue-primary" />
-          <span className="text-sm">{house.commuteTime}</span>
-        </div>
+        {house.bedroomCount != 0 && (
+          <div className="flex items-center space-x-1 bg-gray-100 text-blue-primary px-3 py-1 rounded-sm">
+            <FaBed className="text-blue-primary" />
+            <span className="text-sm ">{house.bedroomCount}</span>
+          </div>
+        )}
+
+        {house.bathroomCount != 0 && (
+          <div className="flex items-center space-x-1 bg-gray-100 text-blue-primary px-3 py-1 rounded-sm">
+            <FaBath className="text-blue-primary" />
+            <span className="text-sm ">{house.bathroomCount}</span>
+          </div>
+        )}
+
+        {house.commuteTime != 0 && (
+          <div className="flex items-center space-x-1 bg-gray-100 text-blue-primary px-3 py-1 rounded-sm">
+            <FaRegClock className="text-blue-primary" />
+            <span className="text-sm">{house.commuteTime}</span>
+          </div>
+        )}
+
         <div className="flex items-center space-x-1 bg-gray-100 text-blue-primary px-3 py-1 rounded-sm">
           <FaCalendarAlt className="text-blue-primary" />
           <span className="text-sm">{house.availableDate || t('unknown')}</span>
         </div>
+
+        {house.parkingCount != null && (
+          <div className="flex items-center space-x-1 bg-gray-100 text-blue-primary px-3 py-1 rounded-sm">
+            <FaCar className="text-blue-primary" />
+            <span className="text-sm">{house.parkingCount}</span>
+          </div>
+        )}
       </div>
 
       <div className="mt-4">
