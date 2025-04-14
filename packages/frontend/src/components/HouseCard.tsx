@@ -62,9 +62,21 @@ const JustLandedHouseCard = ({ house }) => {
     house.availableDate = house.availableDate.split('T')[0];
   }
 
+  if (house.keywords == null) {
+    house.keywords = '';
+  }
+
+  if (house.descriptionCN == null) {
+    house.descriptionCN = '';
+  }
+
   let description = '';
   if (locale == 'en') {
-    description = house.keywords.split(',');
+    if (house.keywords == null) {
+      description = house.description.split(',');
+    } else {
+      description = house.keywords.split(',');
+    }
   } else {
     description = house.descriptionCN.split(',');
   }
@@ -133,7 +145,6 @@ const JustLandedHouseCard = ({ house }) => {
       </div>
 
       <div className="mt-4">
-        {' '}
         <div className="mt-2">
           {description.map((kw, index) => (
             <span

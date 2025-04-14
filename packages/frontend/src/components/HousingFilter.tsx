@@ -49,7 +49,7 @@ const SUBURB_OPTIONS = {
 const HousingFilter = () => {
   const t = useTranslations('Search');
 
-  const [isAccordionOpen, setAccordionOpen] = useState(true);
+  const [accordionOpen, setAccordionOpen] = useState(true);
 
   const { filter, updateFilter } = useFilterStore();
 
@@ -175,17 +175,17 @@ const HousingFilter = () => {
       <div className="mt-4">
         <div
           className="text-lg text-gray-600 font-bold cursor-pointer flex items-center justify-between"
-          onClick={() => setAccordionOpen(!isAccordionOpen)}
+          onClick={() => setAccordionOpen(!accordionOpen)}
         >
           <span>{t('area')}</span>
           <ChevronDown
             className={`w-5 h-5 transform transition-transform duration-300 ${
-              isAccordionOpen ? 'rotate-180' : 'rotate-0'
+              accordionOpen ? 'rotate-180' : 'rotate-0'
             }`}
           />
         </div>
 
-        {isAccordionOpen && filter.university == 'UNSW' && (
+        {accordionOpen && filter.university == 'UNSW' && (
           <div className="mt-2 max-h-52 overflow-y-auto  grid grid-cols-2 gap-2">
             {unswAreaOptions.map((option, index) => (
               <div key={index} className="flex items-center">
@@ -205,7 +205,7 @@ const HousingFilter = () => {
           </div>
         )}
 
-        {isAccordionOpen && filter.university == 'USYD' && (
+        {accordionOpen && filter.university == 'USYD' && (
           <div className="mt-2 max-h-52 overflow-y-auto  grid grid-cols-2 gap-2">
             {usydAreaOptions.map((option, index) => (
               <div key={index} className="flex items-center">
