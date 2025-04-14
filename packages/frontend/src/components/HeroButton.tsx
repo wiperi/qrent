@@ -17,8 +17,8 @@ const HeroButton = () => {
       icon: faBookOpen,
       title: t('rental-guide'),
       description: t('rental-guide-des'),
-      progress: (checkedItemsRentalGuide / 28) * 100, // Progress percentage
-      progressText: `${checkedItemsRentalGuide}/28`,
+      progress: (checkedItemsRentalGuide / 21) * 100, // Progress percentage
+      progressText: `${checkedItemsRentalGuide}/21`,
     },
     {
       href: '/prepareDocuments',

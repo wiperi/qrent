@@ -36,7 +36,7 @@ export default function Search() {
             <div className="flex-1">
               <div className="text-sm text-gray-600">{t('university')}</div>
               <select
-                className="border rounded px-2 py-1 max-h-40 overflow-y-auto w-full"
+                className="border rounded px-2 py-1 max-h-40 overflow-y-auto w-full bg-white"
                 value={filter.university}
                 onChange={e => updateFilter({ ...filter, university: e.target.value })}
               >
