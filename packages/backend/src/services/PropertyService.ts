@@ -57,7 +57,12 @@ class PropertyService {
    * @returns Promise resolving to the filtered properties
    */
   async getPropertiesByPreferences(
-    preferences: UserPreference & { page: number; pageSize: number; publishedAt?: string }
+    preferences: UserPreference & {
+      page: number;
+      pageSize: number;
+      publishedAt?: string;
+      orderBy?: Prisma.PropertyOrderByWithRelationInput[];
+    }
   ): Promise<Property[]> {
     const page = preferences.page;
     const pageSize = preferences.pageSize;
@@ -71,54 +76,78 @@ class PropertyService {
       throw new HttpError(400, 'Page size is required');
     }
 
+    let orderBy: Prisma.PropertyOrderByWithRelationInput[] = [];
+
+    if (preferences.orderBy) {
+      // Check if every key is a valid db column
+      for (const obj of preferences.orderBy) {
+        for (const key in obj) {
+          if (!(key in prisma.property.fields)) {
+            throw new HttpError(400, `Invalid orderBy key: ${key}`);
+          }
+
+          if (obj[key as keyof typeof obj] !== 'asc' && obj[key as keyof typeof obj] !== 'desc') {
+            throw new HttpError(400, `Invalid orderBy value: ${obj[key as keyof typeof obj]}`);
+          }
+        }
+      }
+      orderBy = preferences.orderBy;
+    }
+
+    const where: Prisma.PropertyWhereInput = {};
+
+    // Price filter
+    where.pricePerWeek = { gte: preferences.minPrice ?? 0 };
+    if (preferences.maxPrice) {
+      where.pricePerWeek.lte = preferences.maxPrice;
+    }
+
+    // Bedroom filter
+    where.bedroomCount = { gte: preferences.minBedrooms ?? 0 };
+    if (preferences.maxBedrooms) {
+      where.bedroomCount.lte = preferences.maxBedrooms;
+    }
+
+    // Bathroom filter
+    where.bathroomCount = { gte: preferences.minBathrooms ?? 0 };
+    if (preferences.maxBathrooms) {
+      where.bathroomCount.lte = preferences.maxBathrooms;
+    }
+
+    // Property type filter
+    if (preferences.propertyType) {
+      where.propertyType = preferences.propertyType;
+    }
+
+    // Rating filter
+    where.averageScore = { gte: preferences.minRating ?? 0 };
+
+    // Commute time filter
+    where.commuteTime = { gte: preferences.minCommuteTime ?? 0 };
+    if (preferences.maxCommuteTime) {
+      where.commuteTime.lte = preferences.maxCommuteTime;
+    }
+
+    // Regions filter
+    if (preferences.regions && preferences.regions.length > 0) {
+      const regions = preferences.regions.split(' ');
+      where.OR = regions.map(region => ({
+        addressLine2: {
+          contains: region,
+        },
+      }));
+    }
+
+    // Published date filter
+    if (preferences.publishedAt) {
+      where.publishedAt = { gte: new Date(preferences.publishedAt) };
+    }
+
     const properties = await prisma.property.findMany({
-      where: {
-        pricePerWeek: {
-          gte: preferences.minPrice ?? 0,
-          ...(preferences.maxPrice ? { lte: preferences.maxPrice } : {}),
-        },
-
-        bedroomCount: {
-          gte: preferences.minBedrooms ?? 0,
-          ...(preferences.maxBedrooms ? { lte: preferences.maxBedrooms } : {}),
-        },
-
-        bathroomCount: {
-          gte: preferences.minBathrooms ?? 0,
-          ...(preferences.maxBathrooms ? { lte: preferences.maxBathrooms } : {}),
-        },
-
-        ...(preferences.propertyType ? { propertyType: preferences.propertyType } : {}),
-
-        ...(preferences.minRating
-          ? {
-              averageScore: {
-                gte: preferences.minRating,
-              },
-            }
-          : {}),
-
-        commuteTime: {
-          gte: preferences.minCommuteTime ?? 0,
-          ...(preferences.maxCommuteTime ? { lte: preferences.maxCommuteTime } : {}),
-        },
-
-        ...(preferences.regions && preferences.regions.length > 0
-          ? {
-              addressLine2: {
-                contains: preferences.regions,
-              },
-            }
-          : {}),
-
-        averageScore: {
-          gte: preferences.minRating ?? 0,
-        },
-
-        ...(preferences.publishedAt ? { publishedAt: { gte: new Date(preferences.publishedAt) } } : {}),
-      },
+      where,
       take: pageSize,
       skip,
+      orderBy,
     });
 
     return properties;
