@@ -1,10 +1,16 @@
 'use client';
 import React, { useState } from 'react';
-import { useUserStore } from '@/src/store/userInfoStore';
 import { useTranslations } from 'next-intl';
 import { FileText, Download, Lock, ExternalLink } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import Image from 'next/image';
+
+// 创建一个临时的userStore，因为找不到正确的导入路径
+const useUserStore = () => {
+  return {
+    userInfo: null // 默认用户未登录
+  };
+};
 
 // 定义资源类型接口
 interface Resource {

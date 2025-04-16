@@ -5,6 +5,8 @@ import { faBookOpen, faFileAlt, faSearch, faDownload } from '@fortawesome/free-s
 import { useTranslations } from 'next-intl';
 import { useRentalGuideProgressStore } from '../store/rentalGuideProgressStore';
 import { usePrepareDocProgressStore } from '../store/prepareDocProgressStore';
+// 暂时注释掉错误的引用，因为目前没有使用到这个store
+// import { useUserStore } from '../../../store/userInfoStore';
 
 const HeroButton = () => {
   const t = useTranslations('HeroButton');
