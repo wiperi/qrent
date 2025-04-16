@@ -1,0 +1,429 @@
+---
+description: 
+globs: 
+alwaysApply: true
+---
+
+# Your rule content
+
+- You can @ files here
+- You can use markdown but dont have to
+# QRent 项目架构指南
+
+## 1. 项目概述
+
+QRent是一个租房服务平台，采用现代化的前后端分离架构，使用Monorepo结构组织代码。项目主要分为三个部分：
+- **前端**：基于Next.js的React应用
+- **后端**：Express API服务
+- **共享**：前后端共用的类型和工具
+
+## 2. 项目技术栈
+
+### 前端技术栈
+- **框架**: Next.js 15 + React 19
+- **语言**: TypeScript
+- **状态管理**: Zustand (持久化存储)
+- **样式**: Tailwind CSS + 多个UI组件库(Material UI, Mantine, Heroui等)
+- **国际化**: next-intl
+- **HTTP请求**: axios + Next.js API Routes
+- **包管理**: pnpm
+
+### 后端技术栈
+- **框架**: Express.js
+- **语言**: TypeScript
+- **数据库**: MySQL
+- **ORM**: Prisma
+- **认证**: JWT
+- **API文档**: Swagger
+
+## 3. 目录结构
+
+```
+/
+├── packages/
+│   ├── frontend/        # 前端代码
+│   │   ├── src/
+│   │   │   ├── app/     # Next.js App Router页面
+│   │   │   ├── components/ # React组件
+│   │   │   ├── hooks/   # 自定义钩子
+│   │   │   ├── i18n/    # 国际化配置
+│   │   │   ├── lib/     # 工具类库
+│   │   │   └── store/   # Zustand状态存储
+│   │   ├── messages/    # 国际化翻译文件
+│   │   └── public/      # 静态资源
+│   ├── backend/         # 后端代码
+│   │   ├── src/
+│   │   │   ├── controllers/ # 控制器
+│   │   │   ├── models/      # 模型
+│   │   │   ├── routes/      # 路由
+│   │   │   └── services/    # 服务
+│   │   └── tests/           # 测试文件
+│   └── shared/          # 共享代码
+│       ├── types/       # 共享类型定义
+│       └── utils/       # 共享工具函数
+└── docker/              # Docker配置
+```
+
+## 4. 前端架构详解
+
+### 4.1 页面路由
+- 使用Next.js App Router的文件系统路由
+- 国际化路由结构：`/[locale]/路径名`
+- 主要页面：
+  - `/`: 首页
+  - `/findAHome`: 找房页面
+  - `/rentalGuide`: 租房指南
+  - `/prepareDocuments`: 准备文档
+  - `/login`: 登录页面
+  - `/signup`: 注册页面
+  - `/team`: 团队介绍
+  - `/about`: 关于我们
+  - `/contact`: 联系我们
+  - `/justLanded`: 刚落地指南
+
+### 4.2 状态管理
+- 使用Zustand管理全局状态，配合persist中间件实现持久化
+- 用户信息存储在`userInfoStore.js`中：
+```javascript
+import { create } from 'zustand';
+import { persist } from 'zustand/middleware';
+
+export const useUserStore = create()(
+  persist(
+    set => ({
+      userInfo: null,
+      setUser: userInfo => set({ userInfo }),
+      clearUser: () => set({ userInfo: null }),
+    }),
+    {
+      name: 'user-info',
+      storage: createJSONStorage(() => localStorage),
+    }
+  )
+);
+```
+
+- 每个主要功能模块使用独立的store文件，如：
+  - `useFilterStore.js`: 房源筛选条件
+  - `rentalGuideProgressStore.js`: 租房指南进度
+  - `prepareDocProgressStore.js`: 文档准备进度
+
+### 4.3 API调用规范
+
+#### 前端API路由
+- 在`app/api/`下创建API路由作为BFF层
+- 通过Next.js API Routes中转请求到后端
+
+```typescript
+// packages/frontend/src/app/api/properties/search/route.ts
+export async function POST(request: Request) {
+  try {
+    const body = await request.json();
+    const res = await fetch(`http://${process.env.NEXT_PUBLIC_BACKEND_URL}/properties/search`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${process.env.API_TOKEN}`,
+      },
+      body: JSON.stringify(body),
+    });
+    
+    // 处理响应...
+    const data = await res.json();
+    return NextResponse.json(data);
+  } catch (error) {
+    // 错误处理...
+    return NextResponse.json({ error: error.message }, { status: 500 });
+  }
+}
+```
+
+#### 后端API交互
+- 使用`shared`包中的`requestHelpers.ts`进行API请求封装
+- 统一错误处理和响应拦截
+- 环境变量配置API地址`NEXT_PUBLIC_BACKEND_URL`
+
+### 4.4 组件开发规范
+
+#### 组件命名
+- 使用PascalCase命名组件文件
+- 功能型组件使用描述性名称，如`HousingFilter.tsx`
+- UI组件使用通用名称，如`Button.tsx`、`Input.tsx`
+
+#### 组件结构
+- 使用函数式组件和React Hooks
+- 使用TypeScript接口定义props类型
+- 复杂组件拆分为更小的子组件
+- 组件示例：
+
+```typescript
+// NavBar.tsx
+'use client';
+import { useTranslations } from 'next-intl';
+import Link from 'next/link';
+import LanguageSwitcher from './LanguageSwitcher';
+
+const NavBar = () => {
+  const t = useTranslations('common');
+  
+  return (
+    <nav className="bg-white shadow-md">
+      {/* 导航内容 */}
+    </nav>
+  );
+};
+
+export default NavBar;
+```
+
+#### 样式规范
+- 主要使用Tailwind CSS实现样式
+- 组件级定制样式通过`cn`工具函数合并class:
+```typescript
+import { cn } from '@/src/lib/utils';
+
+const Button = ({ className, ...props }) => {
+  return (
+    <button
+      className={cn(
+        "bg-blue-primary text-white px-4 py-2 rounded-md",
+        className
+      )}
+      {...props}
+    />
+  );
+};
+```
+- 遵循项目定义的色彩系统，主要包括：
+  - Morandi色系：绿(#597A69)、蓝(#2A4C65)、灰(#EBEBE9)、浅蓝(#BFC2CB)
+  - 主题蓝：#1E4F9C
+
+### 4.5 国际化规范
+
+- 使用next-intl实现国际化
+- 支持英文(en)和中文(zh)
+- 翻译文件存放在`messages/`目录下
+- 使用方式：
+
+```typescript
+// 组件中使用
+import { useTranslations } from 'next-intl';
+
+const Component = () => {
+  const t = useTranslations('namespace');
+  return <div>{t('key')}</div>;
+};
+
+// 页面路由中
+export const metadata = {
+  title: 'QRent - 租房平台'
+};
+
+export default function Page() {
+  // ...
+}
+```
+
+### 4.6 响应式设计规范
+
+- 使用Tailwind内置断点实现响应式
+- 移动优先设计原则
+- 主要断点:
+  - sm: 640px
+  - md: 768px
+  - lg: 1024px
+  - xl: 1280px
+  - 2xl: 1536px
+
+```html
+<!-- 响应式示例 -->
+<div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3">
+  <!-- 内容 -->
+</div>
+```
+
+### 4.7 自定义Hooks
+
+- 将复用逻辑抽离为自定义Hooks
+- 命名规范：使用"use"前缀
+- 示例：`useOutsideClick`
+
+```typescript
+// hooks/use-outside-click.tsx
+import { useEffect, RefObject } from 'react';
+
+export const useOutsideClick = (
+  ref: RefObject<HTMLElement>,
+  callback: () => void
+) => {
+  useEffect(() => {
+    const listener = (event: MouseEvent | TouchEvent) => {
+      if (!ref.current || ref.current.contains(event.target as Node)) {
+        return;
+      }
+      callback();
+    };
+    
+    document.addEventListener('mousedown', listener);
+    document.addEventListener('touchstart', listener);
+    
+    return () => {
+      document.removeEventListener('mousedown', listener);
+      document.removeEventListener('touchstart', listener);
+    };
+  }, [ref, callback]);
+};
+```
+
+## 5. 后端架构详解
+
+### 5.1 API设计
+- RESTful API设计
+- JWT认证
+- 错误处理标准化
+- Swagger文档
+
+### 5.2 控制器设计
+- 每个资源一个控制器
+- 控制器负责处理请求和响应
+- 业务逻辑委托给服务层
+
+### 5.3 数据库交互
+- 使用Prisma ORM
+- 模型定义在schema.prisma中
+- 事务处理
+
+## 6. 共享模块
+
+### 6.1 类型定义
+- 定义前后端共用的接口和类型
+- DTO (Data Transfer Objects)
+
+### 6.2 工具函数
+- API请求封装
+- 错误处理
+- 日期格式化等通用函数
+
+```typescript
+// shared/utils/requestHelpers.ts
+import axios, { AxiosError } from 'axios';
+
+const http = axios.create({
+  baseURL: process.env.BACKEND_URL || 'http://localhost:3200',
+  timeout: 5000,
+  headers: {
+    'Content-Type': 'application/json',
+  },
+});
+
+// 统一处理错误
+function handleRequestError(error: unknown): never {
+  if (axios.isAxiosError(error)) {
+    // 错误处理逻辑...
+  }
+  // 非 Axios 错误
+  console.error('[System Error]', error);
+  throw error;
+}
+
+// 响应拦截器
+http.interceptors.response.use(
+  response => response.data,
+  error => handleRequestError(error)
+);
+
+// 请求方法导出
+export { login, register, /* 其他方法 */ };
+```
+
+## 7. 开发工作流
+
+### 7.1 分支管理
+- `main`: 主分支，稳定版本
+- `dev`: 开发分支
+- 功能分支: `feature/xxx`
+- 修复分支: `fix/xxx`
+
+### 7.2 代码规范
+- 使用ESLint和Prettier
+- TypeScript严格模式
+- 提交前运行lint和测试
+
+### 7.3 环境配置
+- 开发环境: `.env.development`
+- 生产环境: `.env.production`
+- 测试环境: `.env.test`
+
+## 8. 性能优化
+
+### 8.1 前端优化
+- Next.js静态生成和服务端渲染
+- 图片优化
+- 代码分割
+- 缓存策略
+
+### 8.2 后端优化
+- 数据库索引优化
+- 批量处理
+- 缓存层
+- 限流
+
+## 9. 部署
+
+### 9.1 前端部署
+- Vercel部署Next.js应用
+- 环境变量配置
+- CI/CD流程
+
+### 9.2 后端部署
+- Docker容器化
+- Docker Compose编排
+- 数据库迁移
+
+## 10. 最佳实践
+
+- 组件设计尽量保持独立，减少耦合
+- 状态尽可能下放到最低层级
+- 避免过度优化，先解决业务问题
+- 共享逻辑提取到hooks或utils
+- 关注用户体验和交互设计
+- 保持代码统一风格
+- 编写有意义的注释
+- 保持良好的文档
+
+## 11. 常见问题解决方案
+
+### 11.1 前端调试
+- React DevTools
+- Next.js调试模式
+
+### 11.2 API调试
+- Postman集合
+- 环境变量管理
+
+### 11.3 国际化问题
+- 确保所有文本都通过国际化工具获取
+- 检查翻译缺失
+
+## 12. 贡献指南
+
+1. 确保理解项目架构
+2. 遵循代码规范
+3. 编写单元测试
+4. 提交前进行自我审查
+5. 提交有意义的commit信息
+
+## 13. 学习资源
+
+### 前端
+- Next.js官方文档
+- React官方文档
+- Zustand状态管理
+- Tailwind CSS文档
+
+### 后端
+- Express.js文档
+- Prisma文档
+- JWT认证最佳实践
+
+本文档仅供参考，随项目发展可能有所变动。开发者应遵循最新的团队共识和实践。
