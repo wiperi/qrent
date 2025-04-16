@@ -1,10 +1,10 @@
 'use client';
 import React, { useState } from 'react';
-import { useUserStore } from '@/src/store/userInfoStore';
 import { useTranslations } from 'next-intl';
 import { FileText, Download, Lock, ExternalLink } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import Image from 'next/image';
+import { useUserStore } from '../../../store/userInfoStore';
 
 // 定义资源类型接口
 interface Resource {
@@ -164,4 +164,4 @@ export default function ResourceCenter() {
       </div>
     </div>
   );
-} 
+}
