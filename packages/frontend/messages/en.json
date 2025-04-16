@@ -242,6 +242,7 @@
   "Guides": {
     "recommended": "Recommended",
     "official": "Official",
+
     "guide1": "Guide 1",
     "guide2": "Guide 2",
     "guide3": "Guide 3",
@@ -285,5 +286,34 @@
     "rental-vocabulary-desc": "English-Chinese glossary of common rental terms in Australia",
     "inspection-checklist": "Property Inspection Checklist",
     "inspection-checklist-desc": "Detailed checklist for inspecting a property before renting"
+=======
+    "guide1": "🇦🇺 Complete Guide: Finally Someone Explains Sydney Rental Clearly😭",
+    "guide2": "How to Rent in Australia While Still in Your Home Country",
+    "guide3": "How I Found a $200 Rental in Sydney - Whole Property Edition",
+    "guide4": "How I Found a $200 Rental in Sydney - Part 1",
+    "guide5": "International Student's Guide to University Apartments Near USYD",
+    "guide6": "Application Materials",
+    "guide7": "Scape Darling Square Living Experience",
+    "guide8": "Australian Rental Guide (Using Realestate as Example)",
+    "guide9": "UNSW Popular Rental Areas Analysis - Where to Live",
+    "guide10": "USYD Rental Guide | Pure Tips No Ads✅",
+    "guide11": "USYD Area Rental Guide (UNSW Coming Next)",
+    "guide12": "Monthly Living Expenses Reference for Australian Students",
+    "guide13": "2k Words Guide | 🇦🇺UNSW Area Rental Introduction",
+    "guide14": "Quick Property Search",
+    "guide15": "First-time Renter's Guide to Australian Property Market",
+    "guide16": "🏠Complete Property Viewing Checklist + Application Tips",
+    "guide17": "What Makes a Cover Letter Praised by Australian Landlords",
+    "guide18": "Realestate Rental Experience",
+    "guide19": "How I Got an Offer Among 40 Applicants",
+    "guide20": "Success Story: All Applications Approved on Realestate👏",
+    "guide21": "Recent Sydney Rental FAQs (Required Documents)",
+    "guide22": "🇦🇺Survival Guide | Ultimate Rental Tutorial",
+    "guide23": "Essential Things Sydney Renters Must Know",
+    "guide24": "Guide: How to Properly Pay Bond in Australia with Screenshots",
+    "guide25": "2024 Sydney Rental Contract Guide❗No More Worries About Bad Landlords",
+    "guide26": "How to Protect Your Rights as a Tenant in Australia",
+    "guide27": "Pre-rental Inspection Guide❗️Condition Report Tips",
+    "guide28": "Must-Read for International Students❗Setting Up Utilities"
   }
 }

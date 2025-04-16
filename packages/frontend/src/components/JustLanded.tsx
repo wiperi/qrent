@@ -23,7 +23,7 @@ const JustLanded = () => {
 
       requestBody.targetSchool = school;
       requestBody.page = 1;
-      requestBody.pageSize = 20;
+      requestBody.pageSize = 50;
       requestBody.publishedAt = new Date().toDateString();
 
       console.log(requestBody);
@@ -38,14 +38,17 @@ const JustLanded = () => {
       let results = await response.json();
 
       for (const result of results) {
-        if (result.url == 'https://www.domain.com.au/nan') {
+        if (result.url == 'https://www.domain.com.au/nan' || result.addressLine1 == null) {
           results.splice(results.indexOf(result), 1);
         }
       }
+
+      results.sort((a, b) => b.averageScore - a.averageScore);
+      console.log(results);
+
       results = results.slice(0, 9);
 
       setListings(results);
-      console.log(results);
     } catch (error) {
       console.error('Error fetching properties:', error);
     } finally {

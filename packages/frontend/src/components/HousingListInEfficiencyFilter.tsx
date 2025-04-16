@@ -135,6 +135,7 @@ const HousingListInEfficiencyFilter = () => {
       if (results.length == 0) {
         setHasMore(false);
       }
+      results.sort((a, b) => b.averageScore - a.averageScore);
       setListings(results);
     } catch (error) {
       console.error('Error fetching properties:', error);
