@@ -123,6 +123,12 @@ const HousingListInEfficiencyFilter = () => {
 
       requestBody.publishedAt = new Date().toDateString();
 
+      requestBody.orderBy = [
+        {
+          averageScore: 'desc',
+        },
+      ];
+
       console.log(requestBody);
 
       const response = await fetch('/api/properties/search', {
