@@ -40,79 +40,95 @@ export default function ResourceCenter() {
   const handleDownload = () => {
     // 执行下载操作
     const link = document.createElement('a');
-    link.href = `/resources/rental-guide.pdf`;
-    link.download = "澳洲租房最全全流程攻略.pdf";
+    link.href = `/resources/rental-guide-0417.pdf`;
+    link.download = "Qrent澳洲租房全流程攻略.pdf";
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
   };
 
   return (
-    <div className="max-w-screen-lg mx-auto my-12 px-6 min-h-[80vh]">
-      <h1 className="text-3xl font-bold mb-8 text-center">{t('title')}</h1>
-      
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-10">
-        {/* 左侧 - 微信群二维码 */}
-        <div className="bg-white p-8 rounded-lg shadow-md flex flex-col items-center">
-          <h2 className="text-2xl font-semibold mb-5">Qrent租房交流群</h2>
-          <div className="relative w-full h-[400px] mb-6">
-            <Image 
-              src="/resources/wechat-group.png" 
-              alt="Qrent租房交流群" 
-              fill
-              className="object-contain"
-              priority
-            />
-          </div>
-          <p className="text-center text-gray-800 text-lg mb-3 font-medium">扫码加入种子用户租房交流群</p>
-          <p className="text-center text-gray-600 text-base">租房问题全解答！</p>
-        </div>
-
-        {/* 右侧 - PDF下载 */}
-        <div className="bg-white p-8 rounded-lg shadow-md flex flex-col">
-          <div className="flex items-start mb-5">
-            <div className="text-blue-primary mr-4">
-              <FileText className="w-12 h-12" />
-            </div>
-            <div>
-              <h3 className="text-2xl font-semibold">澳洲租房最全全流程攻略</h3>
-              <p className="text-gray-600 mt-2">为留学生精心准备的澳洲租房完整指南，从选区到签约全程覆盖</p>
-            </div>
-          </div>
-          
-          <div className="flex-grow mb-6">
-            <div className="relative w-full h-80 bg-gray-100 rounded-md overflow-hidden">
-              <Image 
-                src="/resources/first-page.jpg" 
-                alt="PDF预览" 
-                fill
-                className="object-contain"
-                priority
-              />
+    <div className="w-full bg-white min-h-screen">
+      <div className="max-w-6xl mx-auto px-4 py-12">
+        <div className="flex flex-col md:flex-row gap-8">
+          {/* 左侧 - 二维码 */}
+          <div className="md:w-1/2 flex flex-col items-center justify-center">
+            <div className="w-full max-w-lg">
+              <div className="mb-8 text-center">
+                <Image 
+                  src="/QrentLogo.jpg" 
+                  alt="Qrent" 
+                  width={180}
+                  height={70}
+                  className="object-contain mx-auto"
+                />
+              </div>
+              
+              <div className="flex flex-col items-center">
+                <h2 className="text-2xl font-semibold text-gray-800 mb-2">加入租房社群</h2>
+                <p className="text-center text-gray-600 text-base mb-8">有问题实时解答！</p>
+                
+                <div className="border-2 border-[#4D8BF8] rounded-xl px-5 py-6 w-96 flex flex-col items-center justify-center mb-6 relative bg-white">
+                  <Image 
+                    src="/resources/wechat-group-0417.jpg" 
+                    alt="Qrent租房交流群" 
+                    width={320}
+                    height={320}
+                    className="object-contain"
+                    priority
+                  />
+                </div>
+                
+                <div className="bg-blue-50 rounded-full px-6 py-3">
+                  <p className="text-center text-blue-600 text-base font-medium">扫码加入Qrent租房交流群</p>
+                </div>
+              </div>
             </div>
           </div>
 
-          <div className="mt-auto">
-            <button
-              onClick={handleDownload}
-              className="w-full flex items-center justify-center gap-2 px-4 py-4 rounded-md mb-3 bg-blue-primary text-white hover:bg-blue-700"
-            >
-              <Download className="w-5 h-5" /> {t('download-pdf')}
-            </button>
+          {/* 右侧 - 资源列表和PDF */}
+          <div className="md:w-1/2 bg-[#4D8BF8] rounded-2xl text-white flex flex-col items-center relative overflow-hidden">
+            <div className="absolute top-6 left-6 bg-white bg-opacity-20 rounded-full px-4 py-1 z-10">
+              <h1 className="text-sm font-medium text-white">下载中心</h1>
+            </div>
             
-            <div className="p-4 bg-blue-50 border border-blue-200 rounded-md">
-              <p className="text-blue-800 text-lg flex items-center justify-center font-medium">
-                <ExternalLink className="w-5 h-5 mr-2" />
-                PDF文档密码: <span className="font-bold ml-2 text-lg">www.qrent.rent</span>
-              </p>
+            <div className="w-full px-6 pt-20 pb-2">
+              <h2 className="text-xl font-semibold mb-2">01. 澳洲租房全流程攻略 (1w+ 字)</h2>
+            </div>
+
+            <div className="w-full px-4 mb-6">
+              <div className="rounded-xl overflow-hidden shadow-md w-full">
+                <div className="relative w-full aspect-[5/4]">
+                  <Image 
+                    src="/resources/first-page-new.png" 
+                    alt="PDF预览" 
+                    fill
+                    className="object-cover object-top"
+                    priority
+                  />
+                </div>
+              </div>
+            </div>
+
+            <div className="w-full flex justify-center px-4 mt-auto mb-4">
+              <button
+                onClick={handleDownload}
+                className="w-full flex items-center justify-center gap-2 px-6 py-3 rounded-full bg-white text-blue-600 hover:bg-gray-100 font-semibold"
+              >
+                <Download className="w-5 h-5" /> 下载PDF
+              </button>
+            </div>
+            
+            <div className="w-full px-4 mb-6">
+              <div className="p-3 bg-white bg-opacity-20 rounded-lg text-center">
+                <p className="text-white flex items-center justify-center font-medium">
+                  <ExternalLink className="w-5 h-5 mr-2" />
+                  PDF文档密码: <span className="font-bold ml-2">www.qrent.rent</span>
+                </p>
+              </div>
             </div>
           </div>
         </div>
-      </div>
-      
-      <div className="mt-12 p-6 bg-blue-50 rounded-lg text-center">
-        <h3 className="text-xl font-semibold mb-3 text-blue-800">更多澳洲租房资源即将上线</h3>
-        <p className="text-gray-700">我们正在准备更多实用的澳洲租房资源，敬请期待！</p>
       </div>
     </div>
   );
