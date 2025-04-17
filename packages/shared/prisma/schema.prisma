@@ -59,6 +59,14 @@ model Property {
   // Users who have saved or are interested in this property
   users User[]
 
+  @@index([pricePerWeek])
+  @@index([bedroomCount])
+  @@index([bathroomCount])
+  @@index([propertyType])
+  @@index([commuteTime])
+  @@index([availableDate])
+  @@index([averageScore])
+  @@index([publishedAt])
   @@map("property")
 }
 

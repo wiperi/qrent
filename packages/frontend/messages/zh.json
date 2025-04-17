@@ -31,7 +31,11 @@
     "rental-guide": "租房指南",
     "rental-guide-des": "你需要的所有租房信息",
     "application-materials": "申请材料",
-    "application-materials-des": "所有材料的准备与生成"
+    "application-materials-des": "所有材料的准备与生成",
+    "resource-center": "资源中心",
+    "resource-center-des": "租房相关资源下载",
+    "efficiency-filter": "高效筛房",
+    "efficiency-filter-des": "快速找到合适房源"
   },
   "JustLanded": {
     "just-landed": "每日新房",
@@ -259,5 +263,20 @@
     "guide26": "澳洲租房如何维权以及免费维权途径1",
     "guide27": "澳洲租房前检查攻略❗️condition report",
     "guide28": "澳洲留学生必看❗租🏠如何开通水电煤网？"
+  },
+  "ResourceCenter": {
+    "title": "资源中心",
+    "login-required": "需要登录才能下载资源",
+    "please-login": "请先登录或注册账号",
+    "go-to-login": "去登录",
+    "close": "关闭",
+    "login-to-download": "登录后下载",
+    "download-pdf": "下载PDF",
+    "rental-process-chart": "租房申请流程图",
+    "rental-process-desc": "详细介绍澳洲留学生租房申请的完整流程图",
+    "rental-vocabulary": "租房词汇表",
+    "rental-vocabulary-desc": "澳洲租房常用词汇中英对照表",
+    "inspection-checklist": "租房检查清单",
+    "inspection-checklist-desc": "租房前检查房屋状况的详细清单"
   }
 }
