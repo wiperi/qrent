@@ -40,11 +40,18 @@ export default function ResourceCenter() {
   const handleDownload = () => {
     // 执行下载操作
     const link = document.createElement('a');
-    link.href = `/resources/rental-guide-0417.pdf`;
-    link.download = "Qrent澳洲租房全流程攻略.pdf";
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
+    // 确保源文件名与下载名一致，或使用Blob方式处理
+    fetch(`/resources/rental-guide-0417.pdf`)
+      .then(response => response.blob())
+      .then(blob => {
+        const url = window.URL.createObjectURL(blob);
+        link.href = url;
+        link.download = "澳洲租房全流程攻略.pdf";
+        document.body.appendChild(link);
+        link.click();
+        window.URL.revokeObjectURL(url);
+        document.body.removeChild(link);
+      });
   };
 
   return (
