@@ -35,7 +35,8 @@
     "resource-center": "资源中心",
     "resource-center-des": "租房相关资源下载",
     "efficiency-filter": "高效筛房",
-    "efficiency-filter-des": "快速找到合适房源"
+    "efficiency-filter-des": "快速找到合适房源",
+    "here-is-the-guide": "攻略在这里"
   },
   "JustLanded": {
     "just-landed": "每日新房",
@@ -204,32 +205,32 @@
     "budget-subtask-2": "了解整租与分租的优缺点",
     "budget-subtask-3": "确定个人租房预算范围",
     "budget-subtask-4": "确定个人对房源的其他要求",
-    
+
     "area-title": "了解学校附近区域与租房平台",
     "area-subtask-1": "研究学校周边各区域特点",
     "area-subtask-2": "确定目标区域范围",
     "area-subtask-3": "了解相关租房网站的使用",
     "area-subtask-4": "了解房源价格水平",
-    
+
     "prepare-title": "了解具体房源与准备申请材料（提前3-4周）",
     "prepare-subtask-1": "了解预算内的房源市场情况",
     "prepare-subtask-2": "准备租房申请相关材料",
     "prepare-subtask-3": "了解看房/代看房注意事项",
     "prepare-subtask-4": "了解租房申请相关流程",
-    
+
     "view-title": "积极看房联系（提前两周）",
     "view-subtask-1": "确定起租日期合适的相关房源",
     "view-subtask-2": "预约安排看房行程",
     "view-subtask-3": "持续与中介保持沟通，及时跟进申请状态",
-    
+
     "contract-title": "完成签约与押金支付等（成功签约！）",
     "contract-subtask-1": "了解标准租房合同",
     "contract-subtask-2": "了解押金、定金支付与相关规则",
     "contract-subtask-3": "支付押金、定金，完成合同签订等",
-    
+
     "after-title": "租后事项处理",
     "after-subtask-1": "提交房屋检查报告",
-    "after-subtask-2": "办理水电网络", 
+    "after-subtask-2": "办理水电网络",
     "after-subtask-3": "了解维修流程"
   },
   "Guides": {

@@ -42,7 +42,8 @@
     "resource-center": "Resource Center",
     "resource-center-des": "Rental related resources",
     "efficiency-filter": "Efficient Filtering",
-    "efficiency-filter-des": "Find suitable properties quickly"
+    "efficiency-filter-des": "Find suitable properties quickly",
+    "here-is-the-guide": "Here is the guide!"
   },
   "JustLanded": {
     "just-landed": "Just Landed",
@@ -211,32 +212,32 @@
     "budget-subtask-2": "Learn pros and cons of whole vs. shared rentals",
     "budget-subtask-3": "Set your personal rental budget range",
     "budget-subtask-4": "Determine other requirements for your housing",
-    
+
     "area-title": "Research Areas Near School and Rental Platforms",
     "area-subtask-1": "Study characteristics of areas around campus",
     "area-subtask-2": "Define your target neighborhood range",
     "area-subtask-3": "Learn to use relevant rental websites",
     "area-subtask-4": "Understand property price levels",
-    
+
     "prepare-title": "Research Properties and Prepare Application Materials (3-4 weeks in advance)",
     "prepare-subtask-1": "Explore available properties within your budget",
     "prepare-subtask-2": "Prepare rental application materials",
     "prepare-subtask-3": "Understand property viewing/proxy viewing tips",
     "prepare-subtask-4": "Learn about rental application processes",
-    
+
     "view-title": "Actively View Properties (2 weeks in advance)",
     "view-subtask-1": "Identify properties with suitable start dates",
     "view-subtask-2": "Schedule property viewings",
     "view-subtask-3": "Maintain communication with agents and track application status",
-    
+
     "contract-title": "Complete Contract Signing and Deposit Payment (Success!)",
     "contract-subtask-1": "Understand standard rental contracts",
     "contract-subtask-2": "Learn about deposit, down payment rules",
     "contract-subtask-3": "Pay deposit, complete contract signing",
-    
+
     "after-title": "Post-Rental Matters",
     "after-subtask-1": "Submit property inspection report",
-    "after-subtask-2": "Set up utilities and internet", 
+    "after-subtask-2": "Set up utilities and internet",
     "after-subtask-3": "Understand maintenance procedures"
   },
   "Guides": {
