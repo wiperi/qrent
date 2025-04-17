@@ -7,7 +7,7 @@ import Link from 'next/link';
 import { useTranslations } from 'next-intl';
 import { Alert } from '@heroui/react';
 import { useRouter } from 'next/navigation';
-// import { useUserStore } from '@/src/store/userInfoStore';
+import { useUserStore } from '../../../store/userInfoStore';
 
 async function getApiBaseUrl() {
   return process.env.NEXT_PUBLIC_BACKEND_URL || 'http://localhost:5000';
@@ -30,7 +30,7 @@ const Login = () => {
   const router = useRouter();
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
-    // const { setUser } = useUserStore();
+    const { setUser } = useUserStore();
 
     e.preventDefault();
     try {
@@ -51,7 +51,10 @@ const Login = () => {
       }
 
       console.log('Login successful');
-      // setUser(email.split('')[0]);
+      setUser({
+        name: email.split('@')[0],
+        email: email,
+      });
 
       setisSuccVisible(true);
 
