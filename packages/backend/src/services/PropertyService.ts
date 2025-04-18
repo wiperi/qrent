@@ -128,16 +128,12 @@ class PropertyService {
       where.commuteTime.lte = preferences.maxCommuteTime;
     }
 
-// Regions filter
-    // Check if regions are provided and not empty, and not 'any'
-    if (
-      preferences.regions &&
-      typeof preferences.regions === 'string' &&
-      preferences.regions.trim().length > 0 &&
-      preferences.regions.toLowerCase().trim() !== 'any'
-    ) {
-
-      const regions = preferences.regions.split(' ');
+    // Regions filter
+    if (preferences.regions && preferences.regions.length > 0) {
+      const regions = preferences.regions
+        .toLowerCase()
+        .split(' ')
+        .filter(region => region && region !== 'any'); // ignore "any" and empty values
 
       if (regions.length > 0) {
         where.OR = regions.map(region => ({
