@@ -136,10 +136,8 @@ class PropertyService {
       preferences.regions.trim().length > 0 &&
       preferences.regions.toLowerCase().trim() !== 'any'
     ) {
-      const regions = preferences.regions
-        .toLowerCase()
-        .split(/\s+/)
-        .filter(region => region !== 'any');
+
+      const regions = preferences.regions.split(' ');
 
       if (regions.length > 0) {
         where.OR = regions.map(region => ({
