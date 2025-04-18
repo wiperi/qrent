@@ -130,9 +130,7 @@ class PropertyService {
 
     // Regions filter
     if (preferences.regions && preferences.regions.length > 0) {
-      const regions = preferences.regions
-        .split(' ')
-        .filter((region) => region !== 'any');
+      const regions = preferences.regions.split(' ');
 
       where.OR = regions.map(region => ({
         addressLine2: {
