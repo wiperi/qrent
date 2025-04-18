@@ -131,19 +131,14 @@ class PropertyService {
     // Regions filter
     if (preferences.regions && preferences.regions.length > 0) {
       const regions = preferences.regions
-        .toLowerCase()
         .split(' ')
-        .filter(region => region && region !== 'any'); // ignore "any" and empty values
+        .filter((region) => region !== 'any');
 
-      if (regions.length > 0) {
-        where.OR = regions.map(region => ({
-          addressLine2: {
-            contains: region,
-            mode: 'insensitive',
-          },
-        }));
-      }
-    }
+      where.OR = regions.map(region => ({
+        addressLine2: {
+          contains: region,
+        },
+      }));
 
     // Published date filter
     if (preferences.publishedAt) {
