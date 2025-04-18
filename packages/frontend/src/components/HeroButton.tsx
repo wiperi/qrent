@@ -11,7 +11,8 @@ const HeroButton = () => {
 
   const checkedItemsRentalGuide = useRentalGuideProgressStore(state => state.checkedItem);
   const checkedItemsPrepareDoc = usePrepareDocProgressStore(state => state.checkedItem);
-
+  
+  // 主要按钮（有进度条）
   const mainNavItems = [
     {
       href: '/rentalGuide',
@@ -31,6 +32,7 @@ const HeroButton = () => {
     },
   ];
 
+  // 次要按钮（无进度条）
   const secondaryNavItems = [
     {
       href: '/resourceCenter',
@@ -49,6 +51,7 @@ const HeroButton = () => {
 
   return (
     <div className="max-w-screen-lg mx-auto mt-8 px-6">
+      {/* 主要按钮 */}
       <nav className="flex flex-wrap gap-6 mb-4">
         {mainNavItems.map((item, index) => (
           <Link
@@ -81,6 +84,7 @@ const HeroButton = () => {
         ))}
       </nav>
 
+      {/* 次要按钮 */}
       <nav className="flex flex-wrap gap-4">
         {secondaryNavItems.map((item, index) => (
           <Link
@@ -90,7 +94,7 @@ const HeroButton = () => {
           >
             {item.highlight && (
               <div className="absolute -top-3 -left-2 bg-blue-500 text-white text-xs px-2 py-1 rounded-full shadow-md animate-pulse">
-                {t('here-is-the-guide')}
+                攻略在这里
               </div>
             )}
             {/* Icon */}

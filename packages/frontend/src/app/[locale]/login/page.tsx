@@ -53,7 +53,9 @@ const Login = () => {
       console.log('Login successful');
       setUser({
         name: email.split('@')[0],
+
         email: email,
+
       });
 
       setisSuccVisible(true);

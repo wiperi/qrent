@@ -42,8 +42,10 @@
     "resource-center": "Resource Center",
     "resource-center-des": "Rental related resources",
     "efficiency-filter": "Efficient Filtering",
+
     "efficiency-filter-des": "Find suitable properties quickly",
     "here-is-the-guide": "Here is the guide!"
+
   },
   "JustLanded": {
     "just-landed": "Just Landed",
