@@ -137,6 +137,7 @@ class PropertyService {
           contains: region,
         },
       }));
+    }
 
     // Published date filter
     if (preferences.publishedAt) {
