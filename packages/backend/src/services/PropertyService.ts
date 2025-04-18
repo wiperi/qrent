@@ -128,14 +128,26 @@ class PropertyService {
       where.commuteTime.lte = preferences.maxCommuteTime;
     }
 
-    // Regions filter
-    if (preferences.regions && preferences.regions.length > 0) {
-      const regions = preferences.regions.split(' ');
-      where.OR = regions.map(region => ({
-        addressLine2: {
-          contains: region,
-        },
-      }));
+// Regions filter
+    // Check if regions are provided and not empty, and not 'any'
+    if (
+      preferences.regions &&
+      preferences.regions.trim().length > 0 &&
+      preferences.regions.toLowerCase().trim() !== 'any'
+    ) {
+      const regions = preferences.regions
+        .toLowerCase()  // Convert to lowercase
+        .split(/\s+/) // Split by whitespace
+        .filter((region) => region !== 'any');  // Filter out 'any'
+
+      if (regions.length > 0) {
+        where.OR = regions.map((region) => ({
+          addressLine2: {
+            contains: region,
+            mode: 'insensitive',
+          },
+        }));
+      }
     }
 
     // Published date filter
