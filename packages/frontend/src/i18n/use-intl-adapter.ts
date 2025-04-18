@@ -10,10 +10,10 @@ export const useTranslations = useNextIntlTranslations;
 export const useLocale = () => {
   // You can implement this based on your routing configuration
   // For now, return a default locale
-  return 'en';
+  return 'zh';
 };
 
 export default {
   useTranslations,
   useLocale,
-}; 
+};

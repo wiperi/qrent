@@ -46,7 +46,9 @@ export default function ResourceCenter() {
       .then(blob => {
         const url = window.URL.createObjectURL(blob);
         link.href = url;
-        link.download = "澳洲租房全流程攻略.pdf";
+
+        link.download = "Qrent澳洲租房全流程攻略.pdf";
+
         document.body.appendChild(link);
         link.click();
         window.URL.revokeObjectURL(url);
