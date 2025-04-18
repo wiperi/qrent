@@ -132,16 +132,15 @@ class PropertyService {
     // Check if regions are provided and not empty, and not 'any'
     if (
       preferences.regions &&
+      typeof preferences.regions === 'string' &&
       preferences.regions.trim().length > 0 &&
       preferences.regions.toLowerCase().trim() !== 'any'
     ) {
-      const regions = preferences.regions
-        .toLowerCase()  // Convert to lowercase
-        .split(/\s+/) // Split by whitespace
-        .filter((region) => region !== 'any');  // Filter out 'any'
+
+      const regions = preferences.regions.split(' ');
 
       if (regions.length > 0) {
-        where.OR = regions.map((region) => ({
+        where.OR = regions.map(region => ({
           addressLine2: {
             contains: region,
             mode: 'insensitive',
