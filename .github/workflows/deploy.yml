@@ -40,8 +40,8 @@ jobs:
         password: ${{ secrets.SERVER_PASSWORD }}
         script: |
           cd ~/qrent/
-          export MYSQL_ROOT_PASSWORD="${{ secrets.MYSQL_ROOT_PASSWORD }}"
-          export EXPOSE_PORT="3201"
+          export MYSQL_ROOT_PASSWORD='${{ secrets.MYSQL_ROOT_PASSWORD }}'
+          export EXPOSE_PORT='3201'
           docker compose down
           docker compose build
           docker compose up -d
