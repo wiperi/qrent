@@ -42,11 +42,11 @@ jobs:
         password: ${{ secrets.SERVER_PASSWORD }}
         script: |
           cd ~/qrent/
-          export MYSQL_ROOT_PASSWORD=${{ secrets.MYSQL_ROOT_PASSWORD }}
+          export MYSQL_ROOT_PASSWORD='${{ secrets.MYSQL_ROOT_PASSWORD }}'
           docker compose down
           docker compose build
           docker compose up -d
-
+          timeout 20 bash -c 'while ! docker compose ps | grep -q "healthy"; do sleep 2; done'
           
           # Check if the server is responding with status code 200
           response=$(curl -s -o /dev/null -w "%{http_code}" http://localhost:3200/echo)
