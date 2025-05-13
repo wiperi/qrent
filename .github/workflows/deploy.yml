@@ -42,6 +42,7 @@ jobs:
         password: ${{ secrets.SERVER_PASSWORD }}
         script: |
           cd ~/qrent/
+          export MYSQL_ROOT_PASSWORD=${{ secrets.MYSQL_ROOT_PASSWORD }}
           docker compose down
           docker compose build
           docker compose up -d
