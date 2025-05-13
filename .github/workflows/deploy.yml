@@ -19,8 +19,6 @@ jobs:
       run: |
         cp .env.example .env
         cat << EOF >> .env
-        
-        EXPOSE_PORT=3201
         EOF
 
     - name: Copy files to server
@@ -42,7 +40,8 @@ jobs:
         password: ${{ secrets.SERVER_PASSWORD }}
         script: |
           cd ~/qrent/
-          export MYSQL_ROOT_PASSWORD='${{ secrets.MYSQL_ROOT_PASSWORD }}'
+          export MYSQL_ROOT_PASSWORD="${{ secrets.MYSQL_ROOT_PASSWORD }}"
+          export EXPOSE_PORT=3201
           docker compose down
           docker compose build
           docker compose up -d

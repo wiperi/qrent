@@ -24,7 +24,7 @@ services:
     env_file:
       - .env 
     ports:
-      - "${EXPOSE_PORT:-3201}:${PORT:-3200}"
+      - "${EXPOSE_PORT:-3200}:${PORT:-3200}"
     depends_on:
       db:
         condition: service_healthy
