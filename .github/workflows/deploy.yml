@@ -40,14 +40,23 @@ jobs:
         password: ${{ secrets.SERVER_PASSWORD }}
         script: |
           cd ~/qrent/
-          export MYSQL_ROOT_PASSWORD='${{ secrets.MYSQL_ROOT_PASSWORD }}'
-          export EXPOSE_PORT='3201'
-          export DATABASE_URL='mysql://root:${{ secrets.MYSQL_ROOT_PASSWORD }}@db:3306/qrent'
-          export JWT_SECRET='${{ secrets.JWT_SECRET }}'
-          export API_KEY='${{ secrets.API_KEY }}'
+          # 使用 printf 来设置环境变量，避免特殊字符问题
+          printf -v MYSQL_ROOT_PASSWORD '%s' '${{ secrets.MYSQL_ROOT_PASSWORD }}'
+          printf -v EXPOSE_PORT '%s' '3201'
+          printf -v DATABASE_URL '%s' 'mysql://root:'"$MYSQL_ROOT_PASSWORD"'@db:3306/qrent'
+          printf -v JWT_SECRET '%s' '${{ secrets.JWT_SECRET }}'
+          printf -v API_KEY '%s' '${{ secrets.API_KEY }}'
+          
+          # 导出环境变量
+          export MYSQL_ROOT_PASSWORD
+          export EXPOSE_PORT
+          export DATABASE_URL
+          export JWT_SECRET
+          export API_KEY
           docker compose down
           docker compose build
           docker compose up -d
+          timeout 20 bash -c 'until docker compose ps | grep -q "healthy"; do sleep 2; done'
           
           # Check if the server is responding with status code 200
           response=$(curl -s -o /dev/null -w "%{http_code}" http://localhost:3200/echo)
