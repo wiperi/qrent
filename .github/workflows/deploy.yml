@@ -43,6 +43,8 @@ jobs:
           export MYSQL_ROOT_PASSWORD='${{ secrets.MYSQL_ROOT_PASSWORD }}'
           export EXPOSE_PORT='3201'
           export DATABASE_URL='mysql://root:${{ secrets.MYSQL_ROOT_PASSWORD }}@db:3306/qrent'
+          export JWT_SECRET='${{ secrets.JWT_SECRET }}'
+          export API_KEY='${{ secrets.API_KEY }}'
           docker compose down
           docker compose build
           docker compose up -d
