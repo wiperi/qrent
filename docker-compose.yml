@@ -22,7 +22,9 @@ services:
       context: .
       dockerfile: packages/backend/Dockerfile
     env_file:
-      - .env 
+      - .env
+    environment:
+      - DATABASE_URL=${DATABASE_URL}
     ports:
       - "${EXPOSE_PORT:-3200}:${PORT:-3200}"
     depends_on:
