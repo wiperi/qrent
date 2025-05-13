@@ -9,6 +9,7 @@ on:
 jobs:
   deploy:
     runs-on: ubuntu-latest
+    environment: production
     needs: []  # 如果要等待 CI 完成，可以添加依赖
 
     steps:
@@ -32,6 +33,8 @@ jobs:
         target: "~/qrent/"
 
     - name: Deploy application
+      env:
+        MYSQL_ROOT_PASSWORD: ${{ secrets.MYSQL_ROOT_PASSWORD }}
       uses: appleboy/ssh-action@v1.0.3
       with:
         host: ${{ secrets.SERVER_HOST }}
