@@ -42,6 +42,7 @@ jobs:
           cd ~/qrent/
           export MYSQL_ROOT_PASSWORD='${{ secrets.MYSQL_ROOT_PASSWORD }}'
           export EXPOSE_PORT='3201'
+          export DATABASE_URL='mysql://root:${{ secrets.MYSQL_ROOT_PASSWORD }}@db:3306/qrent'
           docker compose down
           docker compose build
           docker compose up -d
