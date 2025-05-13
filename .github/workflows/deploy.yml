@@ -31,8 +31,6 @@ jobs:
         target: "~/qrent/"
 
     - name: Deploy application
-      env:
-        MYSQL_ROOT_PASSWORD: ${{ secrets.MYSQL_ROOT_PASSWORD }}
       uses: appleboy/ssh-action@v1.0.3
       with:
         host: ${{ secrets.SERVER_HOST }}

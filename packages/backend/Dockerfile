@@ -32,7 +32,5 @@ RUN cd packages/shared && pnpm db:generate
 COPY startup.sh ./
 RUN chmod +x ./startup.sh
 
-ENV DATABASE_URL=mysql://root:${MYSQL_ROOT_PASSWORD}@db:3306/qrent
-
 # Use the startup script as the entry point
 CMD ["./startup.sh"]
