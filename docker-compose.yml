@@ -5,10 +5,12 @@ services:
     environment:
       - MYSQL_DATABASE=${MYSQL_DATABASE}
       - MYSQL_ROOT_PASSWORD=${MYSQL_ROOT_PASSWORD}
+      - MYSQL_PROPERTY_USER_PASSWORD=${MYSQL_PROPERTY_USER_PASSWORD}
     ports:
       - "3306:3306"
     volumes:
       - qrent-data:/var/lib/mysql
+      - ./docker/mysql/init:/docker-entrypoint-initdb.d
     networks:
       - qrent-network
     healthcheck:
