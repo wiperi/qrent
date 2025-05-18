@@ -2,18 +2,19 @@
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useRentalGuideProgressStore } from '../store/rentalGuideProgressStore';
-
-interface Step {
-  title: string;
-  subtasks: string[];
-}
+import { useTranslations } from 'next-intl';
 
 interface ChecklistProps {
   title: string;
-  stepsData: Step[];
+  stepsData: {
+    title: string;
+    subtasks: string[];
+  }[];
 }
 
 const Checklist: React.FC<ChecklistProps> = ({ title, stepsData }) => {
+  const t = useTranslations('CheckList');
+
   const { checkedTasks, updateProgress } = useRentalGuideProgressStore();
 
   const [openIndex, setOpenIndex] = useState<number | null>(null);

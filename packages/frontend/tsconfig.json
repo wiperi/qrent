@@ -30,7 +30,8 @@
     "**/*.js",
     "**/*.tsx",
     ".next/types/**/*.ts",
-    "src/app/about.js"
+    "src/app/about.js",
+    "src/components/TeamsIntro"
   ],
   "exclude": ["node_modules"]
 }

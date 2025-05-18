@@ -5,10 +5,12 @@ services:
     environment:
       - MYSQL_DATABASE=${MYSQL_DATABASE}
       - MYSQL_ROOT_PASSWORD=${MYSQL_ROOT_PASSWORD}
+      - MYSQL_PROPERTY_USER_PASSWORD=${MYSQL_PROPERTY_USER_PASSWORD}
     ports:
       - "3306:3306"
     volumes:
       - qrent-data:/var/lib/mysql
+      - ./docker/mysql/init:/docker-entrypoint-initdb.d
     networks:
       - qrent-network
     healthcheck:
@@ -22,7 +24,11 @@ services:
       context: .
       dockerfile: packages/backend/Dockerfile
     env_file:
-      - .env 
+      - .env
+    environment:
+      - DATABASE_URL=${DATABASE_URL}
+      - JWT_SECRET=${JWT_SECRET}
+      - API_KEY=${API_KEY}
     ports:
       - "${EXPOSE_PORT:-3200}:${PORT:-3200}"
     depends_on:

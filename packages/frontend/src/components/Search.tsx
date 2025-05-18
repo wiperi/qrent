@@ -36,7 +36,7 @@ export default function Search() {
             <div className="flex-1">
               <div className="text-sm text-gray-600">{t('university')}</div>
               <select
-                className="border rounded px-2 py-1 max-h-40 overflow-y-auto w-full"
+                className="border rounded px-2 py-1 max-h-40 overflow-y-auto w-full bg-white"
                 value={filter.university}
                 onChange={e => updateFilter({ ...filter, university: e.target.value })}
               >
@@ -94,22 +94,27 @@ export default function Search() {
             </div>
 
             <div className="flex-1">
-              <div className="text-sm text-gray-600">{t('travel-time')}</div>
-              <select
-                className="border rounded px-2 py-1 max-h-40 overflow-y-auto w-full"
-                value={filter.travelTime}
-                onChange={e => updateFilter({ ...filter, travelTime: e.target.value })}
-              >
-                <option>Any</option>
-                <option>10 min</option>
-                <option>20 min</option>
-                <option>30 min</option>
-                <option>40 min</option>
-                <option>50 min</option>
-                <option>1h</option>
-                <option>1.5h</option>
-                <option>2h</option>
-              </select>
+              <div className="text-sm text-gray-600">{t('travel-time')} (Minutes)</div>
+
+              <div className="flex items-center space-x-1">
+                <Textbox
+                  label=""
+                  name="commuteTimeMin"
+                  filter={filter}
+                  setFilter={updateFilter}
+                  ph={t('min')}
+                />
+
+                <span className="text-lg">-</span>
+
+                <Textbox
+                  label=""
+                  name="commuteTimeMax"
+                  filter={filter}
+                  setFilter={updateFilter}
+                  ph={t('max')}
+                />
+              </div>
             </div>
 
             <div className="flex gap-4">

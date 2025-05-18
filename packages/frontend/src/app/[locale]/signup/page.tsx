@@ -12,21 +12,27 @@ async function getApiBaseUrl() {
 }
 
 const Signup = () => {
+  const t = useTranslations('Signup');
+
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [reEnterPassword, setReEnterPassword] = useState('');
 
   const [isSuccVisible, setisSuccVisible] = useState(false);
-  const succTitle = 'SignUp successful!';
-  const succDes = 'Please login to continue.';
+  const succTitle = t('succ-title');
+  const succDes = t('succ-des');
 
   const [isFailVisible, setisFailVisible] = useState(false);
-  const failTitle = 'SignUp failed!';
-  const failDes = 'Please try again.';
+  const failTitle = t('fail-title');
+  const failDes = t('fail-des');
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
     try {
+      if (password != reEnterPassword) {
+        throw new Error('different password');
+      }
       console.log(email, password);
       const baseurl = await getApiBaseUrl();
       console.log(baseurl);
@@ -51,14 +57,10 @@ const Signup = () => {
     }
   };
 
-  const t = useTranslations('Signup');
-
   return (
-    <div className="max-w-md w-full mx-auto rounded-none md:rounded-2xl p-4 md:p-8 shadow-input bg-white dark:bg-black font-serif font-bold">
-      <h2 className="font-bold text-3xl text-blue-primary dark:text-neutral-200">{t('welcome')}</h2>
-      <p className="text-black text-sm max-w-sm mt-2 dark:text-neutral-300">
-        {t('create-continue')}
-      </p>
+    <div className="max-w-md w-full mx-auto rounded-none md:rounded-2xl p-4 md:p-8 shadow-input bg-white  font-serif font-bold">
+      <h2 className="font-bold text-3xl text-blue-primary ">{t('welcome')}</h2>
+      <p className="text-black text-sm max-w-sm mt-2 ">{t('create-continue')}</p>
 
       <form className="my-8" onSubmit={handleSubmit}>
         <LabelInputContainer className="mb-4">
@@ -90,18 +92,23 @@ const Signup = () => {
 
         <LabelInputContainer className="mb-4">
           <Label htmlFor="re-password">{t('re-pwd')}</Label>
-          <Input id="reEnterPassword" placeholder="••••••••" type="Password" />
+          <Input
+            id="reEnterPassword"
+            placeholder="••••••••"
+            type="Password"
+            onChange={e => setReEnterPassword(e.target.value)}
+          />
         </LabelInputContainer>
 
         <button
-          className="bg-gradient-to-br relative group/btn from-morandi-blue dark:from-zinc-700 dark:to-zinc-700 to-neutral-800 block dark:bg-zinc-700 w-full text-white rounded-md h-10 font-medium shadow-[0px_1px_0px_0px_#ffffff40_inset,0px_-1px_0px_0px_#ffffff40_inset] dark:shadow-[0px_1px_0px_0px_var(--zinc-800)_inset,0px_-1px_0px_0px_var(--zinc-800)_inset]"
+          className="bg-gradient-to-br relative group/btn from-morandi-blue  to-neutral-800 block w-full text-white rounded-md h-10 font-medium shadow-[0px_1px_0px_0px_#ffffff40_inset,0px_-1px_0px_0px_#ffffff40_inset] dark:shadow-[0px_1px_0px_0px_var(--zinc-800)_inset,0px_-1px_0px_0px_var(--zinc-800)_inset]"
           type="submit"
         >
           {t('signup')} &rarr;
           <BottomGradient />
         </button>
 
-        <div className="bg-gradient-to-r from-transparent via-neutral-300 dark:via-neutral-700 to-transparent my-8 h-[1px] w-full" />
+        <div className="bg-gradient-to-r from-transparent via-neutral-300  to-transparent my-8 h-[1px] w-full" />
         <div className="flex justify-center items-center gap-2 py-1">
           <p className="text-gray-600">{t('already-have-acc')}</p>
           <Link href="/login" className="text-blue-primary font-semibold hover:underline">

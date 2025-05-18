@@ -59,6 +59,14 @@ model Property {
   // Users who have saved or are interested in this property
   users User[]
 
+  @@index([pricePerWeek])
+  @@index([bedroomCount])
+  @@index([bathroomCount])
+  @@index([propertyType])
+  @@index([commuteTime])
+  @@index([availableDate])
+  @@index([averageScore])
+  @@index([publishedAt])
   @@map("property")
 }
 
@@ -81,7 +89,7 @@ model UserPreference {
   maxBathrooms Int? @db.UnsignedTinyInt
 
   // Location/Region
-  regions String? @db.Text // Stored as JSON array or comma-separated values
+  regions String? @db.Text // eg. "kingsford zetland redfern"
 
   // 1: House, 2: Apartment
   propertyType Int? @db.UnsignedTinyInt
