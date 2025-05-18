@@ -121,6 +121,12 @@ const HousingListInEfficiencyFilter = () => {
       requestBody.page = filter.page;
       requestBody.pageSize = 10;
 
+      requestBody.orderBy = [
+        {
+          averageScore: 'desc',
+        },
+      ];
+
       console.log(requestBody);
 
       const response = await fetch('/api/properties/search', {

@@ -24,7 +24,11 @@ const JustLanded = () => {
       requestBody.targetSchool = school;
       requestBody.page = 1;
       requestBody.pageSize = 50;
-      requestBody.publishedAt = new Date().toDateString();
+      requestBody.orderBy = [
+        {
+          publishedAt: 'desc'
+        }
+      ]
 
       console.log(requestBody);
 
