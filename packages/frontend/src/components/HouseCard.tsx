@@ -152,7 +152,7 @@ const JustLandedHouseCard = ({ house }) => {
 
         <div className="flex items-center space-x-1 bg-gray-100 text-blue-primary px-3 py-1 rounded-sm">
           <FaCalendarAlt className="text-blue-primary" />
-          <span className="text-sm">{house.availableDate || t('unknown')}</span>
+          <span className="text-sm">{house.availableDate || 'Unknown'}</span>
         </div>
 
         {house.parkingCount != null && (

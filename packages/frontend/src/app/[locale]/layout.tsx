@@ -34,8 +34,8 @@ export default async function LocaleLayout({
             gtag('config', 'G-LVXN1Q8W0X');
           `}
         </Script>
-        <Script 
-          id="clarity-analytics" 
+        <Script
+          id="clarity-analytics"
           strategy="afterInteractive"
           dangerouslySetInnerHTML={{
             __html: `
