@@ -5,3 +5,5 @@ mysql-connector-python
 tqdm
 requests
 dotenv
+concurrent.futures
+dashscope

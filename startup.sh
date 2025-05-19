@@ -15,4 +15,4 @@ pnpm db:push
 
 # Start the application
 echo "Starting the application..."
-exec pnpm --filter @qrent/backend dev
+exec pnpm --filter @qrent/backend start

@@ -1,7 +1,7 @@
 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
 // @ts-nocheck
 
-import React from 'react';
+import React, { useState } from 'react';
 import {
   Modal,
   ModalContent,
@@ -14,9 +14,61 @@ import {
 import RatingSlider from './Slider';
 import { useTranslations } from 'next-intl';
 
+const SUBURB_OPTIONS = {
+  unsw: [
+    'Alexandria',
+    'Bondi',
+    'Botany',
+    'Coogee',
+    'Eastgardens',
+    'Eastlakes',
+    'Hillsdale',
+    'Kensington',
+    'Kingsford',
+    'Maroubra',
+    'Mascot',
+    'Matraville',
+    'Paddington',
+    'Randwick',
+    'Redfern',
+    'Rosebery',
+    'Waterloo',
+    'WolliCreek',
+    'Zetland',
+  ],
+  usyd: [
+    'Burwood',
+    'Chippendale',
+    'City',
+    'Glebe',
+    'Haymarket',
+    'Hurstville',
+    'Mascot',
+    'Newtown',
+    'Ultimo',
+    'Waterloo',
+    'WolliCreek',
+    'Zetland',
+  ],
+};
+
 const MoreFilterModal = ({ filter, setFilter }) => {
   const { isOpen, onOpen, onOpenChange } = useDisclosure();
   const [scrollBehavior] = React.useState<ModalProps['scrollBehavior']>('inside');
+  const [isAccordionOpen, setAccordionOpen] = useState(true);
+  const unswAreaOptions = ['Any', ...SUBURB_OPTIONS.unsw];
+  const usydAreaOptions = ['Any', ...SUBURB_OPTIONS.usyd];
+
+  const handleCheckboxChange = area => {
+    if (filter.area.includes(area)) {
+      // If the area is already selected, remove it
+      setFilter({ area: filter.area.filter(item => item !== area) });
+    } else {
+      // If the area is not selected, add it
+      setFilter({ area: [...filter.area, area] });
+    }
+  };
+
   const t = useTranslations('Search');
   return (
     <div className="flex gap-4">
@@ -89,11 +141,61 @@ const MoreFilterModal = ({ filter, setFilter }) => {
                       >
                         <option>Any</option>
                         <option>House</option>
-                        <option>Apartment/Unit</option>
+                        <option>Apartment/Unit/Flat</option>
+                        <option>Studio</option>
+                        <option>Semi-detached</option>
                       </select>
                     </div>
                   </div>
 
+                  <div className="mt-4">
+                    <div
+                      className="text-lg text-gray-600 font-bold cursor-pointer"
+                      onClick={() => setAccordionOpen(!isAccordionOpen)}
+                    >
+                      Area
+                    </div>
+
+                    {isAccordionOpen && filter.university == 'UNSW' && (
+                      <div className="mt-2 max-h-52 overflow-y-auto  grid grid-cols-2 gap-2">
+                        {unswAreaOptions.map((option, index) => (
+                          <div key={index} className="flex items-center">
+                            <input
+                              type="checkbox"
+                              id={`checkbox-${index}`}
+                              value={option}
+                              checked={filter.area.includes(option)}
+                              onChange={() => handleCheckboxChange(option)}
+                              className="mr-2"
+                            />
+                            <label htmlFor={`checkbox-${index}`} className="text-gray-600">
+                              {option}
+                            </label>
+                          </div>
+                        ))}
+                      </div>
+                    )}
+
+                    {isAccordionOpen && filter.university == 'USYD' && (
+                      <div className="mt-2 max-h-52 overflow-y-auto  grid grid-cols-2 gap-2">
+                        {usydAreaOptions.map((option, index) => (
+                          <div key={index} className="flex items-center">
+                            <input
+                              type="checkbox"
+                              id={`checkbox-${index}`}
+                              value={option}
+                              checked={filter.area.includes(option)}
+                              onChange={() => handleCheckboxChange(option)}
+                              className="mr-2"
+                            />
+                            <label htmlFor={`checkbox-${index}`} className="text-gray-600">
+                              {option}
+                            </label>
+                          </div>
+                        ))}
+                      </div>
+                    )}
+                  </div>
                   {/* Rate */}
                   <div className="border-b pb-4">
                     <div className="text-sm text-gray-600 font-semibold">{t('rate')}</div>

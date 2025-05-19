@@ -43,13 +43,15 @@ model Property {
   // Estimated commute time to target location in minutes
   commuteTime   Float?
   // Date when the property becomes available for move-in
-  availableDate String?   @db.VarChar(50)
+  availableDate DateTime? @db.DateTime
   // Searchable keywords related to the property
   keywords      String?   @db.Text
   // Overall rating score for the property
   averageScore  Float?
   // Property description text
   description   String?   @db.VarChar(1024)
+  // Property description text(Chinese)
+  descriptionCN String?   @db.VarChar(1024)
   // URL to the property listing
   url           String?   @db.VarChar(255)
   // Date and time when the property was published
@@ -57,6 +59,14 @@ model Property {
   // Users who have saved or are interested in this property
   users User[]
 
+  @@index([pricePerWeek])
+  @@index([bedroomCount])
+  @@index([bathroomCount])
+  @@index([propertyType])
+  @@index([commuteTime])
+  @@index([availableDate])
+  @@index([averageScore])
+  @@index([publishedAt])
   @@map("property")
 }
 
@@ -79,7 +89,7 @@ model UserPreference {
   maxBathrooms Int? @db.UnsignedTinyInt
 
   // Location/Region
-  regions String? @db.Text // Stored as JSON array or comma-separated values
+  regions String? @db.Text // eg. "kingsford zetland redfern"
 
   // 1: House, 2: Apartment
   propertyType Int? @db.UnsignedTinyInt
