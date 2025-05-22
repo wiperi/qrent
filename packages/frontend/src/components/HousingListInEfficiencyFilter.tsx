@@ -2,7 +2,7 @@
 // @ts-nocheck
 
 'use client';
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect } from 'react';
 import { useFilterStore } from '../store/useFilterStore';
 import HouseCard from './HouseCard';
 
@@ -11,11 +11,8 @@ const HousingListInEfficiencyFilter = () => {
   const [loading, setLoading] = useState(false);
   const [error] = useState(null);
   const [currentPage, setCurrentPage] = useState(1);
-  const [totalPage, setTotalPage] = useState(1);
   const { filter, updateFilter } = useFilterStore();
   const [hasMore, setHasMore] = useState(true);
-
-  const topRef = useRef();
 
   const fetchData = async () => {
     setLoading(true);
@@ -121,8 +118,8 @@ const HousingListInEfficiencyFilter = () => {
         requestBody.moveInDate = filter.avaliableDate;
       }
 
-      requestBody.page = 1;
-      requestBody.pageSize = 10000000;
+      requestBody.page = filter.page;
+      requestBody.pageSize = 10;
 
       requestBody.orderBy = [
         {
@@ -146,8 +143,6 @@ const HousingListInEfficiencyFilter = () => {
       }
       results.sort((a, b) => b.averageScore - a.averageScore);
       setListings(results);
-
-      setTotalPage(Math.ceil(results.length / 10));
     } catch (error) {
       console.error('Error fetching properties:', error);
     } finally {
@@ -158,27 +153,25 @@ const HousingListInEfficiencyFilter = () => {
   const handleNextPage = () => {
     setCurrentPage(prevPage => prevPage + 1);
     updateFilter({ ...filter, page: currentPage });
-    topRef.current?.scrollIntoView({ behavior: 'smooth' });
   };
 
   const handlePrevPage = () => {
     setCurrentPage(prevPage => (prevPage > 1 ? prevPage - 1 : 1));
     updateFilter({ ...filter, page: currentPage });
-    topRef.current?.scrollIntoView({ behavior: 'smooth' });
   };
 
   useEffect(() => {
     fetchData();
-  }, [filter]);
+  }, [currentPage, filter]);
 
   return (
-    <div ref={topRef} className="grid grid-cols-1 gap-4">
+    <div className="grid grid-cols-1 gap-4 overflow-y-auto max-h-[900px]">
       {/* Error Message */}
       {error && <p className="text-red-500">{error}</p>}
       {!loading && !error && listings.length === 0 && <p>No new listings available.</p>}
 
       {/* Display Current Listings */}
-      {listings.slice((currentPage - 1) * 10, currentPage * 10).map((house, index) => (
+      {listings.map((house, index) => (
         <HouseCard key={index} house={house} />
       ))}
 
@@ -191,11 +184,6 @@ const HousingListInEfficiencyFilter = () => {
         >
           &lt;
         </button>
-
-        <div className="px-4 py-2 text-sm">
-          {currentPage} / {totalPage}
-        </div>
-
         <button
           onClick={handleNextPage}
           disabled={!hasMore}

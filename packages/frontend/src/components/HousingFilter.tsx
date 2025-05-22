@@ -49,47 +49,20 @@ const SUBURB_OPTIONS = {
 const HousingFilter = () => {
   const t = useTranslations('Search');
 
-  const [accordionOpen, setAccordionOpen] = useState(false);
+  const [accordionOpen, setAccordionOpen] = useState(true);
 
   const { filter, updateFilter } = useFilterStore();
 
-  const unswAreaOptions = [...SUBURB_OPTIONS.unsw];
-  const usydAreaOptions = [...SUBURB_OPTIONS.usyd];
+  const unswAreaOptions = ['Any', ...SUBURB_OPTIONS.unsw];
+  const usydAreaOptions = ['Any', ...SUBURB_OPTIONS.usyd];
 
-  const handleCheckboxChange = (option: string) => {
-    // If "Any" is selected
-    if (option === 'Any') {
-      if (filter.area.includes('Any')) {
-        // If "Any" is already selected, unselect it
-        updateFilter({
-          ...filter,
-          area: [],
-        });
-      } else {
-        // If "Any" is not selected, select only "Any"
-        updateFilter({
-          ...filter,
-          area: ['Any'],
-        });
-      }
-    }
-    // If another option is selected while "Any" was previously selected
-    else if (filter.area.includes('Any')) {
-      updateFilter({
-        ...filter,
-        area: [option], // Replace "Any" with the new option
-      });
-    }
-    // Normal toggle behavior for other cases
-    else {
-      const newArea = filter.area.includes(option)
-        ? filter.area.filter(item => item !== option) // Unselect if already selected
-        : [...filter.area, option]; // Select if not selected
-
-      updateFilter({
-        ...filter,
-        area: newArea,
-      });
+  const handleCheckboxChange = area => {
+    if (filter.area.includes(area)) {
+      // If the area is already selected, remove it
+      updateFilter({ area: filter.area.filter(item => item !== area) });
+    } else {
+      // If the area is not selected, add it
+      updateFilter({ area: [...filter.area, area] });
     }
   };
 
@@ -199,7 +172,6 @@ const HousingFilter = () => {
         </div>
       </div>
 
-      {/* Area */}
       <div className="mt-4">
         <div
           className="text-lg text-gray-600 font-bold cursor-pointer flex items-center justify-between"
@@ -213,65 +185,43 @@ const HousingFilter = () => {
           />
         </div>
 
-        {accordionOpen && (
-          <div className="mt-2 max-h-52 overflow-y-auto grid grid-cols-2 gap-2">
-            {/* "Any" option - always shown */}
-            <div className="flex items-center">
-              <input
-                type="checkbox"
-                id="checkbox-any"
-                value="Any"
-                checked={filter.area.includes('Any')}
-                onChange={() => handleCheckboxChange('Any')}
-                className="mr-2"
-              />
-              <label htmlFor="checkbox-any" className="text-gray-600">
-                Any
-              </label>
-            </div>
+        {accordionOpen && filter.university == 'UNSW' && (
+          <div className="mt-2 max-h-52 overflow-y-auto  grid grid-cols-2 gap-2">
+            {unswAreaOptions.map((option, index) => (
+              <div key={index} className="flex items-center">
+                <input
+                  type="checkbox"
+                  id={`checkbox-${index}`}
+                  value={option}
+                  checked={filter.area.includes(option)}
+                  onChange={() => handleCheckboxChange(option)}
+                  className="mr-2"
+                />
+                <label htmlFor={`checkbox-${index}`} className="text-gray-600">
+                  {option}
+                </label>
+              </div>
+            ))}
+          </div>
+        )}
 
-            {/* University-specific options */}
-            {filter.university === 'UNSW' &&
-              unswAreaOptions.map((option, index) => (
-                <div key={index} className="flex items-center">
-                  <input
-                    type="checkbox"
-                    id={`checkbox-${index}`}
-                    value={option}
-                    checked={filter.area.includes(option)}
-                    onChange={() => handleCheckboxChange(option)}
-                    className="mr-2"
-                    disabled={filter.area.includes('Any') && !filter.area.includes(option)}
-                  />
-                  <label
-                    htmlFor={`checkbox-${index}`}
-                    className={`text-gray-600 ${filter.area.includes('Any') ? 'opacity-50' : ''}`}
-                  >
-                    {option}
-                  </label>
-                </div>
-              ))}
-
-            {filter.university === 'USYD' &&
-              usydAreaOptions.map((option, index) => (
-                <div key={index} className="flex items-center">
-                  <input
-                    type="checkbox"
-                    id={`checkbox-${index}`}
-                    value={option}
-                    checked={filter.area.includes(option)}
-                    onChange={() => handleCheckboxChange(option)}
-                    className="mr-2"
-                    disabled={filter.area.includes('Any') && !filter.area.includes(option)}
-                  />
-                  <label
-                    htmlFor={`checkbox-${index}`}
-                    className={`text-gray-600 ${filter.area.includes('Any') ? 'opacity-50' : ''}`}
-                  >
-                    {option}
-                  </label>
-                </div>
-              ))}
+        {accordionOpen && filter.university == 'USYD' && (
+          <div className="mt-2 max-h-52 overflow-y-auto  grid grid-cols-2 gap-2">
+            {usydAreaOptions.map((option, index) => (
+              <div key={index} className="flex items-center">
+                <input
+                  type="checkbox"
+                  id={`checkbox-${index}`}
+                  value={option}
+                  checked={filter.area.includes(option)}
+                  onChange={() => handleCheckboxChange(option)}
+                  className="mr-2"
+                />
+                <label htmlFor={`checkbox-${index}`} className="text-gray-600">
+                  {option}
+                </label>
+              </div>
+            ))}
           </div>
         )}
       </div>
