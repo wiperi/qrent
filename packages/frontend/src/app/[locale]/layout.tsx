@@ -1,4 +1,5 @@
 import Footer from '@/src/components/Footer';
+import FooterHandler from '@/src/components/FooterHandler';
 import NavBar from '@/src/components/NavBar';
 import { routing } from '@/src/i18n/routing';
 import { NextIntlClientProvider, hasLocale } from 'next-intl';
@@ -52,7 +53,7 @@ export default async function LocaleLayout({
         <NextIntlClientProvider>
           <NavBar />
           {children}
-          <Footer />
+          <FooterHandler />
         </NextIntlClientProvider>
       </body>
     </html>

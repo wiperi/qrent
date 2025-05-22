@@ -176,7 +176,7 @@ const HousingListInEfficiencyFilter = () => {
   }, [filter]);
 
   return (
-    <div ref={topRef} className="grid grid-cols-1 gap-4 overflow-y-auto max-h-[900px]">
+    <div ref={topRef} className="grid grid-cols-1 gap-4">
       {/* Error Message */}
       {error && <p className="text-red-500">{error}</p>}
       {!loading && !error && listings.length === 0 && <p>No new listings available.</p>}
