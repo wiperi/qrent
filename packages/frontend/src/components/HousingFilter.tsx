@@ -49,7 +49,7 @@ const SUBURB_OPTIONS = {
 const HousingFilter = () => {
   const t = useTranslations('Search');
 
-  const [accordionOpen, setAccordionOpen] = useState(true);
+  const [accordionOpen, setAccordionOpen] = useState(false);
 
   const { filter, updateFilter } = useFilterStore();
 
