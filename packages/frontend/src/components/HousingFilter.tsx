@@ -8,7 +8,7 @@ import { useTranslations } from 'next-intl';
 import { useFilterStore } from '../store/useFilterStore';
 import { ChevronDown } from 'lucide-react';
 
-const SUBURB_OPTIONS = {
+export const SUBURB_OPTIONS = {
   unsw: [
     'Alexandria',
     'Bondi',

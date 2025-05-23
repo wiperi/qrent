@@ -7,6 +7,7 @@
 import { useState, useEffect, useRef } from 'react';
 import { useFilterStore } from '../store/useFilterStore';
 import HouseCard from './HouseCard';
+import { SUBURB_OPTIONS } from './HousingFilter';
 
 const HousingListInEfficiencyFilter = () => {
   const [listings, setListings] = useState([]);
@@ -23,14 +24,6 @@ const HousingListInEfficiencyFilter = () => {
     setLoading(true);
     try {
       const requestBody = {};
-
-      if (
-        filter.university !== 'Any' &&
-        filter.university !== '' &&
-        filter.university !== undefined
-      ) {
-        requestBody.targetSchool = filter.university;
-      }
 
       if (filter.priceMin !== 'Any' && filter.priceMin !== '' && filter.priceMin !== undefined) {
         requestBody.minPrice = parseInt(filter.priceMin);
@@ -74,6 +67,15 @@ const HousingListInEfficiencyFilter = () => {
 
       if (filter.area && filter.area.length > 0) {
         requestBody.regions = filter.area.join(' ');
+      } else {
+        // if filter area is empty, user didn't choose any region
+        // then set region based on school
+        if (filter.university == 'UNSW') {
+          requestBody.regions = SUBURB_OPTIONS.unsw.join(' ');
+        } else {
+          // else, USYD
+          requestBody.regions = SUBURB_OPTIONS.usyd.join(' ');
+        }
       }
 
       if (
