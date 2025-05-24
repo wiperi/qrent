@@ -8,6 +8,4 @@ router.post('/search', catchError(propertyController.fetchProperty));
 
 router.post('/:propertyId/subscribe', catchError(propertyController.handleProperty));
 
-router.post('/:propertyId/subscribe', catchError(propertyController.handleProperty));
-
 export default router;
