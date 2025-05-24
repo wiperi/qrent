@@ -42,23 +42,6 @@ services:
       - ./packages/shared:/app/packages/shared
     networks:
       - qrent-network
-  crawler:
-    build:
-      context: ./packages/backend/scraper
-      dockerfile: Dockerfile
-    env_file:
-      - .env
-    restart: unless-stopped
-    volumes:
-      - ./packages/backend/scraper:/app
-    networks:
-      - qrent-network
-    logging:
-      driver: "json-file"
-      options:
-        max-size: "10m"
-        max-file: "3"
-    command: sh -c "chmod +x /app/start_crawler.sh && exec /app/start_crawler.sh"
 
 networks:
   qrent-network:
