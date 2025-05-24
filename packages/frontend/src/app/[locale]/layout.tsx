@@ -1,4 +1,5 @@
 import Footer from '@/src/components/Footer';
+import FooterHandler from '@/src/components/FooterHandler';
 import NavBar from '@/src/components/NavBar';
 import { routing } from '@/src/i18n/routing';
 import { NextIntlClientProvider, hasLocale } from 'next-intl';
@@ -34,8 +35,8 @@ export default async function LocaleLayout({
             gtag('config', 'G-LVXN1Q8W0X');
           `}
         </Script>
-        <Script 
-          id="clarity-analytics" 
+        <Script
+          id="clarity-analytics"
           strategy="afterInteractive"
           dangerouslySetInnerHTML={{
             __html: `
@@ -52,7 +53,7 @@ export default async function LocaleLayout({
         <NextIntlClientProvider>
           <NavBar />
           {children}
-          <Footer />
+          <FooterHandler />
         </NextIntlClientProvider>
       </body>
     </html>

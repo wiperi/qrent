@@ -1,31 +1,29 @@
 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
 // @ts-nocheck
 
+// this file is for just landed page
+
 'use client';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useFilterStore } from '../store/useFilterStore';
 import HouseCard from './HouseCard';
+import { SUBURB_OPTIONS } from './HousingFilter';
 
 const HousingListInEfficiencyFilter = () => {
   const [listings, setListings] = useState([]);
   const [loading, setLoading] = useState(false);
   const [error] = useState(null);
   const [currentPage, setCurrentPage] = useState(1);
+  const [totalPage, setTotalPage] = useState(1);
   const { filter, updateFilter } = useFilterStore();
   const [hasMore, setHasMore] = useState(true);
+
+  const topRef = useRef();
 
   const fetchData = async () => {
     setLoading(true);
     try {
       const requestBody = {};
-
-      if (
-        filter.university !== 'Any' &&
-        filter.university !== '' &&
-        filter.university !== undefined
-      ) {
-        requestBody.targetSchool = filter.university;
-      }
 
       if (filter.priceMin !== 'Any' && filter.priceMin !== '' && filter.priceMin !== undefined) {
         requestBody.minPrice = parseInt(filter.priceMin);
@@ -69,6 +67,15 @@ const HousingListInEfficiencyFilter = () => {
 
       if (filter.area && filter.area.length > 0) {
         requestBody.regions = filter.area.join(' ');
+      } else {
+        // if filter area is empty, user didn't choose any region
+        // then set region based on school
+        if (filter.university == 'UNSW') {
+          requestBody.regions = SUBURB_OPTIONS.unsw.join(' ');
+        } else {
+          // else, USYD
+          requestBody.regions = SUBURB_OPTIONS.usyd.join(' ');
+        }
       }
 
       if (
@@ -118,8 +125,8 @@ const HousingListInEfficiencyFilter = () => {
         requestBody.moveInDate = filter.avaliableDate;
       }
 
-      requestBody.page = filter.page;
-      requestBody.pageSize = 10;
+      requestBody.page = 1;
+      requestBody.pageSize = 1000000;
 
       requestBody.publishedAt = new Date().toDateString();
 
@@ -143,6 +150,9 @@ const HousingListInEfficiencyFilter = () => {
       if (results.length == 0) {
         setHasMore(false);
       }
+
+      setTotalPage(Math.ceil(results.length / 10));
+
       setListings(results);
     } catch (error) {
       console.error('Error fetching properties:', error);
@@ -154,25 +164,27 @@ const HousingListInEfficiencyFilter = () => {
   const handleNextPage = () => {
     setCurrentPage(prevPage => prevPage + 1);
     updateFilter({ ...filter, page: currentPage });
+    topRef.current?.scrollIntoView({ behavior: 'smooth' });
   };
 
   const handlePrevPage = () => {
     setCurrentPage(prevPage => (prevPage > 1 ? prevPage - 1 : 1));
     updateFilter({ ...filter, page: currentPage });
+    topRef.current?.scrollIntoView({ behavior: 'smooth' });
   };
 
   useEffect(() => {
     fetchData();
-  }, [currentPage, filter]);
+  }, [filter]);
 
   return (
-    <div className="grid grid-cols-1 gap-4 overflow-y-auto max-h-[900px]">
+    <div ref={topRef} className="grid grid-cols-1 gap-4">
       {/* Error Message */}
       {error && <p className="text-red-500">{error}</p>}
       {!loading && !error && listings.length === 0 && <p>No new listings available.</p>}
 
       {/* Display Current Listings */}
-      {listings.map((house, index) => (
+      {listings.slice((currentPage - 1) * 10, currentPage * 10).map((house, index) => (
         <HouseCard key={index} house={house} />
       ))}
 
@@ -185,6 +197,11 @@ const HousingListInEfficiencyFilter = () => {
         >
           &lt;
         </button>
+
+        <div className="px-4 py-2 text-sm">
+          {currentPage} / {totalPage}
+        </div>
+
         <button
           onClick={handleNextPage}
           disabled={!hasMore}
