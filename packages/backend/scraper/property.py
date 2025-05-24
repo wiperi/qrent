@@ -130,6 +130,7 @@ if __name__ == "__main__":
         df1 = pd.read_csv(csv_file_1)
         df2 = pd.read_csv(csv_file_2)
         merged_df = pd.concat([df1, df2])
+        merged_df = merged_df.drop_duplicates(subset="houseId", keep="first")
         merged_df.to_csv(merged_output_file, index=False)
         key_column = "houseId"
         push_delta_to_remote_db(merged_output_file, table_name, key_column, HOST, USER, PASSWORD, DATABASE, PORT) 
