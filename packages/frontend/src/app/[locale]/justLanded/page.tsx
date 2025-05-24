@@ -9,7 +9,7 @@ const Page = () => {
       {/* Main Content Layout */}
       <div className="flex flex-col lg:flex-row">
         {/* Left: Filter Sidebar */}
-        <section className="flex-[2] bg-gray-50 rounded-lg p-5 shadow-md h-auto overflow-y-auto">
+        <section className="flex-[2] bg-gray-50 rounded-lg p-5 shadow-md h-screen sticky top-0 overflow-y-auto">
           <HousingFilter />
         </section>
 
