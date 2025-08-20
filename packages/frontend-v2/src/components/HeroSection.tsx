@@ -6,7 +6,7 @@ import SearchBar from '@/components/SearchBar'
 export default function HeroSection() {
 
   return (
-    <section className="relative">
+    <section className="relative pb-6">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="relative h-[340px] sm:h-[420px] md:h-[520px] w-full overflow-hidden rounded-2xl">
           <Image

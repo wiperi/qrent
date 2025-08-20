@@ -1,4 +1,5 @@
 import PropertyCard from './PropertyCard'
+import Section from './Section'
 
 const sampleProperties = [
   {
@@ -69,23 +70,20 @@ const sampleProperties = [
 
 export default function PropertyGrid() {
   return (
-    <section className="py-12 md:py-16">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <h2 className="text-2xl md:text-3xl font-semibold tracking-tight text-slate-900">Daily New Houses</h2>
-        <div className="mt-8 grid gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-          {sampleProperties.map((property) => (
-            <PropertyCard
-              key={property.id}
-              title={property.title}
-              location={property.location}
-              price={property.price}
-              description={property.description}
-              imageUrl={property.imageUrl}
-            />
-          ))}
-        </div>
+    <Section title="Daily New Houses">
+      <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+        {sampleProperties.map((property) => (
+          <PropertyCard
+            key={property.id}
+            title={property.title}
+            location={property.location}
+            price={property.price}
+            description={property.description}
+            imageUrl={property.imageUrl}
+          />
+        ))}
       </div>
-    </section>
+    </Section>
   )
 }
 

@@ -1,4 +1,5 @@
 import { HiBookOpen, HiClipboardCheck, HiCollection } from 'react-icons/hi'
+import Section from './Section'
 
 interface ProgressCardProps {
   title: string
@@ -41,30 +42,27 @@ function GuideCard({ title, description, icon, progress }: ProgressCardProps) {
 
 export default function UsefulGuide() {
   return (
-    <section className="py-10 md:py-12">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <h2 id="guide" className="text-2xl md:text-3xl font-semibold tracking-tight text-slate-900">Useful Guide</h2>
-        <div className="mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-          <GuideCard 
-            title="Rental Guide"
-            description="Step-by-step guide to renting your next home."
-            icon={<HiBookOpen className="h-5 w-5" />} 
-            progress={{ current: 3, total: 10 }}
-          />
-          <GuideCard 
-            title="Document Preparation"
-            description="Prepare and organize application documents."
-            icon={<HiClipboardCheck className="h-5 w-5" />} 
-            progress={{ current: 1, total: 6 }}
-          />
-          <GuideCard 
-            title="Resource Center"
-            description="Browse tips, checklists, and local resources."
-            icon={<HiCollection className="h-5 w-5" />} 
-          />
-        </div>
+    <Section title="Useful Guide">
+      <div id="guide" className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+        <GuideCard 
+          title="Rental Guide"
+          description="Step-by-step guide to renting your next home."
+          icon={<HiBookOpen className="h-5 w-5" />} 
+          progress={{ current: 3, total: 10 }}
+        />
+        <GuideCard 
+          title="Document Preparation"
+          description="Prepare and organize application documents."
+          icon={<HiClipboardCheck className="h-5 w-5" />} 
+          progress={{ current: 1, total: 6 }}
+        />
+        <GuideCard 
+          title="Resource Center"
+          description="Browse tips, checklists, and local resources."
+          icon={<HiCollection className="h-5 w-5" />} 
+        />
       </div>
-    </section>
+    </Section>
   )
 }
 

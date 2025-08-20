@@ -21,8 +21,8 @@ export default function Header() {
   return (
     <>
       <header className="sticky top-0 z-50 mb-2 sm:mb-3">
-        <div className="max-w-7xl mx-auto px-2 sm:px-4 lg:px-8">
-          <div className="mt-2 rounded-xl lg:rounded-2xl overflow-hidden border border-slate-200 bg-white/90 backdrop-blur supports-[backdrop-filter]:bg-white/60">
+        <div className="overflow-hidden bg-white">
+          <div className="max-w-7xl mx-auto px-2 sm:px-4 lg:px-8">
             <div className="h-16 px-2 sm:px-3 lg:px-4 flex items-center justify-between">
             {/* Left: logo + brand */}
             <Link href="/" className="flex items-center" aria-label="Qrent home">
@@ -56,7 +56,7 @@ export default function Header() {
             {/* Mobile hamburger */}
             <button 
               onClick={openDrawer}
-              className="md:hidden inline-flex h-10 w-10 items-center justify-center rounded-md border border-slate-200 text-slate-700 hover:text-blue-600 hover:border-blue-300 focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-600" 
+              className="md:hidden inline-flex h-10 w-10 items-center justify-center text-slate-700 hover:text-blue-600 focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-600" 
               aria-label="Open menu"
             >
               <HiMenu className="h-5 w-5" />
