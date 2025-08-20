@@ -61,7 +61,7 @@ class PropertyService {
     return `Successfully unsubscribed from property`;
   }
 
-  async createPreference(preferences: Preference): Promise<Preference> {
+  async createPreference(preferences: Omit<Preference, 'id'>): Promise<Preference> {
     return await prisma.preference.create({
       data: preferences,
     });
@@ -73,7 +73,7 @@ class PropertyService {
    * @returns Promise resolving to the filtered properties
    */
   async getPropertiesByPreferences(
-    preferences: Preference & {
+    preferences: Omit<Preference, 'id'> & {
       page: number;
       pageSize: number;
       publishedAt?: string;

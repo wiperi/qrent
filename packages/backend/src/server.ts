@@ -6,6 +6,9 @@ import router from '@/routes';
 import morgan from 'morgan';
 import dotenv from 'dotenv';
 import cors from 'cors';
+import { createExpressMiddleware } from '@trpc/server/adapters/express';
+import { appRouter } from './trpc/routers';
+import { createTRPCContext } from './trpc/context';
 import { authenticate } from './utils/helper';
 import path from 'path';
 
@@ -59,6 +62,12 @@ app.use(morgan('dev'));
 /////////////////////////////////////////////////////////////////////
 
 import rentalLetterRoutes from './routes/rentalLetter';
+
+// Mount tRPC before global authenticate so public procedures can be accessed
+app.use('/trpc', createExpressMiddleware({
+  router: appRouter,
+  createContext: createTRPCContext,
+}));
 
 app.use(authenticate);
 app.use('/api/generate-rental-letter', rentalLetterRoutes);

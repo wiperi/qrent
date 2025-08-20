@@ -6,15 +6,22 @@
     "dev": "next dev --turbopack",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint"
+    "lint": "next lint",
+    "test:trpc": "pnpm -w exec tsx packages/frontend-v2/test/trpc/auth.ts",
+    "test:endpoints": "pnpm -w exec tsx packages/frontend-v2/test/trpc-properties-users.ts"
   },
   "dependencies": {
+    "@tanstack/react-query": "^5.85.3",
+    "@trpc/client": "^11.4.4",
+    "@trpc/react-query": "^11.4.4",
     "next": "15.4.6",
     "react": "19.1.0",
     "react-dom": "19.1.0",
-    "react-icons": "^5.5.0"
+    "react-icons": "^5.5.0",
+    "zod": "^4.0.17"
   },
   "devDependencies": {
+    "@qrent/backend": "workspace:*",
     "@eslint/eslintrc": "^3",
     "@tailwindcss/postcss": "^4",
     "@types/node": "^20",
