@@ -73,8 +73,10 @@ jobs:
             EOL
 
             docker compose down
+            docker system prune -f --volumes
             docker compose build
             docker compose up -d
+            docker image prune -f
             timeout 20 bash -c 'while ! docker compose ps | grep -q "healthy"; do sleep 2; done'
 
             # Check if the server is responding with status code 200
