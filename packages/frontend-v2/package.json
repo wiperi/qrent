@@ -7,8 +7,12 @@
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
-    "test:trpc": "pnpm -w exec tsx packages/frontend-v2/test/trpc/auth.ts",
-    "test:endpoints": "pnpm -w exec tsx packages/frontend-v2/test/trpc-properties-users.ts"
+    "test": "vitest",
+    "test:watch": "vitest --watch",
+    "test:ui": "vitest --ui",
+    "test:coverage": "vitest --coverage",
+    "test:unit": "vitest run test/unit",
+    "test:integration": "vitest run test/integration"
   },
   "dependencies": {
     "@tanstack/react-query": "^5.85.3",
@@ -22,6 +26,7 @@
   },
   "devDependencies": {
     "@qrent/backend": "workspace:*",
+    "@qrent/shared": "workspace:*",
     "@eslint/eslintrc": "^3",
     "@tailwindcss/postcss": "^4",
     "@types/node": "^20",
@@ -30,6 +35,9 @@
     "eslint": "^9",
     "eslint-config-next": "15.4.6",
     "tailwindcss": "^4",
-    "typescript": "^5"
+    "typescript": "^5",
+    "vitest": "^1.0.0",
+    "@vitest/ui": "^1.0.0",
+    "@faker-js/faker": "^8.0.0"
   }
 }
