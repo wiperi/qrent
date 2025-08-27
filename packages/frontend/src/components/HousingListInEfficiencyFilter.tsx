@@ -6,6 +6,7 @@ import { useState, useEffect, useRef } from 'react';
 import { useFilterStore } from '../store/useFilterStore';
 import HouseCard from './HouseCard';
 import { filterReportStore } from '../store/filterReportStore';
+import { SCHOOL } from '@/qrent/shared/enum';
 
 const HousingListInEfficiencyFilter = () => {
   const [listings, setListings] = useState([]);
@@ -64,11 +65,11 @@ const HousingListInEfficiencyFilter = () => {
 
       // School
       if (filter.university === 'UNSW') {
-        requestBody.targetSchool = 'University of New South Wales';
+        requestBody.targetSchool = SCHOOL.UNSW;
       } else if (filter.university === 'USYD') {
-        requestBody.targetSchool = 'University of Sydney';
+        requestBody.targetSchool = SCHOOL.USYD;
       } else {
-        requestBody.targetSchool = 'University of Technology Sydney';
+        requestBody.targetSchool = SCHOOL.UTS;
       }
 
       // Area

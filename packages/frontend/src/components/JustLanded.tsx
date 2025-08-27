@@ -9,6 +9,7 @@ import { faHome, faArrowRight } from '@fortawesome/free-solid-svg-icons';
 import { useTranslations } from 'next-intl';
 import JustLandedHouseCard from './JustLandedHouseCard';
 import { useFilterStore } from '../store/useFilterStore';
+import {SCHOOL} from "@/qrent/shared/enum"
 
 const JustLanded = () => {
   const [school, setSchool] = useState('unsw');
@@ -26,11 +27,11 @@ const JustLanded = () => {
     try {
       const requestBody = {};
       if (school === 'unsw') {
-        requestBody.targetSchool = 'University of New South Wales';
+        requestBody.targetSchool = SCHOOL.UNSW;
       } else if (school === 'usyd') {
-        requestBody.targetSchool = 'University of Sydney';
+        requestBody.targetSchool = SCHOOL.USYD;
       } else {
-        requestBody.targetSchool = 'University of Technology Sydney';
+        requestBody.targetSchool = SCHOOL.UTS;
       }
       requestBody.page = 1;
       requestBody.pageSize = 9;
