@@ -1,9 +1,11 @@
 import type { Metadata } from 'next'
 import './globals.css'
+import TRPCProvider from '@/lib/trpc-provider'
+import { AuthProvider } from '@/lib/auth-context'
 
 export const metadata: Metadata = {
-  title: 'BlueEstate Rentals',
-  description: 'Find your perfect rental home',
+  title: 'Qrent - Your Perfect Home Awaits',
+  description: 'Discover exceptional rental properties with ease. Your dream home is just a search away.',
 }
 
 export default function RootLayout({
@@ -14,7 +16,11 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className="bg-white text-slate-800 antialiased">
-        {children}
+        <TRPCProvider>
+          <AuthProvider>
+            {children}
+          </AuthProvider>
+        </TRPCProvider>
       </body>
     </html>
   )

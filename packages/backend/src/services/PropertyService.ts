@@ -5,8 +5,30 @@ import validationService from './ValidationService';
 import _ from 'lodash';
 import { emailService } from './EmailService';
 
+// Type definitions for service responses
+type PropertyWithRegion = Omit<Property, 'regionId'> & {
+  region: string | null;
+  commuteTime: number | null;
+};
+
+type TopRegion = {
+  propertyCount: number;
+  averagePrice: number;
+  averageCommuteTime: number;
+  region: string;
+};
+
+type SearchPropertiesResponse = {
+  properties: PropertyWithRegion[];
+  totalCount: number;
+  filteredCount: number;
+  averagePrice: number;
+  averageCommuteTime: number;
+  topRegions: TopRegion[];
+};
+
 class PropertyService {
-  async fetchSubscriptions(userId: number): Promise<any[]> {
+  async fetchSubscriptions(userId: number): Promise<PropertyWithRegion[]> {
     await validationService.validateUserExists(userId);
     const user = await prisma.user.findUnique({
       where: { id: userId },
@@ -23,7 +45,8 @@ class PropertyService {
       user?.properties.map(p => ({
         ...p,
         regionId: undefined,
-        region: p.region?.name,
+        region: p.region?.name || null,
+        commuteTime: null,
       })) || []
     );
   }
@@ -79,14 +102,7 @@ class PropertyService {
       publishedAt?: string;
       orderBy?: Prisma.PropertyOrderByWithRelationInput[];
     }
-  ): Promise<{
-    properties: any[];
-    totalCount: number;
-    filteredCount: number;
-    averagePrice: number | null;
-    averageCommuteTime: number | null;
-    topRegions: any[];
-  }> {
+  ): Promise<SearchPropertiesResponse> {
     const page = preferences.page;
     const pageSize = preferences.pageSize;
     const skip = (page - 1) * pageSize;
@@ -100,7 +116,7 @@ class PropertyService {
     }
 
     let orderBy: Prisma.PropertyOrderByWithRelationInput[] = [];
-
+    
     if (preferences.orderBy) {
       // Check if every key is a valid db column
       for (const obj of preferences.orderBy) {
@@ -224,7 +240,7 @@ class PropertyService {
             return {
               ...p,
               regionId: undefined,
-              region: p.region?.name,
+              region: p.region?.name || null,
               commuteTime,
             };
           })
@@ -306,10 +322,10 @@ class PropertyService {
         });
 
         return {
-          propertyCount: r._count,
+          propertyCount: r._count.id || 0,
           averagePrice: r._avg.price,
           averageCommuteTime: commuteTime._avg.commuteTime,
-          region: region?.name,
+          region: region?.name || null,
         };
       })
     );

@@ -61,7 +61,7 @@ export const propertiesRouter = t.router({
         userId: ctx.userId ?? null,
       };
 
-      await propertyService.createPreference(createPreferenceData);
+      // await propertyService.createPreference(createPreferenceData);
 
       // Search properties with all params including pagination
       const properties = await propertyService.getPropertiesByPreferences({

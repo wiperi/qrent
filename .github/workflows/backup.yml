@@ -18,6 +18,6 @@ jobs:
           script: |
             cd ~/qrent/
 
-            export MYSQL_ROOT_PASSWORD='${{ secrets.MYSQL_ROOT_PASSWORD }}'
+            export MYSQL_ROOT_PASSWORD='${{ secrets.DB_ROOT_PASSWORD }}'
 
             bash ./scripts/db-backup.sh

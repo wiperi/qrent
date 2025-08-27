@@ -5,6 +5,7 @@ import HttpError from '@/error/HttpError';
 export const createTRPC = () => {
   return initTRPC.context<TrpcContext>().create({
     errorFormatter({ shape, error }) {
+      console.log('TRPC Error:', error);
       // 统一处理 HttpError 转换
       if (error.cause instanceof HttpError) {
         const httpError = error.cause as HttpError;

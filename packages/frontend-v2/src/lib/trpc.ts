@@ -1,19 +1,24 @@
-import { createTRPCProxyClient, httpBatchLink } from '@trpc/client';
+import { createTRPCReact } from '@trpc/react-query';
+import { httpBatchLink } from '@trpc/client';
 import type { AppRouter } from '@qrent/backend/src/trpc/routers';
-import { authToken } from './cookies';
 
-const BACKEND_URL = process.env.NEXT_PUBLIC_BACKEND_URL ?? 'http://127.0.0.1:3201';
+export const trpc = createTRPCReact<AppRouter>();
 
-const client = createTRPCProxyClient<AppRouter>({
-  links: [
-    httpBatchLink({
-      url: `${BACKEND_URL}/trpc`,
-      headers() {
-        const token = authToken.get();
-        return token ? { Authorization: `Bearer ${token}` } : {};
-      },
-    }),
-  ],
-});
-
-export default client;
+export function getTRPCClient() {
+  const backendUrl = process.env.NEXT_PUBLIC_BACKEND_URL || 'http://localhost:3201';
+  
+  return trpc.createClient({
+    links: [
+      httpBatchLink({
+        url: `${backendUrl}/trpc`,
+        headers() {
+          const token = typeof window !== 'undefined' 
+            ? localStorage.getItem('auth-token') 
+            : null;
+          
+          return token ? { Authorization: `Bearer ${token}` } : {};
+        },
+      }),
+    ],
+  });
+}

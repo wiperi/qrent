@@ -3,15 +3,32 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
 import { usePathname, useRouter, useSearchParams } from 'next/navigation'
 import { HiX } from 'react-icons/hi'
+import { PROPERTY_TYPE } from '@qrent/shared/enum'
 
 const UNIVERSITY_OPTIONS = ['UNSW', 'UTS', 'USYD'] as const
 const PROPERTY_TYPES = [
-  { key: 'house', label: 'House' },
-  { key: 'apartment', label: 'Apartment' },
-  { key: 'studio', label: 'Studio' },
-  { key: 'semi-detached', label: 'Semi detached' },
+  { key: PROPERTY_TYPE.House, label: 'House' },
+  { key: PROPERTY_TYPE.Apartment, label: 'Apartment' },
 ] as const
-const AREA_OPTIONS = ['Kensington', 'Zetland', 'Redfern', 'CBD', 'Waterloo', 'Surry Hills']
+
+// University to regions mapping based on suburbOptions.ts
+const UNIVERSITY_REGIONS = {
+  UNSW: [
+    'alexandria', 'bondi', 'botany', 'coogee', 'eastgardens', 'eastlakes', 
+    'hillsdale', 'kensington', 'kingsford', 'maroubra', 'mascot', 'matraville', 
+    'paddington', 'randwick', 'redfern', 'rosebery', 'waterloo', 'zetland'
+  ],
+  USYD: [
+    'burwood', 'chippendale', 'city', 'glebe', 'haymarket', 'hurstville', 
+    'mascot', 'newtown', 'ultimo', 'waterloo', 'zetland'
+  ],
+  UTS: [
+    'sydney', 'mascot', 'zetland', 'chippendale', 'surry hills', 'burwood', 
+    'waterloo', 'hurstville', 'strathfield', 'pyrmont', 'marrickville', 
+    'darlinghurst', 'haymarket', 'paddington', 'ultimo', 'redfern', 
+    'glebe', 'kensington', 'newtown'
+  ]
+} as const
 
 export default function FilterModal() {
   const router = useRouter()
@@ -20,8 +37,8 @@ export default function FilterModal() {
   const isOpen = searchParams.get('filters') === 'open'
 
   // Local state initialized from URL
-  const [university, setUniversity] = useState<string>('')
-  const [selectedTypes, setSelectedTypes] = useState<string[]>([])
+  const [university, setUniversity] = useState<string>('UNSW')
+  const [selectedTypes, setSelectedTypes] = useState<number[]>([])
   const [priceMin, setPriceMin] = useState<string>('')
   const [priceMax, setPriceMax] = useState<string>('')
   const [bedroomsMin, setBedroomsMin] = useState<string>('')
@@ -40,8 +57,8 @@ export default function FilterModal() {
   // Initialize from URL whenever modal opens
   useEffect(() => {
     if (!isOpen) return
-    setUniversity(searchParams.get('university') || '')
-    setSelectedTypes((searchParams.get('propertyType') || '').split(',').filter(Boolean))
+    setUniversity(searchParams.get('university') || 'UNSW')
+    setSelectedTypes((searchParams.get('propertyType') || '').split(',').filter(Boolean).map(Number))
     setPriceMin(searchParams.get('priceMin') || '')
     setPriceMax(searchParams.get('priceMax') || '')
     setBedroomsMin(searchParams.get('bedroomsMin') || '')
@@ -79,7 +96,7 @@ export default function FilterModal() {
   }
   const onClear = () => {
     // Clear all form state
-    setUniversity('')
+    setUniversity('UNSW')
     setSelectedTypes([])
     setPriceMin('')
     setPriceMax('')
@@ -149,12 +166,18 @@ export default function FilterModal() {
     }
   }
 
-  const toggleType = (key: string) => {
+  const toggleType = (key: number) => {
     setSelectedTypes(prev => prev.includes(key) ? prev.filter(k => k !== key) : [...prev, key])
   }
   const toggleArea = (area: string) => {
     setAreas(prev => prev.includes(area) ? prev.filter(a => a !== area) : [...prev, area])
   }
+
+  // Get regions based on selected university
+  const availableRegions = useMemo(() => {
+    const universityKey = university as keyof typeof UNIVERSITY_REGIONS
+    return UNIVERSITY_REGIONS[universityKey] || []
+  }, [university])
 
   if (!isOpen) return null
 
@@ -193,7 +216,7 @@ export default function FilterModal() {
                 <button
                   key={u}
                   type="button"
-                  onClick={() => setUniversity(prev => prev === u ? '' : u)}
+                  onClick={() => setUniversity(u)}
                   className={`rounded-xl border px-3 py-2 text-sm font-medium transition ${
                     university === u ? 'border-blue-500 text-blue-600 bg-blue-50' : 'border-slate-200 text-slate-700 hover:border-blue-300'
                   }`}
@@ -225,7 +248,7 @@ export default function FilterModal() {
 
           {/* Price */}
           <section>
-            <h3 className="text-sm font-medium text-slate-800 mb-2">Price ($/month)</h3>
+            <h3 className="text-sm font-medium text-slate-800 mb-2">Price ($/week)</h3>
             <div className="grid grid-cols-2 gap-3">
               <input value={priceMin} onChange={e => setPriceMin(e.target.value)} type="number" placeholder="Min" className="rounded-xl border border-slate-200 px-3 py-2" />
               <input value={priceMax} onChange={e => setPriceMax(e.target.value)} type="number" placeholder="Max" className="rounded-xl border border-slate-200 px-3 py-2" />
@@ -293,20 +316,20 @@ export default function FilterModal() {
             />
           </section>
 
-          {/* Area (multi-select) */}
+          {/* Region (multi-select) */}
           <section>
-            <h3 className="text-sm font-medium text-slate-800 mb-3">Area</h3>
+            <h3 className="text-sm font-medium text-slate-800 mb-3">Region</h3>
             <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
-              {AREA_OPTIONS.map(a => (
+              {availableRegions.map(region => (
                 <button
-                  key={a}
+                  key={region}
                   type="button"
-                  onClick={() => toggleArea(a)}
-                  className={`rounded-xl border px-3 py-2 text-sm font-medium transition ${
-                    areas.includes(a) ? 'border-blue-500 text-blue-600 bg-blue-50' : 'border-slate-200 text-slate-700 hover:border-blue-300'
+                  onClick={() => toggleArea(region)}
+                  className={`rounded-xl border px-3 py-2 text-sm font-medium transition capitalize ${
+                    areas.includes(region) ? 'border-blue-500 text-blue-600 bg-blue-50' : 'border-slate-200 text-slate-700 hover:border-blue-300'
                   }`}
                 >
-                  {a}
+                  {region.replace('-', ' ')}
                 </button>
               ))}
             </div>

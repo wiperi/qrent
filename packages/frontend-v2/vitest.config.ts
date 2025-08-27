@@ -12,7 +12,7 @@ export default defineConfig({
       exclude: ['node_modules/', 'test/', '**/*.d.ts', '**/*.config.*'],
     },
     env: {
-      DATABASE_URL: 'mysql://root:1234@localhost:3307/qrent',
+      DATABASE_URL: 'mysql://root:1234@localhost:3306/qrent',
     },
   },
   define: {
