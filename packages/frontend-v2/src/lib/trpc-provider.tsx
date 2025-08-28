@@ -1,35 +1,18 @@
 'use client';
 
-import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import { QueryClientProvider } from '@tanstack/react-query';
 import { useState } from 'react';
-import { trpc, getTRPCClient } from './trpc';
+import { TRPCProvider, getQueryClient, createTRPCClientInstance } from './trpc';
 
-export default function TRPCProvider({ children }: { children: React.ReactNode }) {
-  const [queryClient] = useState(() => new QueryClient({
-    defaultOptions: {
-      queries: {
-        staleTime: 5 * 60 * 1000, // 5 minutes
-        retry: (failureCount, error: unknown) => {
-          // Don't retry on auth errors
-          if (error && typeof error === 'object' && 'data' in error) {
-            const errorData = error.data as { code?: string };
-            if (errorData.code === 'UNAUTHORIZED') {
-              return false;
-            }
-          }
-          return failureCount < 3;
-        },
-      },
-    },
-  }));
-  
-  const [trpcClient] = useState(() => getTRPCClient());
+export default function AppTRPCProvider({ children }: { children: React.ReactNode }) {
+  const queryClient = getQueryClient();
+  const [trpcClient] = useState(() => createTRPCClientInstance());
 
   return (
-    <trpc.Provider client={trpcClient} queryClient={queryClient}>
-      <QueryClientProvider client={queryClient}>
+    <QueryClientProvider client={queryClient}>
+      <TRPCProvider trpcClient={trpcClient} queryClient={queryClient}>
         {children}
-      </QueryClientProvider>
-    </trpc.Provider>
+      </TRPCProvider>
+    </QueryClientProvider>
   );
 }

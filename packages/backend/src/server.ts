@@ -1,27 +1,28 @@
-import express, { NextFunction, Request, Response, Router } from 'express';
-import process from 'process';
+// Load environment variables FIRST before any other imports
+import dotenv from 'dotenv';
+import path from 'path';
+
+if (process.env.NODE_ENV === 'development') {
+  dotenv.config({ path: path.resolve(__dirname, '../../../.env') });
+}
+
+// Now import everything else after env is loaded
+import express, { NextFunction, Request, Response } from 'express';
 import { prisma } from '@qrent/shared';
 import HttpError from '@/error/HttpError';
 import router from '@/routes';
 import morgan from 'morgan';
-import dotenv from 'dotenv';
 import cors from 'cors';
 import { createExpressMiddleware } from '@trpc/server/adapters/express';
 import { appRouter } from './trpc/routers';
 import { createTRPCContext } from './trpc/context';
 import { authenticate } from './utils/helper';
-import path from 'path';
-
-const app = express();
 
 /////////////////////////////////////////////////////////////////////
 // Server Setup
-/////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////
 
-// Load environment variables
-if (process.env.NODE_ENV === 'development') {
-  dotenv.config({ path: path.resolve(__dirname, '../../../.env') });
-}
+const app = express();
 
 // Middleware to parse JSON bodies
 app.use(express.json());
@@ -64,10 +65,13 @@ app.use(morgan('dev'));
 import rentalLetterRoutes from './routes/rentalLetter';
 
 // Mount tRPC before global authenticate so public procedures can be accessed
-app.use('/trpc', createExpressMiddleware({
-  router: appRouter,
-  createContext: createTRPCContext,
-}));
+app.use(
+  '/trpc',
+  createExpressMiddleware({
+    router: appRouter,
+    createContext: createTRPCContext,
+  })
+);
 
 app.use(authenticate);
 app.use('/api/generate-rental-letter', rentalLetterRoutes);
@@ -96,6 +100,11 @@ if (!process.env.BACKEND_LISTEN_PORT) {
 
 if (!process.env.BACKEND_LISTEN_HOST) {
   console.error('BACKEND_LISTEN_HOST environment variable is not set.');
+  process.exit(1);
+}
+
+if (!process.env.REDIS_URL) {
+  console.error('REDIS_URL environment variable is not set.');
   process.exit(1);
 }
 

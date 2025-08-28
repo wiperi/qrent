@@ -1,7 +1,8 @@
 'use client';
 
 import { createContext, useContext, useEffect, useState } from 'react';
-import { trpc } from './trpc';
+import { useMutation, useQuery } from '@tanstack/react-query';
+import { useTRPC } from './trpc';
 
 interface User {
   id: number;
@@ -27,10 +28,16 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined);
 export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [token, setToken] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(true);
+  const trpc = useTRPC();
 
-  const loginMutation = trpc.auth.login.useMutation();
-  const registerMutation = trpc.auth.register.useMutation();
-  const userQuery = trpc.users.getProfile.useQuery(undefined, {
+  const loginMutation = useMutation(
+    trpc.auth.login.mutationOptions()
+  );
+  const registerMutation = useMutation(
+    trpc.auth.register.mutationOptions()
+  );
+  const userQuery = useQuery({
+    ...trpc.users.getProfile.queryOptions(),
     enabled: !!token,
     retry: false,
   });
@@ -60,7 +67,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     const result = await registerMutation.mutateAsync({ email, password, name });
     setToken(result.token);
   };
-
+  
   const logout = () => {
     setToken(null);
     localStorage.removeItem('auth-token');
@@ -72,7 +79,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   };
 
   const contextValue: AuthContextType = {
-    user: userQuery.data || null,
+    user: userQuery.data as User | null || null,
     token,
     isLoading: isLoading || userQuery.isLoading,
     login,

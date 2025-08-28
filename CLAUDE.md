@@ -2,6 +2,10 @@
 
 This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
 
+## Notice
+
+- Use pnpm.
+
 ## Project Overview
 
 QRent is a rental property management system built with:

@@ -2,12 +2,14 @@
 
 import PropertyCard from './PropertyCard'
 import Section from './Section'
-import { trpc } from '@/lib/trpc'
+import { useMutation } from '@tanstack/react-query'
+import { useTRPC } from '@/lib/trpc'
 import { SCHOOL } from '@qrent/shared/enum'
 import { useEffect } from 'react'
 
 export default function PropertyGrid() {
-  const { mutate, data, isPending, error } = trpc.properties.search.useMutation()
+  const trpc = useTRPC()
+  const { mutate, data, isPending, error } = useMutation(trpc.properties.search.mutationOptions())
 
   useEffect(() => {
     mutate({

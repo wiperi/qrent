@@ -4,7 +4,8 @@ import PropertyCard from '@/components/PropertyCard'
 import { HiSearch } from 'react-icons/hi'
 import Link from 'next/link'
 import { Suspense, useEffect, useMemo } from 'react'
-import { trpc } from '@/lib/trpc'
+import { useMutation } from '@tanstack/react-query'
+import { useTRPC } from '@/lib/trpc'
 import { SCHOOL } from '@qrent/shared/enum'
 import { useSearchParams } from 'next/navigation'
 
@@ -45,7 +46,8 @@ export default function SearchResults({ searchParams }: { searchParams: SearchPa
     }
   }, [searchParams, page])
 
-  const { mutate, data, isPending, error } = trpc.properties.search.useMutation()
+  const trpc = useTRPC()
+  const { mutate, data, isPending, error } = useMutation(trpc.properties.search.mutationOptions())
 
   useEffect(() => {
     mutate(searchFilters)
