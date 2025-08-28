@@ -1,6 +1,15 @@
 import { NextFunction, Request, RequestHandler, Response } from 'express';
-import jwt from 'jsonwebtoken';
+import jwt, { JwtPayload } from 'jsonwebtoken';
 import HttpError from '@/error/HttpError';
+
+// Extend Express Request interface to include user property
+declare global {
+  namespace Express {
+    interface Request {
+      user?: JwtPayload;
+    }
+  }
+}
 
 export function catchError(
   fn: (req: Request, res: Response, next: NextFunction) => any

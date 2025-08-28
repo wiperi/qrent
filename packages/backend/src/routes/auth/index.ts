@@ -2,7 +2,7 @@ import { authController } from '@/controllers/AuthController';
 import { catchError } from '@/utils/helper';
 import { Router } from 'express';
 
-const router = Router();
+const router: Router = Router();
 
 router.post('/register', catchError(authController.register));
 router.post('/login', catchError(authController.login));

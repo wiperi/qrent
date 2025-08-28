@@ -1,5 +1,5 @@
 import { createTRPCProxyClient, httpBatchLink } from '@trpc/client';
-import type { AppRouter } from '@qrent/backend/src/trpc/routers';
+import type { AppRouter } from '@qrent/backend/trpc';
 
 const BACKEND_URL = process.env.BACKEND_URL ?? 'http://localhost:3201';
 

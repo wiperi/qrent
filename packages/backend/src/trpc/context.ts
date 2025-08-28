@@ -1,8 +1,6 @@
 import type { TrpcContext } from './trpc';
 import type { Request, Response } from 'express';
 import jwt from 'jsonwebtoken';
-import type { AppRouter } from './routers';
-import { type appRouter } from './routers';
 
 export async function createTRPCContext({ req, res }: { req: Request; res: Response }): Promise<TrpcContext> {
   let userId: number | undefined;
@@ -25,7 +23,5 @@ export async function createTRPCContext({ req, res }: { req: Request; res: Respo
   return { req, res, userId };
 }
 
-let t: AppRouter;
-let res = t.users.getProfile;
 
 

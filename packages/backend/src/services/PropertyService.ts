@@ -7,6 +7,7 @@ import { emailService } from './EmailService';
 
 // Type definitions for service responses
 type PropertyWithRegion = Omit<Property, 'regionId'> & {
+  regionId?: number | undefined;
   region: string | null;
   commuteTime: number | null;
 };
@@ -15,7 +16,7 @@ type TopRegion = {
   propertyCount: number;
   averagePrice: number;
   averageCommuteTime: number;
-  region: string;
+  region: string | null;
 };
 
 type SearchPropertiesResponse = {
@@ -322,9 +323,9 @@ class PropertyService {
         });
 
         return {
-          propertyCount: r._count.id || 0,
-          averagePrice: r._avg.price,
-          averageCommuteTime: commuteTime._avg.commuteTime,
+          propertyCount: r._count || 0,
+          averagePrice: r._avg.price || 0,
+          averageCommuteTime: commuteTime._avg.commuteTime || 0,
           region: region?.name || null,
         };
       })
@@ -334,8 +335,8 @@ class PropertyService {
       properties,
       totalCount,
       filteredCount: aggregate._count || 0,
-      averagePrice: aggregate._avg.price,
-      averageCommuteTime: avgCommuteTime._avg.commuteTime,
+      averagePrice: aggregate._avg.price || 0,
+      averageCommuteTime: avgCommuteTime._avg.commuteTime || 0,
       topRegions,
     };
   }
@@ -373,7 +374,7 @@ class PropertyService {
     });
 
     for (const recipient of recipients) {
-      let recommendations: (Property & { region: Region })[] = [];
+      let recommendations: any[] = [];
 
       const preference = await prisma.preference.findFirst({
         where: {

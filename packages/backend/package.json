@@ -1,6 +1,14 @@
 {
   "name": "@qrent/backend",
   "version": "1.0.0",
+  "main": "./dist/server.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    "./trpc": {
+      "types": "./dist/trpc.d.ts",
+      "default": "./dist/trpc.js"
+    }
+  },
   "scripts": {
     "test": "jest",
     "dev": "NODE_ENV=development ts-node-dev -r tsconfig-paths/register -T src/server.ts",

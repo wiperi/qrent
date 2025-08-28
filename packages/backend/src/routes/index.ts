@@ -7,7 +7,7 @@ import propertyRoutes from './properties';
 import rentalLetterRoutes from './rentalLetter';
 import { propertyService } from '@/services/PropertyService';
 
-const router = Router();
+const router: Router = Router();
 
 router.use('/auth', authRoutes);
 router.use('/users', userRoutes);

@@ -67,7 +67,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     const result = await registerMutation.mutateAsync({ email, password, name });
     setToken(result.token);
   };
-  
+
   const logout = () => {
     setToken(null);
     localStorage.removeItem('auth-token');
@@ -102,3 +102,4 @@ export function useAuth() {
   }
   return context;
 }
+
