@@ -6,7 +6,7 @@ beforeAll(async () => {
   console.log('Waiting for backend server at http://localhost:3201...');
   await waitForServer('http://localhost:3201/trpc', 5000);
   console.log('Backend server is ready!');
-  
+
   await setupTestDatabase();
 });
 
@@ -16,14 +16,14 @@ afterAll(async () => {
 
 async function waitForServer(url: string, timeout: number = 10000): Promise<void> {
   const start = Date.now();
-  
+
   while (Date.now() - start < timeout) {
     try {
       // Try to make a simple request to the server
       const response = await fetch(url, {
         method: 'GET',
       });
-      
+
       // If we get any response (even 404 or 405), the server is running
       if (response.status >= 200 && response.status < 600) {
         return;
@@ -36,9 +36,9 @@ async function waitForServer(url: string, timeout: number = 10000): Promise<void
         return;
       }
     }
-    
+
     await new Promise(resolve => setTimeout(resolve, 1000));
   }
-  
+
   throw new Error(`Server at ${url} did not become available within ${timeout}ms`);
 }

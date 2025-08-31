@@ -218,9 +218,11 @@ describe('User Workflows Integration - Client-Side tRPC', () => {
       const authenticatedClient = createAuthenticatedClient(authToken);
 
       // Try to subscribe to non-existent property
-      await expect(authenticatedClient.properties.subscribe.mutate({
-        propertyId: 999999,
-      })).rejects.toThrow();
+      await expect(
+        authenticatedClient.properties.subscribe.mutate({
+          propertyId: 999999,
+        })
+      ).rejects.toThrow();
     });
   });
 });

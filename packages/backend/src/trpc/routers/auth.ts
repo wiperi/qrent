@@ -54,16 +54,19 @@ export const authRouter = t.router({
       if (input.password !== undefined) updateData.password = input.password;
       if (input.phone !== undefined) updateData.phone = input.phone;
       if (input.email !== undefined) updateData.email = input.email;
-      
-      const profile = await authService.changeAuthProfile(ctx.userId!, input.oldPassword, updateData as any);
+
+      const profile = await authService.changeAuthProfile(
+        ctx.userId!,
+        input.oldPassword,
+        updateData as any
+      );
       return profile;
     }),
 
-  sendVerificationEmail: protectedProcedure
-    .mutation(async ({ ctx }) => {
-      await authService.sendVerificationEmail(ctx.userId!);
-      return { ok: true };
-    }),
+  sendVerificationEmail: protectedProcedure.mutation(async ({ ctx }) => {
+    await authService.sendVerificationEmail(ctx.userId!);
+    return { ok: true };
+  }),
 
   verifyEmail: publicProcedure
     .input(z.object({ email: z.string().email(), code: z.number().int() }))
@@ -74,5 +77,3 @@ export const authRouter = t.router({
 });
 
 export type AuthRouter = typeof authRouter;
-
-

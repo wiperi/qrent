@@ -1,7 +1,12 @@
 import { describe, it, expect, beforeEach, afterEach } from 'vitest';
 import { createUnauthenticatedClient, createAuthenticatedClient } from '../setup/trpc-client';
 import { generatePropertySearch, generateTestUser } from '../setup/test-data';
-import { setupTestDatabase, teardownTestDatabase, createTestProperty, createTestUser } from '../setup/db-helpers';
+import {
+  setupTestDatabase,
+  teardownTestDatabase,
+  createTestProperty,
+  createTestUser,
+} from '../setup/db-helpers';
 
 describe('Properties Router - Client-Side tRPC', () => {
   beforeEach(async () => {
@@ -15,7 +20,7 @@ describe('Properties Router - Client-Side tRPC', () => {
   describe('properties.search', () => {
     it('should search properties successfully with basic parameters via HTTP', async () => {
       const client = createUnauthenticatedClient();
-      
+
       const searchParams = {
         targetSchool: 'UNSW',
         page: 1,
@@ -31,7 +36,7 @@ describe('Properties Router - Client-Side tRPC', () => {
 
     it('should search with price filters via HTTP', async () => {
       const client = createUnauthenticatedClient();
-      
+
       const searchParams = {
         targetSchool: 'USYD',
         minPrice: 300,
@@ -48,7 +53,7 @@ describe('Properties Router - Client-Side tRPC', () => {
 
     it('should search with bedroom and bathroom filters via HTTP', async () => {
       const client = createUnauthenticatedClient();
-      
+
       const searchParams = {
         targetSchool: 'UTS',
         minBedrooms: 2,
@@ -67,7 +72,7 @@ describe('Properties Router - Client-Side tRPC', () => {
 
     it('should search with property type filter via HTTP', async () => {
       const client = createUnauthenticatedClient();
-      
+
       const searchParams = {
         targetSchool: 'UNSW',
         propertyType: 1, // House
@@ -83,7 +88,7 @@ describe('Properties Router - Client-Side tRPC', () => {
 
     it('should search with commute time filters', async () => {
       const client = createUnauthenticatedClient();
-      
+
       const searchParams = {
         targetSchool: 'UNSW',
         minCommuteTime: 10,
@@ -99,7 +104,7 @@ describe('Properties Router - Client-Side tRPC', () => {
 
     it('should handle pagination correctly', async () => {
       const client = createUnauthenticatedClient();
-      
+
       const searchParams = {
         targetSchool: 'UNSW',
         page: 2,
@@ -113,7 +118,7 @@ describe('Properties Router - Client-Side tRPC', () => {
 
     it('should fail with invalid target school', async () => {
       const client = createUnauthenticatedClient();
-      
+
       const searchParams = {
         targetSchool: 'INVALID_SCHOOL',
         page: 1,
@@ -126,7 +131,7 @@ describe('Properties Router - Client-Side tRPC', () => {
 
     it('should fail with negative price values', async () => {
       const client = createUnauthenticatedClient();
-      
+
       const searchParams = {
         targetSchool: 'UNSW',
         minPrice: -100,
@@ -143,7 +148,7 @@ describe('Properties Router - Client-Side tRPC', () => {
       const client = createUnauthenticatedClient();
       const userData = generateTestUser();
       const testProperty = await createTestProperty();
-      
+
       // Register and get token
       const registerResult = await client.auth.register.mutate(userData);
       const authToken = registerResult.token;
@@ -160,37 +165,43 @@ describe('Properties Router - Client-Side tRPC', () => {
       const testProperty = await createTestProperty();
       const client = createUnauthenticatedClient();
 
-      await expect(client.properties.subscribe.mutate({
-        propertyId: testProperty.id,
-      })).rejects.toThrow();
+      await expect(
+        client.properties.subscribe.mutate({
+          propertyId: testProperty.id,
+        })
+      ).rejects.toThrow();
     });
 
     it('should fail with invalid property ID via HTTP', async () => {
       const client = createUnauthenticatedClient();
       const userData = generateTestUser();
-      
+
       // Register and get token
       const registerResult = await client.auth.register.mutate(userData);
       const authToken = registerResult.token;
       const authenticatedClient = createAuthenticatedClient(authToken);
 
-      await expect(authenticatedClient.properties.subscribe.mutate({
-        propertyId: 999999,
-      })).rejects.toThrow();
+      await expect(
+        authenticatedClient.properties.subscribe.mutate({
+          propertyId: 999999,
+        })
+      ).rejects.toThrow();
     });
 
     it('should fail with negative property ID', async () => {
       const client = createUnauthenticatedClient();
       const userData = generateTestUser();
-      
+
       // Register and get token
       const registerResult = await client.auth.register.mutate(userData);
       const authToken = registerResult.token;
       const authenticatedClient = createAuthenticatedClient(authToken);
 
-      await expect(authenticatedClient.properties.subscribe.mutate({
-        propertyId: -1,
-      })).rejects.toThrow();
+      await expect(
+        authenticatedClient.properties.subscribe.mutate({
+          propertyId: -1,
+        })
+      ).rejects.toThrow();
     });
   });
 
@@ -199,7 +210,7 @@ describe('Properties Router - Client-Side tRPC', () => {
       const client = createUnauthenticatedClient();
       const userData = generateTestUser();
       const testProperty = await createTestProperty();
-      
+
       // Register and get token
       const registerResult = await client.auth.register.mutate(userData);
       const authToken = registerResult.token;
@@ -222,23 +233,27 @@ describe('Properties Router - Client-Side tRPC', () => {
       const testProperty = await createTestProperty();
       const client = createUnauthenticatedClient();
 
-      await expect(client.properties.unsubscribe.mutate({
-        propertyId: testProperty.id,
-      })).rejects.toThrow();
+      await expect(
+        client.properties.unsubscribe.mutate({
+          propertyId: testProperty.id,
+        })
+      ).rejects.toThrow();
     });
 
     it('should fail with invalid property ID', async () => {
       const client = createUnauthenticatedClient();
       const userData = generateTestUser();
-      
+
       // Register and get token
       const registerResult = await client.auth.register.mutate(userData);
       const authToken = registerResult.token;
       const authenticatedClient = createAuthenticatedClient(authToken);
 
-      await expect(authenticatedClient.properties.unsubscribe.mutate({
-        propertyId: 999999,
-      })).rejects.toThrow();
+      await expect(
+        authenticatedClient.properties.unsubscribe.mutate({
+          propertyId: 999999,
+        })
+      ).rejects.toThrow();
     });
   });
 
@@ -246,7 +261,7 @@ describe('Properties Router - Client-Side tRPC', () => {
     it('should get empty subscriptions for new user via HTTP', async () => {
       const client = createUnauthenticatedClient();
       const userData = generateTestUser();
-      
+
       // Register and get token
       const registerResult = await client.auth.register.mutate(userData);
       const authToken = registerResult.token;
@@ -262,7 +277,7 @@ describe('Properties Router - Client-Side tRPC', () => {
       const client = createUnauthenticatedClient();
       const userData = generateTestUser();
       const testProperty = await createTestProperty();
-      
+
       // Register and get token
       const registerResult = await client.auth.register.mutate(userData);
       const authToken = registerResult.token;

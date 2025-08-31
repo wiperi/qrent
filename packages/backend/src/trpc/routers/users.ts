@@ -14,21 +14,22 @@ export const protectedProcedure = t.procedure.use(({ ctx, next }) => {
 });
 
 export const usersRouter = t.router({
-  getProfile: protectedProcedure
-    .query(async ({ ctx }) => {
-      const profile = await userService.getProfile(ctx.userId!);
-      return profile;
-    }),
+  getProfile: protectedProcedure.query(async ({ ctx }) => {
+    const profile = await userService.getProfile(ctx.userId!);
+    return profile;
+  }),
 
   updateProfile: protectedProcedure
     .input(
       z.object({
         name: z.string().min(1).max(50),
         gender: z.number().int().min(0).max(255),
-        emailPreferences: z.array(z.object({
-          userId: z.number(),
-          type: z.number().int()
-        }))
+        emailPreferences: z.array(
+          z.object({
+            userId: z.number(),
+            type: z.number().int(),
+          })
+        ),
       })
     )
     .mutation(async ({ input, ctx }) => {
@@ -36,11 +37,10 @@ export const usersRouter = t.router({
       return profile;
     }),
 
-  getPreference: protectedProcedure
-    .query(async ({ ctx }) => {
-      const preferences = await propertyService.fetchPreference(ctx.userId!);
-      return preferences;
-    }),
+  getPreference: protectedProcedure.query(async ({ ctx }) => {
+    const preferences = await propertyService.fetchPreference(ctx.userId!);
+    return preferences;
+  }),
 });
 
 export type UsersRouter = typeof usersRouter;

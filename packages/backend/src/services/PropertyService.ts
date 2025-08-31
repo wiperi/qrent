@@ -117,7 +117,7 @@ class PropertyService {
     }
 
     let orderBy: Prisma.PropertyOrderByWithRelationInput[] = [];
-    
+
     if (preferences.orderBy) {
       // Check if every key is a valid db column
       for (const obj of preferences.orderBy) {

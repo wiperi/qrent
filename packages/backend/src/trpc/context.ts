@@ -2,7 +2,13 @@ import type { TrpcContext } from './trpc';
 import type { Request, Response } from 'express';
 import jwt from 'jsonwebtoken';
 
-export async function createTRPCContext({ req, res }: { req: Request; res: Response }): Promise<TrpcContext> {
+export async function createTRPCContext({
+  req,
+  res,
+}: {
+  req: Request;
+  res: Response;
+}): Promise<TrpcContext> {
   let userId: number | undefined;
 
   const authHeader = req.headers.authorization;
@@ -22,6 +28,3 @@ export async function createTRPCContext({ req, res }: { req: Request; res: Respo
 
   return { req, res, userId };
 }
-
-
-

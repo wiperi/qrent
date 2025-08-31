@@ -1,11 +1,6 @@
 {
   "permissions": {
-    "allow": [
-      "Bash(npm run *)",
-      "Bash(pnpm run *)",
-      "Read(~/.bashrc)"
-    ],
-    "deny": [
-    ]
+    "allow": ["Bash(npm run *)", "Bash(pnpm run *)", "Read(~/.bashrc)"],
+    "deny": []
   }
 }

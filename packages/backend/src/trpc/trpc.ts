@@ -19,7 +19,7 @@ export const createTRPC = () => {
           },
         };
       }
-      
+
       // Zod 错误处理
       const zodIssues = error.cause instanceof ZodError ? error.cause.flatten() : null;
       return {
@@ -48,7 +48,3 @@ export function httpStatusToTrpcCode(statusCode: number): TRPCError['code'] {
   if (statusCode === 422) return 'UNPROCESSABLE_CONTENT';
   return 'INTERNAL_SERVER_ERROR';
 }
-
-
-
-

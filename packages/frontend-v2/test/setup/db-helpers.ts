@@ -7,47 +7,47 @@ export async function cleanupTestData() {
       where: {
         user: {
           email: {
-            contains: '@qrent-test.com'
-          }
-        }
-      }
+            contains: '@qrent-test.com',
+          },
+        },
+      },
     }),
     prisma.propertySchool.deleteMany(),
     prisma.preference.deleteMany({
       where: {
         user: {
           email: {
-            contains: '@qrent-test.com'
-          }
-        }
-      }
+            contains: '@qrent-test.com',
+          },
+        },
+      },
     }),
     prisma.userSession.deleteMany({
       where: {
         user: {
           email: {
-            contains: '@qrent-test.com'
-          }
-        }
-      }
+            contains: '@qrent-test.com',
+          },
+        },
+      },
     }),
     prisma.property.deleteMany({
       where: {
         users: {
           some: {
             email: {
-              contains: '@qrent-test.com'
-            }
-          }
-        }
-      }
+              contains: '@qrent-test.com',
+            },
+          },
+        },
+      },
     }),
     prisma.user.deleteMany({
       where: {
         email: {
-          contains: '@qrent-test.com'
-        }
-      }
+          contains: '@qrent-test.com',
+        },
+      },
     }),
   ]);
 }

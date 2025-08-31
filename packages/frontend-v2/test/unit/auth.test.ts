@@ -77,10 +77,12 @@ describe('Auth Router - Client-Side tRPC', () => {
     it('should fail with invalid email via HTTP', async () => {
       const client = createUnauthenticatedClient();
 
-      await expect(client.auth.login.mutate({
-        email: 'nonexistent@test.com',
-        password: 'password123',
-      })).rejects.toThrow();
+      await expect(
+        client.auth.login.mutate({
+          email: 'nonexistent@test.com',
+          password: 'password123',
+        })
+      ).rejects.toThrow();
     });
 
     it('should fail with wrong password via HTTP', async () => {
@@ -91,10 +93,12 @@ describe('Auth Router - Client-Side tRPC', () => {
       await client.auth.register.mutate(userData);
 
       // Try login with wrong password
-      await expect(client.auth.login.mutate({
-        email: userData.email,
-        password: 'wrongpassword',
-      })).rejects.toThrow();
+      await expect(
+        client.auth.login.mutate({
+          email: userData.email,
+          password: 'wrongpassword',
+        })
+      ).rejects.toThrow();
     });
   });
 
@@ -121,10 +125,12 @@ describe('Auth Router - Client-Side tRPC', () => {
     it('should fail without authentication via HTTP', async () => {
       const client = createUnauthenticatedClient();
 
-      await expect(client.auth.changeProfile.mutate({
-        oldPassword: 'oldpass',
-        password: 'newpass123',
-      })).rejects.toThrow();
+      await expect(
+        client.auth.changeProfile.mutate({
+          oldPassword: 'oldpass',
+          password: 'newpass123',
+        })
+      ).rejects.toThrow();
     });
   });
 
@@ -171,10 +177,12 @@ describe('Auth Router - Client-Side tRPC', () => {
     it('should fail with invalid email format via HTTP', async () => {
       const client = createUnauthenticatedClient();
 
-      await expect(client.auth.verifyEmail.mutate({
-        email: 'invalid-email',
-        code: 123456,
-      })).rejects.toThrow();
+      await expect(
+        client.auth.verifyEmail.mutate({
+          email: 'invalid-email',
+          code: 123456,
+        })
+      ).rejects.toThrow();
     });
   });
 });

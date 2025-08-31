@@ -4,7 +4,7 @@ import { EMAIL_PREFERENCE, GENDER } from '@qrent/shared/enum';
 class UserService {
   async updateProfile(
     userId: number,
-    profileData: Pick<User,'name' | 'gender'> & { emailPreferences: EmailPreference[] }
+    profileData: Pick<User, 'name' | 'gender'> & { emailPreferences: EmailPreference[] }
   ) {
     if (profileData.gender && !Object.values(GENDER).includes(profileData.gender)) {
       throw new Error('Invalid gender');

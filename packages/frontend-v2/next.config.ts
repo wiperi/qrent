@@ -1,4 +1,4 @@
-import type { NextConfig } from "next";
+import type { NextConfig } from 'next';
 import { config as dotenvConfig } from 'dotenv';
 import { join } from 'path';
 

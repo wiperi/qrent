@@ -16,7 +16,7 @@ describe('Users Router - Client-Side tRPC', () => {
     it('should get user profile successfully via HTTP', async () => {
       const client = createUnauthenticatedClient();
       const userData = generateTestUser();
-      
+
       // Register and get token
       const registerResult = await client.auth.register.mutate(userData);
       const authToken = registerResult.token;
@@ -42,12 +42,12 @@ describe('Users Router - Client-Side tRPC', () => {
     it('should update user profile successfully via HTTP', async () => {
       const client = createUnauthenticatedClient();
       const userData = generateTestUser();
-      
+
       // Register and get token
       const registerResult = await client.auth.register.mutate(userData);
       const authToken = registerResult.token;
       const authenticatedClient = createAuthenticatedClient(authToken);
-      
+
       const updateData = {
         name: 'Updated Test User',
         gender: 0,
@@ -76,7 +76,7 @@ describe('Users Router - Client-Side tRPC', () => {
     it('should fail with invalid name length', async () => {
       const testUser = await createTestUser();
       const caller = createAuthenticatedCaller(testUser.id);
-      
+
       const updateData = {
         name: '', // Empty name
         gender: 1,
@@ -89,7 +89,7 @@ describe('Users Router - Client-Side tRPC', () => {
     it('should fail with name too long', async () => {
       const testUser = await createTestUser();
       const caller = createAuthenticatedCaller(testUser.id);
-      
+
       const updateData = {
         name: 'a'.repeat(51), // Too long name (max 50 chars)
         gender: 1,
@@ -102,7 +102,7 @@ describe('Users Router - Client-Side tRPC', () => {
     it('should fail with invalid gender value', async () => {
       const testUser = await createTestUser();
       const caller = createAuthenticatedCaller(testUser.id);
-      
+
       const updateData = {
         name: 'Valid Name',
         gender: 256, // Invalid gender (max 255 for UnsignedTinyInt)
@@ -115,7 +115,7 @@ describe('Users Router - Client-Side tRPC', () => {
     it('should update email preferences correctly', async () => {
       const testUser = await createTestUser();
       const caller = createAuthenticatedCaller(testUser.id);
-      
+
       const updateData = {
         name: 'Test User',
         gender: 1,
@@ -137,7 +137,7 @@ describe('Users Router - Client-Side tRPC', () => {
     it('should get preferences for authenticated user via HTTP', async () => {
       const client = createUnauthenticatedClient();
       const userData = generateTestUser();
-      
+
       // Register and get token
       const registerResult = await client.auth.register.mutate(userData);
       const authToken = registerResult.token;

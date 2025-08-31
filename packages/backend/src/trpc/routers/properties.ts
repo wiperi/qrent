@@ -23,7 +23,13 @@ const preferenceSchema = z.object({
   maxBedrooms: z.number().int().min(0).max(255).optional(),
   minBathrooms: z.number().int().min(0).max(255).optional(),
   maxBathrooms: z.number().int().min(0).max(255).optional(),
-  regions: z.string().regex(/^[a-z-]+(\s[a-z-]+)*$/, 'Regions must be space-separated words containing only lowercase letters and hyphens').optional(),
+  regions: z
+    .string()
+    .regex(
+      /^[a-z-]+(\s[a-z-]+)*$/,
+      'Regions must be space-separated words containing only lowercase letters and hyphens'
+    )
+    .optional(),
   propertyType: z.number().int().min(1).max(2).optional(), // 1: House, 2: Apartment
   minRating: z.number().optional(),
   minCommuteTime: z.number().int().positive().optional(),
@@ -42,7 +48,7 @@ export const propertiesRouter = t.router({
     .mutation(async ({ input, ctx }) => {
       // Extract pagination params
       const { page, pageSize, ...preferences } = input;
-      
+
       // Create preference with proper null conversion
       const createPreferenceData = {
         targetSchool: preferences.targetSchool,
@@ -69,7 +75,7 @@ export const propertiesRouter = t.router({
         page,
         pageSize,
       });
-      
+
       return properties;
     }),
 
@@ -87,11 +93,10 @@ export const propertiesRouter = t.router({
       return result;
     }),
 
-  getSubscriptions: protectedProcedure
-    .query(async ({ ctx }) => {
-      const result = await propertyService.fetchSubscriptions(ctx.userId!);
-      return result;
-    }),
+  getSubscriptions: protectedProcedure.query(async ({ ctx }) => {
+    const result = await propertyService.fetchSubscriptions(ctx.userId!);
+    return result;
+  }),
 });
 
 export type PropertiesRouter = typeof propertiesRouter;

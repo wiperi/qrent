@@ -45,7 +45,6 @@ async function main() {
       console.log('\n⚠️  Skipping authenticated tests (no AUTH_TOKEN provided)');
       console.log('To test authenticated endpoints, set AUTH_TOKEN environment variable');
     }
-
   } catch (err) {
     console.error('❌ Test failed:', err);
     process.exitCode = 1;

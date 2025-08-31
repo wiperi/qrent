@@ -32,8 +32,7 @@ export const generateUserProfile = () => ({
   ],
 });
 
-export const createTestEmail = () => 
-  `test-${faker.string.alphanumeric(8)}@qrent-test.com`;
+export const createTestEmail = () => `test-${faker.string.alphanumeric(8)}@qrent-test.com`;
 
 export const createTestProperty = () => ({
   price: faker.number.int({ min: 300, max: 2000 }),
