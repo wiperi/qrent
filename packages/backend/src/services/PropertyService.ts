@@ -1,5 +1,5 @@
-import { Prisma, prisma, User, Preference, Property, Region } from '@qrent/shared';
-import { EMAIL_PREFERENCE, PROPERTY_TYPE, SCHOOL } from '@qrent/shared/enum';
+import { Prisma, prisma, Preference, Property } from '@qrent/shared';
+import { EMAIL_PREFERENCE } from '@qrent/shared/enum';
 import HttpError from '@/error/HttpError';
 import validationService from './ValidationService';
 import _ from 'lodash';

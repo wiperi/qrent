@@ -46,8 +46,10 @@ class UserService {
       if (!newPreferenceTypes.includes(preference.type)) {
         await prisma.emailPreference.delete({
           where: {
-            userId: preference.userId,
-            type: preference.type,
+            userId_type: {
+              userId: preference.userId,
+              type: preference.type,
+            },
           },
         });
       }

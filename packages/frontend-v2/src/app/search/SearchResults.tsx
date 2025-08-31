@@ -6,8 +6,6 @@ import Link from 'next/link'
 import { Suspense, useEffect, useMemo } from 'react'
 import { useMutation } from '@tanstack/react-query'
 import { useTRPC } from '@/lib/trpc'
-import { SCHOOL } from '@qrent/shared/enum'
-import { useSearchParams } from 'next/navigation'
 
 type SearchParams = {
   q?: string
@@ -74,7 +72,6 @@ export default function SearchResults({ searchParams }: { searchParams: SearchPa
           <aside className="lg:col-span-3">
             <StatsPanel 
               searchSummary={searchSummary}
-              query={searchParams.q || ''}
               isPending={isPending}
             />
           </aside>
@@ -101,13 +98,13 @@ export default function SearchResults({ searchParams }: { searchParams: SearchPa
                     <PropertyCard
                       key={property.id}
                       address={property.address}
-                      region={property.region}
+                      region={property.region || ''}
                       price={property.price}
                       bedroomCount={property.bedroomCount}
                       bathroomCount={property.bathroomCount}
                       propertyType={property.propertyType}
                       descriptionEn={property.descriptionEn}
-                      commuteTime={property.commuteTime}
+                      commuteTime={property.commuteTime ?? undefined}
                       url={property.url}
                     />
                   ))}
@@ -127,7 +124,6 @@ export default function SearchResults({ searchParams }: { searchParams: SearchPa
 
 function StatsPanel({ 
   searchSummary, 
-  query, 
   isPending 
 }: { 
   searchSummary: {
@@ -135,9 +131,8 @@ function StatsPanel({
     filteredCount: number
     averagePrice: number
     averageCommuteTime: number
-    topRegions: any[]
+    topRegions: { region: string | null; propertyCount: number; averagePrice: number; averageCommuteTime: number }[]
   }
-  query: string
   isPending: boolean 
 }) {
   return (
@@ -266,7 +261,7 @@ function EmptyState({ query }: { query: string }) {
       <h3 className="mt-4 text-lg font-semibold text-slate-900">No results</h3>
       <p className="mt-2 text-sm text-slate-600">
         {query ? (
-          <>We couldn't find any results for "{query}". Try different keywords.</>
+          <>We couldn&apos;t find any results for &quot;{query}&quot;. Try different keywords.</>
         ) : (
           <>Try adjusting your search filters to find properties.</>
         )}

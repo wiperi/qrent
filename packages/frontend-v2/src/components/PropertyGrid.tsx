@@ -58,13 +58,13 @@ export default function PropertyGrid() {
           <PropertyCard
             key={property.id}
             address={property.address}
-            region={property.region}
+            region={property.region || ''}
             price={property.price}
             bedroomCount={property.bedroomCount}
             bathroomCount={property.bathroomCount}
             propertyType={property.propertyType}
             descriptionEn={property.descriptionEn}
-            commuteTime={property.commuteTime}
+            commuteTime={property.commuteTime ?? undefined}
             url={property.url}
           />
         ))}

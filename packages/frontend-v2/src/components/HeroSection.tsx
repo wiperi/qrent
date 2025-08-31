@@ -1,5 +1,6 @@
 'use client'
 
+import { Suspense } from 'react'
 import Image from 'next/image'
 import SearchBar from '@/components/SearchBar'
 
@@ -21,7 +22,9 @@ export default function HeroSection() {
           {/* Search bar overlay */}
           <div className="absolute inset-0 flex items-center justify-center px-4">
             <div className="w-full max-w-3xl">
-              <SearchBar initialQuery="" />
+              <Suspense fallback={<div className="h-16 bg-white/80 backdrop-blur rounded-2xl animate-pulse" />}>
+                <SearchBar initialQuery="" />
+              </Suspense>
             </div>
           </div>
         </div>

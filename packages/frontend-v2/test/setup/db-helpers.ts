@@ -84,9 +84,16 @@ export async function createTestProperty(propertyData?: Partial<any>) {
     regionId: region.id,
     bedroomCount: 2,
     bathroomCount: 1,
+    parkingCount: 1,
     propertyType: 1,
     houseId: Math.floor(Math.random() * 1000000),
     publishedAt: new Date(),
+    availableDate: new Date(),
+    keywords: '',
+    averageScore: 0,
+    descriptionEn: 'Test property description',
+    descriptionCn: '测试房产描述',
+    url: 'https://example.com/test-property',
   };
 
   return await prisma.property.create({

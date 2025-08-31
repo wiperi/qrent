@@ -3,6 +3,7 @@ import dotenv from 'dotenv';
 import path from 'path';
 
 if (process.env.NODE_ENV === 'development') {
+  console.log('🔄 Loading:', path.resolve(__dirname, '../../../.env'));
   dotenv.config({ path: path.resolve(__dirname, '../../../.env') });
 }
 

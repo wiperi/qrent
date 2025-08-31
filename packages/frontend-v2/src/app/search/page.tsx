@@ -1,6 +1,5 @@
 import Header from '@/components/Header'
 import Footer from '@/components/Footer'
-import { Suspense } from 'react'
 import { Metadata } from 'next'
 import SearchBar from '@/components/SearchBar'
 import FilterModal from '@/components/FilterModal'

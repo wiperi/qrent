@@ -1,3 +1,4 @@
+import { Suspense } from 'react'
 import Header from '@/components/Header'
 import HeroSection from '@/components/HeroSection'
 import UsefulGuide from '@/components/UsefulGuide'
@@ -13,7 +14,9 @@ export default function Home() {
         <HeroSection />
         <UsefulGuide />
         <PropertyGrid />
-        <FilterModal />
+        <Suspense fallback={null}>
+          <FilterModal />
+        </Suspense>
       </main>
       <Footer />
     </>

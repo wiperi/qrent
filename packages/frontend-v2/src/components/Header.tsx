@@ -101,7 +101,7 @@ export default function Header() {
                   >
                     <span className="sr-only">User menu</span>
                     {user.name ? (
-                      <img alt="avatar" src={`https://api.dicebear.com/7.x/initials/svg?seed=${user.name}`} className="h-8 w-8 rounded-full" />
+                      <Image alt="avatar" src={`https://api.dicebear.com/7.x/initials/svg?seed=${user.name}`} width={32} height={32} className="h-8 w-8 rounded-full" />
                     ) : (
                       <HiUser className="h-5 w-5 text-slate-600" />
                     )}

@@ -9,29 +9,29 @@ datasource db {
 
 /// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
 model User {
-  id       Int     @id @default(autoincrement()) @db.UnsignedInt
-  email    String  @unique @db.VarChar(50)
-  password String  @db.VarChar(200)
-  name     String  @default("User") @db.VarChar(50)
-  gender   Int?    @db.UnsignedTinyInt // enum
-  phone    String? @unique @db.Char(11)
+  id            Int     @id @default(autoincrement()) @db.UnsignedInt
+  email         String  @unique @db.VarChar(50)
+  password      String  @db.VarChar(200)
+  name          String  @default("User") @db.VarChar(50)
+  gender        Int?    @db.UnsignedTinyInt // enum
+  phone         String? @unique @db.Char(11)
   emailVerified Boolean @default(false) @map("email_verified")
 
   emailPreferences EmailPreference[]
-  userSessions UserSession[]
-  preferences  Preference[]
-  properties   Property[]
+  userSessions     UserSession[]
+  preferences      Preference[]
+  properties       Property[]
 
   @@map("users")
 }
 
 model EmailPreference {
-  userId Int @map("user_id") @db.UnsignedInt
-  user User @relation(fields: [userId], references: [id])
+  userId Int  @map("user_id") @db.UnsignedInt
+  user   User @relation(fields: [userId], references: [id])
 
   type Int @db.UnsignedTinyInt
-  
-  @@id([userId, type])  // Composite key
+
+  @@id([userId, type]) // Composite key
   @@map("email_preferences")
 }
 
@@ -99,27 +99,27 @@ model Property {
   regionId        Int              @map("region_id") @db.UnsignedInt
   region          Region           @relation(fields: [regionId], references: [id])
   // Number of bedrooms in the property
-  bedroomCount    Float?           @map("bedroom_count")
+  bedroomCount    Float            @map("bedroom_count")
   // Number of bathrooms in the property
-  bathroomCount   Float?           @map("bathroom_count")
+  bathroomCount   Float            @map("bathroom_count")
   // Number of parking spaces available
-  parkingCount    Float?           @map("parking_count")
+  parkingCount    Float            @map("parking_count")
   // 1: House, 2: Apartment
   propertyType    Int              @map("property_type") @db.UnsignedTinyInt
   // External reference ID for the property
   houseId         Int              @unique @map("house_id")
   // Date when the property becomes available for move-in
-  availableDate   DateTime?        @map("available_date") @db.DateTime(0)
+  availableDate   DateTime         @map("available_date") @db.DateTime(0)
   // Searchable keywords related to the property
-  keywords        String?          @db.Text
+  keywords        String           @db.Text
   // Overall rating score for the property
-  averageScore    Float?           @map("average_score")
+  averageScore    Float            @map("average_score")
   // Property description text
-  descriptionEn   String?          @map("description_en") @db.VarChar(1024)
+  descriptionEn   String           @map("description_en") @db.VarChar(1024)
   // Property description text(Chinese)
-  descriptionCn   String?          @map("description_cn") @db.VarChar(1024)
+  descriptionCn   String           @map("description_cn") @db.VarChar(1024)
   // URL to the property listing
-  url             String?          @db.VarChar(255)
+  url             String           @db.VarChar(255)
   // Date and time when the property was published
   publishedAt     DateTime         @map("published_at") @db.DateTime(0)
   // Users who have saved or are interested in this property
