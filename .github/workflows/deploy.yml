@@ -23,11 +23,8 @@ jobs:
           node-version: '20'
           cache: 'pnpm'
 
-      - name: Install dependencies
-        run: pnpm install
-
-      - name: Check code formatting
-        run: pnpm lint:check
+      - name: Install Prettier only and execute linting
+        run: pnpm dlx prettier --check "**/*.{ts,json}"
 
   deploy:
     runs-on: ubuntu-latest

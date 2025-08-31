@@ -36,7 +36,11 @@ jobs:
           REDIS_URL=${{ secrets.REDIS_URL }}
           EOL
 
+          docker compose down
+          docker system prune -f --volumes
+          docker compose build
           docker compose up -d
+          docker image prune -f
           timeout 60 bash -c 'while ! docker compose ps | grep -q "healthy"; do sleep 2; done'
 
       - name: Run tests in container

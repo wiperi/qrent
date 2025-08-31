@@ -2,7 +2,7 @@ import { PrismaClient } from '@prisma/client';
 import * as fs from 'fs';
 import * as path from 'path';
 
-const prisma = new PrismaClient();
+const p = new PrismaClient();
 
 interface PropertyData {
   addressLine2: string;
@@ -31,21 +31,21 @@ function parseAddressLine2(addressLine2: string) {
 async function cleanDatabase() {
   console.log('clean...');
 
-  await (prisma as any).propertySchool.deleteMany();
+  await (p as any).propertySchool.deleteMany();
   console.log(' property_school');
 
-  await (prisma as any).property.deleteMany();
+  await (p as any).property.deleteMany();
   console.log('properties');
 
-  await (prisma as any).region.deleteMany();
+  await (p as any).region.deleteMany();
   console.log('regions');
 
-  await (prisma as any).school.deleteMany();
+  await (p as any).school.deleteMany();
   console.log('schools ');
 
-  await prisma.$executeRaw`ALTER TABLE schools AUTO_INCREMENT = 1`;
-  await prisma.$executeRaw`ALTER TABLE regions AUTO_INCREMENT = 1`;
-  await prisma.$executeRaw`ALTER TABLE properties AUTO_INCREMENT = 1`;
+  await p.$executeRaw`ALTER TABLE schools AUTO_INCREMENT = 1`;
+  await p.$executeRaw`ALTER TABLE regions AUTO_INCREMENT = 1`;
+  await p.$executeRaw`ALTER TABLE properties AUTO_INCREMENT = 1`;
 
   console.log('cleaned');
 }
@@ -59,7 +59,7 @@ async function seedSchools() {
   ];
 
   for (const school of schools) {
-    await (prisma as any).school.create({
+    await (p as any).school.create({
       data: school,
     });
   }
@@ -93,7 +93,7 @@ async function seedRegions() {
 
   for (let i = 0; i < regionsArray.length; i++) {
     const region = regionsArray[i];
-    await (prisma as any).region.create({
+    await (p as any).region.create({
       data: {
         id: i + 1,
         name: region.name,
@@ -121,7 +121,7 @@ async function main() {
     console.error('error', error);
     throw error;
   } finally {
-    await prisma.$disconnect();
+    await p.$disconnect();
   }
 }
 

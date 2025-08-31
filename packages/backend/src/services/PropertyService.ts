@@ -195,9 +195,9 @@ class PropertyService {
 
     // Target school filter
     // Commute time filter
-    filter.propertySchools = {
+    filter.property_school = {
       some: {
-        school: {
+        schools: {
           name: preferences.targetSchool,
         },
         commuteTime: {
@@ -231,8 +231,8 @@ class PropertyService {
                 commuteTime: true,
               },
               where: {
-                propertyId: p.id,
-                school: {
+                property_id: p.id,
+                schools: {
                   name: preferences.targetSchool,
                 },
               },
@@ -259,10 +259,10 @@ class PropertyService {
     // Get average commute time for the target school
     const avgCommuteTime = await prisma.propertySchool.aggregate({
       where: {
-        property: {
+        properties: {
           ...filter,
         },
-        school: {
+        schools: {
           name: preferences.targetSchool,
         },
       },
@@ -274,9 +274,9 @@ class PropertyService {
     // Total number of properties in the database
     const totalCount = await prisma.property.count({
       where: {
-        propertySchools: {
+        property_school: {
           some: {
-            school: {
+            schools: {
               name: preferences.targetSchool,
             },
           },
@@ -309,11 +309,11 @@ class PropertyService {
 
         const commuteTime = await prisma.propertySchool.aggregate({
           where: {
-            property: {
+            properties: {
               ...filter,
               regionId: r.regionId,
             },
-            school: {
+            schools: {
               name: preferences.targetSchool,
             },
           },
@@ -325,7 +325,7 @@ class PropertyService {
         return {
           propertyCount: r._count || 0,
           averagePrice: r._avg.price || 0,
-          averageCommuteTime: commuteTime._avg.commuteTime || 0,
+          averageCommuteTime: commuteTime._avg.commuteTime ?? 0,
           region: region?.name || null,
         };
       })
@@ -336,7 +336,7 @@ class PropertyService {
       totalCount,
       filteredCount: aggregate._count || 0,
       averagePrice: aggregate._avg.price || 0,
-      averageCommuteTime: avgCommuteTime._avg.commuteTime || 0,
+      averageCommuteTime: avgCommuteTime._avg.commuteTime ?? 0,
       topRegions,
     };
   }

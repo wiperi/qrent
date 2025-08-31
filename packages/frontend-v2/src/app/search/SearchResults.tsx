@@ -103,7 +103,7 @@ export default function SearchResults({ searchParams }: { searchParams: SearchPa
                       bedroomCount={property.bedroomCount}
                       bathroomCount={property.bathroomCount}
                       propertyType={property.propertyType}
-                      descriptionEn={property.descriptionEn}
+                      descriptionEn={property.descriptionEn || ''}
                       commuteTime={property.commuteTime ?? undefined}
                       url={property.url}
                     />
