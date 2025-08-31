@@ -9,122 +9,85 @@ datasource db {
 
 /// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
 model User {
-  id            Int     @id @default(autoincrement()) @db.UnsignedInt
-  email         String  @unique @db.VarChar(50)
-  password      String  @db.VarChar(200)
-  name          String  @default("User") @db.VarChar(50)
-  gender        Int?    @db.UnsignedTinyInt // enum
-  phone         String? @unique @db.Char(11)
-  emailVerified Boolean @default(false) @map("email_verified")
-
+  id               Int               @id @default(autoincrement()) @db.UnsignedInt
+  email            String            @unique @db.VarChar(50)
+  password         String            @db.VarChar(200)
+  name             String            @default("User") @db.VarChar(50)
+  gender           Int?              @db.UnsignedTinyInt
+  phone            String?           @unique @db.Char(11)
+  emailVerified    Boolean           @default(false) @map("email_verified")
   emailPreferences EmailPreference[]
-  userSessions     UserSession[]
   preferences      Preference[]
-  properties       Property[]
+  userSessions     UserSession[]
+  properties       Property[]        @relation("PropertyToUser")
 
   @@map("users")
 }
 
 model EmailPreference {
   userId Int  @map("user_id") @db.UnsignedInt
+  type   Int  @db.UnsignedTinyInt
   user   User @relation(fields: [userId], references: [id])
 
-  type Int @db.UnsignedTinyInt
-
-  @@id([userId, type]) // Composite key
+  @@id([userId, type])
   @@map("email_preferences")
 }
 
 model UserSession {
   id        Int      @id @default(autoincrement()) @db.UnsignedInt
   userId    Int      @map("user_id") @db.UnsignedInt
-  user      User     @relation(fields: [userId], references: [id])
   token     String   @db.VarChar(255)
   expiresAt DateTime @map("expires_at") @db.DateTime(0)
-  createdAt DateTime @default(dbgenerated("CURRENT_TIMESTAMP")) @map("created_at") @db.DateTime(0)
+  createdAt DateTime @default(now()) @map("created_at") @db.DateTime(0)
   updatedAt DateTime @updatedAt @map("updated_at") @db.DateTime(0)
+  user      User     @relation(fields: [userId], references: [id])
 
+  @@index([userId], map: "user_sessions_user_id_fkey")
   @@map("user_sessions")
 }
 
 model Preference {
-  id Int @id @default(autoincrement()) @db.UnsignedInt
+  id             Int       @id @default(autoincrement()) @db.UnsignedInt
+  targetSchool   String    @map("target_school") @db.VarChar(100)
+  minPrice       Int?      @map("min_price") @db.UnsignedInt
+  maxPrice       Int?      @map("max_price") @db.UnsignedInt
+  minBedrooms    Int?      @map("min_bedrooms") @db.UnsignedTinyInt
+  maxBedrooms    Int?      @map("max_bedrooms") @db.UnsignedTinyInt
+  minBathrooms   Int?      @map("min_bathrooms") @db.UnsignedTinyInt
+  maxBathrooms   Int?      @map("max_bathrooms") @db.UnsignedTinyInt
+  regions        String?   @db.Text
+  propertyType   Int?      @map("property_type") @db.UnsignedTinyInt
+  minRating      Float?    @default(13) @map("min_rating")
+  minCommuteTime Int?      @map("min_commute_time") @db.UnsignedInt
+  maxCommuteTime Int?      @map("max_commute_time") @db.UnsignedInt
+  moveInDate     DateTime? @map("move_in_date") @db.DateTime(0)
+  userId         Int?      @map("user_id") @db.UnsignedInt
+  user           User?     @relation(fields: [userId], references: [id])
 
-  // Target school
-  targetSchool String @map("target_school") @db.VarChar(100)
-
-  // Price range (per week)
-  minPrice Int? @map("min_price") @db.UnsignedInt
-  maxPrice Int? @map("max_price") @db.UnsignedInt
-
-  // Bedroom count
-  minBedrooms Int? @map("min_bedrooms") @db.UnsignedTinyInt
-  maxBedrooms Int? @map("max_bedrooms") @db.UnsignedTinyInt
-
-  // Bathroom count
-  minBathrooms Int? @map("min_bathrooms") @db.UnsignedTinyInt
-  maxBathrooms Int? @map("max_bathrooms") @db.UnsignedTinyInt
-
-  // Location/Region
-  regions String? @db.Text // eg. "kingsford zetland redfern"
-
-  // 1: House, 2: Apartment
-  propertyType Int? @map("property_type") @db.UnsignedTinyInt
-
-  // Property rating
-  minRating Float? @default(13) @map("min_rating") // Default to 13 as shown in the UI
-
-  // Commute time (in minutes)
-  minCommuteTime Int? @map("min_commute_time") @db.UnsignedInt
-  maxCommuteTime Int? @map("max_commute_time") @db.UnsignedInt
-
-  // Move-in date
-  moveInDate DateTime? @map("move_in_date") @db.DateTime(0)
-
-  // Logical foreign key: User ID
-  userId Int?  @map("user_id") @db.UnsignedInt
-  user   User? @relation(fields: [userId], references: [id])
-
+  @@index([userId], map: "preferences_user_id_fkey")
   @@map("preferences")
 }
 
 model Property {
-  // Unique identifier for the property
   id              Int              @id @default(autoincrement()) @db.UnsignedInt
-  // Weekly rental price in local currency
   price           Int              @db.UnsignedInt
-  // Primary address line (street number and name)
   address         String           @db.VarChar(60)
-  // Secondary address information (apt/unit number, etc.)
   regionId        Int              @map("region_id") @db.UnsignedInt
-  region          Region           @relation(fields: [regionId], references: [id])
-  // Number of bedrooms in the property
-  bedroomCount    Float            @map("bedroom_count")
-  // Number of bathrooms in the property
-  bathroomCount   Float            @map("bathroom_count")
-  // Number of parking spaces available
-  parkingCount    Float            @map("parking_count")
-  // 1: House, 2: Apartment
+  bedroomCount    Int              @map("bedroom_count") @db.UnsignedTinyInt
+  bathroomCount   Int              @map("bathroom_count") @db.UnsignedTinyInt
+  parkingCount    Int              @map("parking_count") @db.UnsignedTinyInt
   propertyType    Int              @map("property_type") @db.UnsignedTinyInt
-  // External reference ID for the property
-  houseId         Int              @unique @map("house_id")
-  // Date when the property becomes available for move-in
-  availableDate   DateTime         @map("available_date") @db.DateTime(0)
-  // Searchable keywords related to the property
+  houseId         Int              @unique(map: "house_id") @map("house_id") @db.UnsignedInt
+  availableDate   DateTime?        @map("available_date") @db.DateTime(0)
   keywords        String           @db.Text
-  // Overall rating score for the property
-  averageScore    Float            @map("average_score")
-  // Property description text
-  descriptionEn   String           @map("description_en") @db.VarChar(1024)
-  // Property description text(Chinese)
-  descriptionCn   String           @map("description_cn") @db.VarChar(1024)
-  // URL to the property listing
+  averageScore    Float            @map("average_score") @db.Float
+  descriptionEn   String?          @map("description_en") @db.VarChar(1024)
+  descriptionCn   String?          @map("description_cn") @db.VarChar(1024)
   url             String           @db.VarChar(255)
-  // Date and time when the property was published
   publishedAt     DateTime         @map("published_at") @db.DateTime(0)
-  // Users who have saved or are interested in this property
-  propertySchools PropertySchool[]
-  users           User[]
+  region          Region           @relation(fields: [regionId], references: [id])
+  property_school PropertySchool[]
+  users           User[]           @relation("PropertyToUser")
 
   @@index([price])
   @@index([address])
@@ -146,7 +109,7 @@ model Region {
   state      String     @db.VarChar(20)
   postcode   Int        @db.UnsignedInt
   properties Property[]
-  schools    School[]
+  schools    School[]   @relation("RegionToSchool")
 
   @@index([name])
   @@map("regions")
@@ -155,22 +118,22 @@ model Region {
 model School {
   id              Int              @id @default(autoincrement()) @db.UnsignedInt
   name            String           @unique @db.VarChar(255)
-  propertySchools PropertySchool[]
-  regions         Region[]
+  property_school PropertySchool[]
+  regions         Region[]         @relation("RegionToSchool")
 
   @@index([name])
   @@map("schools")
 }
 
 model PropertySchool {
-  propertyId  Int      @map("property_id") @db.UnsignedInt
-  schoolId    Int      @map("school_id") @db.UnsignedInt
+  property_id Int      @db.UnsignedInt
+  school_id   Int      @db.UnsignedInt
   commuteTime Int?     @map("commute_time") @db.UnsignedInt
-  property    Property @relation(fields: [propertyId], references: [id])
-  school      School   @relation(fields: [schoolId], references: [id])
+  properties  Property @relation(fields: [property_id], references: [id], onDelete: Cascade)
+  schools     School   @relation(fields: [school_id], references: [id], onDelete: Cascade)
 
-  @@id([propertyId, schoolId])
-  @@index([propertyId])
-  @@index([schoolId])
+  @@id([property_id, school_id])
+  @@index([property_id])
+  @@index([school_id])
   @@map("property_school")
 }
