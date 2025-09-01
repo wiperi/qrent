@@ -3,6 +3,13 @@ name: Deploy
 on:
   push:
     branches: [main, staging]
+    paths:
+      - 'packages/backend/**'
+      - 'packages/shared/**'
+      - '.github/workflows/backend-ci-cd.yml'
+      - 'docker-compose.yml'
+      - 'package.json'
+      - 'pnpm-lock.yaml'
   pull_request:
     branches: []
 
