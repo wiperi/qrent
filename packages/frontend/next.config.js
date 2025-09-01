@@ -8,6 +8,9 @@ const nextConfig = {
   eslint: {
     ignoreDuringBuilds: true,
   },
+  images: {
+    domains: ['api.dicebear.com'],
+  },
   async headers() {
     return [
       {

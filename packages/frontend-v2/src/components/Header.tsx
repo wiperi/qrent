@@ -72,8 +72,8 @@ export default function Header() {
 
             {/* Center: desktop nav */}
             <nav className="hidden md:flex items-center gap-8" aria-label="Primary">
-              <a href="#guide" className="text-slate-700 hover:text-blue-600 transition-colors">Rental Guide</a>
-              <a href="#docs" className="text-slate-700 hover:text-blue-600 transition-colors">Document Preparation</a>
+              {/* <a href="#guide" className="text-slate-700 hover:text-blue-600 transition-colors">Rental Guide</a>
+              <a href="#docs" className="text-slate-700 hover:text-blue-600 transition-colors">Document Preparation</a> */}
             </nav>
 
             {/* Right: actions */}

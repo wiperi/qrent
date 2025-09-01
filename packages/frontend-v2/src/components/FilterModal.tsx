@@ -191,7 +191,7 @@ export default function FilterModal() {
         role="dialog"
         aria-modal="true"
         aria-labelledby="filter-modal-title"
-        className="absolute inset-x-0 top-0 mx-auto mt-10 w-[min(900px,92vw)] overflow-hidden rounded-2xl bg-white shadow-2xl"
+        className="absolute inset-x-0 top-0 mx-auto mt-28 w-[min(900px,92vw)] overflow-hidden rounded-2xl bg-white shadow-2xl"
       >
         {/* Header */}
         <div className="flex items-center justify-between border-b px-5 py-3">

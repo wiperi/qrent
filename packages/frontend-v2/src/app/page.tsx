@@ -12,7 +12,7 @@ export default function Home() {
       <Header />
       <main>
         <HeroSection />
-        <UsefulGuide />
+        {/* <UsefulGuide /> */}
         <PropertyGrid />
         <Suspense fallback={null}>
           <FilterModal />

@@ -51,8 +51,6 @@ export default function SearchResults({ searchParams }: { searchParams: SearchPa
     mutate(searchFilters)
   }, [mutate, searchFilters])
 
-  console.log('k2542', data)
-
   const properties = data?.properties || []
   const searchSummary = {
     totalCount: data?.totalCount || 0,
@@ -106,6 +104,8 @@ export default function SearchResults({ searchParams }: { searchParams: SearchPa
                       descriptionEn={property.descriptionEn || ''}
                       commuteTime={property.commuteTime ?? undefined}
                       url={property.url}
+                      averageScore={property.averageScore}
+                      keywords={property.keywords}
                     />
                   ))}
                 </div>
@@ -173,20 +173,38 @@ function StatsPanel({
       <div className="rounded-xl border border-slate-200 bg-white p-4 shadow-sm">
         <div className="text-sm font-medium text-slate-800">Top Regions</div>
         {isPending ? (
-          <div className="mt-2 space-y-2">
+          <div className="mt-2 space-y-3">
             {Array.from({ length: 3 }).map((_, i) => (
-              <div key={i} className="h-4 bg-slate-200 rounded animate-pulse" />
+              <div key={i} className="space-y-2">
+                <div className="h-4 bg-slate-200 rounded animate-pulse" />
+                <div className="h-3 bg-slate-200 rounded w-3/4 animate-pulse" />
+              </div>
             ))}
           </div>
         ) : (
-          <ul className="mt-2 text-sm text-slate-600 space-y-1">
+          <div className="mt-3 space-y-3">
             {searchSummary.topRegions.slice(0, 5).map((region, i) => (
-              <li key={i} className="flex justify-between">
-                <span className="capitalize">{region.region?.replace('-', ' ')}</span>
-                <span>{region.propertyCount} properties</span>
-              </li>
+              <div key={i} className="border-l-2 border-blue-200 pl-3">
+                <div className="font-medium text-slate-800 capitalize text-sm">
+                  {region.region?.replace(/-/g, ' ') || 'Unknown'}
+                </div>
+                <div className="mt-1 grid grid-cols-3 gap-2 text-xs text-slate-600">
+                  <div>
+                    <span className="font-medium">{region.propertyCount}</span>
+                    <span className="block text-slate-500">properties</span>
+                  </div>
+                  <div>
+                    <span className="font-medium">${Math.round(region.averagePrice)}</span>
+                    <span className="block text-slate-500">avg/week</span>
+                  </div>
+                  <div>
+                    <span className="font-medium">{Math.round(region.averageCommuteTime)} min</span>
+                    <span className="block text-slate-500">commute</span>
+                  </div>
+                </div>
+              </div>
             ))}
-          </ul>
+          </div>
         )}
       </div>
     </div>
