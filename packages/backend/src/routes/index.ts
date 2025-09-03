@@ -5,7 +5,7 @@ import authRoutes from './auth';
 import userRoutes from './users';
 import propertyRoutes from './properties';
 import rentalLetterRoutes from './rentalLetter';
-import { propertyService } from '@/services/PropertyService';
+import propertyStatsRoutes from './propertyStats';
 
 const router: Router = Router();
 
@@ -13,6 +13,7 @@ router.use('/auth', authRoutes);
 router.use('/users', userRoutes);
 router.use('/properties', propertyRoutes);
 router.use('/rental-letter', rentalLetterRoutes);
+router.use('/property-stats', propertyStatsRoutes);
 
 router.get(
   '/echo',

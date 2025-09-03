@@ -37,7 +37,7 @@ export const authenticate: RequestHandler = async (
 ) => {
   try {
     // Define whitelist paths that bypass authentication
-    const whitelistPaths = ['/auth/login', '/auth/register', '/echo', '/properties/search'];
+    const whitelistPaths = ['/auth/login', '/auth/register', '/echo', '/properties/search', '/property-stats'];
 
     // Check if the path is in the whitelist
     if (whitelistPaths.some(path => req.path.startsWith(path))) {
