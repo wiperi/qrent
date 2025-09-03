@@ -2,15 +2,17 @@
   "name": "root",
   "private": true,
   "scripts": {
-    "build": "pnpm -r build",
     "start:backend": "pnpm --filter backend start",
-    "dev": "pnpm -r dev",
     "dev:backend": "pnpm --filter backend dev",
-    "test": "pnpm -r test",
     "test:backend": "pnpm --filter backend test",
-    "lint:eslint": "eslint \"**/*.{ts,js}\" --report-unused-disable-directives --max-warnings 0",
+    "dev:frontend": "pnpm --filter frontend-v2 dev",
+    "build": "pnpm -r build",
+    "dev": "pnpm -r dev",
+    "test": "pnpm -r test",
+    "lint": "prettier --check \"**/*.{ts,json}\"",
     "lint:write": "prettier --write \"**/*.{ts,json}\"",
-    "lint:check": "prettier --check \"**/*.{ts,json}\""
+    "lint:eslint": "eslint \"**/*.{ts,js}\" --report-unused-disable-directives --max-warnings 0",
+    "prepare": "husky || true"
   },
   "devDependencies": {
     "@eslint/js": "^9.0.0",
@@ -19,6 +21,7 @@
     "@typescript-eslint/eslint-plugin": "^8.35.1",
     "@typescript-eslint/parser": "^8.35.1",
     "eslint": "^9.0.0",
+    "husky": "^9.0.0",
     "jest": "^29.7.0",
     "prettier": "^3.6.2",
     "ts-jest": "^29.2.5",

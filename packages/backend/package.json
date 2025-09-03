@@ -1,12 +1,12 @@
 {
   "name": "@qrent/backend",
   "version": "1.0.0",
-  "main": "./dist/server.js",
-  "types": "./dist/index.d.ts",
+  "main": "./dist/src/server.js",
+  "types": "./dist/src/index.d.ts",
   "exports": {
     "./trpc": {
-      "types": "./dist/trpc.d.ts",
-      "default": "./dist/trpc.js"
+      "types": "./dist/src/trpc.d.ts",
+      "default": "./dist/src/trpc.js"
     }
   },
   "scripts": {

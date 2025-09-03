@@ -15,20 +15,22 @@ export const protectedProcedure = t.procedure.use(({ ctx, next }) => {
 });
 
 // OrderBy schema for Property sorting
-const propertyOrderBySchema = z.object({
-  id: z.enum(['asc', 'desc']).optional(),
-  price: z.enum(['asc', 'desc']).optional(),
-  address: z.enum(['asc', 'desc']).optional(),
-  regionId: z.enum(['asc', 'desc']).optional(),
-  bedroomCount: z.enum(['asc', 'desc']).optional(),
-  bathroomCount: z.enum(['asc', 'desc']).optional(),
-  parkingCount: z.enum(['asc', 'desc']).optional(),
-  propertyType: z.enum(['asc', 'desc']).optional(),
-  houseId: z.enum(['asc', 'desc']).optional(),
-  availableDate: z.enum(['asc', 'desc']).optional(),
-  averageScore: z.enum(['asc', 'desc']).optional(),
-  publishedAt: z.enum(['asc', 'desc']).optional(),
-}).strict();
+const propertyOrderBySchema = z
+  .object({
+    id: z.enum(['asc', 'desc']).optional(),
+    price: z.enum(['asc', 'desc']).optional(),
+    address: z.enum(['asc', 'desc']).optional(),
+    regionId: z.enum(['asc', 'desc']).optional(),
+    bedroomCount: z.enum(['asc', 'desc']).optional(),
+    bathroomCount: z.enum(['asc', 'desc']).optional(),
+    parkingCount: z.enum(['asc', 'desc']).optional(),
+    propertyType: z.enum(['asc', 'desc']).optional(),
+    houseId: z.enum(['asc', 'desc']).optional(),
+    availableDate: z.enum(['asc', 'desc']).optional(),
+    averageScore: z.enum(['asc', 'desc']).optional(),
+    publishedAt: z.enum(['asc', 'desc']).optional(),
+  })
+  .strict();
 
 // Preference input schema based on Prisma model
 const preferenceSchema = z.object({

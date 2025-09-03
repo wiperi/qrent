@@ -5,6 +5,7 @@
   "scripts": {
     "dev": "next dev --turbopack",
     "build": "next build",
+    "build:all": "pnpm --filter shared db:generate && pnpm --filter backend build && next build",
     "start": "next start",
     "lint": "next lint",
     "test": "vitest",
