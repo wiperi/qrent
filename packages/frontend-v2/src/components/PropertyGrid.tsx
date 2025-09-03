@@ -1,51 +1,59 @@
-'use client'
+'use client';
 
-import PropertyCard from './PropertyCard'
-import Section from './Section'
-import { useMutation } from '@tanstack/react-query'
-import { useTRPC } from '@/lib/trpc'
-import { SCHOOL } from '@qrent/shared/enum'
-import { useEffect, useState } from 'react'
+import PropertyCard from './PropertyCard';
+import Section from './Section';
+import { useQuery } from '@tanstack/react-query';
+import { useTRPCClient } from '@/lib/trpc';
+import { SCHOOL } from '@qrent/shared/enum';
+import { useState } from 'react';
 
 export default function PropertyGrid() {
-  const [selectedUniversity, setSelectedUniversity] = useState(SCHOOL.UNSW)
-  const trpc = useTRPC()
-  const { mutate, data, isPending, error } = useMutation(trpc.properties.search.mutationOptions())
-
-  useEffect(() => {
-    mutate({
-      targetSchool: selectedUniversity,
-      pageSize: 8,
-      page: 1,
-    })
-  }, [mutate, selectedUniversity])
+  const [selectedUniversity, setSelectedUniversity] = useState(SCHOOL.UNSW);
+  const trpc = useTRPCClient();
+  const { data, isPending, error } = useQuery({
+    queryKey: ['properties.search', selectedUniversity],
+    queryFn: () =>
+      trpc.properties.search.query({
+        targetSchool: selectedUniversity,
+        pageSize: 8,
+        page: 1,
+        orderBy: [
+          {
+            availableDate: 'desc' as const,
+          },
+          {
+            averageScore: 'desc' as const,
+          },
+        ],
+      }),
+  });
 
   const getUniversityColors = (school: string, isSelected: boolean) => {
     const colors = {
       [SCHOOL.UNSW]: {
         selected: 'bg-yellow-400 text-black',
-        hover: 'hover:bg-yellow-100 hover:text-yellow-800'
+        hover: 'hover:bg-yellow-100 hover:text-yellow-800',
       },
       [SCHOOL.USYD]: {
         selected: 'bg-blue-800 text-yellow-400',
-        hover: 'hover:bg-blue-100 hover:text-blue-800'
+        hover: 'hover:bg-blue-100 hover:text-blue-800',
       },
       [SCHOOL.UTS]: {
         selected: 'bg-blue-500 text-orange-400',
-        hover: 'hover:bg-blue-100 hover:text-blue-600'
-      }
-    }
-    
-    return isSelected 
+        hover: 'hover:bg-blue-100 hover:text-blue-600',
+      },
+    };
+
+    return isSelected
       ? colors[school as keyof typeof colors]?.selected || 'bg-blue-600 text-white'
-      : colors[school as keyof typeof colors]?.hover || 'hover:text-blue-600'
-  }
+      : colors[school as keyof typeof colors]?.hover || 'hover:text-blue-600';
+  };
 
   const sectionTitle = (
     <div className="flex items-center gap-3">
       <span>Daily New Houses Around</span>
       <div className="flex rounded-lg border border-slate-200 bg-slate-50">
-        {Object.values(SCHOOL).map((school) => (
+        {Object.values(SCHOOL).map(school => (
           <button
             key={school}
             onClick={() => setSelectedUniversity(school)}
@@ -60,14 +68,17 @@ export default function PropertyGrid() {
         ))}
       </div>
     </div>
-  )
+  );
 
   if (isPending) {
     return (
       <Section title={sectionTitle}>
         <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
           {Array.from({ length: 8 }).map((_, i) => (
-            <div key={i} className="animate-pulse overflow-hidden rounded-2xl border border-slate-200 bg-white">
+            <div
+              key={i}
+              className="animate-pulse overflow-hidden rounded-2xl border border-slate-200 bg-white"
+            >
               <div className="p-4 space-y-3">
                 <div className="h-4 bg-slate-200 rounded w-2/3" />
                 <div className="h-3 bg-slate-200 rounded w-1/2" />
@@ -79,7 +90,7 @@ export default function PropertyGrid() {
           ))}
         </div>
       </Section>
-    )
+    );
   }
 
   if (error) {
@@ -89,15 +100,15 @@ export default function PropertyGrid() {
           <p className="text-slate-600">Unable to load properties. Please try again later.</p>
         </div>
       </Section>
-    )
+    );
   }
 
-  const properties = data?.properties || []
+  const properties = data?.properties || [];
 
   return (
     <Section title={sectionTitle}>
       <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-        {properties.map((property) => (
+        {properties.map(property => (
           <PropertyCard
             key={property.id}
             address={property.address}
@@ -115,7 +126,5 @@ export default function PropertyGrid() {
         ))}
       </div>
     </Section>
-  )
+  );
 }
-
-

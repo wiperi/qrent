@@ -14,6 +14,22 @@ export const protectedProcedure = t.procedure.use(({ ctx, next }) => {
   return next();
 });
 
+// OrderBy schema for Property sorting
+const propertyOrderBySchema = z.object({
+  id: z.enum(['asc', 'desc']).optional(),
+  price: z.enum(['asc', 'desc']).optional(),
+  address: z.enum(['asc', 'desc']).optional(),
+  regionId: z.enum(['asc', 'desc']).optional(),
+  bedroomCount: z.enum(['asc', 'desc']).optional(),
+  bathroomCount: z.enum(['asc', 'desc']).optional(),
+  parkingCount: z.enum(['asc', 'desc']).optional(),
+  propertyType: z.enum(['asc', 'desc']).optional(),
+  houseId: z.enum(['asc', 'desc']).optional(),
+  availableDate: z.enum(['asc', 'desc']).optional(),
+  averageScore: z.enum(['asc', 'desc']).optional(),
+  publishedAt: z.enum(['asc', 'desc']).optional(),
+}).strict();
+
 // Preference input schema based on Prisma model
 const preferenceSchema = z.object({
   targetSchool: z.string().max(100),
@@ -43,11 +59,12 @@ export const propertiesRouter = t.router({
       preferenceSchema.extend({
         page: z.number().int().min(1).default(1),
         pageSize: z.number().int().min(1).max(100).default(20),
+        orderBy: z.array(propertyOrderBySchema).optional(),
       })
     )
-    .mutation(async ({ input, ctx }) => {
-      // Extract pagination params
-      const { page, pageSize, ...preferences } = input;
+    .query(async ({ input, ctx }) => {
+      // Extract pagination and orderBy params
+      const { page, pageSize, orderBy, ...preferences } = input;
 
       // Create preference with proper null conversion
       const createPreferenceData = {
@@ -74,6 +91,7 @@ export const propertiesRouter = t.router({
         ...createPreferenceData,
         page,
         pageSize,
+        orderBy,
       });
 
       return properties;

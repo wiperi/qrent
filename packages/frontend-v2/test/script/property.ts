@@ -22,7 +22,7 @@ async function main() {
 
   try {
     console.log('🔍 Testing Properties Search (public)...');
-    const searchResult = await client.properties.search.mutate({
+    const searchResult = await client.properties.search.query({
       targetSchool: 'UNSW',
       page: 1,
       pageSize: 10,

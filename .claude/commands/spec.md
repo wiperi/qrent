@@ -1,112 +1,117 @@
-## Spec工作流系统提示词
+## Spec Workflow System Prompt
 
-### 工作流概述
+### Workflow Overview
 
-将按照三个阶段执行Spec工作流：需求收集 → 系统设计 → 实现计划。每个阶段都必须得到用户明确批准后才能进入下一阶段。
+The Spec workflow will be executed in three phases: Requirements Gathering → System Design → Implementation Planning. Each phase must receive explicit user approval before proceeding to the next phase.
 
-## 阶段一：需求收集 (Requirements Gathering)
+## Phase One: Requirements Gathering
 
-**目标：** 生成标准化的需求文档。
+**Objective:** Generate standardized requirements documentation.
 
-**约束条件：**
-- 必须创建 `.claude/specs/{feature_name}/requirements.md` 文件。
-- 必须基于用户的粗略想法生成初始需求版本，不要先问连续问题。
-- 必须使用以下格式构建 requirements.md 文档：
-    - 清晰的介绍部分、总结功能特性、分层编写的需求列表，每个包含：
-        - 用户故事格式："作为[角色]，我希望[功能]，以便[收益]"
-        - EARS格式的验收标准列表，示例格式：
+**Constraints:**
+- Must create `.claude/specs/{feature_name}/requirements.md` file.
+- Must generate initial requirements version based on user's rough ideas, do not ask sequential questions first.
+- Must structure the requirements.md document using the following format:
+    - Clear introduction section, feature summary, hierarchically written requirements list, each containing:
+        - User story format: "As a [role], I want [functionality], so that [benefit]"
+        - EARS format acceptance criteria list, example format:
             ```
-            # 功能需求文档
-            ## 用户认证系统
-            ## 用户故事：作为网站用户，我希望能够安全登录，以便我访问个人账户信息。
+            # Feature Requirements Document
+            ## User Authentication System
+            ## User Story: As a website user, I want to be able to securely log in, so that I can access my personal account information.
             ```
-            验收标准：
+            Acceptance Criteria:
             ```
-            1.1 当用户输入正确的用户名和密码时，系统应该允许登录。
-            1.2 当用户输入错误凭据时，系统应该显示错误消息。
-            1.3 当用户连续3次登录失败时，系统应该锁定账户15分钟。
+            1.1 When a user enters correct username and password, the system should allow login.
+            1.2 When a user enters incorrect credentials, the system should display an error message.
+            1.3 When a user fails to login 3 consecutive times, the system should lock the account for 15 minutes.
             ```
-- 必须考虑边界情况、用户体验、技术约束和成功标准。
-- 更新需求文档后，必须询问："需求看起来如何？如果没问题，我们可以进入设计阶段。"
-- 必须等待用户明确批准后才能进入下一阶段。
+            Additional Details:
+            ```
+            Dependencies: [List any dependencies on other requirements or systems]
+            Assumptions: [List any assumptions made]
+            ```
+- Must consider edge cases, user experience, technical constraints, and success criteria.
+- After updating requirements document, must ask: "How do the requirements look? If they're good, we can proceed to the design phase."
+- Must wait for explicit user approval before proceeding to the next phase.
 
-## 阶段二：系统设计 (Design Document Creation)
+## Phase Two: System Design (Design Document Creation)
 
-**目标：** 基于批准的需求创建综合设计文档。
+**Objective:** Create comprehensive design documentation based on approved requirements.
 
-**约束条件：**
-- 必须创建 `.claude/specs/{feature_name}/design.md` 文件。
-- 必须识别需要研究的领域并进行必要的技术调研。
-- 必须在设计文档中包含以下部分：
-    - 概述 (Overview)
-    - 架构 (Architecture)
-    - 组件和接口 (Components and Interfaces)
-    - 数据模型 (Data Models)
-    - 错误处理 (Error Handling)
-    - 测试策略 (Testing Strategy)
-    - 适当时应包含图表或视觉表示（可使用Mermaid图表）。
-- 必须确保设计解决方案有已识别的功能需求。
-- 应突出设计决策及其理由。
-- 更新设计文档后，必须询问："设计看起来如何？如果没问题，我们可以进入实现计划。"
-- 必须等待用户明确批准后才能进入下一阶段。
+**Constraints:**
+- Must create `.claude/specs/{feature_name}/design.md` file.
+- Must identify areas requiring research and conduct necessary technical investigation.
+- Must include the following sections in the design document:
+    - Overview
+    - Architecture
+    - Components and Interfaces
+    - Data Models
+    - Error Handling
+    - Testing Strategy
+    - Should include diagrams or visual representations when appropriate (can use Mermaid charts).
+- Must ensure design solutions address identified functional requirements.
+- Should highlight design decisions and their rationale.
+- After updating design document, must ask: "How does the design look? If it's good, we can proceed to implementation planning."
+- Must wait for explicit user approval before proceeding to the next phase.
 
-## 阶段三：实现计划 (Implementation Planning)
+## Phase Three: Implementation Planning
 
-**目标：** 创建基于需求和设计的可执行实现计划。
+**Objective:** Create executable implementation plan based on requirements and design.
 
-**约束条件：**
-- 必须创建 `.claude/specs/{feature_name}/tasks.md` 文件。
-- 必须将功能设计转换为一系列编码任务提示。
-- 必须优先考虑最佳实践、增量进展和早期测试。
-- 必须确保每个提示都建立在之前的提示基础上。
-- 必须将实现计划格式化为带复选框的编号列表，最多两级层次结构。
-- 每个任务项必须包含：
-    - 涉及及编写、修改或测试代码的明确目标。
-    - 任务描述的附加信息作为子要点。
-    - 对需求文档中具体需求的引用。
-    - 对设计文档中相关设计决策和组件的引用，确保实现与设计保持一致。
-    - 预期输出或验收标准，以便进行验证。
-- 确保每个任务都与需求和设计文档中的特定项直接关联，以实现可追溯性。
-- 在任务完成后，必须通过与原始Spec的对比来验证实现的正确性。
-- 更新实现计划后，必须询问："实现计划看起来如何？如果没问题，我们可以开始开发。"
-- 必须等待用户明确批准后才能进入开发阶段。
+**Constraints:**
+- Must create `.claude/specs/{feature_name}/tasks.md` file.
+- Must convert feature design into a series of coding task prompts.
+- Must prioritize best practices, incremental progress, and early testing.
+- Must ensure each prompt builds upon previous prompts.
+- Must format implementation plan as numbered list with checkboxes, maximum two-level hierarchy.
+- Each task item must include:
+    - Clear objective involving writing, modifying, or testing code.
+    - Additional information for task description as sub-bullets.
+    - References to specific requirements in the requirements document.
+    - References to relevant design decisions and components in the design document, ensuring implementation aligns with design.
+    - Expected output or acceptance criteria for verification.
+- Ensure each task directly correlates with specific items in requirements and design documents for traceability.
+- After task completion, must verify implementation correctness by comparing with original Spec.
+- After updating implementation plan, must ask: "How does the implementation plan look? If it's good, we can begin development."
+- Must wait for explicit user approval before proceeding to development phase.
 
-### 任务格式示例
+### Task Format Example
 
 ```markdown
-# 实现计划
+# Implementation Plan
 
-## 核心功能开发
+## Core Feature Development
 
-### 1. 用户认证系统
-- [ ] 1.1 创建用户模型和数据库架构。
-        - 目标：根据设计文档，创建包含用户ID、用户名、密码哈希、邮箱等字段的用户表。
-        - 详情：参照 `design.md` 中的数据库设计部分。
-        - 引用需求：`requirements.md` 中“用户认证系统”及相关验收标准。
-        - 验收：数据库中成功创建 `users` 表，且字段符合设计要求。
+### 1. User Authentication System
+- [ ] 1.1 Create user model and database schema.
+        - Objective: Based on design document, create user table with fields including user ID, username, password hash, email, etc.
+        - Details: Reference database design section in `design.md`.
+        - Requirements Reference: "User Authentication System" and related acceptance criteria in `requirements.md`.
+        - Acceptance: Successfully create `users` table in database with fields meeting design requirements.
 
-- [ ] 1.2 实现用户注册API。
-        - 目标：允许新用户通过POST请求注册，存储加密后的密码。
-        - 详情：参照 `design.md` 中的用户认证API接口定义。
-        - 引用需求：`requirements.md` 中“用户认证系统”的注册流程描述。
-        - 验收：API能处理有效和无效的注册请求，并返回相应的成功或错误信息，确保密码加密存储。
+- [ ] 1.2 Implement user registration API.
+        - Objective: Allow new users to register via POST request, storing encrypted passwords.
+        - Details: Reference user authentication API interface definition in `design.md`.
+        - Requirements Reference: Registration flow description in "User Authentication System" section of `requirements.md`.
+        - Acceptance: API can handle valid and invalid registration requests, returning appropriate success or error messages, ensuring password encryption storage.
 
-- [ ] 1.3 实现用户登录API。
-        - 目标：允许用户通过用户名和密码登录，并返回认证令牌。
-        - 详情：参照 `design.md` 中的用户认证API接口定义。
-        - 引用需求：`requirements.md` 中“用户认证系统”验收标准1.1和1.2。
-        - 验收：成功登录返回令牌，错误登录返回错误提示。
+- [ ] 1.3 Implement user login API.
+        - Objective: Allow users to login with username and password, returning authentication token.
+        - Details: Reference user authentication API interface definition in `design.md`.
+        - Requirements Reference: "User Authentication System" acceptance criteria 1.1 and 1.2 in `requirements.md`.
+        - Acceptance: Successful login returns token, failed login returns error message.
 
-- [ ] 1.4 实现密码哈希和验证逻辑。
-        - 目标：确保用户密码在存储前进行安全的哈希处理，并在登录时进行验证。
-        - 详情：采用 bcrypt 或其他推荐的密码哈希算法。
-        - 引用设计：`design.md` 中的安全考虑和密码处理策略。
-        - 验收：密码在数据库中以哈希形式存储，登录验证哈希密码正确。
+- [ ] 1.4 Implement password hashing and verification logic.
+        - Objective: Ensure user passwords are securely hashed before storage and verified during login.
+        - Details: Use bcrypt or other recommended password hashing algorithms.
+        - Design Reference: Security considerations and password handling strategy in `design.md`.
+        - Acceptance: Passwords stored as hashes in database, login verification of hashed passwords works correctly.
 
-### 2. 授权管理系统（示例）
-- [ ] 2.1 创建角色和权限模型。
-        - 目标：设计并实现用户角色、权限及其关联的数据模型。
-        - 详情：参照 `design.md` 中授权部分的数据库设计。
-        - 引用需求：`requirements.md` 中关于用户角色的定义。
-        - 验收：数据库中创建 `roles` 和 `permissions` 表，并建立关联。
+### 2. Authorization Management System (Example)
+- [ ] 2.1 Create roles and permissions model.
+        - Objective: Design and implement data models for user roles, permissions and their associations.
+        - Details: Reference authorization section database design in `design.md`.
+        - Requirements Reference: User role definitions in `requirements.md`.
+        - Acceptance: Create `roles` and `permissions` tables in database with proper associations.
 ```

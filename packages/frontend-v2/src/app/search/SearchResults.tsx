@@ -3,9 +3,9 @@
 import PropertyCard from '@/components/PropertyCard'
 import { HiSearch } from 'react-icons/hi'
 import Link from 'next/link'
-import { Suspense, useEffect, useMemo } from 'react'
-import { useMutation } from '@tanstack/react-query'
-import { useTRPC } from '@/lib/trpc'
+import { Suspense, useMemo } from 'react'
+import { useTRPCClient } from '@/lib/trpc'
+import { useQuery } from '@tanstack/react-query'
 
 type SearchParams = {
   q?: string
@@ -41,15 +41,18 @@ export default function SearchResults({ searchParams }: { searchParams: SearchPa
       maxBathrooms: searchParams.bathroomsMax ? Number(searchParams.bathroomsMax) : undefined,
       propertyType: searchParams.propertyType ? Number(searchParams.propertyType.split(',')[0]) : undefined,
       regions,
+      orderBy: [{
+        averageScore: 'desc' as const,
+      }]
     }
   }, [searchParams, page])
 
-  const trpc = useTRPC()
-  const { mutate, data, isPending, error } = useMutation(trpc.properties.search.mutationOptions())
+  const trpc = useTRPCClient()
 
-  useEffect(() => {
-    mutate(searchFilters)
-  }, [mutate, searchFilters])
+  const { data, isPending, error } = useQuery({
+    queryKey: ['properties.search', searchFilters],
+    queryFn: () => trpc.properties.search.query(searchFilters)
+  })
 
   const properties = data?.properties || []
   const searchSummary = {
