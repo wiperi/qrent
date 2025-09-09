@@ -6,7 +6,7 @@ on:
     paths:
       - 'packages/backend/**'
       - 'packages/shared/**'
-      - '.github/workflows/backend-ci-cd.yml'
+      - '.github/workflows/*.yml'
       - 'docker-compose.yml'
       - 'package.json'
       - 'pnpm-lock.yaml'
