@@ -107,7 +107,9 @@ def scrape_data(driver, url, postcode, university):
     })
     if university == 'UNSW':
         filename = f"UNSW_rentaldata_suburb_{postcode}.csv"
-    else:
+    elif university == 'USYD':
         filename = f"USYD_rentaldata_suburb_{postcode}.csv"
+    else:  # UTS
+        filename = f"UTS_rentaldata_suburb_{postcode}.csv"
     df.to_csv(filename, index=False, encoding='utf-8')
     print(f"Data for postcode {postcode} saved to {filename}.")

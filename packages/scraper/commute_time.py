@@ -5,8 +5,23 @@ import os
 from tqdm import tqdm
 from datetime import datetime, timedelta
 from dotenv import load_dotenv
+import os
 
-load_dotenv('../../.env')
+# Try to load .env from multiple possible locations
+env_paths = [
+    '.env',
+    '../.env', 
+    '../../.env',
+    '/app/.env'
+]
+
+for env_path in env_paths:
+    if os.path.exists(env_path):
+        load_dotenv(env_path)
+        break
+else:
+    # If no .env file found, try to load from environment
+    load_dotenv()
 
 GOOGLE_MAPS_API_KEY = os.getenv('GOOGLE_MAPS_API_KEY')
 
@@ -237,6 +252,10 @@ def main():
     print("\n" + "=" * 50)
     print("USYD...")
     update_commute_time('USYD')
+    
+    print("\n" + "=" * 50)
+    print("UTS...")
+    update_commute_time('UTS')
 
 if __name__ == "__main__":
     main()

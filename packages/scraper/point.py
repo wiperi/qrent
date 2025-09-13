@@ -9,8 +9,23 @@ import glob
 import re
 from datetime import datetime
 from dotenv import load_dotenv
+import os
 
-load_dotenv('.env')
+# Try to load .env from multiple possible locations
+env_paths = [
+    '.env',
+    '../.env', 
+    '../../.env',
+    '/app/.env'
+]
+
+for env_path in env_paths:
+    if os.path.exists(env_path):
+        load_dotenv(env_path)
+        break
+else:
+    # If no .env file found, try to load from environment
+    load_dotenv()
 
 API_KEY_POINT = os.getenv('PROPERTY_RATING_API_KEY')
 MODEL_NAME = "qwen-plus-1220"
@@ -18,9 +33,10 @@ MODEL_NAME = "qwen-plus-1220"
 today_date = datetime.now()
 current_date = today_date.strftime('%y%m%d')
 
-# 两个目标文件
+# 三个目标文件
 output_file1 = f"UNSW_rentdata_{current_date}.csv"
 output_file2 = f"USYD_rentdata_{current_date}.csv"
+output_file3 = f"UTS_rentdata_{current_date}.csv"
 
 # ========== 房屋打分相关配置 ==========
 NUM_CALLS = 2         # 调用次数
@@ -328,7 +344,7 @@ def process_missing_scores_and_keywords(file_path: str):
     print(f"File processed and saved: {file_path}")
 
 def find_today_csv_files():
-    today_files = [output_file1, output_file2]
+    today_files = [output_file1, output_file2, output_file3]
     
     existing_files = []
     for file in today_files:

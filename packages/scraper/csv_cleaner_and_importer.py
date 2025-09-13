@@ -8,8 +8,23 @@ from tqdm import tqdm
 from datetime import datetime
 import glob
 from dotenv import load_dotenv
+import os
 
-load_dotenv('.env')
+# Try to load .env from multiple possible locations
+env_paths = [
+    '.env',
+    '../.env', 
+    '../../.env',
+    '/app/.env'
+]
+
+for env_path in env_paths:
+    if os.path.exists(env_path):
+        load_dotenv(env_path)
+        break
+else:
+    # If no .env file found, try to load from environment
+    load_dotenv()
 
 DB_CONFIG = {
     'host': os.getenv("DB_HOST"),
