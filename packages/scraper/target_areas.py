@@ -25,3 +25,17 @@ postcodes_usyd = [
     "ultimo-nsw-2007",
     "haymarket-nsw-2000",
 ]
+
+# Postcodes for target areas in UTS
+postcodes_uts = [
+    "sydney-city-nsw",
+    "ultimo-nsw-2007",
+    "haymarket-nsw-2000",
+    "pyrmont-nsw-2009",
+    "chippendale-nsw-2008",
+    "surry-hills-nsw-2010",
+    "redfern-nsw-2016",
+    "waterloo-nsw-2017",
+    "glebe-nsw-2037",
+    "newtown-nsw-2042",
+]

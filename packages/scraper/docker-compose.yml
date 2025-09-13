@@ -1,0 +1,84 @@
+version: '3.8'
+
+services:
+  scraper:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    restart: unless-stopped
+    container_name: qrent-scraper
+    environment:
+      - PYTHONUNBUFFERED=1
+      - DISPLAY=:99
+      # Database configuration
+      - DB_HOST=${DB_HOST:-host.docker.internal}
+      - DB_USER=${DB_USER}
+      - DB_PASSWORD=${DB_PASSWORD}
+      - DB_DATABASE=${DB_DATABASE}
+      - DB_PORT=${DB_PORT:-3306}
+      # API Keys
+      - GOOGLE_MAPS_API_KEY=${GOOGLE_MAPS_API_KEY}
+      - PROPERTY_RATING_API_KEY=${PROPERTY_RATING_API_KEY}
+    volumes:
+      - scraper_logs:/app/scraper/logs
+      - scraper_data:/app/scraper/data
+      - ./backup:/app/scraper/backup  # Local backup directory
+    # Running mode options:
+    # - run: Execute immediately once
+    # - cron-only: Start scheduled tasks only (daily at 1:00 AM)
+    # - test: Test mode
+    command: ["/usr/local/bin/docker-entrypoint.sh", "cron-only"]
+    
+    # Resource limits
+    deploy:
+      resources:
+        limits:
+          memory: 2G
+          cpus: '1.0'
+        reservations:
+          memory: 1G
+          cpus: '0.5'
+    
+    # Health check
+    healthcheck:
+      test: ["CMD", "python", "-c", "import requests; print('OK')"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+
+  # Optional: Local MySQL database (if you don't want to depend on external database)
+  # Uncomment the following section to enable local database
+  # db:
+  #   image: mysql:8.0
+  #   container_name: qrent-scraper-db
+  #   restart: unless-stopped
+  #   environment:
+  #     - MYSQL_ROOT_PASSWORD=${DB_ROOT_PASSWORD}
+  #     - MYSQL_DATABASE=${DB_DATABASE}
+  #     - MYSQL_USER=${DB_USER}
+  #     - MYSQL_PASSWORD=${DB_PASSWORD}
+  #   ports:
+  #     - '${DB_PORT:-3306}:3306'
+  #   volumes:
+  #     - db_data:/var/lib/mysql
+  #     - ./init-db:/docker-entrypoint-initdb.d
+  #   healthcheck:
+  #     test: ["CMD-SHELL", "mysqladmin ping -h localhost -u root -p$MYSQL_ROOT_PASSWORD"]
+  #     interval: 5s
+  #     timeout: 5s
+  #     retries: 20
+  #     start_period: 10s
+
+volumes:
+  scraper_logs:
+    driver: local
+  scraper_data:
+    driver: local
+  # db_data:  # If enabling local database, uncomment this
+  #   driver: local
+
+# Network configuration (if need to connect to external services)
+networks:
+  default:
+    name: qrent-scraper-network
