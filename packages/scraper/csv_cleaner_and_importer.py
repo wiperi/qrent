@@ -193,6 +193,73 @@ def get_school_id(cursor, school_name):
         print(f"error to get or create school id  {e}")
         return None
 
+def remove_delisted_properties(cursor, connection, current_house_ids, school_name, dry_run=False):
+    """Remove properties that exist in database but not in current scraping data"""
+    try:
+        school_id = get_school_id(cursor, school_name)
+        if not school_id:
+            print(f"Cannot find school: {school_name}")
+            return 0
+        
+        # Get all house_ids currently in database for this school
+        cursor.execute("""
+            SELECT DISTINCT p.house_id 
+            FROM properties p 
+            JOIN property_school ps ON p.id = ps.property_id 
+            WHERE ps.school_id = %s AND p.house_id IS NOT NULL
+        """, (school_id,))
+        
+        db_house_ids = {row[0] for row in cursor.fetchall()}
+        current_house_ids_set = set(current_house_ids)
+        
+        # Find house_ids that are in database but not in current scraping
+        delisted_house_ids = db_house_ids - current_house_ids_set
+        
+        if not delisted_house_ids:
+            print(f"✅ No delisted properties found for {school_name}")
+            return 0
+        
+        print(f"🔍 Found {len(delisted_house_ids)} delisted properties for {school_name}")
+        print(f"   Delisted house_ids: {sorted(list(delisted_house_ids))[:10]}{'...' if len(delisted_house_ids) > 10 else ''}")
+        
+        if dry_run:
+            print(f"🧪 DRY RUN: Would remove {len(delisted_house_ids)} delisted properties")
+            return len(delisted_house_ids)
+        
+        # Delete property_school relationships first
+        relationship_deleted = 0
+        for house_id in delisted_house_ids:
+            cursor.execute("""
+                DELETE ps FROM property_school ps 
+                JOIN properties p ON ps.property_id = p.id 
+                WHERE p.house_id = %s AND ps.school_id = %s
+            """, (house_id, school_id))
+            relationship_deleted += cursor.rowcount
+        
+        # Delete properties that no longer have any school relationships
+        if delisted_house_ids:
+            placeholders = ','.join(['%s'] * len(delisted_house_ids))
+            cursor.execute(f"""
+                DELETE p FROM properties p 
+                LEFT JOIN property_school ps ON p.id = ps.property_id 
+                WHERE ps.property_id IS NULL AND p.house_id IN ({placeholders})
+            """, list(delisted_house_ids))
+            
+            deleted_count = cursor.rowcount
+        else:
+            deleted_count = 0
+        
+        connection.commit()
+        
+        print(f"✨ Successfully removed {deleted_count} delisted properties for {school_name}")
+        print(f"   (Removed {relationship_deleted} school relationships)")
+        return deleted_count
+        
+    except Exception as e:
+        print(f"❌ Error removing delisted properties: {e}")
+        connection.rollback()
+        return 0
+
 def import_to_database(df, school_name):
     connection = None
     cursor = None
@@ -214,9 +281,43 @@ def import_to_database(df, school_name):
         
         print(f"school ID: {school_id}")
         
+        # Get current house_ids from scraping data
+        current_house_ids = []
+        for index, row in df.iterrows():
+            house_id = safe_int(row.get('houseId'))
+            if house_id != 0:
+                current_house_ids.append(house_id)
+        
+        print(f"Current scraping found {len(current_house_ids)} properties")
+        
+        # First do a dry run to see what would be removed
+        dry_run_count = remove_delisted_properties(cursor, connection, current_house_ids, school_name, dry_run=True)
+        
+        if dry_run_count > 0:
+            # Check if auto-delete is enabled (for Docker/automation)
+            auto_delete = os.getenv('AUTO_DELETE_DELISTED', 'false').lower() in ['true', '1', 'yes']
+            
+            if auto_delete:
+                print(f"🤖 AUTO_DELETE_DELISTED is enabled. Removing {dry_run_count} delisted properties automatically.")
+                removed_count = remove_delisted_properties(cursor, connection, current_house_ids, school_name, dry_run=False)
+            else:
+                # Interactive mode - ask user
+                try:
+                    response = input(f"⚠️  This will remove {dry_run_count} delisted properties for {school_name}. Continue? (y/N): ").strip().lower()
+                    if response in ['y', 'yes']:
+                        removed_count = remove_delisted_properties(cursor, connection, current_house_ids, school_name, dry_run=False)
+                    else:
+                        print("❌ Skipping deletion of delisted properties")
+                        removed_count = 0
+                except (EOFError, KeyboardInterrupt):
+                    print("\n❌ User cancelled. Skipping deletion of delisted properties")
+                    removed_count = 0
+        else:
+            removed_count = 0
+        
         cursor.execute("SELECT house_id FROM properties WHERE house_id IS NOT NULL")
         existing_properties = {row[0] for row in cursor.fetchall()}
-        print(f"we have {len(existing_properties)} properties")
+        print(f"Database now has {len(existing_properties)} properties (after removing {removed_count})")
         
         new_count = 0
         update_count = 0

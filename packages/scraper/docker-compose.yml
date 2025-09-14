@@ -19,6 +19,8 @@ services:
       # API Keys
       - GOOGLE_MAPS_API_KEY=${GOOGLE_MAPS_API_KEY}
       - PROPERTY_RATING_API_KEY=${PROPERTY_RATING_API_KEY}
+      # Auto-delete configuration
+      - AUTO_DELETE_DELISTED=${AUTO_DELETE_DELISTED:-true}
     volumes:
       - scraper_logs:/app/scraper/logs
       - scraper_data:/app/scraper/data

@@ -286,14 +286,14 @@ main() {
         "build")
             check_docker
             check_env_file
-            check_required_vars
+            check_required_env
             create_directories
             build_image
             ;;
         "start")
             check_docker
             check_env_file
-            check_required_vars
+            check_required_env
             start_service
             ;;
         "stop")

@@ -8,7 +8,8 @@
 - 🧹 Intelligent data cleaning and standardization
 - 📍 Google Maps API for commute time calculation
 - 🤖 AI-driven property scoring and keyword extraction
-- 🗄️ Incremental database updates
+- 🗄️ Incremental database updates with delisted property removal
+- 🔄 **Smart data synchronization** - removes properties no longer available
 - 🐳 **Completely independent Docker deployment**
 - ⏰ Scheduled task support (runs daily at 1:00 AM)
 - 🔒 Fully isolated from main application
@@ -78,6 +79,9 @@ DB_PORT=3306
 # API Keys
 GOOGLE_MAPS_API_KEY=your_google_maps_api_key
 PROPERTY_RATING_API_KEY=your_dashscope_api_key
+
+# Data Synchronization
+AUTO_DELETE_DELISTED=false  # Set to 'true' to auto-remove delisted properties
 ```
 
 ### Running Mode Configuration
@@ -129,9 +133,11 @@ Domain.com.au Property Data
          ↓
 7. UTS Commute Time Recalculation
          ↓
-8. Database Import (three universities separately)
+8. Database Synchronization (remove delisted properties) 🆕
          ↓
-9. Cleanup Temporary Files
+9. Database Import (three universities separately)
+         ↓
+10. Cleanup Temporary Files
 ```
 
 ## 🎯 Target Areas
