@@ -3,5 +3,5 @@
     "allow": ["Read(~/*)", "Search(~/*)"],
     "deny": []
   },
-  "outputStyle": "Explanatory"
+  "outputStyle": "default"
 }
