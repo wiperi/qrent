@@ -1,4 +1,4 @@
-name: Continuous Deployment
+name: CD
 
 on:
   push:
@@ -12,7 +12,7 @@ on:
       - 'package.json'
       - 'pnpm-lock.yaml'
   workflow_run:
-    workflows: ["Continuous Integration"]
+    workflows: ["CI"]
     types:
       - completed
     branches: [main, staging]
@@ -81,9 +81,9 @@ jobs:
               echo "✅ Backup created at $BACKUP_DIR"
             fi
             
-            # Keep only last 5 backups
+            # Keep only last 1 backups
             cd ~/qrent-backups
-            ls -dt backup-* | tail -n +6 | xargs -r rm -rf
+            ls -dt backup-* | tail -n +2 | xargs -r rm -rf
 
       - name: Copy files to server
         uses: appleboy/scp-action@v0.1.7
