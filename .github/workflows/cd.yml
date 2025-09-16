@@ -1,0 +1,280 @@
+name: Continuous Deployment
+
+on:
+  push:
+    branches: [main, staging]
+    paths:
+      - 'packages/backend/**'
+      - 'packages/frontend/**'
+      - 'packages/shared/**'
+      - '.github/workflows/**'
+      - 'docker-compose.yml'
+      - 'package.json'
+      - 'pnpm-lock.yaml'
+  workflow_run:
+    workflows: ["Continuous Integration"]
+    types:
+      - completed
+    branches: [main, staging]
+
+concurrency:
+  group: deployment-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  # Only deploy if CI passed
+  check-ci:
+    runs-on: ubuntu-latest
+    outputs:
+      should-deploy: ${{ steps.check.outputs.should-deploy }}
+    steps:
+      - name: Check CI status
+        id: check
+        run: |
+          if [[ "${{ github.event_name }}" == "push" ]]; then
+            echo "should-deploy=true" >> $GITHUB_OUTPUT
+          elif [[ "${{ github.event_name }}" == "workflow_run" && "${{ github.event.workflow_run.conclusion }}" == "success" ]]; then
+            echo "should-deploy=true" >> $GITHUB_OUTPUT
+          else
+            echo "should-deploy=false" >> $GITHUB_OUTPUT
+          fi
+
+  deploy:
+    runs-on: ubuntu-latest
+    needs: [check-ci]
+    if: needs.check-ci.outputs.should-deploy == 'true'
+    environment: ${{ github.ref == 'refs/heads/main' && 'production' || 'staging' }}
+    
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set deployment environment
+        run: |
+          if [[ "${{ github.ref }}" == "refs/heads/main" ]]; then
+            echo "DEPLOY_ENV=production" >> $GITHUB_ENV
+            echo "🚀 Deploying to PRODUCTION"
+          else
+            echo "DEPLOY_ENV=staging" >> $GITHUB_ENV
+            echo "🧪 Deploying to STAGING"
+          fi
+
+      - name: Create deployment backup point
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{ secrets.DEPLOY_SERVER_HOST }}
+          username: ${{ secrets.DEPLOY_SERVER_USERNAME }}
+          password: ${{ secrets.DEPLOY_SERVER_PASSWORD }}
+          script: |
+            cd ~/qrent/
+            
+            # Create backup directory if not exists
+            mkdir -p ~/qrent-backups
+            
+            # Create timestamped backup
+            BACKUP_DIR=~/qrent-backups/backup-$(date +%Y%m%d-%H%M%S)
+            echo "Creating backup at $BACKUP_DIR"
+            
+            # Backup current deployment
+            if [ -d ~/qrent ]; then
+              cp -r ~/qrent $BACKUP_DIR
+              echo "✅ Backup created at $BACKUP_DIR"
+            fi
+            
+            # Keep only last 5 backups
+            cd ~/qrent-backups
+            ls -dt backup-* | tail -n +6 | xargs -r rm -rf
+
+      - name: Copy files to server
+        uses: appleboy/scp-action@v0.1.7
+        with:
+          host: ${{ secrets.DEPLOY_SERVER_HOST }}
+          username: ${{ secrets.DEPLOY_SERVER_USERNAME }}
+          password: ${{ secrets.DEPLOY_SERVER_PASSWORD }}
+          source: '.,!node_modules,!packages/*/node_modules,!.git'
+          target: '~/qrent-new/'
+          rm: true
+
+      - name: Deploy application with health checks
+        id: deploy
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{ secrets.DEPLOY_SERVER_HOST }}
+          username: ${{ secrets.DEPLOY_SERVER_USERNAME }}
+          password: ${{ secrets.DEPLOY_SERVER_PASSWORD }}
+          script: |
+            set -e  # Exit on any error
+            
+            cd ~/qrent-new/
+            
+            # Create environment file
+            touch .env
+            cat > .env << EOL
+            BACKEND_JWT_SECRET_KEY=${{ secrets.BACKEND_JWT_SECRET_KEY }}
+            BACKEND_LISTEN_HOST=${{ secrets.BACKEND_LISTEN_HOST}}
+            BACKEND_LISTEN_PORT=${{ secrets.BACKEND_LISTEN_PORT }}
+            DB_DATABASE_NAME=${{ secrets.DB_DATABASE_NAME }}
+            DB_PORT=${{ secrets.DB_PORT }}
+            DB_PROPERTY_USER_PASSWORD=${{ secrets.DB_PROPERTY_USER_PASSWORD }}
+            DB_ROOT_PASSWORD=${{ secrets.DB_ROOT_PASSWORD }}
+            DEEPSEEK_API_KEY=${{ secrets.DEEPSEEK_API_KEY }}
+            DATABASE_URL=mysql://root:${{ secrets.DB_ROOT_PASSWORD }}@db:3306/${{ secrets.DB_DATABASE_NAME }}
+            NSW_TRANSPORT_API_KEY=${{ secrets.NSW_TRANSPORT_API_KEY }}
+            SENDGRID_API_KEY=${{ secrets.SENDGRID_API_KEY }}
+            REDIS_PORT=${{ secrets.REDIS_PORT }}
+            REDIS_URL=${{ secrets.REDIS_URL }}
+            EOL
+            
+            echo "🔧 Building new deployment..."
+            docker compose build --no-cache
+            
+            echo "🚀 Starting new deployment..."
+            docker compose up -d
+            
+            echo "⏳ Waiting for services to be healthy..."
+            timeout 120 bash -c '
+              while ! docker compose ps | grep -q "healthy"; do 
+                echo "Waiting for health checks..."
+                sleep 5
+              done
+            '
+            
+            # Advanced health checks
+            echo "🔍 Running health checks..."
+            
+            # Check backend API health
+            for i in {1..20}; do
+              response=$(curl -s -o /dev/null -w "%{http_code}" localhost:${{ secrets.BACKEND_LISTEN_PORT }}/echo || echo "000")
+              if [ "$response" == "200" ]; then
+                echo "✅ Backend API health check passed"
+                break
+              else
+                echo "🔄 Attempt $i: Backend not ready (status: $response), retrying in 5s..."
+                sleep 5
+              fi
+              if [ "$i" -eq 20 ]; then
+                echo "❌ Backend health check failed after 20 attempts"
+                exit 1
+              fi
+            done
+            
+            # Check database connectivity
+            DB_CHECK=$(docker compose exec -T backend sh -c 'timeout 10 node -e "
+              const { PrismaClient } = require(\"@prisma/client\");
+              const prisma = new PrismaClient();
+              prisma.\$queryRaw\`SELECT 1\`.then(() => {
+                console.log(\"DB_OK\");
+                process.exit(0);
+              }).catch(() => process.exit(1));
+            "' 2>/dev/null || echo "DB_ERROR")
+            
+            if [ "$DB_CHECK" == "DB_OK" ]; then
+              echo "✅ Database connectivity check passed"
+            else
+              echo "❌ Database connectivity check failed"
+              exit 1
+            fi
+            
+            # Check Redis connectivity
+            REDIS_CHECK=$(docker compose exec -T redis redis-cli ping 2>/dev/null || echo "REDIS_ERROR")
+            if [ "$REDIS_CHECK" == "PONG" ]; then
+              echo "✅ Redis connectivity check passed"
+            else
+              echo "❌ Redis connectivity check failed"
+              exit 1
+            fi
+            
+            echo "🎉 All health checks passed! Deployment successful."
+
+      - name: Finalize deployment
+        if: steps.deploy.outcome == 'success'
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{ secrets.DEPLOY_SERVER_HOST }}
+          username: ${{ secrets.DEPLOY_SERVER_USERNAME }}
+          password: ${{ secrets.DEPLOY_SERVER_PASSWORD }}
+          script: |
+            # Stop old deployment
+            cd ~/qrent/ 2>/dev/null && docker compose down --remove-orphans || true
+            
+            # Replace old with new
+            rm -rf ~/qrent-old 2>/dev/null || true
+            mv ~/qrent ~/qrent-old 2>/dev/null || true
+            mv ~/qrent-new ~/qrent
+            
+            # Cleanup
+            cd ~/qrent/
+            docker system prune -f --volumes
+            docker image prune -f
+            
+            echo "🎯 Deployment finalized successfully"
+
+      - name: Rollback on failure
+        if: steps.deploy.outcome == 'failure'
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{ secrets.DEPLOY_SERVER_HOST }}
+          username: ${{ secrets.DEPLOY_SERVER_USERNAME }}
+          password: ${{ secrets.DEPLOY_SERVER_PASSWORD }}
+          script: |
+            echo "💥 Deployment failed, initiating rollback..."
+            
+            # Stop failed deployment
+            cd ~/qrent-new/ && docker compose down --remove-orphans || true
+            
+            # Restore from backup if exists
+            LATEST_BACKUP=$(ls -dt ~/qrent-backups/backup-* 2>/dev/null | head -1 || echo "")
+            if [ -n "$LATEST_BACKUP" ]; then
+              echo "📦 Restoring from backup: $LATEST_BACKUP"
+              cd ~/qrent/ && docker compose down --remove-orphans
+              rm -rf ~/qrent-rollback 2>/dev/null || true
+              cp -r "$LATEST_BACKUP" ~/qrent-rollback
+              rm -rf ~/qrent
+              mv ~/qrent-rollback ~/qrent
+              cd ~/qrent/
+              docker compose up -d
+              echo "🔄 Rollback completed"
+            else
+              echo "⚠️ No backup found, manual intervention required"
+            fi
+            
+            # Clean up failed deployment
+            rm -rf ~/qrent-new
+
+      - name: Post-deployment smoke tests
+        if: steps.deploy.outcome == 'success'
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{ secrets.DEPLOY_SERVER_HOST }}
+          username: ${{ secrets.DEPLOY_SERVER_USERNAME }}
+          password: ${{ secrets.DEPLOY_SERVER_PASSWORD }}
+          script: |
+            echo "🧪 Running post-deployment smoke tests..."
+            
+            # Test API endpoints
+            curl -f localhost:${{ secrets.BACKEND_LISTEN_PORT }}/echo || exit 1
+            
+            # Test database operations (basic query)
+            docker compose exec -T backend sh -c 'node -e "
+              const { PrismaClient } = require(\"@prisma/client\");
+              const prisma = new PrismaClient();
+              prisma.user.count().then(count => {
+                console.log(\"User count:\", count);
+                process.exit(0);
+              }).catch(e => {
+                console.error(\"Database test failed:\", e.message);
+                process.exit(1);
+              });
+            "' || exit 1
+            
+            echo "✅ All smoke tests passed!"
+
+      - name: Notify deployment status
+        if: always()
+        run: |
+          if [[ "${{ steps.deploy.outcome }}" == "success" ]]; then
+            echo "🎉 Deployment to ${{ env.DEPLOY_ENV }} completed successfully!"
+          else
+            echo "💥 Deployment to ${{ env.DEPLOY_ENV }} failed and rollback initiated"
+            exit 1
+          fi

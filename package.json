@@ -5,7 +5,7 @@
     "start:backend": "pnpm --filter backend start",
     "dev:backend": "pnpm --filter backend dev",
     "test:backend": "pnpm --filter backend test",
-    "dev:frontend": "pnpm --filter frontend-v2 dev",
+    "dev:frontend": "pnpm --filter frontend dev",
     "build": "pnpm -r build",
     "dev": "pnpm -r dev",
     "test": "pnpm -r test",
