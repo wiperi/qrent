@@ -1,5 +1,5 @@
 tt*
-
+.reports/
 # I don't know why these are being ignored
 # *.json
 # !package.json
