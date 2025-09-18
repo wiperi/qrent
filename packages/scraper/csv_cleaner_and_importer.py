@@ -178,15 +178,30 @@ def get_or_create_region(cursor, connection, region_info):
         print(f"error in creat region: {e}")
         return None
 
+def normalize_school_name(school_name):
+    """Normalize school names to use short names"""
+    name_mapping = {
+        'UNSW': 'UNSW',
+        'University of New South Wales': 'UNSW',
+        'USYD': 'USYD', 
+        'University of Sydney': 'USYD',
+        'UTS': 'UTS',
+        'University of Technology Sydney': 'UTS'
+    }
+    return name_mapping.get(school_name, school_name)
+
 def get_school_id(cursor, school_name):
     try:
-        cursor.execute("SELECT id FROM schools WHERE name = %s", (school_name,))
+        # Normalize school name first
+        normalized_name = normalize_school_name(school_name)
+        
+        cursor.execute("SELECT id FROM schools WHERE name = %s", (normalized_name,))
         result = cursor.fetchone()
         if result:
             return result[0]
-        cursor.execute("INSERT INTO schools (name) VALUES (%s)", (school_name,))
+        cursor.execute("INSERT INTO schools (name) VALUES (%s)", (normalized_name,))
         cursor.connection.commit() if hasattr(cursor, 'connection') else None
-        cursor.execute("SELECT id FROM schools WHERE name = %s", (school_name,))
+        cursor.execute("SELECT id FROM schools WHERE name = %s", (normalized_name,))
         result = cursor.fetchone()
         return result[0] if result else None
     except Exception as e:
@@ -194,7 +209,7 @@ def get_school_id(cursor, school_name):
         return None
 
 def remove_delisted_properties(cursor, connection, current_house_ids, school_name, dry_run=False):
-    """Remove properties that exist in database but not in current scraping data"""
+    """Remove properties that exist in database but not in current scraping data for this school"""
     try:
         school_id = get_school_id(cursor, school_name)
         if not school_id:
@@ -226,7 +241,7 @@ def remove_delisted_properties(cursor, connection, current_house_ids, school_nam
             print(f"🧪 DRY RUN: Would remove {len(delisted_house_ids)} delisted properties")
             return len(delisted_house_ids)
         
-        # Delete property_school relationships first
+        # First, remove property_school relationships for this school
         relationship_deleted = 0
         for house_id in delisted_house_ids:
             cursor.execute("""
@@ -236,23 +251,33 @@ def remove_delisted_properties(cursor, connection, current_house_ids, school_nam
             """, (house_id, school_id))
             relationship_deleted += cursor.rowcount
         
-        # Delete properties that no longer have any school relationships
-        if delisted_house_ids:
-            placeholders = ','.join(['%s'] * len(delisted_house_ids))
-            cursor.execute(f"""
-                DELETE p FROM properties p 
-                LEFT JOIN property_school ps ON p.id = ps.property_id 
-                WHERE ps.property_id IS NULL AND p.house_id IN ({placeholders})
-            """, list(delisted_house_ids))
+        # Then, delete properties that no longer have ANY school relationships
+        properties_to_delete = []
+        for house_id in delisted_house_ids:
+            cursor.execute("""
+                SELECT COUNT(*) FROM property_school ps 
+                JOIN properties p ON ps.property_id = p.id 
+                WHERE p.house_id = %s
+            """, (house_id,))
             
+            relationship_count = cursor.fetchone()[0]
+            if relationship_count == 0:
+                properties_to_delete.append(house_id)
+        
+        # Delete properties that have no school relationships left
+        deleted_count = 0
+        if properties_to_delete:
+            placeholders = ','.join(['%s'] * len(properties_to_delete))
+            cursor.execute(f"""
+                DELETE FROM properties WHERE house_id IN ({placeholders})
+            """, properties_to_delete)
             deleted_count = cursor.rowcount
-        else:
-            deleted_count = 0
         
         connection.commit()
         
         print(f"✨ Successfully removed {deleted_count} delisted properties for {school_name}")
         print(f"   (Removed {relationship_deleted} school relationships)")
+        print(f"   (Properties with other school relationships were preserved)")
         return deleted_count
         
     except Exception as e:
@@ -415,11 +440,11 @@ def import_to_database(df, school_name):
                     commute_time = None
                     raw_commute_value = None
                     
-                    if school_name == 'University of New South Wales':
+                    if school_name == 'UNSW':
                         raw_commute_value = row.get('commuteTime_UNSW')
-                    elif school_name == 'University of Sydney':
+                    elif school_name == 'USYD':
                         raw_commute_value = row.get('commuteTime_USYD')
-                    elif school_name == 'University of Technology Sydney':
+                    elif school_name == 'UTS':
                         raw_commute_value = row.get('commuteTime_UTS')
                     
                     if raw_commute_value is not None and not pd.isna(raw_commute_value):
@@ -487,11 +512,11 @@ def import_to_database(df, school_name):
 
 def process_csv_file(csv_file, clean_only=False):
     if 'UNSW' in csv_file.upper():
-        school_name = 'University of New South Wales'
+        school_name = 'UNSW'
     elif 'USYD' in csv_file.upper():
-        school_name = 'University of Sydney'
+        school_name = 'USYD'
     elif 'UTS' in csv_file.upper():
-        school_name = 'University of Technology Sydney'
+        school_name = 'UTS'
     else:
         print(f"cannot find : {csv_file}")
         return
