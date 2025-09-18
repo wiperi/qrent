@@ -85,6 +85,58 @@ def fetch_db_data():
         print(f"Database error: {e}")
         return pd.DataFrame()
 
+def fetch_db_data_by_house_ids(house_ids):
+    """Fetch database data only for specific house IDs to avoid processing all properties"""
+    if not house_ids:
+        print("No house IDs provided, returning empty DataFrame")
+        return pd.DataFrame()
+    
+    try:
+        connection = mysql.connector.connect(
+            host=DB_HOST,
+            user=DB_USER,
+            password=DB_PASSWORD,
+            database=DB_DATABASE,
+            port=DB_PORT
+        )
+        if connection.is_connected():
+            cursor = connection.cursor(dictionary=True)
+            
+            cursor.execute("DESCRIBE properties")
+            columns_info = cursor.fetchall()
+            available_columns = [col['Field'] for col in columns_info]
+            
+            desired_columns = [
+                'house_id', 'description_en', 'available_date', 
+                'published_at', 'keywords', 'average_score', 
+                'url', 'description_cn'
+            ]
+            
+            existing_columns = [col for col in desired_columns if col in available_columns]
+            
+            if not existing_columns:
+                print("No required columns found in database")
+                return pd.DataFrame()
+            
+            # Create placeholders for the IN clause
+            placeholders = ', '.join(['%s'] * len(house_ids))
+            columns_str = ', '.join(existing_columns)
+            sql = f"SELECT {columns_str} FROM properties WHERE house_id IN ({placeholders})"
+            
+            cursor.execute(sql, house_ids)
+            db_data = cursor.fetchall()
+            cursor.close()
+            connection.close()
+            
+            print(f"Successfully fetched data for {len(db_data)} properties out of {len(house_ids)} requested")
+            return pd.DataFrame(db_data)
+        else:
+            print("Cannot connect to the database")
+            return pd.DataFrame()
+    except Error as e:
+        print(f"Database error: {e}")
+        return pd.DataFrame()
+
 def scrape_property_data(university):
     current_date = datetime.now().strftime('%y%m%d')
     today_file = f"{university}_rentdata_cleaned_{current_date}.csv"
@@ -123,7 +175,8 @@ def scrape_property_data(university):
             print("Warning: 'houseId' column not found in data files. Cannot map from yesterday's data.")
     else:
         print(f"No previous day's data found: {yesterday_file}")
-        db_df = fetch_db_data()
+        print("Fetching existing data from database for today's scraped properties only")
+        db_df = fetch_db_data_by_house_ids(today_data['houseId'].tolist() if 'houseId' in today_data.columns else [])
         if not db_df.empty:
             if 'houseId' in today_data.columns:
                 db_df_unique = db_df.drop_duplicates(subset=['house_id'], keep='first')
@@ -144,7 +197,11 @@ def scrape_property_data(university):
             else:
                 print("Warning: 'houseId' column not found in CSV data. Skipping DB mapping.")
         else:
-            print("No data retrieved from the database. Skipping DB mapping.")
+            print("No matching data retrieved from the database. Initializing with None values.")
+            all_required_cols = ['description_en', 'available_date', 'published_at', 'keywords', 'average_score', 'url', 'description_cn']
+            for col in all_required_cols:
+                if col not in today_data.columns:
+                    today_data[col] = None
 
     if 'description_en' not in today_data.columns:
         today_data['description_en'] = None
