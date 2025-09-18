@@ -1,65 +1,56 @@
-import js from '@eslint/js';
-import tseslint from '@typescript-eslint/eslint-plugin';
-import tsparser from '@typescript-eslint/parser';
+import { dirname } from "path";
+import { fileURLToPath } from "url";
+import { FlatCompat } from "@eslint/eslintrc";
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = dirname(__filename);
+
+const compat = new FlatCompat({
+  baseDirectory: __dirname,
+});
 
 export default [
-  // Base configuration for all files
-  js.configs.recommended,
-  
-  // TypeScript configuration
+  // Next.js recommended configs for frontend packages
+  ...compat.extends("next/core-web-vitals", "next/typescript"),
+
+  // Custom configuration for all TypeScript files in src/
   {
-    files: ['**/*.ts', '**/*.tsx'],
-    languageOptions: {
-      parser: tsparser,
-      parserOptions: {
-        ecmaVersion: 'latest',
-        sourceType: 'module',
-      },
-    },
-    plugins: {
-      '@typescript-eslint': tseslint,
-    },
+    files: ['**/src/**/*.ts', '**/src/**/*.tsx'],
     rules: {
-      // TypeScript specific rules
+      // Custom rules
       '@typescript-eslint/no-unused-vars': 'error',
       '@typescript-eslint/no-explicit-any': 'warn',
-      '@typescript-eslint/no-inferrable-types': 'error',
-      
-      // General rules
       'no-console': 'warn',
       'no-debugger': 'error',
       'prefer-const': 'error',
       'no-var': 'error',
     },
   },
-  
-  // JavaScript configuration
+
+  // Backend specific rules (no React rules)
   {
-    files: ['**/*.js', '**/*.mjs'],
-    languageOptions: {
-      ecmaVersion: 'latest',
-      sourceType: 'module',
-    },
+    files: ['packages/backend/src/**/*.ts'],
     rules: {
-      'no-unused-vars': 'error',
-      'no-console': 'warn',
-      'no-debugger': 'error',
-      'prefer-const': 'error',
-      'no-var': 'error',
+      'no-console': 'off', // Allow console in backend
     },
   },
-  
+
   // Ignore patterns
   {
     ignores: [
-      'node_modules/**',
-      'dist/**',
-      'build/**',
-      '.next/**',
+      '**/node_modules/**',
+      '**/dist/**',
+      '**/build/**',
+      '**/.next/**',
+      '**/.vercel/**',
       'coverage/**',
       '*.min.js',
-      'docker/**',
-      'scripts/**',
+      '**/docker/**',
+      '**/scripts/**',
+      'packages/shared/prisma/migrations/**',
+      'packages/frontend/test/**',
+      'packages/backend/test/**',
+      '**/test/**',
     ],
   },
 ];

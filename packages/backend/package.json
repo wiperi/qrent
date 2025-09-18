@@ -19,7 +19,7 @@
   "dependencies": {
     "@qrent/shared": "workspace:*",
     "@sendgrid/mail": "^8.1.5",
-    "@trpc/server": "^11.4.4",
+    "@trpc/server": "^11.5.1",
     "@types/bcrypt": "^6.0.0",
     "@types/cors": "^2.8.17",
     "@types/express": "^5.0.0",
