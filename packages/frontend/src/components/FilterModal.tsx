@@ -1,9 +1,9 @@
 'use client'
 
-import { useEffect, useMemo, useRef, useState } from 'react'
-import { usePathname, useRouter, useSearchParams } from 'next/navigation'
-import { HiX } from 'react-icons/hi'
 import { PROPERTY_TYPE } from '@qrent/shared/enum'
+import { usePathname, useRouter, useSearchParams } from 'next/navigation'
+import { useEffect, useMemo, useRef, useState } from 'react'
+import { HiX } from 'react-icons/hi'
 
 // const UNIVERSITY_OPTIONS = ['UNSW', 'UTS', 'USYD'] as const
 const PROPERTY_TYPES = [
@@ -14,18 +14,18 @@ const PROPERTY_TYPES = [
 // University to regions mapping based on suburbOptions.ts
 const UNIVERSITY_REGIONS = {
   UNSW: [
-    'alexandria', 'bondi', 'botany', 'coogee', 'eastgardens', 'eastlakes', 
-    'hillsdale', 'kensington', 'kingsford', 'maroubra', 'mascot', 'matraville', 
+    'alexandria', 'bondi', 'botany', 'coogee', 'eastgardens', 'eastlakes',
+    'hillsdale', 'kensington', 'kingsford', 'maroubra', 'mascot', 'matraville',
     'paddington', 'randwick', 'redfern', 'rosebery', 'waterloo', 'zetland'
   ],
   USYD: [
-    'burwood', 'chippendale', 'city', 'glebe', 'haymarket', 'hurstville', 
+    'burwood', 'chippendale', 'city', 'glebe', 'haymarket', 'hurstville',
     'mascot', 'newtown', 'ultimo', 'waterloo', 'zetland'
   ],
   UTS: [
-    'sydney', 'mascot', 'zetland', 'chippendale', 'surry hills', 'burwood', 
-    'waterloo', 'hurstville', 'strathfield', 'pyrmont', 'marrickville', 
-    'darlinghurst', 'haymarket', 'paddington', 'ultimo', 'redfern', 
+    'sydney', 'mascot', 'zetland', 'chippendale', 'surry hills', 'burwood',
+    'waterloo', 'hurstville', 'strathfield', 'pyrmont', 'marrickville',
+    'darlinghurst', 'haymarket', 'paddington', 'ultimo', 'redfern',
     'glebe', 'kensington', 'newtown'
   ]
 } as const
@@ -68,7 +68,7 @@ export default function FilterModal() {
     setRating(Number(searchParams.get('rating') || 13))
     setMoveInDate(searchParams.get('moveInDate') || '')
     setAreas((searchParams.get('areas') || '').split(',').filter(Boolean))
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isOpen])
 
   // Scroll lock & basic focus handling
@@ -107,17 +107,17 @@ export default function FilterModal() {
 
     // Update URL params but keep modal open
     const params = new URLSearchParams(searchParams.toString())
-    ;[
-      'university',
-      'propertyType',
-      'priceMin', 'priceMax',
-      'bedroomsMin', 'bedroomsMax',
-      'bathroomsMin', 'bathroomsMax',
-      'commuteMin', 'commuteMax',
-      'rating',
-      'moveInDate',
-      'areas',
-    ].forEach(k => params.delete(k))
+      ;[
+        'university',
+        'propertyType',
+        'priceMin', 'priceMax',
+        'bedroomsMin', 'bedroomsMax',
+        'bathroomsMin', 'bathroomsMax',
+        'commuteMin', 'commuteMax',
+        'rating',
+        'moveInDate',
+        'areas',
+      ].forEach(k => params.delete(k))
     // keep modal open
     params.set('filters', 'open')
     const href = `${pathname}?${params.toString()}`
@@ -179,7 +179,7 @@ export default function FilterModal() {
         role="dialog"
         aria-modal="true"
         aria-labelledby="filter-modal-title"
-        className="absolute inset-x-0 top-0 mx-auto mt-28 w-[min(900px,92vw)] overflow-hidden rounded-2xl bg-white shadow-2xl"
+        className="absolute inset-x-0 top-0 mx-auto mt-2 sm:mt-4 md:mt-8 lg:mt-12 w-[min(900px,92vw)] max-h-[92vh] overflow-hidden rounded-2xl bg-white shadow-2xl"
       >
         {/* Header */}
         <div className="flex items-center justify-between border-b px-5 py-3">
@@ -195,7 +195,7 @@ export default function FilterModal() {
         </div>
 
         {/* Content */}
-        <div className="max-h-[70vh] overflow-y-auto px-5 py-4 space-y-6">
+        <div className="max-h-[calc(92vh-120px)] overflow-y-auto px-5 py-4 space-y-6">
           {/* University (single-select) */}
           {/* <section>
             <h3 className="text-sm font-medium text-slate-800 mb-3">University</h3>
@@ -222,9 +222,8 @@ export default function FilterModal() {
               <button
                 type="button"
                 onClick={() => setSelectedType(null)}
-                className={`rounded-xl border px-3 py-2 text-sm font-medium transition ${
-                  selectedType === null ? 'border-blue-500 text-blue-600 bg-blue-50' : 'border-slate-200 text-slate-700 hover:border-blue-300'
-                }`}
+                className={`rounded-xl border px-3 py-2 text-sm font-medium transition ${selectedType === null ? 'border-blue-500 text-blue-600 bg-blue-50' : 'border-slate-200 text-slate-700 hover:border-blue-300'
+                  }`}
               >
                 Any
               </button>
@@ -233,9 +232,8 @@ export default function FilterModal() {
                   key={t.key}
                   type="button"
                   onClick={() => selectType(t.key)}
-                  className={`rounded-xl border px-3 py-2 text-sm font-medium transition ${
-                    selectedType === t.key ? 'border-blue-500 text-blue-600 bg-blue-50' : 'border-slate-200 text-slate-700 hover:border-blue-300'
-                  }`}
+                  className={`rounded-xl border px-3 py-2 text-sm font-medium transition ${selectedType === t.key ? 'border-blue-500 text-blue-600 bg-blue-50' : 'border-slate-200 text-slate-700 hover:border-blue-300'
+                    }`}
                 >
                   {t.label}
                 </button>
@@ -328,9 +326,8 @@ export default function FilterModal() {
                   key={region}
                   type="button"
                   onClick={() => toggleArea(region)}
-                  className={`rounded-xl border px-3 py-2 text-sm font-medium transition capitalize ${
-                    areas.includes(region) ? 'border-blue-500 text-blue-600 bg-blue-50' : 'border-slate-200 text-slate-700 hover:border-blue-300'
-                  }`}
+                  className={`rounded-xl border px-3 py-2 text-sm font-medium transition capitalize ${areas.includes(region) ? 'border-blue-500 text-blue-600 bg-blue-50' : 'border-slate-200 text-slate-700 hover:border-blue-300'
+                    }`}
                 >
                   {region.replace('-', ' ')}
                 </button>
