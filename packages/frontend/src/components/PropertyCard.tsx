@@ -55,11 +55,9 @@ export default function PropertyCard({
   const keywordList = keywords.trim() ? keywords.split(' ').filter(Boolean).slice(0, 10) : [];
 
   const getScoreColor = (score: number): string => {
+    if (score >= 18.3) return 'bg-orange-600 text-white';
     if (score >= 18) return 'bg-orange-500 text-white';
-    if (score >= 15) return 'bg-purple-500 text-white';
-    if (score >= 10) return 'bg-blue-500 text-white';
-    if (score >= 5) return 'bg-green-500 text-white';
-    return 'bg-gray-300 text-gray-700';
+    return 'bg-orange-400 text-white';
   };
 
   const formatAvailableDate = (date: string | null | undefined): string | null => {
