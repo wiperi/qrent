@@ -20,29 +20,114 @@ export default function SearchBar() {
   const searchParams = useSearchParams();
 
   // First-level filter states
-  const [targetSchool, setTargetSchool] = useState<string>('UNSW');
+  const [targetSchool, setTargetSchool] = useState<string>('');
   const [maxPrice, setMaxPrice] = useState<string>('');
   const [commuteTime, setCommuteTime] = useState<string>('');
   const [numBedrooms, setNumBedrooms] = useState<string>('');
 
-  // Initialize first-level filters from URL parameters
+  // Load from localStorage on mount, with URL taking precedence
   useEffect(() => {
-    setTargetSchool(searchParams.get('university') || 'UNSW');
-    setMaxPrice(searchParams.get('priceMax') || '');
-    setCommuteTime(searchParams.get('commuteMax') || '');
-    setNumBedrooms(searchParams.get('bedroomsMax') || '');
+    try {
+      const savedFilters = localStorage.getItem('searchFilters');
+      if (savedFilters) {
+        const { targetSchool: lsSchool, maxPrice: lsPrice, commuteTime: lsCommute, numBedrooms: lsBedrooms } =
+          JSON.parse(savedFilters) || {};
+
+        const urlSchool = searchParams.get('university');
+        const urlPrice = searchParams.get('priceMax');
+        const urlCommute = searchParams.get('commuteMax');
+        const urlBedroomsMax = searchParams.get('bedroomsMax');
+        const urlBedroomsMin = searchParams.get('bedroomsMin');
+
+        setTargetSchool(urlSchool || lsSchool || SCHOOL.UNSW);
+        setMaxPrice(urlPrice || lsPrice || '');
+        setCommuteTime(urlCommute || lsCommute || '');
+
+        // 初始化卧室逻辑：优先 Max；否则用 Min（Min>=5 视为 '5'）；否则用 localStorage；否则空
+        const initBedrooms =
+          urlBedroomsMax ||
+          (urlBedroomsMin && parseInt(urlBedroomsMin) >= 5 ? '5' : urlBedroomsMin) ||
+          lsBedrooms ||
+          '';
+        setNumBedrooms(initBedrooms);
+      } else {
+        // 无 localStorage 时完全从 URL 推断；没有时落到默认
+        const urlSchool = searchParams.get('university');
+        const urlPrice = searchParams.get('priceMax');
+        const urlCommute = searchParams.get('commuteMax');
+        const urlBedroomsMax = searchParams.get('bedroomsMax');
+        const urlBedroomsMin = searchParams.get('bedroomsMin');
+
+        setTargetSchool(urlSchool || SCHOOL.UNSW);
+        setMaxPrice(urlPrice || '');
+        setCommuteTime(urlCommute || '');
+
+        const initBedrooms =
+          urlBedroomsMax ||
+          (urlBedroomsMin && parseInt(urlBedroomsMin) >= 5 ? '5' : urlBedroomsMin) ||
+          '';
+        setNumBedrooms(initBedrooms);
+      }
+    } catch (error) {
+      console.error('Failed to parse search filters from localStorage', error);
+
+      // JSON 解析异常时：URL 优先，否则默认
+      const urlSchool = searchParams.get('university');
+      const urlPrice = searchParams.get('priceMax');
+      const urlCommute = searchParams.get('commuteMax');
+      const urlBedroomsMax = searchParams.get('bedroomsMax');
+      const urlBedroomsMin = searchParams.get('bedroomsMin');
+
+      setTargetSchool(urlSchool || SCHOOL.UNSW);
+      setMaxPrice(urlPrice || '');
+      setCommuteTime(urlCommute || '');
+
+      const initBedrooms =
+        urlBedroomsMax ||
+        (urlBedroomsMin && parseInt(urlBedroomsMin) >= 5 ? '5' : urlBedroomsMin) ||
+        '';
+      setNumBedrooms(initBedrooms);
+    }
+    // 仅首挂载执行一次
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  // Save to localStorage whenever filters change
+  useEffect(() => {
+    const filters = { targetSchool, maxPrice, commuteTime, numBedrooms };
+    localStorage.setItem('searchFilters', JSON.stringify(filters));
+  }, [targetSchool, maxPrice, commuteTime, numBedrooms]);
+
+  // URL params always take precedence: 每次 URL 变化都同步到状态（不会造成循环）
+  useEffect(() => {
+    const university = searchParams.get('university');
+    const priceMax = searchParams.get('priceMax');
+    const commuteMax = searchParams.get('commuteMax');
+    const bedroomsMax = searchParams.get('bedroomsMax');
+    const bedroomsMin = searchParams.get('bedroomsMin');
+
+    if (university !== null) setTargetSchool(university || '');
+    if (priceMax !== null) setMaxPrice(priceMax || '');
+    if (commuteMax !== null) setCommuteTime(commuteMax || '');
+
+    if (bedroomsMax !== null) {
+      setNumBedrooms(bedroomsMax || '');
+    } else if (bedroomsMin !== null) {
+      if (bedroomsMin && parseInt(bedroomsMin) >= 5) setNumBedrooms('5');
+      else setNumBedrooms(bedroomsMin || '');
+    }
   }, [searchParams]);
 
+  // 可访问性：URL 变化时把焦点移到结果标题
   useEffect(() => {
     const heading = document.getElementById('results-heading') as HTMLHeadingElement | null;
     if (heading) heading.focus();
   }, [searchParams]);
 
-  const onSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
+  // 统一的 URL 参数更新逻辑（Search 与 Filter 复用）
+  const updateUrlParams = () => {
     const params = new URLSearchParams(searchParams.toString());
 
-    // Set first-level filter parameters
     const setOrDelete = (key: string, val: string) => {
       if (val && val.trim() !== '') params.set(key, val);
       else params.delete(key);
@@ -52,13 +137,29 @@ export default function SearchBar() {
     setOrDelete('priceMax', maxPrice);
     setOrDelete('commuteMax', commuteTime);
     setOrDelete('bedroomsMin', numBedrooms);
-    
-    if (parseInt(numBedrooms) < 5) {
-      setOrDelete('bedroomsMax', numBedrooms);
+
+    // “5+” 规则：<5 才写 Max；选择 5+ 时删除 Max
+    if (numBedrooms && parseInt(numBedrooms) < 5) {
+      params.set('bedroomsMax', numBedrooms);
+    } else {
+      params.delete('bedroomsMax');
     }
 
+    return params;
+  };
+
+  const onSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    const params = updateUrlParams();
     params.set('page', '1');
     router.push(`/search?${params.toString()}`);
+  };
+
+  const onFilterClick = () => {
+    const params = updateUrlParams();
+    params.set('filters', 'open');
+    const href = pathname === '/search' ? `/search?${params.toString()}` : `${pathname}?${params.toString()}`;
+    router.replace(href);
   };
 
   return (
@@ -150,29 +251,7 @@ export default function SearchBar() {
           {/* Filter Button */}
           <button
             type="button"
-            onClick={() => {
-              const params = new URLSearchParams(searchParams.toString());
-
-              // Set first-level filter values before opening modal
-              const setOrDelete = (key: string, val: string) => {
-                if (val && val.trim() !== '') params.set(key, val);
-                else params.delete(key);
-              };
-
-              setOrDelete('university', targetSchool);
-              setOrDelete('priceMax', maxPrice);
-              setOrDelete('commuteMax', commuteTime);
-              setOrDelete('bedroomsMax', numBedrooms);
-
-              if (pathname === '/search') {
-                params.set('filters', 'open');
-                router.replace(`/search?${params.toString()}`);
-              } else {
-                params.set('filters', 'open');
-                const href = params.toString() ? `${pathname}?${params.toString()}` : pathname;
-                router.replace(href);
-              }
-            }}
+            onClick={onFilterClick}
             className="inline-flex items-center justify-center gap-1.5 rounded-xl border border-slate-200 bg-white px-3 py-2.5 text-sm font-medium text-slate-700 hover:border-blue-300 hover:text-blue-600 transition flex-shrink-0"
           >
             <HiAdjustments className="h-4 w-4" />
