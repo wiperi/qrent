@@ -1,5 +1,6 @@
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
+import rehypeRaw from 'rehype-raw';
 import { markdownComponents } from '@/lib/markdown-components';
 import type { BlogPost } from '@/types/blog';
 import Link from 'next/link';
@@ -60,6 +61,7 @@ export default function BlogPostContent({ post }: BlogPostContentProps) {
           <div className="prose prose-lg max-w-none">
             <ReactMarkdown
               remarkPlugins={[remarkGfm]}
+              rehypePlugins={[rehypeRaw]}
               components={markdownComponents}
             >
               {post.content}
