@@ -1,0 +1,353 @@
+openapi: 3.0.0
+info:
+  title: Property Search and Subscription API
+  description: API for managing user search preferences and property subscriptions
+  version: 1.0.0
+  contact:
+    email: api@example.com
+servers:
+  - url: https://api.example.com
+    description: Main API server
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+  schemas:
+    Error:
+      type: object
+      properties:
+        success:
+          type: boolean
+          example: false
+        error:
+          type: string
+          example: "Error message"
+        details:
+          type: array
+          items:
+            type: string
+          example: ["Field X is required"]
+    
+    SearchPreference:
+      type: object
+      properties:
+        location:
+          type: string
+          example: "New York"
+        priceRange:
+          type: object
+          properties:
+            min:
+              type: number
+              example: 1000
+            max:
+              type: number
+              example: 3000
+        propertyType:
+          type: string
+          example: "apartment"
+        bedrooms:
+          type: integer
+          example: 2
+    
+    SearchPreferenceResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+          example: true
+        data:
+          type: object
+          properties:
+            location:
+              type: string
+              example: "New York"
+            priceRange:
+              type: object
+              properties:
+                min:
+                  type: number
+                  example: 1000
+                max:
+                  type: number
+                  example: 3000
+            propertyType:
+              type: string
+              example: "apartment"
+            bedrooms:
+              type: integer
+              example: 2
+            updatedAt:
+              type: string
+              format: date-time
+              example: "2023-06-15T10:30:00Z"
+    
+    SubscriptionResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+          example: true
+        data:
+          type: object
+          properties:
+            subscriptionId:
+              type: string
+              example: "sub_12345"
+            propertyId:
+              type: string
+              example: "prop_67890"
+            userId:
+              type: string
+              example: "user_54321"
+            createdAt:
+              type: string
+              format: date-time
+              example: "2023-06-15T10:30:00Z"
+            notificationType:
+              type: string
+              example: "email"
+    
+    UserSubscriptionsResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+          example: true
+        data:
+          type: array
+          items:
+            type: object
+            properties:
+              subscriptionId:
+                type: string
+                example: "sub_12345"
+              propertyId:
+                type: string
+                example: "prop_67890"
+              property:
+                type: object
+                properties:
+                  id:
+                    type: string
+                    example: "prop_67890"
+                  title:
+                    type: string
+                    example: "Luxury Apartment in Downtown"
+                  price:
+                    type: number
+                    example: 2500
+                  location:
+                    type: string
+                    example: "New York"
+                  imageUrl:
+                    type: string
+                    example: "https://example.com/image.jpg"
+              createdAt:
+                type: string
+                format: date-time
+                example: "2023-06-15T10:30:00Z"
+        count:
+          type: integer
+          example: 2
+    
+    UnsubscribeResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+          example: true
+        message:
+          type: string
+          example: "Successfully unsubscribed from property"
+
+security:
+  - bearerAuth: []
+
+paths:
+  /api/users/preferences/search:
+    get:
+      summary: Get Search Preferences
+      description: Retrieve user's search preferences
+      tags:
+        - User Preferences
+      responses:
+        '200':
+          description: User search preferences retrieved successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SearchPreferenceResponse'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '404':
+          description: Search preferences not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+    
+    put:
+      summary: Update Search Preferences
+      description: Update user's search preferences
+      tags:
+        - User Preferences
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SearchPreference'
+      responses:
+        '200':
+          description: Search preferences updated successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SearchPreferenceResponse'
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+    
+    post:
+      summary: Create Search Preferences
+      description: Create search preferences if they don't exist
+      tags:
+        - User Preferences
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SearchPreference'
+      responses:
+        '201':
+          description: Search preferences created successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SearchPreferenceResponse'
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '409':
+          description: Search preferences already exist
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+  
+  /api/properties/{propertyId}/subscribe:
+    post:
+      summary: Subscribe to Property
+      description: Subscribe to updates for a specific property
+      tags:
+        - Property Subscriptions
+      parameters:
+        - name: propertyId
+          in: path
+          required: true
+          description: ID of the property to subscribe to
+          schema:
+            type: string
+      responses:
+        '201':
+          description: Successfully subscribed to property
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SubscriptionResponse'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '404':
+          description: Property not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '409':
+          description: Already subscribed to this property
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+    
+    delete:
+      summary: Unsubscribe from Property
+      description: Unsubscribe from a property
+      tags:
+        - Property Subscriptions
+      parameters:
+        - name: propertyId
+          in: path
+          required: true
+          description: ID of the property to unsubscribe from
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Successfully unsubscribed from property
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UnsubscribeResponse'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '404':
+          description: Subscription not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+  
+  /api/users/subscriptions:
+    get:
+      summary: Get User Subscriptions
+      description: Get all properties a user is subscribed to
+      tags:
+        - Property Subscriptions
+      responses:
+        '200':
+          description: User subscriptions retrieved successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserSubscriptionsResponse'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error' 
