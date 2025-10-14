@@ -58,8 +58,8 @@ export default function Header() {
         <div className="bg-white">
           <div className="max-w-7xl mx-auto px-2 sm:px-4 lg:px-8">
             <div className="h-16 px-2 sm:px-3 lg:px-4 flex items-center justify-between">
-            {/* Left: logo + blog link */}
-            <div className="flex items-center gap-6">
+            {/* Left: logo + nav links */}
+            <div className="flex items-center gap-8">
               <Link href="/" className="flex items-center" aria-label="Qrent home">
                 <Image
                   src="/qrent-logo.svg"
@@ -70,16 +70,21 @@ export default function Header() {
                   className="rounded-md"
                 />
               </Link>
-              <Link href="/blog" className="hidden md:block text-slate-700 hover:text-blue-600 transition-colors font-bold">
-                Rental Blog
-              </Link>
+              <nav className="hidden md:flex items-center gap-8" aria-label="Primary">
+                <Link
+                  href="/roomate-mathcing"
+                  className="text-slate-700 hover:text-blue-600 transition-colors font-semibold"
+                >
+                  Roomate Mathcing
+                </Link>
+                <Link
+                  href="/blog"
+                  className="text-slate-700 hover:text-blue-600 transition-colors font-semibold"
+                >
+                  Rental Blog
+                </Link>
+              </nav>
             </div>
-
-            {/* Center: desktop nav */}
-            <nav className="hidden md:flex items-center gap-8" aria-label="Primary">
-              {/* <a href="#guide" className="text-slate-700 hover:text-blue-600 transition-colors">Rental Guide</a>
-              <a href="#docs" className="text-slate-700 hover:text-blue-600 transition-colors">Document Preparation</a> */}
-            </nav>
 
             {/* Right: actions */}
             <div className="hidden md:flex items-center gap-3">
@@ -170,7 +175,20 @@ export default function Header() {
               </button>
             </div>
             <nav className="px-4 py-4 space-y-1" aria-label="Mobile">
-              <Link href="/blog" onClick={closeDrawer} className="block rounded-md px-3 py-2 text-slate-700 hover:bg-slate-100 hover:text-blue-600">Blog</Link>
+              <Link
+                href="/roomate-mathcing"
+                onClick={closeDrawer}
+                className="block rounded-md px-3 py-2 text-slate-700 hover:bg-slate-100 hover:text-blue-600"
+              >
+                Roomate Mathcing
+              </Link>
+              <Link
+                href="/blog"
+                onClick={closeDrawer}
+                className="block rounded-md px-3 py-2 text-slate-700 hover:bg-slate-100 hover:text-blue-600"
+              >
+                Rental Blog
+              </Link>
               <a href="#guide" className="block rounded-md px-3 py-2 text-slate-700 hover:bg-slate-100 hover:text-blue-600">Rental Guide</a>
               <a href="#docs" className="block rounded-md px-3 py-2 text-slate-700 hover:bg-slate-100 hover:text-blue-600">Document Preparation</a>
               <div className="my-3 h-px bg-slate-200"></div>
