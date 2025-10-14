@@ -13,6 +13,11 @@ if (process.env.NODE_ENV === 'development') {
 const withNextIntl = createNextIntlPlugin('./src/i18n.ts');
 
 const nextConfig: NextConfig = {
+  i18n: {
+    locales: ['en', 'zh'],
+    defaultLocale: 'en',
+    localeDetection: false,
+  },
   eslint: {
     ignoreDuringBuilds: false,
   },
