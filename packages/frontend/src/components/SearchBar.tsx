@@ -168,7 +168,11 @@ export default function SearchBar() {
               setOrDelete('university', targetSchool);
               setOrDelete('priceMax', maxPrice);
               setOrDelete('commuteMax', commuteTime);
-              setOrDelete('bedroomsMax', numBedrooms);
+              setOrDelete('bedroomsMin', numBedrooms);
+
+              if (parseInt(numBedrooms) < 5) {
+                setOrDelete('bedroomsMax', numBedrooms);
+              }
 
               if (pathname === `/${locale}/search`) {
                 params.set('filters', 'open');
