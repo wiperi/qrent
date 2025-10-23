@@ -21,8 +21,6 @@ schema:
   "datePublished": "2025-09-26"
 ---
 
-# 澳洲租房代看房保姆级清单！+申请技巧
-# Ultimate Checklist for Renting in Australia (with Application Tips)
 
 ## 澳洲租房必看清单是什么？
 1. 周边环境检查

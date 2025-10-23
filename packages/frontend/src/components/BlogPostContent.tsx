@@ -51,6 +51,68 @@ export default function BlogPostContent({ post }: BlogPostContentProps) {
     });
   };
 
+  // 根据语言过滤内容
+  const filterContentByLanguage = (content: string, locale: string): string => {
+    const lines = content.split('\n');
+    const filteredLines: string[] = [];
+
+    for (let i = 0; i < lines.length; i++) {
+      const line = lines[i];
+
+      // 空行总是保留
+      if (!line.trim()) {
+        filteredLines.push(line);
+        continue;
+      }
+
+      // 检测标题
+      const isTitle = /^#+\s/.test(line);
+      if (isTitle) {
+        const hasChineseChars = /[\u4e00-\u9fff]/.test(line);
+        const hasEnglishChars = /[A-Za-z]/.test(line);
+
+        if (locale === LOCALE.ZH) {
+          // 中文模式：只显示包含中文字符的标题
+          if (hasChineseChars) {
+            filteredLines.push(line);
+          }
+        } else {
+          // 英文模式：只显示包含英文字符且不包含中文的标题
+          if (hasEnglishChars && !hasChineseChars) {
+            filteredLines.push(line);
+          }
+        }
+        continue;
+      }
+
+      // 检测段落内容
+      const hasChineseChars = /[\u4e00-\u9fff]/.test(line);
+      const hasEnglishChars = /[A-Za-z]/.test(line);
+
+      if (locale === LOCALE.ZH) {
+        // 中文模式：只显示包含中文字符的内容
+        if (hasChineseChars) {
+          filteredLines.push(line);
+        } else if (!hasEnglishChars) {
+          // 保留不包含任何语言字符的行（如符号、数字等）
+          filteredLines.push(line);
+        }
+        // 跳过纯英文内容
+      } else {
+        // 英文模式：只显示包含英文字符且不包含中文的内容
+        if (hasEnglishChars && !hasChineseChars) {
+          filteredLines.push(line);
+        } else if (!hasChineseChars && !hasEnglishChars) {
+          // 保留不包含任何语言字符的行（如符号、数字等）
+          filteredLines.push(line);
+        }
+        // 跳过包含中文的内容
+      }
+    }
+
+    return filteredLines.join('\n');
+  };
+
   // 将Markdown内容转换为HTML（简单版本）
   const formatContent = (content: string) => {
     return content
@@ -145,7 +207,7 @@ export default function BlogPostContent({ post }: BlogPostContentProps) {
           <div
             className="text-slate-700 leading-relaxed"
             dangerouslySetInnerHTML={{
-              __html: `<p class="text-slate-700 leading-relaxed mb-4">${formatContent(post.content)}</p>`
+              __html: `<p class="text-slate-700 leading-relaxed mb-4">${formatContent(filterContentByLanguage(post.content, locale))}</p>`
             }}
           />
         </article>

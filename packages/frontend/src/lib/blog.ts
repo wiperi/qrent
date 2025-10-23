@@ -41,13 +41,17 @@ export async function getBlogPost(slug: string): Promise<BlogPost | null> {
     const { data, content } = matter(fileContents);
 
     // Generate excerpt from first 150 characters of content
-    const excerpt =
-      content
-        .replace(/^#.*$/gm, '') // Remove headings
-        .replace(/\n/g, ' ') // Replace newlines with spaces
-        .trim()
-        .substring(0, 150)
-        .trim() + '...';
+    // For bilingual content, try to extract Chinese content for excerpt
+    const cleanContent = content
+      .replace(/^#.*$/gm, '') // Remove headings
+      .replace(/\n/g, ' ') // Replace newlines with spaces
+      .trim();
+
+    // Try to extract Chinese content for excerpt (assuming Chinese comes first)
+    const chineseMatch = cleanContent.match(/[\u4e00-\u9fff][^A-Za-z]*[\u4e00-\u9fff]/);
+    const excerpt = chineseMatch
+      ? chineseMatch[0].substring(0, 150).trim() + '...'
+      : cleanContent.substring(0, 150).trim() + '...';
 
     return {
       slug,

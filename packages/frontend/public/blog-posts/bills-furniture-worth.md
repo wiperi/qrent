@@ -21,8 +21,7 @@ schema:
   "datePublished": "2025-09-26"
 ---
 
-# 澳洲租房解答：包 Bills、包家具值多少？房价是否合理？
-# Australia Rental Guide: Are Bills and Furniture Included Worth It? Is the Rent Fair?
+
 
 ## Q1：PW 是什么意思？为什么租金都写 pw？
 在澳洲租房广告里，你经常会看到"pw"。这是 per week 的缩写，意思是"每周"。因为澳洲的租金都是按周来计算的，而不是像国内或其他地区常见的按月计费，所以在看房的时候一定要理解 weekly rent 的概念。

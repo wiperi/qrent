@@ -20,8 +20,6 @@ schema:
   "datePublished": "2025-09-26"
 ---
 
-# 新南威尔士大学租房价格分析（2B/3B/Studio 全面对比）
-# UNSW Rental Price Analysis (2B/3B/Studio Breakdown)
 
 ## 为什么新南均价会比悉大还高？
 新南（UNSW Kensington 校区）周边的平均房租，比很多人预想的还要高。由于房源数量相对悉大较少且可选范围较小，导致价格整体偏高，通勤方式也没有那么多样化。
