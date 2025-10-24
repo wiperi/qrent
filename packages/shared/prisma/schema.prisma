@@ -85,6 +85,8 @@ model Property {
   descriptionCn   String?          @map("description_cn") @db.VarChar(1024)
   url             String           @db.VarChar(255)
   publishedAt     DateTime         @map("published_at") @db.DateTime(0)
+  releaseTime     DateTime?        @map("release_time") @db.DateTime(0)
+  image           String?          @db.Text
   region          Region           @relation(fields: [regionId], references: [id])
   property_school PropertySchool[]
   users           User[]           @relation("PropertyToUser")

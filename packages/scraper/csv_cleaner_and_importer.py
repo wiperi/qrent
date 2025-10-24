@@ -378,6 +378,7 @@ def import_to_database(df, school_name):
                 description_en = safe_str(row.get('description_en'), None) if safe_str(row.get('description_en')) else None
                 description_cn = safe_str(row.get('description_cn'), None) if safe_str(row.get('description_cn')) else None
                 url = safe_str(row.get('url'), None) if safe_str(row.get('url')) else None
+                image = safe_str(row.get('image'), None) if safe_str(row.get('image')) else None
                 
                 published_at = None
                 if 'published_at' in df.columns:
@@ -390,6 +391,15 @@ def import_to_database(df, school_name):
                     published_at = datetime.now()
                 
                 if house_id in existing_properties:
+                    # Check if release_time exists for this property
+                    cursor.execute("SELECT id, release_time FROM properties WHERE house_id = %s", (house_id,))
+                    result = cursor.fetchone()
+                    property_id = result[0] if result else None
+                    existing_release_time = result[1] if result and result[1] else None
+                    
+                    # If release_time is null, set it to current time
+                    release_time = existing_release_time if existing_release_time else datetime.now()
+                    
                     update_sql = """
                         UPDATE properties SET 
                             price = %s, address = %s, region_id = %s, 
@@ -397,37 +407,38 @@ def import_to_database(df, school_name):
                             parking_count = %s, property_type = %s,
                             available_date = %s, keywords = %s, 
                             average_score = %s, description_en = %s,
-                            description_cn = %s, url = %s, published_at = %s
+                            description_cn = %s, url = %s, published_at = %s,
+                            release_time = %s, image = %s
                         WHERE house_id = %s
                     """
                     cursor.execute(update_sql, (
                         price, address, region_id, bedroom_count, 
                         bathroom_count, parking_count, property_type,
                         available_date, keywords, average_score,
-                        description_en, description_cn, url, published_at, house_id
+                        description_en, description_cn, url, published_at,
+                        release_time, image, house_id
                     ))
-                    
-                    cursor.execute("SELECT id FROM properties WHERE house_id = %s", (house_id,))
-                    result = cursor.fetchone()
-                    property_id = result[0] if result else None
                     
                     update_count += 1
                 else:
+                    # For new properties, set release_time to current time
+                    release_time = datetime.now()
+                    
                     insert_sql = """
                         INSERT INTO properties (
                             price, address, region_id, bedroom_count, 
                             bathroom_count, parking_count, property_type, 
                             house_id, available_date, keywords, 
                             average_score, description_en, description_cn, 
-                            url, published_at
-                        ) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
+                            url, published_at, release_time, image
+                        ) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
                     """
                     cursor.execute(insert_sql, (
                         price, address, region_id, bedroom_count,
                         bathroom_count, parking_count, property_type, 
                         house_id, available_date, keywords, 
                         average_score, description_en, description_cn, 
-                        url, published_at
+                        url, published_at, release_time, image
                     ))
                     property_id = cursor.lastrowid
                     existing_properties.add(house_id)
