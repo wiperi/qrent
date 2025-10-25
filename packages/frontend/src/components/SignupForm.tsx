@@ -6,22 +6,18 @@ import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '
 import { Input } from '@/components/ui/input';
 import { useAuth } from '@/hooks/use-auth';
 import { zodResolver } from '@hookform/resolvers/zod';
+import { useTranslations } from 'next-intl';
 import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { HiEye, HiEyeOff } from 'react-icons/hi';
 import { z } from 'zod';
 
-const formSchema = z.object({
-  name: z.string().optional(),
-  email: z.string().email({ message: "Invalid email address" }),
-  password: z.string().min(6, { message: "Password must be at least 6 characters" }),
-  confirmPassword: z.string().min(6, { message: "Password must be at least 6 characters" }),
-}).refine((data) => data.password === data.confirmPassword, {
-  message: "Passwords don't match",
-  path: ["confirmPassword"],
-});
-
-type FormData = z.infer<typeof formSchema>;
+type FormData = {
+  name?: string;
+  email: string;
+  password: string;
+  confirmPassword: string;
+};
 
 interface SignupFormProps {
   onSuccess?: () => void;
@@ -32,6 +28,17 @@ export default function SignupForm({ onSuccess, onSwitchToLogin }: SignupFormPro
   const { register } = useAuth();
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+  const t = useTranslations('Auth');
+
+  const formSchema = z.object({
+    name: z.string().optional(),
+    email: z.string().email({ message: t('invalidEmail') }),
+    password: z.string().min(6, { message: t('passwordMinLength') }),
+    confirmPassword: z.string().min(6, { message: t('passwordMinLength') }),
+  }).refine((data) => data.password === data.confirmPassword, {
+    message: t('passwordsDontMatch'),
+    path: ["confirmPassword"],
+  });
 
   const form = useForm<FormData>({
     resolver: zodResolver(formSchema),
@@ -60,7 +67,7 @@ export default function SignupForm({ onSuccess, onSwitchToLogin }: SignupFormPro
     <div className="w-full max-w-md mx-auto">
       <Card className="shadow-md">
         <CardHeader className="space-y-1">
-          <CardTitle className="text-2xl font-bold text-center">Create your account</CardTitle>
+          <CardTitle className="text-2xl font-bold text-center">{t('signupTitle')}</CardTitle>
         </CardHeader>
 
         <Form {...form}>
@@ -71,9 +78,9 @@ export default function SignupForm({ onSuccess, onSwitchToLogin }: SignupFormPro
                 name="name"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Name (optional)</FormLabel>
+                    <FormLabel>{t('name')}</FormLabel>
                     <FormControl>
-                      <Input placeholder="Enter your name" {...field} />
+                      <Input placeholder={t('name')} {...field} />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -85,9 +92,9 @@ export default function SignupForm({ onSuccess, onSwitchToLogin }: SignupFormPro
                 name="email"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Email</FormLabel>
+                    <FormLabel>{t('email')}</FormLabel>
                     <FormControl>
-                      <Input type="email" placeholder="Enter your email" {...field} />
+                      <Input type="email" placeholder={t('email')} {...field} />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -99,18 +106,19 @@ export default function SignupForm({ onSuccess, onSwitchToLogin }: SignupFormPro
                 name="password"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Password</FormLabel>
+                    <FormLabel>{t('password')}</FormLabel>
                     <FormControl>
                       <div className="relative">
                         <Input
                           type={showPassword ? "text" : "password"}
-                          placeholder="Enter your password"
+                          placeholder={t('password')}
                           {...field}
                         />
                         <button
                           type="button"
                           onClick={() => setShowPassword(!showPassword)}
                           className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600"
+                          title={showPassword ? t('hidePassword') : t('showPassword')}
                         >
                           {showPassword ? <HiEyeOff className="h-5 w-5" /> : <HiEye className="h-5 w-5" />}
                         </button>
@@ -126,18 +134,19 @@ export default function SignupForm({ onSuccess, onSwitchToLogin }: SignupFormPro
                 name="confirmPassword"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Confirm Password</FormLabel>
+                    <FormLabel>{t('confirmPassword')}</FormLabel>
                     <FormControl>
                       <div className="relative">
                         <Input
                           type={showConfirmPassword ? "text" : "password"}
-                          placeholder="Confirm your password"
+                          placeholder={t('confirmPassword')}
                           {...field}
                         />
                         <button
                           type="button"
                           onClick={() => setShowConfirmPassword(!showConfirmPassword)}
                           className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600"
+                          title={showConfirmPassword ? t('hidePassword') : t('showPassword')}
                         >
                           {showConfirmPassword ? <HiEyeOff className="h-5 w-5" /> : <HiEye className="h-5 w-5" />}
                         </button>
@@ -161,19 +170,19 @@ export default function SignupForm({ onSuccess, onSwitchToLogin }: SignupFormPro
                 className="w-full bg-blue-600 hover:bg-blue-700"
                 disabled={form.formState.isSubmitting}
               >
-                {form.formState.isSubmitting ? 'Creating account...' : 'Create account'}
+                {form.formState.isSubmitting ? 'Loading...' : t('signupButton')}
               </Button>
 
               {onSwitchToLogin && (
                 <p className="text-center text-sm text-gray-600">
-                  Already have an account?{' '}
+                  {t('switchToLogin')}{' '}
                   <Button
                     type="button"
                     variant="link"
                     onClick={onSwitchToLogin}
                     className="p-0 h-auto font-medium text-blue-600 hover:text-blue-500"
                   >
-                    Sign in
+                    {t('loginButton')}
                   </Button>
                 </p>
               )}

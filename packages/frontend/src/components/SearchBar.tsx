@@ -1,23 +1,29 @@
 'use client';
 
-import { HiSearch, HiAdjustments } from 'react-icons/hi';
-import { useEffect, useState } from 'react';
-import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 import { SCHOOL } from '@qrent/shared/enum';
+import { useLocale, useTranslations } from 'next-intl';
+import { usePathname, useRouter, useSearchParams } from 'next/navigation';
+import { useEffect, useState } from 'react';
+import { HiAdjustments, HiSearch } from 'react-icons/hi';
 
-const BEDROOM_OPTIONS = [
-  { value: '', label: 'Any bedrooms' },
-  { value: '1', label: '1 bedroom' },
-  { value: '2', label: '2 bedrooms' },
-  { value: '3', label: '3 bedrooms' },
-  { value: '4', label: '4 bedrooms' },
-  { value: '5', label: '5+ bedrooms' },
-] as const;
+// BEDROOM_OPTIONS will be created inside the component to use translations
 
 export default function SearchBar() {
   const router = useRouter();
   const pathname = usePathname();
   const searchParams = useSearchParams();
+  const locale = useLocale();
+  const t = useTranslations('SearchBar');
+
+  // Create bedroom options with translations
+  const BEDROOM_OPTIONS = [
+    { value: '', label: t('anyBedrooms') },
+    { value: '1', label: t('oneBedroom') },
+    { value: '2', label: t('twoBedrooms') },
+    { value: '3', label: t('threeBedrooms') },
+    { value: '4', label: t('fourBedrooms') },
+    { value: '5', label: t('fivePlusBedrooms') },
+  ] as const;
 
   // First-level filter states
   const [targetSchool, setTargetSchool] = useState<string>('UNSW');
@@ -52,13 +58,13 @@ export default function SearchBar() {
     setOrDelete('priceMax', maxPrice);
     setOrDelete('commuteMax', commuteTime);
     setOrDelete('bedroomsMin', numBedrooms);
-    
+
     if (parseInt(numBedrooms) < 5) {
       setOrDelete('bedroomsMax', numBedrooms);
     }
 
     params.set('page', '1');
-    router.push(`/search?${params.toString()}`);
+    router.push(`/${locale}/search?${params.toString()}`);
   };
 
   return (
@@ -71,7 +77,7 @@ export default function SearchBar() {
               htmlFor="target-school"
               className="text-xs font-medium text-slate-700 mb-1 h-4 flex items-center"
             >
-              Target School
+              {t('targetSchool')}
             </label>
             <select
               id="target-school"
@@ -93,7 +99,7 @@ export default function SearchBar() {
               htmlFor="max-price"
               className="text-xs font-medium text-slate-700 mb-1 h-4 flex items-center"
             >
-              Max Price ($/week)
+              {t('maxPrice')}
             </label>
             <input
               id="max-price"
@@ -101,7 +107,7 @@ export default function SearchBar() {
               min="0"
               value={maxPrice}
               onChange={e => setMaxPrice(e.target.value)}
-              placeholder="Any"
+              placeholder={t('anyPlaceholder')}
               className="rounded-lg border border-slate-200 px-3 py-2 text-sm text-slate-700 placeholder-slate-400 focus:border-blue-500 focus:ring-1 focus:ring-blue-500 focus:outline-none h-9"
             />
           </div>
@@ -112,7 +118,7 @@ export default function SearchBar() {
               htmlFor="commute-time"
               className="text-xs font-medium text-slate-700 mb-1 h-4 flex items-center"
             >
-              Max Commute (min)
+              {t('maxCommute')}
             </label>
             <input
               id="commute-time"
@@ -120,7 +126,7 @@ export default function SearchBar() {
               min="0"
               value={commuteTime}
               onChange={e => setCommuteTime(e.target.value)}
-              placeholder="Any"
+              placeholder={t('anyPlaceholder')}
               className="rounded-lg border border-slate-200 px-3 py-2 text-sm text-slate-700 placeholder-slate-400 focus:border-blue-500 focus:ring-1 focus:ring-blue-500 focus:outline-none h-9"
             />
           </div>
@@ -131,7 +137,7 @@ export default function SearchBar() {
               htmlFor="num-bedrooms"
               className="text-xs font-medium text-slate-700 mb-1 h-4 flex items-center"
             >
-              Bedrooms
+              {t('bedrooms')}
             </label>
             <select
               id="num-bedrooms"
@@ -162,11 +168,15 @@ export default function SearchBar() {
               setOrDelete('university', targetSchool);
               setOrDelete('priceMax', maxPrice);
               setOrDelete('commuteMax', commuteTime);
-              setOrDelete('bedroomsMax', numBedrooms);
+              setOrDelete('bedroomsMin', numBedrooms);
 
-              if (pathname === '/search') {
+              if (parseInt(numBedrooms) < 5) {
+                setOrDelete('bedroomsMax', numBedrooms);
+              }
+
+              if (pathname === `/${locale}/search`) {
                 params.set('filters', 'open');
-                router.replace(`/search?${params.toString()}`);
+                router.replace(`/${locale}/search?${params.toString()}`);
               } else {
                 params.set('filters', 'open');
                 const href = params.toString() ? `${pathname}?${params.toString()}` : pathname;
@@ -176,7 +186,7 @@ export default function SearchBar() {
             className="inline-flex items-center justify-center gap-1.5 rounded-xl border border-slate-200 bg-white px-3 py-2.5 text-sm font-medium text-slate-700 hover:border-blue-300 hover:text-blue-600 transition flex-shrink-0"
           >
             <HiAdjustments className="h-4 w-4" />
-            Filter
+            {t('filters')}
           </button>
 
           {/* Search Button */}
@@ -185,7 +195,7 @@ export default function SearchBar() {
             className="inline-flex items-center justify-center gap-1.5 rounded-xl bg-blue-600 px-2 py-2.5 text-sm font-semibold text-white hover:bg-blue-700 transition flex-shrink-0"
           >
             <HiSearch className="h-4 w-4" />
-            Search
+            {t('searchButton')}
           </button>
         </div>
       </div>

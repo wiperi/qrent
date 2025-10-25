@@ -1,0 +1,294 @@
+{
+  "Header": {
+    "login": "Log in",
+    "signup": "Sign up",
+    "signout": "Sign out",
+    "userMenu": "User menu",
+    "openMenu": "Open menu",
+    "closeMenu": "Close menu",
+    "rentalGuide": "Rental Guide",
+    "documentPreparation": "Document Preparation",
+    "rentalBlog": "Rental Blog"
+  },
+  "SearchBar": {
+    "placeholder": "Search by city, address or school...",
+    "searchButton": "Search",
+    "filters": "Filters",
+    "targetSchool": "Target School",
+    "maxPrice": "Max Price ($/week)",
+    "maxCommute": "Max Commute (min)",
+    "bedrooms": "Bedrooms",
+    "anyPlaceholder": "Any",
+    "anyBedrooms": "Any bedrooms",
+    "oneBedroom": "1 bedroom",
+    "twoBedrooms": "2 bedrooms",
+    "threeBedrooms": "3 bedrooms",
+    "fourBedrooms": "4 bedrooms",
+    "fivePlusBedrooms": "5+ bedrooms"
+  },
+  "PropertyCard": {
+    "bedrooms": "bedrooms",
+    "bathrooms": "bathrooms",
+    "parking": "parking",
+    "availableFrom": "Available from",
+    "viewDetails": "View Details"
+  },
+  "FilterModal": {
+    "title": "Filters",
+    "priceRange": "Price Range",
+    "bedrooms": "Bedrooms",
+    "bathrooms": "Bathrooms",
+    "propertyType": "Property Type",
+    "location": "Location",
+    "availableDate": "Available Date",
+    "clearAll": "Clear All",
+    "applyFilters": "Apply Filters",
+    "close": "Close",
+    "any": "Any",
+    "house": "House",
+    "apartment": "Apartment",
+    "min": "Min",
+    "max": "Max",
+    "rating": "Rating"
+  },
+  "Auth": {
+    "loginTitle": "Welcome back",
+    "signupTitle": "Create your account",
+    "email": "Email",
+    "password": "Password",
+    "confirmPassword": "Confirm Password",
+    "name": "Name",
+    "loginButton": "Log in",
+    "signupButton": "Sign up",
+    "switchToSignup": "Don't have an account?",
+    "switchToLogin": "Already have an account?",
+    "showPassword": "Show password",
+    "hidePassword": "Hide password",
+    "invalidEmail": "Invalid email address",
+    "passwordMinLength": "Password must be at least 6 characters",
+    "passwordsDontMatch": "Passwords don't match"
+  },
+  "Footer": {
+    "about": "About",
+    "meetOurTeam": "Meet our team",
+    "getInTouch": "Get in touch",
+    "copyEmail": "Copy email address: yyzyfish5@gmail.com",
+    "emailCopied": "Copied to clipboard",
+    "copyright": "Copyright © 2025 - All right reserved by Qrent Industries Ltd",
+    "icp": "网页备案号: 粤ICP备2025363367号-1"
+  },
+  "About": {
+    "title": "About QRent",
+    "mission": {
+      "title": "Our Mission",
+      "description1": "QRent is dedicated to simplifying the rental property search experience for students and young professionals. We understand that finding the perfect place to live can be overwhelming, time-consuming, and stressful. That's why we've built a platform that aggregates rental listings, analyzes them with intelligent scoring, and helps you make informed decisions quickly.",
+      "description2": "Our smart scoring system evaluates properties based on multiple factors including location, price, amenities, and proximity to universities, giving you a comprehensive view at a glance."
+    },
+    "whatWeDo": {
+      "title": "What We Do",
+      "smartAggregation": {
+        "title": "Smart Aggregation",
+        "description": "We collect and organize rental listings from multiple sources, saving you hours of searching across different platforms."
+      },
+      "intelligentScoring": {
+        "title": "Intelligent Scoring",
+        "description": "Our proprietary algorithm scores each property based on value, location, amenities, and other key factors."
+      },
+      "realTimeUpdates": {
+        "title": "Real-Time Updates",
+        "description": "Stay informed with up-to-date listings and availability information, so you never miss out on great opportunities."
+      },
+      "personalizedExperience": {
+        "title": "Personalized Experience",
+        "description": "Save your preferences, track favorite properties, and receive notifications about new listings that match your criteria."
+      }
+    },
+    "ourStory": {
+      "title": "Our Story",
+      "description1": "QRent was born from personal experience. As students ourselves, we faced the challenges of finding quality, affordable housing while balancing studies and limited budgets. We realized that the rental market needed a better solution—one that combines technology with genuine understanding of renters' needs.",
+      "description2": "Today, we're proud to help thousands of renters find their ideal homes, making the process easier, faster, and more transparent. We're constantly evolving our platform based on user feedback and market trends to serve you better."
+    }
+  },
+  "Team": {
+    "title": "Meet Our Team",
+    "subtitle": "We're a diverse group of developers, designers, and rental market enthusiasts working together to revolutionize the way people find their homes.",
+    "joinTeam": {
+      "title": "Join Our Team",
+      "description": "We're always looking for passionate individuals who want to make a difference in the rental market. If you're interested in joining QRent, we'd love to hear from you!",
+      "getInTouch": "Get in Touch"
+    },
+    "members": {
+      "zhiyang": {
+        "bio": "Product visionary with a strong business background. Zhiyang drives QRent's strategic direction, ensuring the platform meets real market needs while building sustainable growth for the company.",
+        "expertise": "Product Strategy, Business Development"
+      },
+      "cliff": {
+        "bio": "System architect and DevOps expert who designed QRent's scalable infrastructure. Cliff ensures seamless deployment pipelines and robust full-stack solutions that power our platform.",
+        "expertise": "System Architecture, DevOps, Full Stack"
+      },
+      "zack": {
+        "bio": "Data specialist who transforms raw property information into actionable insights. Yibin builds the data pipelines and analytics that help users make informed rental decisions.",
+        "expertise": "Data Engineering, Data Analytics"
+      },
+      "yuting": {
+        "bio": "Frontend developer focused on creating intuitive and responsive user experiences. Yuting crafts the interfaces that make property searching effortless and enjoyable.",
+        "expertise": "Frontend Development, React, UI/UX"
+      },
+      "qixin": {
+        "bio": "Frontend engineer passionate about performance and accessibility. Qixin ensures QRent delivers a fast, polished experience across all devices and browsers.",
+        "expertise": "Frontend Development, Performance Optimization"
+      },
+      "zhongtao": {
+        "bio": "AI specialist building intelligent chatbot solutions. Zhongtao develops conversational interfaces that help users find their perfect rental through natural language interactions.",
+        "expertise": "AI, Chatbots"
+      }
+    }
+  },
+  "Contact": {
+    "title": "Get in Touch",
+    "subtitle": "Have questions, feedback, or just want to say hello? We'd love to hear from you. Fill out the form below or reach out through any of our channels.",
+    "form": {
+      "title": "Send us a message",
+      "name": "Name",
+      "namePlaceholder": "Your name",
+      "email": "Email",
+      "emailPlaceholder": "your.email@example.com",
+      "subject": "Subject",
+      "subjectPlaceholder": "What's this about?",
+      "message": "Message",
+      "messagePlaceholder": "Tell us more...",
+      "submitButton": "Send Message",
+      "successTitle": "Message Sent!",
+      "successMessage": "We'll get back to you as soon as possible."
+    },
+    "contactInfo": {
+      "title": "Contact Information",
+      "email": "Email",
+      "office": "Office",
+      "officeAddress": "Ping An Finance Centre<br />Building A, 35th Floor<br />Shenzhen, Guangdong 518000"
+    },
+    "followUs": {
+      "title": "Follow Us"
+    },
+    "officeHours": {
+      "title": "Office Hours",
+      "weekdays": "Monday - Friday:",
+      "weekdaysTime": "9:00 AM - 6:00 PM",
+      "saturday": "Saturday:",
+      "saturdayTime": "10:00 AM - 4:00 PM",
+      "sunday": "Sunday:",
+      "sundayTime": "Closed"
+    }
+  },
+  "Blog": {
+    "title": "Learn how to boost your rental search",
+    "subtitle": "Discover strategies to get your ideal rental properties with QRent. From search optimization and property evaluation to lease negotiation and move-in preparation, explore our resources and take control of your rental journey.",
+    "noPosts": "No blog posts available yet.",
+    "author": "QRent Team"
+  },
+  "Common": {
+    "loading": "Loading...",
+    "error": "An error occurred",
+    "retry": "Retry",
+    "cancel": "Cancel",
+    "confirm": "Confirm",
+    "save": "Save",
+    "edit": "Edit",
+    "delete": "Delete"
+  },
+  "LanguageSwitcher": {
+    "english": "English",
+    "chinese": "中文"
+  },
+  "SearchResults": {
+    "searchResults": "Search Results",
+    "averagePrice": "Average Price",
+    "averageCommute": "Average Commute",
+    "topRegions": "Top Regions",
+    "properties": "properties",
+    "avgWeek": "avg/week",
+    "commute": "commute",
+    "prev": "Prev",
+    "next": "Next",
+    "page": "Page",
+    "of": "of",
+    "noResults": "No results",
+    "noResultsForQuery": "We couldn't find any results for \"{query}\". Try different keywords.",
+    "adjustFilters": "Try adjusting your search filters to find properties.",
+    "goToHomepage": "Go to homepage",
+    "perWeek": "/week",
+    "minutes": "minutes"
+  },
+  "PropertyGrid": {
+    "dailyNewHouses": "Daily New Houses Around",
+    "loadError": "Unable to load properties. Please try again later."
+  },
+  "PropertyCard": {
+    "bedrooms": "bedrooms",
+    "bathrooms": "bathrooms",
+    "parking": "parking",
+    "availableFrom": "Available from",
+    "viewDetails": "View Details",
+    "house": "House",
+    "apartment": "Apartment",
+    "perWeek": "/week",
+    "availableNow": "Available now",
+    "availableInDays": "Available in {days} day{plural}",
+    "available": "Available",
+    "minToUniversity": "min to university",
+    "keywords": {
+      "bedroom": "bedroom",
+      "bedrooms": "bedrooms",
+      "one-bedroom": "one-bedroom",
+      "two-bedroom": "two-bedroom",
+      "three-bedroom": "three-bedroom",
+      "3-bedroom": "3-bedroom",
+      "apartment": "apartment",
+      "furnished": "furnished",
+      "bathrooms": "bathrooms",
+      "bathroom": "bathroom",
+      "luxury": "luxury",
+      "modern": "modern",
+      "spacious": "spacious",
+      "contemporary": "contemporary",
+      "executive": "executive",
+      "studio": "studio",
+      "design": "design",
+      "open": "open",
+      "plan": "plan",
+      "timber": "timber",
+      "interiors": "interiors",
+      "easy": "easy",
+      "access": "access",
+      "fully": "fully",
+      "study": "study",
+      "living": "living",
+      "level": "level",
+      "ocean": "ocean",
+      "view": "view",
+      "boutique": "boutique",
+      "little": "little",
+      "bay": "bay",
+      "award": "award",
+      "winning": "winning",
+      "redevelopment": "redevelopment",
+      "leisure": "leisure",
+      "heart": "heart",
+      "private": "private",
+      "side": "side",
+      "pathway": "pathway",
+      "quiet": "quiet",
+      "semi": "semi",
+      "semi-detached": "semi-detached",
+      "residence": "residence",
+      "beatty": "beatty",
+      "street": "street",
+      "facade": "facade",
+      "kitchen": "kitchen",
+      "walkable": "walkable",
+      "trains": "trains",
+      "beach": "beach",
+      "elegance": "elegance"
+    }
+  }
+}

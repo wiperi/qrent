@@ -1,13 +1,16 @@
 'use client';
 
-import PropertyCard from './PropertyCard';
-import Section from './Section';
-import { useQuery } from '@tanstack/react-query';
 import { useTRPCClient } from '@/lib/trpc';
 import { SCHOOL } from '@qrent/shared/enum';
+import { useQuery } from '@tanstack/react-query';
+import { useTranslations } from 'next-intl';
 import { useState } from 'react';
+import PropertyCard from './PropertyCard';
+import Section from './Section';
+
 
 export default function PropertyGrid() {
+  const t = useTranslations('PropertyGrid');
   const [selectedUniversity, setSelectedUniversity] = useState(SCHOOL.UNSW);
   const trpc = useTRPCClient();
   const { data, isPending, error } = useQuery({
@@ -51,17 +54,16 @@ export default function PropertyGrid() {
 
   const sectionTitle = (
     <div className="flex items-center gap-3">
-      <span>Daily New Houses Around</span>
+      <span>{t('dailyNewHouses')}</span>
       <div className="flex rounded-lg border border-slate-200 bg-slate-50">
         {Object.values(SCHOOL).map(school => (
           <button
             key={school}
             onClick={() => setSelectedUniversity(school)}
-            className={`px-3 py-2 transition-colors rounded-md ${
-              selectedUniversity === school
-                ? `${getUniversityColors(school, true)} shadow-sm`
-                : getUniversityColors(school, false)
-            }`}
+            className={`px-3 py-2 transition-colors rounded-md ${selectedUniversity === school
+              ? `${getUniversityColors(school, true)} shadow-sm`
+              : getUniversityColors(school, false)
+              }`}
           >
             {school}
           </button>
@@ -97,7 +99,7 @@ export default function PropertyGrid() {
     return (
       <Section title={sectionTitle}>
         <div className="text-center py-8">
-          <p className="text-slate-600">Unable to load properties. Please try again later.</p>
+          <p className="text-slate-600">{t('loadError')}</p>
         </div>
       </Section>
     );
@@ -108,21 +110,20 @@ export default function PropertyGrid() {
   return (
     <Section title={sectionTitle}>
       <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-        {properties.map(property => (
+        {properties.map((property) => (
           <PropertyCard
-            key={property.id}
-            address={property.address}
-            region={property.region || ''}
-            price={property.price}
-            bedroomCount={property.bedroomCount}
-            bathroomCount={property.bathroomCount}
-            propertyType={property.propertyType}
-            descriptionEn={property.descriptionEn || ''}
-            commuteTime={property.commuteTime ?? undefined}
-            url={property.url}
-            averageScore={property.averageScore}
-            keywords={property.keywords}
-            availableDate={property.availableDate}
+            key={property.id as string | number}
+            address={property.address as string}
+            region={(property.region as string) || ''}
+            price={property.price as number}
+            bedroomCount={property.bedroomCount as number}
+            bathroomCount={property.bathroomCount as number}
+            propertyType={property.propertyType as number}
+            commuteTime={(property.commuteTime as number) ?? undefined}
+            url={property.url as string}
+            averageScore={property.averageScore as number}
+            keywords={property.keywords as string}
+            availableDate={property.availableDate as string}
           />
         ))}
       </div>

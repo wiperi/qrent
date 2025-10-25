@@ -1,7 +1,8 @@
+import type { AppRouter } from '@qrent/backend/trpc';
+import { DEFAULT_LOCALE, isLocale } from '@qrent/shared/utils/helper';
 import { QueryClient } from '@tanstack/react-query';
 import { createTRPCClient, httpBatchLink } from '@trpc/client';
 import { createTRPCContext } from '@trpc/tanstack-react-query';
-import type { AppRouter } from '@qrent/backend/trpc';
 
 // Create tRPC context for React components
 export const { TRPCProvider, useTRPC, useTRPCClient } = createTRPCContext<AppRouter>();
@@ -50,9 +51,29 @@ export function createTRPCClientInstance() {
       httpBatchLink({
         url: `${backendUrl}/trpc`,
         headers() {
-          const token = typeof window !== 'undefined' ? localStorage.getItem('auth-token') : null;
+          const headers: Record<string, string> = {};
 
-          return token ? { Authorization: `Bearer ${token}` } : {};
+          // Add auth token if available (client-side only)
+          if (typeof window !== 'undefined') {
+            const token = localStorage.getItem('auth-token');
+            if (token) {
+              headers.Authorization = `Bearer ${token}`;
+            }
+
+            // Extract locale from current URL path (client-side only)
+            const pathname = window.location.pathname;
+            const pathLocale = pathname.split('/')[1];
+            if (isLocale(pathLocale)) {
+              headers['x-locale'] = pathLocale;
+            } else {
+              headers['x-locale'] = DEFAULT_LOCALE;
+            }
+          } else {
+            // Server-side default
+            headers['x-locale'] = DEFAULT_LOCALE;
+          }
+
+          return headers;
         },
       }),
     ],

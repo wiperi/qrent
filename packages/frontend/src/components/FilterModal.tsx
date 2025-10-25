@@ -1,31 +1,29 @@
 'use client'
 
-import { useEffect, useMemo, useRef, useState } from 'react'
-import { usePathname, useRouter, useSearchParams } from 'next/navigation'
-import { HiX } from 'react-icons/hi'
 import { PROPERTY_TYPE } from '@qrent/shared/enum'
+import { useLocale, useTranslations } from 'next-intl'
+import { usePathname, useRouter, useSearchParams } from 'next/navigation'
+import { useEffect, useMemo, useRef, useState } from 'react'
+import { HiX } from 'react-icons/hi'
 
 // const UNIVERSITY_OPTIONS = ['UNSW', 'UTS', 'USYD'] as const
-const PROPERTY_TYPES = [
-  { key: PROPERTY_TYPE.House, label: 'House' },
-  { key: PROPERTY_TYPE.Apartment, label: 'Apartment' },
-] as const
+// PROPERTY_TYPES will be created inside the component to use translations
 
 // University to regions mapping based on suburbOptions.ts
 const UNIVERSITY_REGIONS = {
   UNSW: [
-    'alexandria', 'bondi', 'botany', 'coogee', 'eastgardens', 'eastlakes', 
-    'hillsdale', 'kensington', 'kingsford', 'maroubra', 'mascot', 'matraville', 
+    'alexandria', 'bondi', 'botany', 'coogee', 'eastgardens', 'eastlakes',
+    'hillsdale', 'kensington', 'kingsford', 'maroubra', 'mascot', 'matraville',
     'paddington', 'randwick', 'redfern', 'rosebery', 'waterloo', 'zetland'
   ],
   USYD: [
-    'burwood', 'chippendale', 'city', 'glebe', 'haymarket', 'hurstville', 
+    'burwood', 'chippendale', 'city', 'glebe', 'haymarket', 'hurstville',
     'mascot', 'newtown', 'ultimo', 'waterloo', 'zetland'
   ],
   UTS: [
-    'sydney', 'mascot', 'zetland', 'chippendale', 'surry hills', 'burwood', 
-    'waterloo', 'hurstville', 'strathfield', 'pyrmont', 'marrickville', 
-    'darlinghurst', 'haymarket', 'paddington', 'ultimo', 'redfern', 
+    'sydney', 'mascot', 'zetland', 'chippendale', 'surry hills', 'burwood',
+    'waterloo', 'hurstville', 'strathfield', 'pyrmont', 'marrickville',
+    'darlinghurst', 'haymarket', 'paddington', 'ultimo', 'redfern',
     'glebe', 'kensington', 'newtown'
   ]
 } as const
@@ -34,7 +32,15 @@ export default function FilterModal() {
   const router = useRouter()
   const pathname = usePathname()
   const searchParams = useSearchParams()
+  const locale = useLocale()
+  const t = useTranslations('FilterModal')
   const isOpen = searchParams.get('filters') === 'open'
+
+  // Create property types with translations
+  const PROPERTY_TYPES = [
+    { key: PROPERTY_TYPE.House, label: t('house') },
+    { key: PROPERTY_TYPE.Apartment, label: t('apartment') },
+  ] as const
 
   // Local state initialized from URL - aligned with backend preferenceSchema
   const [university, setUniversity] = useState<string>('UNSW')
@@ -68,7 +74,7 @@ export default function FilterModal() {
     setRating(Number(searchParams.get('rating') || 13))
     setMoveInDate(searchParams.get('moveInDate') || '')
     setAreas((searchParams.get('areas') || '').split(',').filter(Boolean))
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isOpen])
 
   // Scroll lock & basic focus handling
@@ -107,17 +113,17 @@ export default function FilterModal() {
 
     // Update URL params but keep modal open
     const params = new URLSearchParams(searchParams.toString())
-    ;[
-      'university',
-      'propertyType',
-      'priceMin', 'priceMax',
-      'bedroomsMin', 'bedroomsMax',
-      'bathroomsMin', 'bathroomsMax',
-      'commuteMin', 'commuteMax',
-      'rating',
-      'moveInDate',
-      'areas',
-    ].forEach(k => params.delete(k))
+      ;[
+        'university',
+        'propertyType',
+        'priceMin', 'priceMax',
+        'bedroomsMin', 'bedroomsMax',
+        'bathroomsMin', 'bathroomsMax',
+        'commuteMin', 'commuteMax',
+        'rating',
+        'moveInDate',
+        'areas',
+      ].forEach(k => params.delete(k))
     // keep modal open
     params.set('filters', 'open')
     const href = `${pathname}?${params.toString()}`
@@ -147,10 +153,10 @@ export default function FilterModal() {
     params.set('page', '1')
     params.delete('filters')
     const href = `${pathname}?${params.toString()}`
-    if (pathname === '/search') {
+    if (pathname === `/${locale}/search`) {
       router.push(href)
     } else {
-      router.push(`/search?${params.toString()}`)
+      router.push(`/${locale}/search?${params.toString()}`)
     }
   }
 
@@ -183,11 +189,11 @@ export default function FilterModal() {
       >
         {/* Header */}
         <div className="flex items-center justify-between border-b px-5 py-3">
-          <h2 id="filter-modal-title" className="text-base font-semibold text-slate-900">Filters</h2>
+          <h2 id="filter-modal-title" className="text-base font-semibold text-slate-900">{t('title')}</h2>
           <button
             type="button"
             onClick={close}
-            aria-label="Close filters"
+            aria-label={t('close')}
             className="inline-flex h-9 w-9 items-center justify-center rounded-md hover:bg-slate-100"
           >
             <HiX className="h-5 w-5" />
@@ -217,25 +223,23 @@ export default function FilterModal() {
 
           {/* Property Type (single-select) */}
           <section>
-            <h3 className="text-sm font-medium text-slate-800 mb-3">Property Type</h3>
+            <h3 className="text-sm font-medium text-slate-800 mb-3">{t('propertyType')}</h3>
             <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
               <button
                 type="button"
                 onClick={() => setSelectedType(null)}
-                className={`rounded-xl border px-3 py-2 text-sm font-medium transition ${
-                  selectedType === null ? 'border-blue-500 text-blue-600 bg-blue-50' : 'border-slate-200 text-slate-700 hover:border-blue-300'
-                }`}
+                className={`rounded-xl border px-3 py-2 text-sm font-medium transition ${selectedType === null ? 'border-blue-500 text-blue-600 bg-blue-50' : 'border-slate-200 text-slate-700 hover:border-blue-300'
+                  }`}
               >
-                Any
+                {t('any')}
               </button>
               {PROPERTY_TYPES.map(t => (
                 <button
                   key={t.key}
                   type="button"
                   onClick={() => selectType(t.key)}
-                  className={`rounded-xl border px-3 py-2 text-sm font-medium transition ${
-                    selectedType === t.key ? 'border-blue-500 text-blue-600 bg-blue-50' : 'border-slate-200 text-slate-700 hover:border-blue-300'
-                  }`}
+                  className={`rounded-xl border px-3 py-2 text-sm font-medium transition ${selectedType === t.key ? 'border-blue-500 text-blue-600 bg-blue-50' : 'border-slate-200 text-slate-700 hover:border-blue-300'
+                    }`}
                 >
                   {t.label}
                 </button>
@@ -263,7 +267,7 @@ export default function FilterModal() {
 
           {/* Bathrooms */}
           <section>
-            <h3 className="text-sm font-medium text-slate-800 mb-2">Bathrooms</h3>
+            <h3 className="text-sm font-medium text-slate-800 mb-2">{t('bathrooms')}</h3>
             <div className="grid grid-cols-2 gap-3">
               <input
                 value={bathroomsMin}
@@ -276,16 +280,16 @@ export default function FilterModal() {
                 }}
                 type="number"
                 min="0"
-                placeholder="Min"
+                placeholder={t('min')}
                 className="rounded-xl border border-slate-200 px-3 py-2"
               />
-              <input value={bathroomsMax} onChange={e => setBathroomsMax(e.target.value)} type="number" placeholder="Max" className="rounded-xl border border-slate-200 px-3 py-2" />
+              <input value={bathroomsMax} onChange={e => setBathroomsMax(e.target.value)} type="number" placeholder={t('max')} className="rounded-xl border border-slate-200 px-3 py-2" />
             </div>
           </section>
 
           {/* Move In Date */}
           <section>
-            <h3 className="text-sm font-medium text-slate-800 mb-2">Move In Date</h3>
+            <h3 className="text-sm font-medium text-slate-800 mb-2">{t('availableDate')}</h3>
             <input
               value={moveInDate}
               onChange={e => setMoveInDate(e.target.value)}
@@ -306,7 +310,7 @@ export default function FilterModal() {
           {/* Rating */}
           <section>
             <div className="flex items-center justify-between">
-              <h3 className="text-sm font-medium text-slate-800">Rating</h3>
+              <h3 className="text-sm font-medium text-slate-800">{t('rating')}</h3>
               <span className="text-sm text-slate-600">{rating}</span>
             </div>
             <input
@@ -321,16 +325,15 @@ export default function FilterModal() {
 
           {/* Region (multi-select) */}
           <section>
-            <h3 className="text-sm font-medium text-slate-800 mb-3">Region</h3>
+            <h3 className="text-sm font-medium text-slate-800 mb-3">{t('location')}</h3>
             <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
               {availableRegions.map(region => (
                 <button
                   key={region}
                   type="button"
                   onClick={() => toggleArea(region)}
-                  className={`rounded-xl border px-3 py-2 text-sm font-medium transition capitalize ${
-                    areas.includes(region) ? 'border-blue-500 text-blue-600 bg-blue-50' : 'border-slate-200 text-slate-700 hover:border-blue-300'
-                  }`}
+                  className={`rounded-xl border px-3 py-2 text-sm font-medium transition capitalize ${areas.includes(region) ? 'border-blue-500 text-blue-600 bg-blue-50' : 'border-slate-200 text-slate-700 hover:border-blue-300'
+                    }`}
                 >
                   {region.replace('-', ' ')}
                 </button>
@@ -346,7 +349,7 @@ export default function FilterModal() {
             onClick={onClear}
             className="inline-flex items-center justify-center gap-2 rounded-xl border border-slate-200 bg-white px-4 py-2 text-sm font-medium text-slate-700 hover:border-blue-300 hover:text-blue-600"
           >
-            Clear
+            {t('clearAll')}
           </button>
           <div className="ml-auto flex items-center gap-3">
             <button
@@ -354,14 +357,14 @@ export default function FilterModal() {
               onClick={close}
               className="inline-flex items-center justify-center gap-2 rounded-xl border border-slate-200 bg-white px-4 py-2 text-sm font-medium text-slate-700 hover:border-blue-300 hover:text-blue-600"
             >
-              Close
+              {t('close')}
             </button>
             <button
               type="button"
               onClick={onApply}
               className="inline-flex items-center justify-center gap-2 rounded-xl bg-blue-600 px-5 py-2.5 text-sm font-semibold text-white hover:bg-blue-700"
             >
-              Search
+              {t('applyFilters')}
             </button>
           </div>
         </div>

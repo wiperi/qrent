@@ -1,7 +1,8 @@
-import { z } from 'zod';
-import { TRPCError } from '@trpc/server';
-import { createTRPC } from '../trpc';
 import { propertyService } from '@/services/PropertyService';
+import { TRPCError } from '@trpc/server';
+import { z } from 'zod';
+import { createTRPC } from '../trpc';
+import { LOCALE } from '@qrent/shared/enum';
 
 const t = createTRPC();
 
@@ -106,7 +107,17 @@ export const propertiesRouter = t.router({
         orderBy,
       });
 
-      return properties;
+      const localizedProperties = properties.properties.map(p => ({
+        ...p,
+        descriptionCn: undefined,
+        descriptionEn: undefined,
+        description: ctx.locale === LOCALE.ZH ? p.descriptionCn : p.descriptionEn,
+      }));
+
+      return {
+        ...properties,
+        properties: localizedProperties,
+      };
     }),
 
   subscribe: protectedProcedure

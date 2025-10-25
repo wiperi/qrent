@@ -1,12 +1,14 @@
-'use client'
 
-import PropertyCard from '@/components/PropertyCard'
-import { HiSearch } from 'react-icons/hi'
-import Link from 'next/link'
-import { Suspense, useMemo } from 'react'
-import { useSearchParams } from 'next/navigation'
-import { useTRPCClient } from '@/lib/trpc'
-import { useQuery } from '@tanstack/react-query'
+'use client';
+
+import PropertyCard from '@/components/PropertyCard';
+import { useTRPCClient } from '@/lib/trpc';
+import { useQuery } from '@tanstack/react-query';
+import { useLocale, useTranslations } from 'next-intl';
+import Link from 'next/link';
+import { useSearchParams } from 'next/navigation';
+import { useMemo } from 'react';
+import { HiSearch } from 'react-icons/hi';
 
 type SearchParams = {
   q?: string
@@ -26,9 +28,25 @@ type SearchParams = {
   areas?: string
 }
 
+type Property = {
+  id: number
+  address: string
+  region: string | null
+  price: number
+  bedroomCount?: number
+  bathroomCount?: number
+  propertyType: number
+  description?: string | null
+  commuteTime?: number | null
+  url: string
+  averageScore: number
+  keywords: string
+  availableDate?: string | null
+}
+
 export default function SearchResults({ searchParams }: { searchParams: SearchParams }) {
   const page = Number(searchParams.page ?? '1') || 1
-  
+
   // Build search parameters from URL - aligned with backend preferenceSchema
   const searchFilters = useMemo(() => {
     const university = searchParams.university || 'UNSW'
@@ -71,7 +89,7 @@ export default function SearchResults({ searchParams }: { searchParams: SearchPa
     queryFn: () => trpc.properties.search.query(searchFilters)
   })
 
-  const properties = data?.properties || []
+  const properties: Property[] = data?.properties || []
   const searchSummary = {
     totalCount: data?.totalCount || 0,
     filteredCount: data?.filteredCount || 0,
@@ -88,7 +106,7 @@ export default function SearchResults({ searchParams }: { searchParams: SearchPa
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 lg:gap-8">
           {/* Left: stats/info */}
           <aside className="lg:col-span-3">
-            <StatsPanel 
+            <StatsPanel
               searchSummary={searchSummary}
               isPending={isPending}
             />
@@ -101,37 +119,35 @@ export default function SearchResults({ searchParams }: { searchParams: SearchPa
               <Pagination current={page} totalPages={totalPages} />
             </div>
 
-            <Suspense fallback={<ResultsSkeleton />}>
-              {isPending ? (
-                <ResultsSkeleton />
-              ) : error ? (
-                <div className="mt-6 text-center py-8">
-                  <p className="text-slate-600">Unable to load properties. Please try again later.</p>
-                </div>
-              ) : properties.length === 0 ? (
-                <EmptyState query={searchParams.q || ''} />
-              ) : (
-                <div className="mt-6 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-                  {properties.map(property => (
-                    <PropertyCard
-                      key={property.id}
-                      address={property.address}
-                      region={property.region || ''}
-                      price={property.price}
-                      bedroomCount={property.bedroomCount}
-                      bathroomCount={property.bathroomCount}
-                      propertyType={property.propertyType}
-                      descriptionEn={property.descriptionEn || ''}
-                      commuteTime={property.commuteTime ?? undefined}
-                      url={property.url}
-                      averageScore={property.averageScore}
-                      keywords={property.keywords}
-                      availableDate={property.availableDate}
-                    />
-                  ))}
-                </div>
-              )}
-            </Suspense>
+            {/* 注意：如果 useQuery 不支持 suspense 这里写 Suspense 会报错，可以直接移除 Suspense 包裹 */}
+            {isPending ? (
+              <ResultsSkeleton />
+            ) : error ? (
+              <div className="mt-6 text-center py-8">
+                <p className="text-slate-600">Unable to load properties. Please try again later.</p>
+              </div>
+            ) : properties.length === 0 ? (
+              <EmptyState query={searchParams.q || ''} />
+            ) : (
+              <div className="mt-6 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+                {properties.map(property => (
+                  <PropertyCard
+                    key={property.id}
+                    address={property.address}
+                    region={property.region || ''}
+                    price={property.price}
+                    bedroomCount={property.bedroomCount}
+                    bathroomCount={property.bathroomCount}
+                    propertyType={property.propertyType}
+                    commuteTime={property.commuteTime ?? undefined}
+                    url={property.url}
+                    averageScore={property.averageScore}
+                    keywords={property.keywords}
+                    availableDate={property.availableDate}
+                  />
+                ))}
+              </div>
+            )}
 
             <div className="mt-6">
               <Pagination current={page} totalPages={totalPages} />
@@ -143,10 +159,10 @@ export default function SearchResults({ searchParams }: { searchParams: SearchPa
   )
 }
 
-function StatsPanel({ 
-  searchSummary, 
-  isPending 
-}: { 
+function StatsPanel({
+  searchSummary,
+  isPending
+}: {
   searchSummary: {
     totalCount: number
     filteredCount: number
@@ -154,12 +170,13 @@ function StatsPanel({
     averageCommuteTime: number
     topRegions: { region: string | null; propertyCount: number; averagePrice: number; averageCommuteTime: number }[]
   }
-  isPending: boolean 
+  isPending: boolean
 }) {
+  const t = useTranslations('SearchResults');
   return (
     <div className="space-y-4">
       <div className="rounded-xl border border-slate-200 bg-white p-4 shadow-sm">
-        <div className="text-sm text-slate-500">Search Results</div>
+        <div className="text-sm text-slate-500">{t('searchResults')}</div>
         {isPending ? (
           <div className="mt-1 h-8 bg-slate-200 rounded animate-pulse" />
         ) : (
@@ -170,29 +187,29 @@ function StatsPanel({
       </div>
 
       <div className="rounded-xl border border-slate-200 bg-white p-4 shadow-sm">
-        <div className="text-sm text-slate-500">Average Price</div>
+        <div className="text-sm text-slate-500">{t('averagePrice')}</div>
         {isPending ? (
           <div className="mt-1 h-6 bg-slate-200 rounded animate-pulse" />
         ) : (
           <div className="mt-1 text-lg font-semibold text-slate-900">
-            ${Math.round(searchSummary.averagePrice)}/week
+            ${Math.round(searchSummary.averagePrice)}{t('perWeek')}
           </div>
         )}
       </div>
 
       <div className="rounded-xl border border-slate-200 bg-white p-4 shadow-sm">
-        <div className="text-sm text-slate-500">Average Commute</div>
+        <div className="text-sm text-slate-500">{t('averageCommute')}</div>
         {isPending ? (
           <div className="mt-1 h-6 bg-slate-200 rounded animate-pulse" />
         ) : (
           <div className="mt-1 text-lg font-semibold text-slate-900">
-            {Math.round(searchSummary.averageCommuteTime || 0)} minutes
+            {Math.round(searchSummary.averageCommuteTime || 0)} {t('minutes')}
           </div>
         )}
       </div>
 
       <div className="rounded-xl border border-slate-200 bg-white p-4 shadow-sm">
-        <div className="text-sm font-medium text-slate-800">Top Regions</div>
+        <div className="text-sm font-medium text-slate-800">{t('topRegions')}</div>
         {isPending ? (
           <div className="mt-2 space-y-3">
             {Array.from({ length: 3 }).map((_, i) => (
@@ -212,15 +229,15 @@ function StatsPanel({
                 <div className="mt-1 grid grid-cols-3 gap-2 text-xs text-slate-600">
                   <div>
                     <span className="font-medium">{region.propertyCount}</span>
-                    <span className="block text-slate-500">properties</span>
+                    <span className="block text-slate-500">{t('properties')}</span>
                   </div>
                   <div>
                     <span className="font-medium">${Math.round(region.averagePrice)}</span>
-                    <span className="block text-slate-500">avg/week</span>
+                    <span className="block text-slate-500">{t('avgWeek')}</span>
                   </div>
                   <div>
                     <span className="font-medium">{Math.round(region.averageCommuteTime)} min</span>
-                    <span className="block text-slate-500">commute</span>
+                    <span className="block text-slate-500">{t('commute')}</span>
                   </div>
                 </div>
               </div>
@@ -234,6 +251,8 @@ function StatsPanel({
 
 function Pagination({ current, totalPages }: { current: number; totalPages: number }) {
   const searchParams = useSearchParams()
+  const locale = useLocale()
+  const t = useTranslations('SearchResults')
   const prevPage = Math.max(1, current - 1)
   const nextPage = Math.min(totalPages, current + 1)
 
@@ -242,7 +261,7 @@ function Pagination({ current, totalPages }: { current: number; totalPages: numb
     params.set('page', String(pageNum))
     // Remove modal state parameter to prevent modal from opening on pagination
     params.delete('filters')
-    return `/search?${params.toString()}`
+    return `/${locale}/search?${params.toString()}`
   }
 
   return (
@@ -250,27 +269,25 @@ function Pagination({ current, totalPages }: { current: number; totalPages: numb
       <Link
         href={makeHref(prevPage)}
         aria-disabled={current === 1}
-        className={`px-3 py-1.5 rounded-md border text-sm ${
-          current === 1
-            ? 'cursor-not-allowed border-slate-200 text-slate-300'
-            : 'border-slate-200 text-slate-700 hover:border-blue-300 hover:text-blue-600'
-        }`}
+        className={`px-3 py-1.5 rounded-md border text-sm ${current === 1
+          ? 'cursor-not-allowed border-slate-200 text-slate-300'
+          : 'border-slate-200 text-slate-700 hover:border-blue-300 hover:text-blue-600'
+          }`}
       >
-        Prev
+        {t('prev')}
       </Link>
       <span className="text-sm text-slate-600">
-        Page <span className="font-medium text-slate-900">{current}</span> of {totalPages}
+        {t('page')} <span className="font-medium text-slate-900">{current}</span> {t('of')} {totalPages}
       </span>
       <Link
         href={makeHref(nextPage)}
         aria-disabled={current === totalPages}
-        className={`px-3 py-1.5 rounded-md border text-sm ${
-          current === totalPages
-            ? 'cursor-not-allowed border-slate-200 text-slate-300'
-            : 'border-slate-200 text-slate-700 hover:border-blue-300 hover:text-blue-600'
-        }`}
+        className={`px-3 py-1.5 rounded-md border text-sm ${current === totalPages
+          ? 'cursor-not-allowed border-slate-200 text-slate-300'
+          : 'border-slate-200 text-slate-700 hover:border-blue-300 hover:text-blue-600'
+          }`}
       >
-        Next
+        {t('next')}
       </Link>
     </nav>
   )
@@ -295,25 +312,28 @@ function ResultsSkeleton() {
 }
 
 function EmptyState({ query }: { query: string }) {
+  const t = useTranslations('SearchResults')
+  const locale = useLocale()
+
   return (
     <div className="mt-10 rounded-xl border border-dashed border-slate-300 bg-white p-10 text-center">
       <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-blue-50 text-blue-600">
         <HiSearch className="h-6 w-6" />
       </div>
-      <h3 className="mt-4 text-lg font-semibold text-slate-900">No results</h3>
+      <h3 className="mt-4 text-lg font-semibold text-slate-900">{t('noResults')}</h3>
       <p className="mt-2 text-sm text-slate-600">
         {query ? (
-          <>We couldn&apos;t find any results for &quot;{query}&quot;. Try different keywords.</>
+          <>{t('noResultsForQuery', { query })}</>
         ) : (
-          <>Try adjusting your search filters to find properties.</>
+          <>{t('adjustFilters')}</>
         )}
       </p>
       <div className="mt-6">
         <Link
-          href="/"
+          href={`/${locale}`}
           className="inline-flex items-center justify-center gap-2 rounded-md border border-slate-200 bg-white px-4 py-2 text-sm font-medium text-slate-700 hover:border-blue-300 hover:text-blue-600"
         >
-          Go to homepage
+          {t('goToHomepage')}
         </Link>
       </div>
     </div>

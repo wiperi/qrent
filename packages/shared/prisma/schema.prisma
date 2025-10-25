@@ -85,10 +85,11 @@ model Property {
   descriptionCn   String?          @map("description_cn") @db.VarChar(1024)
   url             String           @db.VarChar(255)
   publishedAt     DateTime         @map("published_at") @db.DateTime(0)
-  releaseTime     DateTime?        @map("release_time") @db.DateTime(0)
-  image           String?          @db.Text
+  thumbnailUrl    String           @default("") @map("thumbnail_url") @db.VarChar(500)
+  createdAt       DateTime         @default(now()) @map("created_at") @db.DateTime(0)
   region          Region           @relation(fields: [regionId], references: [id])
   property_school PropertySchool[]
+  images          PropertyImage[]
   users           User[]           @relation("PropertyToUser")
 
   @@index([price])
@@ -138,4 +139,16 @@ model PropertySchool {
   @@index([property_id])
   @@index([school_id])
   @@map("property_school")
+}
+
+model PropertyImage {
+  id           Int      @id @default(autoincrement()) @db.UnsignedInt
+  propertyId   Int      @map("property_id") @db.UnsignedInt
+  url          String   @db.VarChar(500)
+  displayOrder Int      @default(0) @map("display_order") @db.UnsignedTinyInt
+  createdAt    DateTime @default(now()) @map("created_at") @db.DateTime(0)
+  property     Property @relation(fields: [propertyId], references: [id], onDelete: Cascade)
+
+  @@index([propertyId, displayOrder])
+  @@map("property_images")
 }

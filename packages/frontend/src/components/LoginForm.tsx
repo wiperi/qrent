@@ -1,7 +1,8 @@
 'use client';
 
-import { useState } from 'react';
 import { useAuth } from '@/hooks/use-auth';
+import { useTranslations } from 'next-intl';
+import { useState } from 'react';
 
 interface LoginFormProps {
   onSuccess?: () => void;
@@ -15,6 +16,7 @@ export default function LoginForm({ onSuccess, onSwitchToSignup }: LoginFormProp
   const [isLoading, setIsLoading] = useState(false);
 
   const { login } = useAuth();
+  const t = useTranslations('Auth');
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -35,13 +37,13 @@ export default function LoginForm({ onSuccess, onSwitchToSignup }: LoginFormProp
     <div className="w-full max-w-md mx-auto">
       <div className="bg-white rounded-lg shadow-md p-6">
         <h2 className="text-2xl font-bold text-center text-gray-900 mb-6">
-          Sign in to your account
+          {t('loginTitle')}
         </h2>
-        
+
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>
             <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-1">
-              Email
+              {t('email')}
             </label>
             <input
               id="email"
@@ -50,13 +52,13 @@ export default function LoginForm({ onSuccess, onSwitchToSignup }: LoginFormProp
               onChange={(e) => setEmail(e.target.value)}
               required
               className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
-              placeholder="Enter your email"
+              placeholder={t('email')}
             />
           </div>
 
           <div>
             <label htmlFor="password" className="block text-sm font-medium text-gray-700 mb-1">
-              Password
+              {t('password')}
             </label>
             <input
               id="password"
@@ -65,7 +67,7 @@ export default function LoginForm({ onSuccess, onSwitchToSignup }: LoginFormProp
               onChange={(e) => setPassword(e.target.value)}
               required
               className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
-              placeholder="Enter your password"
+              placeholder={t('password')}
             />
           </div>
 
@@ -80,18 +82,18 @@ export default function LoginForm({ onSuccess, onSwitchToSignup }: LoginFormProp
             disabled={isLoading}
             className="w-full bg-blue-600 text-white py-2 px-4 rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed"
           >
-            {isLoading ? 'Signing in...' : 'Sign in'}
+            {isLoading ? 'Loading...' : t('loginButton')}
           </button>
         </form>
 
         {onSwitchToSignup && (
           <p className="mt-4 text-center text-sm text-gray-600">
-            Don&apos;t have an account?{' '}
+            {t('switchToSignup')}{' '}
             <button
               onClick={onSwitchToSignup}
               className="text-blue-600 hover:text-blue-500 font-medium"
             >
-              Sign up
+              {t('signupButton')}
             </button>
           </p>
         )}

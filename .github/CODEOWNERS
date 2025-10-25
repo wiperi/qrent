@@ -1,0 +1,18 @@
+# CODEOWNERS for qrent
+# This file assigns default code owners for paths in the repository.
+# When a pull request changes files that match a pattern below, GitHub
+# will request review from the listed owners.
+# Note: the last matching pattern wins for a given file. Keep general
+# rules near the top and more specific rules below if you want to override.
+
+# Default owner for the whole repository
+* @wiperi
+
+# Specific owners for packages (more specific rules are placed after the default)
+/packages/backend/ @wiperi
+/packages/shared/ @wiperi
+/packages/frontend/ @wiperi
+/.github/ @wiperi
+/packages/scraper/ @zach-moon
+
+# End of CODEOWNERS

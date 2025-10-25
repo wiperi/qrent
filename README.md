@@ -1,3 +1,25 @@
+Qrent
+
+Website: www.qrent.rent
+
+Qrent is an AI-powered rental platform built for international students in Australia.
+It helps students find housing smarter and faster by analyzing commute time, budget, and area data to recommend the most suitable rentals — all in one place.
+
+🌟 Key Features
+
+AI-Based Recommendations: Personalized rental suggestions based on commute, budget, and lifestyle.
+
+Smart Filters: Instantly narrow down listings with intelligent search and filter options.
+
+All-in-One Experience: Compare, shortlist, and book — without switching platforms.
+
+Local Insights: Understand each suburb’s pros and cons with data-driven summaries.
+
+🚀 Mission
+
+To make renting in Australia simple, transparent, and data-driven — empowering international students to find a real home faster.
+
+——————————————————————————————————————————————————————————————————————————————————————————————————————————————————————————————————
 # QRent Backend Setup Guide
 
 ## Overview

@@ -1,0 +1,287 @@
+{
+  "Header": {
+    "login": "登录",
+    "signup": "注册",
+    "signout": "退出登录",
+    "userMenu": "用户菜单",
+    "openMenu": "打开菜单",
+    "closeMenu": "关闭菜单",
+    "rentalGuide": "租房指南",
+    "documentPreparation": "文件准备",
+    "rentalBlog": "租房论坛"
+  },
+  "SearchBar": {
+    "placeholder": "按城市、地址或学校搜索...",
+    "searchButton": "搜索",
+    "filters": "筛选",
+    "targetSchool": "目标学校",
+    "maxPrice": "最高价格 ($/周)",
+    "maxCommute": "最长通勤时间 (分钟)",
+    "bedrooms": "卧室数量",
+    "anyPlaceholder": "不限",
+    "anyBedrooms": "不限卧室数",
+    "oneBedroom": "1间卧室",
+    "twoBedrooms": "2间卧室",
+    "threeBedrooms": "3间卧室",
+    "fourBedrooms": "4间卧室",
+    "fivePlusBedrooms": "5间及以上卧室"
+  },
+  "FilterModal": {
+    "title": "筛选条件",
+    "priceRange": "价格范围",
+    "bedrooms": "卧室数量",
+    "bathrooms": "浴室数量",
+    "propertyType": "房屋类型",
+    "location": "位置",
+    "availableDate": "可入住日期",
+    "clearAll": "清除全部",
+    "applyFilters": "应用筛选",
+    "close": "关闭",
+    "any": "不限",
+    "house": "独栋房屋",
+    "apartment": "公寓",
+    "min": "最小值",
+    "max": "最大值",
+    "rating": "评分"
+  },
+  "Auth": {
+    "loginTitle": "欢迎回来",
+    "signupTitle": "创建您的账户",
+    "email": "邮箱",
+    "password": "密码",
+    "confirmPassword": "确认密码",
+    "name": "姓名",
+    "loginButton": "登录",
+    "signupButton": "注册",
+    "switchToSignup": "没有账户？",
+    "switchToLogin": "已有账户？",
+    "showPassword": "显示密码",
+    "hidePassword": "隐藏密码",
+    "invalidEmail": "邮箱格式无效",
+    "passwordMinLength": "密码至少需要6个字符",
+    "passwordsDontMatch": "两次输入的密码不匹配"
+  },
+  "Footer": {
+    "about": "关于",
+    "meetOurTeam": "认识我们",
+    "getInTouch": "联系我们",
+    "copyEmail": "复制邮箱地址: yyzyfish5@gmail.com",
+    "emailCopied": "已复制到剪贴板",
+    "copyright": "版权所有 © 2025 - Qrent Industries Ltd 保留所有权利",
+    "icp": "网页备案号: 粤ICP备2025363367号-1"
+  },
+  "About": {
+    "title": "关于QRent",
+    "mission": {
+      "title": "我们的使命",
+      "description1": "QRent致力于为学生和年轻专业人士简化租房搜索体验。我们理解找到完美的居住地可能会让人感到不知所措、耗时且压力巨大。这就是为什么我们构建了一个平台，聚合租房信息，通过智能评分进行分析，帮助您快速做出明智的决定。",
+      "description2": "我们的智能评分系统基于多个因素评估房产，包括位置、价格、设施和与大学的距离，让您一目了然地获得全面的视图。"
+    },
+    "whatWeDo": {
+      "title": "我们的服务",
+      "smartAggregation": {
+        "title": "智能聚合",
+        "description": "我们从多个来源收集和整理租房信息，为您节省在不同平台搜索的时间。"
+      },
+      "intelligentScoring": {
+        "title": "智能评分",
+        "description": "我们的专有算法基于价值、位置、设施和其他关键因素对每个房产进行评分。"
+      },
+      "realTimeUpdates": {
+        "title": "实时更新",
+        "description": "通过最新的房源信息和可用性信息保持了解，这样您就不会错过绝佳的机会。"
+      },
+      "personalizedExperience": {
+        "title": "个性化体验",
+        "description": "保存您的偏好，跟踪喜欢的房产，并接收符合您条件的新房源通知。"
+      }
+    },
+    "ourStory": {
+      "title": "我们的故事",
+      "description1": "QRent源于个人经历。作为学生，我们面临着在平衡学习和有限预算的同时寻找优质、经济适用住房的挑战。我们意识到租房市场需要一个更好的解决方案——一个将技术与对租户需求的真正理解相结合的方案。",
+      "description2": "今天，我们很自豪能够帮助成千上万的租户找到理想的住所，使这个过程更容易、更快、更透明。我们不断根据用户反馈和市场趋势发展我们的平台，以更好地为您服务。"
+    }
+  },
+  "Team": {
+    "title": "认识我们的团队",
+    "subtitle": "我们是一群多样化的开发者、设计师和租房市场爱好者，共同努力革新人们寻找家园的方式。",
+    "joinTeam": {
+      "title": "加入我们的团队",
+      "description": "我们一直在寻找有激情的个人，希望为租房市场带来改变。如果您有兴趣加入QRent，我们很乐意听到您的消息！",
+      "getInTouch": "联系我们"
+    },
+    "members": {
+      "zhiyang": {
+        "bio": "具有强大商业背景的产品愿景师。志阳推动QRent的战略方向，确保平台满足真实的市场需求，同时为公司建立可持续的增长。",
+        "expertise": "产品策略，业务发展"
+      },
+      "cliff": {
+        "bio": "系统架构师和DevOps专家，设计了QRent的可扩展基础设施。Cliff确保无缝的部署管道和强大的全栈解决方案，为我们的平台提供动力。",
+        "expertise": "系统架构，DevOps，全栈开发"
+      },
+      "zack": {
+        "bio": "数据专家，将原始房产信息转化为可操作的见解。Yibin构建数据管道和分析，帮助用户做出明智的租房决策。",
+        "expertise": "数据工程，数据分析"
+      },
+      "yuting": {
+        "bio": "专注于创建直观和响应式用户体验的前端开发者。Yuting制作使房产搜索变得轻松愉快的界面。",
+        "expertise": "前端开发，React，UI/UX"
+      },
+      "qixin": {
+        "bio": "对性能和可访问性充满热情的前端工程师。Qixin确保QRent在所有设备和浏览器上提供快速、精美的体验。",
+        "expertise": "前端开发，性能优化"
+      },
+      "zhongtao": {
+        "bio": "构建智能聊天机器人解决方案的AI专家。Zhongtao开发对话界面，帮助用户通过自然语言交互找到完美的租房。",
+        "expertise": "人工智能，聊天机器人"
+      }
+    }
+  },
+  "Contact": {
+    "title": "联系我们",
+    "subtitle": "有问题、反馈或只是想打个招呼？我们很乐意听到您的消息。填写下面的表单或通过我们的任何渠道联系我们。",
+    "form": {
+      "title": "给我们发送消息",
+      "name": "姓名",
+      "namePlaceholder": "您的姓名",
+      "email": "邮箱",
+      "emailPlaceholder": "your.email@example.com",
+      "subject": "主题",
+      "subjectPlaceholder": "这是关于什么的？",
+      "message": "消息",
+      "messagePlaceholder": "告诉我们更多...",
+      "submitButton": "发送消息",
+      "successTitle": "消息已发送！",
+      "successMessage": "我们会尽快回复您。"
+    },
+    "contactInfo": {
+      "title": "联系信息",
+      "email": "邮箱",
+      "office": "办公室",
+      "officeAddress": "平安金融中心<br />A座35层<br />深圳市，广东省 518000"
+    },
+    "followUs": {
+      "title": "关注我们"
+    },
+    "officeHours": {
+      "title": "办公时间",
+      "weekdays": "周一至周五：",
+      "weekdaysTime": "上午9:00 - 下午6:00",
+      "saturday": "周六：",
+      "saturdayTime": "上午10:00 - 下午4:00",
+      "sunday": "周日：",
+      "sundayTime": "休息"
+    }
+  },
+  "Blog": {
+    "title": "学习如何提升您的租房搜索",
+    "subtitle": "发现通过QRent获得理想租房的策略。从搜索优化和房产评估到租赁谈判和入住准备，探索我们的资源，掌控您的租房之旅。",
+    "noPosts": "暂无博客文章。",
+    "author": "QRent团队"
+  },
+  "Common": {
+    "loading": "加载中...",
+    "error": "发生错误",
+    "retry": "重试",
+    "cancel": "取消",
+    "confirm": "确认",
+    "save": "保存",
+    "edit": "编辑",
+    "delete": "删除"
+  },
+  "LanguageSwitcher": {
+    "english": "English",
+    "chinese": "中文"
+  },
+  "SearchResults": {
+    "searchResults": "搜索结果",
+    "averagePrice": "平均价格",
+    "averageCommute": "平均通勤时间",
+    "topRegions": "热门区域",
+    "properties": "房源",
+    "avgWeek": "平均/周",
+    "commute": "通勤",
+    "prev": "上一页",
+    "next": "下一页",
+    "page": "第",
+    "of": "页，共",
+    "noResults": "无搜索结果",
+    "noResultsForQuery": "未找到与\"{query}\"相关的结果，请尝试其他关键词。",
+    "adjustFilters": "请尝试调整搜索筛选条件来查找房源。",
+    "goToHomepage": "返回首页",
+    "perWeek": "/周",
+    "minutes": "分钟"
+  },
+  "PropertyGrid": {
+    "dailyNewHouses": "每日新房推荐",
+    "loadError": "无法加载房源信息，请稍后重试。"
+  },
+  "PropertyCard": {
+    "bedrooms": "卧室",
+    "bathrooms": "浴室",
+    "parking": "停车位",
+    "availableFrom": "可入住时间",
+    "viewDetails": "查看详情",
+    "house": "独栋房屋",
+    "apartment": "公寓",
+    "perWeek": "/周",
+    "availableNow": "即可入住",
+    "availableInDays": "{days}天后可入住",
+    "available": "可入住",
+    "minToUniversity": "分钟到学校",
+    "keywords": {
+      "bedroom": "卧室",
+      "bedrooms": "卧室",
+      "one-bedroom": "一室",
+      "two-bedroom": "两室",
+      "three-bedroom": "三室",
+      "3-bedroom": "三室",
+      "apartment": "公寓",
+      "furnished": "精装修",
+      "bathrooms": "浴室",
+      "bathroom": "浴室",
+      "luxury": "豪华",
+      "modern": "现代",
+      "spacious": "宽敞",
+      "contemporary": "现代风格",
+      "executive": "高端",
+      "studio": "单间公寓",
+      "design": "设计",
+      "open": "开放式",
+      "plan": "布局",
+      "timber": "木质",
+      "interiors": "内饰",
+      "easy": "便利",
+      "access": "交通",
+      "fully": "全",
+      "study": "书房",
+      "living": "客厅",
+      "level": "层",
+      "ocean": "海景",
+      "view": "景观",
+      "boutique": "精品",
+      "little": "小",
+      "bay": "海湾",
+      "award": "获奖",
+      "winning": "获奖",
+      "redevelopment": "重建",
+      "leisure": "休闲",
+      "heart": "中心",
+      "private": "私人",
+      "side": "侧",
+      "pathway": "通道",
+      "quiet": "安静",
+      "semi": "半",
+      "semi-detached": "半独立式",
+      "residence": "住宅",
+      "beatty": "比蒂",
+      "street": "街",
+      "facade": "外观",
+      "kitchen": "厨房",
+      "walkable": "步行可达",
+      "trains": "火车",
+      "beach": "海滩",
+      "elegance": "优雅"
+    }
+  }
+}

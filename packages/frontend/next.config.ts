@@ -1,5 +1,6 @@
-import type { NextConfig } from 'next';
 import { config as dotenvConfig } from 'dotenv';
+import type { NextConfig } from 'next';
+import createNextIntlPlugin from 'next-intl/plugin';
 import { join } from 'path';
 
 // Load .env in development environment
@@ -8,6 +9,8 @@ if (process.env.NODE_ENV === 'development') {
   dotenvConfig({ path: join(__dirname, '../../.env') });
   console.log('🌐 Backend URL:', process.env.NEXT_PUBLIC_BACKEND_URL);
 }
+
+const withNextIntl = createNextIntlPlugin('./src/i18n.ts');
 
 const nextConfig: NextConfig = {
   eslint: {
@@ -19,6 +22,10 @@ const nextConfig: NextConfig = {
         protocol: 'https',
         hostname: 'api.dicebear.com',
       },
+      {
+        protocol: 'https',
+        hostname: 'images.unsplash.com',
+      },
     ],
     dangerouslyAllowSVG: true,
     contentDispositionType: 'attachment',
@@ -26,4 +33,4 @@ const nextConfig: NextConfig = {
   },
 };
 
-export default nextConfig;
+export default withNextIntl(nextConfig);

@@ -17,3 +17,8 @@ export enum GENDER {
   Female = 0,
   Male = 1,
 }
+
+export enum LOCALE {
+  EN = 'en',
+  ZH = 'zh',
+}

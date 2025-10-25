@@ -1,6 +1,7 @@
 import { NextFunction, Request, RequestHandler, Response } from 'express';
 import jwt, { JwtPayload } from 'jsonwebtoken';
 import HttpError from '@/error/HttpError';
+import { LOCALE } from '@qrent/shared/enum';
 
 // Extend Express Request interface to include user property
 declare global {

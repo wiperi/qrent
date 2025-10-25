@@ -250,6 +250,15 @@ def import_to_database(df, school_name):
                     published_at = datetime.now()
                 
                 if house_id in existing_properties:
+                    # Check if release_time exists for this property
+                    cursor.execute("SELECT id, release_time FROM properties WHERE house_id = %s", (house_id,))
+                    result = cursor.fetchone()
+                    property_id = result[0] if result else None
+                    existing_release_time = result[1] if result and result[1] else None
+                    
+                    # If release_time is null, set it to current time
+                    release_time = existing_release_time if existing_release_time else datetime.now()
+                    
                     update_sql = """
                         UPDATE properties SET 
                             price = %s, address = %s, region_id = %s, 
@@ -269,12 +278,11 @@ def import_to_database(df, school_name):
                         thumbnail_url, house_id
                     ))
                     
-                    cursor.execute("SELECT id FROM properties WHERE house_id = %s", (house_id,))
-                    result = cursor.fetchone()
-                    property_id = result[0] if result else None
-                    
                     update_count += 1
                 else:
+                    # For new properties, set release_time to current time
+                    release_time = datetime.now()
+                    
                     insert_sql = """
                         INSERT INTO properties (
                             price, address, region_id, bedroom_count, 

@@ -1,6 +1,6 @@
+import HttpError from '@/error/HttpError';
 import { initTRPC, TRPCError } from '@trpc/server';
 import { ZodError } from 'zod';
-import HttpError from '@/error/HttpError';
 
 export const createTRPC = () => {
   return initTRPC.context<TrpcContext>().create({
@@ -35,6 +35,7 @@ export const createTRPC = () => {
 
 export type TrpcContext = {
   userId?: number;
+  locale: string;
   req: import('express').Request;
   res: import('express').Response;
 };
