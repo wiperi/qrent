@@ -235,6 +235,7 @@
     "availableNow": "Available now",
     "availableInDays": "Available in {days} day{plural}",
     "available": "Available",
+    "created": "Created",
     "minToUniversity": "min to university",
     "keywords": {
       "bedroom": "bedroom",
