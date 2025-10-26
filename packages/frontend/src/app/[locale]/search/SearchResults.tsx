@@ -42,7 +42,7 @@ type Property = {
   averageScore: number
   keywords: string
   availableDate?: string | null
-  createdAt: string
+  publishedAt: string
 }
 
 export default function SearchResults({ searchParams }: { searchParams: SearchParams }) {
@@ -145,7 +145,7 @@ export default function SearchResults({ searchParams }: { searchParams: SearchPa
                     averageScore={property.averageScore}
                     keywords={property.keywords}
                     availableDate={property.availableDate}
-                    createdAt={property.createdAt}
+                    publishedAt={property.publishedAt}
                   />
                 ))}
               </div>

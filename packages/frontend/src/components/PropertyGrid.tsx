@@ -124,7 +124,7 @@ export default function PropertyGrid() {
             averageScore={property.averageScore}
             keywords={property.keywords}
             availableDate={property.availableDate}
-            createdAt={property.createdAt}
+            publishedAt={property.publishedAt}
           />
         ))}
       </div>

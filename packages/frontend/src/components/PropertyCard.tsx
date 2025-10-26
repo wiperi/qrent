@@ -15,7 +15,7 @@ interface PropertyCardProps {
   averageScore: number;
   keywords: string;
   availableDate?: string | null;
-  createdAt: string;
+  publishedAt: string;
 }
 
 export default function PropertyCard({
@@ -30,7 +30,7 @@ export default function PropertyCard({
   averageScore,
   keywords,
   availableDate,
-  createdAt,
+  publishedAt,
 }: PropertyCardProps) {
   const t = useTranslations('PropertyCard');
   const locale = useLocale();
@@ -99,21 +99,21 @@ export default function PropertyCard({
     return `${t('available')} ${formattedDate}`;
   };
 
-  const formatCreatedAt = (date: string | Date | null | undefined): string | null => {
+  const formatPublishedAt = (date: string | Date | null | undefined): string | null => {
     if (date === null || date === undefined) {
       return null;
     }
 
-    const createdDate = typeof date === 'string' ? new Date(date) : date;
+    const publishedDate = typeof date === 'string' ? new Date(date) : date;
     const now = new Date();
 
     const options: Intl.DateTimeFormatOptions = {
       month: 'short',
       day: 'numeric',
-      year: createdDate.getFullYear() !== now.getFullYear() ? 'numeric' : undefined,
+      year: publishedDate.getFullYear() !== now.getFullYear() ? 'numeric' : undefined,
     };
 
-    return createdDate.toLocaleDateString(locale === LOCALE.ZH ? 'zh-CN' : 'en-US', options);
+    return publishedDate.toLocaleDateString(locale === LOCALE.ZH ? 'zh-CN' : 'en-US', options);
   };
 
   const content = (
@@ -164,10 +164,10 @@ export default function PropertyCard({
           )}
         </div>
 
-        {/* Third row: Created date */}
-        {createdAt && (
+        {/* Third row: Published date */}
+        {publishedAt && (
           <div className="text-xs text-slate-500">
-            {t('created')}: {formatCreatedAt(createdAt)}
+            {t('published')} {formatPublishedAt(publishedAt)}
           </div>
         )}
       </div>
