@@ -30,6 +30,11 @@ export default function Header() {
     document.body.classList.remove('overflow-hidden')
   }
 
+  const toggleDrawer = () => {
+    setIsDrawerOpen(!isDrawerOpen)
+    document.body.classList.toggle('overflow-hidden')
+  }
+
   const openAuthModal = (mode: 'login' | 'signup') => {
     setAuthMode(mode)
     setAuthModalOpen(true)
@@ -139,7 +144,7 @@ export default function Header() {
 
               {/* Mobile hamburger */}
               <button
-                onClick={openDrawer}
+                onClick={toggleDrawer}
                 className="md:hidden inline-flex h-10 w-10 items-center justify-center text-slate-700 hover:text-blue-600 focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-600"
                 aria-label={t('openMenu')}
               >
