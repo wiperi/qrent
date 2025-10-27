@@ -5,7 +5,7 @@ from selenium.webdriver.support import expected_conditions as EC
 import pandas as pd
 from scraper import scrape_data
 # Postcodes for target areas
-from target_areas import postcodes_unsw, postcodes_usyd, postcodes_uts
+from target_areas import postcodes_unsw, postcodes_usyd
 from datetime import datetime
 from scraper_detailed import scrape_property_data
 from data_cleaner import clean_rental_data
@@ -43,14 +43,10 @@ postcodes = postcodes_unsw
 for postcode in postcodes:
     url = base_url.format(postcode)
     scrape_data(driver, url, postcode, 'UNSW')
-
-# Scrape data for USYD postcodes  
 postcodes = postcodes_usyd
 for postcode in postcodes:
     url = base_url.format(postcode)
     scrape_data(driver, url, postcode, 'USYD')
-
-# Note: UTS uses the same data as USYD, will be copied later
 # Close the browser
 driver.quit()
 
@@ -111,8 +107,6 @@ for filename in os.listdir(csv_directory):
         os.remove(file_path)
         print(f"{file_path} has been removed.")
 
-# Note: UTS data will be copied from USYD after processing
-
 # Clean the merged data and add descriptions and available dates to the data
 current_date = datetime.now().strftime("%y%m%d")
 output_file1 = f"UNSW_rentdata_{current_date}.csv"
@@ -120,25 +114,19 @@ output_file2 = f"USYD_rentdata_{current_date}.csv"
 output_file3 = f"UTS_rentdata_{current_date}.csv"
 
 if __name__ == "__main__":
-    # Process UNSW and USYD data normally
     clean_rental_data('UNSW')
     clean_rental_data('USYD')
     scrape_property_data('UNSW')
     scrape_property_data('USYD')
-    
-    # Calculate commute times for UNSW and USYD
+    today_str = datetime.now().strftime('%y%m%d')
     update_commute_time('UNSW')
     update_commute_time('USYD')
-    
-    # Process AI scoring and keywords for all properties
     process_missing_fields()
-    
-    # Copy USYD data for UTS and calculate UTS commute time
+
     if os.path.exists(output_file2):
         shutil.copyfile(output_file2, output_file3)
         print(f"Copied {output_file2} to {output_file3} for UTS.")
         update_commute_time('UTS')
-        print("UTS commute time calculation completed.")
     else:
         print(f"[ERROR] '{output_file2}' does not exist. Cannot create UTS data.")
 

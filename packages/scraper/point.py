@@ -9,23 +9,8 @@ import glob
 import re
 from datetime import datetime
 from dotenv import load_dotenv
-import os
 
-# Try to load .env from multiple possible locations
-env_paths = [
-    '.env',
-    '../.env', 
-    '../../.env',
-    '/app/.env'
-]
-
-for env_path in env_paths:
-    if os.path.exists(env_path):
-        load_dotenv(env_path)
-        break
-else:
-    # If no .env file found, try to load from environment
-    load_dotenv()
+load_dotenv('.env')
 
 API_KEY_POINT = os.getenv('PROPERTY_RATING_API_KEY')
 MODEL_NAME = "qwen-plus-1220"
@@ -33,10 +18,9 @@ MODEL_NAME = "qwen-plus-1220"
 today_date = datetime.now()
 current_date = today_date.strftime('%y%m%d')
 
-# 三个目标文件
+# 两个目标文件
 output_file1 = f"UNSW_rentdata_{current_date}.csv"
 output_file2 = f"USYD_rentdata_{current_date}.csv"
-output_file3 = f"UTS_rentdata_{current_date}.csv"
 
 # ========== 房屋打分相关配置 ==========
 NUM_CALLS = 2         # 调用次数
@@ -175,12 +159,19 @@ def call_model_for_keywords(description: str) -> str:
         {
             'role': 'system',
             'content': (
-                "Extract concise keywords from the given property description. "
-                "Include aspects such as location, property features, and available facilities. "
-                "Output in one line without any extra text, in English. "
-                "For example: Keywords: 3-bedroom apartment, large courtyard, stylish tiled floor, built-in wardrobes, "
-                "master suite bathroom, air conditioning, ample storage, open kitchen, SMEG appliances, NBN ready, "
-                "resort-style amenities, indoor heated pool, gym, private landscaped courtyard."
+                "从房源描述中提取简洁的关键词，包括以下10个维度：\n"
+                "1.安全性：门禁系统、安保设施等\n"
+                "2.重要家电：空调、烘干机等配置\n"
+                "3.厨房：有无灶台，灶台大小/类型，有无洗碗机、微波炉、烤箱等\n"
+                "4.装修状况：是否带家具，装修风格\n"
+                "5.储物空间：衣柜、储藏室，可容纳床尺寸评估等\n"
+                "6.洗手间：是否干湿分离、配备浴缸等\n"
+                "7.社区配套：健身房、游泳池等公共设施\n"
+                "8.购物：周边有无较大的买菜市场、药店等\n"
+                "9.户外空间：采光状态、景观特色，庭院或阳台私密性评估等\n"
+                "10.地理位置：临近商店、公园、餐厅等\n\n"
+                "用英文输出，描述中未提及的维度不要输出，关键词数量≤11个，不包含额外文字。\n"
+                "示例格式：\"large courtyard, built-in wardrobes, master suite bathroom, air conditioning, ample storage, open kitchen, SMEG appliances, NBN ready, indoor heated pool, gym, private landscaped courtyard\""
             )
         },
         {
@@ -216,18 +207,28 @@ def process_one_row_keywords(idx: int, row: pd.Series) -> (int, str):
     keywords = call_model_for_keywords(desc)
     return idx, keywords
 
-def extract_keywords_parallel(df: pd.DataFrame, max_workers=5) -> pd.DataFrame:
+def extract_keywords_parallel(df: pd.DataFrame, max_workers=5, force_update=False) -> pd.DataFrame:
     if 'keywords' not in df.columns:
         df['keywords'] = pd.Series(dtype="string")
     else:
         df['keywords'] = df['keywords'].astype("string")
     
-    to_extract = df[
-        (df['keywords'].isna()) | 
-        (df['keywords'] == 'N/A') |
-        (df['keywords'] == '')
-    ]
-    print(f"Number of properties needing keyword extraction: {len(to_extract)}")
+    if force_update:
+        # 重新生成所有有description_en的房源的关键词
+        to_extract = df[
+            (df['description_en'].notna()) & 
+            (df['description_en'] != '') &
+            (df['description_en'] != 'N/A')
+        ]
+        print(f"Force updating keywords for all properties with descriptions: {len(to_extract)}")
+    else:
+        # 只处理没有关键词或关键词为空/N/A的房源
+        to_extract = df[
+            (df['keywords'].isna()) | 
+            (df['keywords'] == 'N/A') |
+            (df['keywords'] == '')
+        ]
+        print(f"Number of properties needing keyword extraction: {len(to_extract)}")
     
     if len(to_extract) == 0:
         return df
@@ -319,7 +320,7 @@ def extract_keywords_cn_parallel(df: pd.DataFrame, max_workers=5) -> pd.DataFram
     
     return df
 
-def process_missing_scores_and_keywords(file_path: str):
+def process_missing_scores_and_keywords(file_path: str, force_update_keywords=False):
     if not os.path.exists(file_path):
         print(f"File not found: {file_path}")
         return
@@ -331,7 +332,8 @@ def process_missing_scores_and_keywords(file_path: str):
     
     df = extract_keywords_cn_parallel(df, max_workers=2)
     
-    df = extract_keywords_parallel(df, max_workers=2)
+    # 使用force_update参数控制是否重新生成所有关键词
+    df = extract_keywords_parallel(df, max_workers=2, force_update=force_update_keywords)
     
     cols = df.columns.tolist()
     if 'description_cn' in cols and 'description_en' in cols and 'published_at' in cols:
@@ -344,7 +346,7 @@ def process_missing_scores_and_keywords(file_path: str):
     print(f"File processed and saved: {file_path}")
 
 def find_today_csv_files():
-    today_files = [output_file1, output_file2, output_file3]
+    today_files = [output_file1, output_file2]
     
     existing_files = []
     for file in today_files:
@@ -367,11 +369,12 @@ def main():
     for file in today_files:
         print(f"  - {file}")
     
-    # 处理每个文件
+    force_update_keywords = False  # force to update all keywords
+    
     for file_path in today_files:
         print(f"\n complete: {file_path}")
         try:
-            process_missing_scores_and_keywords(file_path)
+            process_missing_scores_and_keywords(file_path, force_update_keywords=force_update_keywords)
             print(f"file finish: {file_path}")
         except Exception as e:
             print(f": {file_path}, error: {e}")

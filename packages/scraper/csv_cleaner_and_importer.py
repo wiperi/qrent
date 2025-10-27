@@ -8,23 +8,8 @@ from tqdm import tqdm
 from datetime import datetime
 import glob
 from dotenv import load_dotenv
-import os
 
-# Try to load .env from multiple possible locations
-env_paths = [
-    '.env',
-    '../.env', 
-    '../../.env',
-    '/app/.env'
-]
-
-for env_path in env_paths:
-    if os.path.exists(env_path):
-        load_dotenv(env_path)
-        break
-else:
-    # If no .env file found, try to load from environment
-    load_dotenv()
+load_dotenv('.env')
 
 DB_CONFIG = {
     'host': os.getenv("DB_HOST"),
@@ -178,112 +163,20 @@ def get_or_create_region(cursor, connection, region_info):
         print(f"error in creat region: {e}")
         return None
 
-def normalize_school_name(school_name):
-    """Normalize school names to use short names"""
-    name_mapping = {
-        'UNSW': 'UNSW',
-        'University of New South Wales': 'UNSW',
-        'USYD': 'USYD', 
-        'University of Sydney': 'USYD',
-        'UTS': 'UTS',
-        'University of Technology Sydney': 'UTS'
-    }
-    return name_mapping.get(school_name, school_name)
-
 def get_school_id(cursor, school_name):
     try:
-        # Normalize school name first
-        normalized_name = normalize_school_name(school_name)
-        
-        cursor.execute("SELECT id FROM schools WHERE name = %s", (normalized_name,))
+        cursor.execute("SELECT id FROM schools WHERE name = %s", (school_name,))
         result = cursor.fetchone()
         if result:
             return result[0]
-        cursor.execute("INSERT INTO schools (name) VALUES (%s)", (normalized_name,))
+        cursor.execute("INSERT INTO schools (name) VALUES (%s)", (school_name,))
         cursor.connection.commit() if hasattr(cursor, 'connection') else None
-        cursor.execute("SELECT id FROM schools WHERE name = %s", (normalized_name,))
+        cursor.execute("SELECT id FROM schools WHERE name = %s", (school_name,))
         result = cursor.fetchone()
         return result[0] if result else None
     except Exception as e:
         print(f"error to get or create school id  {e}")
         return None
-
-def remove_delisted_properties(cursor, connection, current_house_ids, school_name, dry_run=False):
-    """Remove properties that exist in database but not in current scraping data for this school"""
-    try:
-        school_id = get_school_id(cursor, school_name)
-        if not school_id:
-            print(f"Cannot find school: {school_name}")
-            return 0
-        
-        # Get all house_ids currently in database for this school
-        cursor.execute("""
-            SELECT DISTINCT p.house_id 
-            FROM properties p 
-            JOIN property_school ps ON p.id = ps.property_id 
-            WHERE ps.school_id = %s AND p.house_id IS NOT NULL
-        """, (school_id,))
-        
-        db_house_ids = {row[0] for row in cursor.fetchall()}
-        current_house_ids_set = set(current_house_ids)
-        
-        # Find house_ids that are in database but not in current scraping
-        delisted_house_ids = db_house_ids - current_house_ids_set
-        
-        if not delisted_house_ids:
-            print(f"✅ No delisted properties found for {school_name}")
-            return 0
-        
-        print(f"🔍 Found {len(delisted_house_ids)} delisted properties for {school_name}")
-        print(f"   Delisted house_ids: {sorted(list(delisted_house_ids))[:10]}{'...' if len(delisted_house_ids) > 10 else ''}")
-        
-        if dry_run:
-            print(f"🧪 DRY RUN: Would remove {len(delisted_house_ids)} delisted properties")
-            return len(delisted_house_ids)
-        
-        # First, remove property_school relationships for this school
-        relationship_deleted = 0
-        for house_id in delisted_house_ids:
-            cursor.execute("""
-                DELETE ps FROM property_school ps 
-                JOIN properties p ON ps.property_id = p.id 
-                WHERE p.house_id = %s AND ps.school_id = %s
-            """, (house_id, school_id))
-            relationship_deleted += cursor.rowcount
-        
-        # Then, delete properties that no longer have ANY school relationships
-        properties_to_delete = []
-        for house_id in delisted_house_ids:
-            cursor.execute("""
-                SELECT COUNT(*) FROM property_school ps 
-                JOIN properties p ON ps.property_id = p.id 
-                WHERE p.house_id = %s
-            """, (house_id,))
-            
-            relationship_count = cursor.fetchone()[0]
-            if relationship_count == 0:
-                properties_to_delete.append(house_id)
-        
-        # Delete properties that have no school relationships left
-        deleted_count = 0
-        if properties_to_delete:
-            placeholders = ','.join(['%s'] * len(properties_to_delete))
-            cursor.execute(f"""
-                DELETE FROM properties WHERE house_id IN ({placeholders})
-            """, properties_to_delete)
-            deleted_count = cursor.rowcount
-        
-        connection.commit()
-        
-        print(f"✨ Successfully removed {deleted_count} delisted properties for {school_name}")
-        print(f"   (Removed {relationship_deleted} school relationships)")
-        print(f"   (Properties with other school relationships were preserved)")
-        return deleted_count
-        
-    except Exception as e:
-        print(f"❌ Error removing delisted properties: {e}")
-        connection.rollback()
-        return 0
 
 def import_to_database(df, school_name):
     connection = None
@@ -306,43 +199,9 @@ def import_to_database(df, school_name):
         
         print(f"school ID: {school_id}")
         
-        # Get current house_ids from scraping data
-        current_house_ids = []
-        for index, row in df.iterrows():
-            house_id = safe_int(row.get('houseId'))
-            if house_id != 0:
-                current_house_ids.append(house_id)
-        
-        print(f"Current scraping found {len(current_house_ids)} properties")
-        
-        # First do a dry run to see what would be removed
-        dry_run_count = remove_delisted_properties(cursor, connection, current_house_ids, school_name, dry_run=True)
-        
-        if dry_run_count > 0:
-            # Check if auto-delete is enabled (for Docker/automation)
-            auto_delete = os.getenv('AUTO_DELETE_DELISTED', 'false').lower() in ['true', '1', 'yes']
-            
-            if auto_delete:
-                print(f"🤖 AUTO_DELETE_DELISTED is enabled. Removing {dry_run_count} delisted properties automatically.")
-                removed_count = remove_delisted_properties(cursor, connection, current_house_ids, school_name, dry_run=False)
-            else:
-                # Interactive mode - ask user
-                try:
-                    response = input(f"⚠️  This will remove {dry_run_count} delisted properties for {school_name}. Continue? (y/N): ").strip().lower()
-                    if response in ['y', 'yes']:
-                        removed_count = remove_delisted_properties(cursor, connection, current_house_ids, school_name, dry_run=False)
-                    else:
-                        print("❌ Skipping deletion of delisted properties")
-                        removed_count = 0
-                except (EOFError, KeyboardInterrupt):
-                    print("\n❌ User cancelled. Skipping deletion of delisted properties")
-                    removed_count = 0
-        else:
-            removed_count = 0
-        
         cursor.execute("SELECT house_id FROM properties WHERE house_id IS NOT NULL")
         existing_properties = {row[0] for row in cursor.fetchall()}
-        print(f"Database now has {len(existing_properties)} properties (after removing {removed_count})")
+        print(f"we have {len(existing_properties)} properties")
         
         new_count = 0
         update_count = 0
@@ -378,7 +237,7 @@ def import_to_database(df, school_name):
                 description_en = safe_str(row.get('description_en'), None) if safe_str(row.get('description_en')) else None
                 description_cn = safe_str(row.get('description_cn'), None) if safe_str(row.get('description_cn')) else None
                 url = safe_str(row.get('url'), None) if safe_str(row.get('url')) else None
-                image = safe_str(row.get('image'), None) if safe_str(row.get('image')) else None
+                thumbnail_url = safe_str(row.get('image'), '') if safe_str(row.get('image')) else ''
                 
                 published_at = None
                 if 'published_at' in df.columns:
@@ -408,7 +267,7 @@ def import_to_database(df, school_name):
                             available_date = %s, keywords = %s, 
                             average_score = %s, description_en = %s,
                             description_cn = %s, url = %s, published_at = %s,
-                            release_time = %s, image = %s
+                            thumbnail_url = %s
                         WHERE house_id = %s
                     """
                     cursor.execute(update_sql, (
@@ -416,7 +275,7 @@ def import_to_database(df, school_name):
                         bathroom_count, parking_count, property_type,
                         available_date, keywords, average_score,
                         description_en, description_cn, url, published_at,
-                        release_time, image, house_id
+                        thumbnail_url, house_id
                     ))
                     
                     update_count += 1
@@ -430,15 +289,15 @@ def import_to_database(df, school_name):
                             bathroom_count, parking_count, property_type, 
                             house_id, available_date, keywords, 
                             average_score, description_en, description_cn, 
-                            url, published_at, release_time, image
-                        ) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
+                            url, published_at, thumbnail_url
+                        ) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
                     """
                     cursor.execute(insert_sql, (
                         price, address, region_id, bedroom_count,
                         bathroom_count, parking_count, property_type, 
                         house_id, available_date, keywords, 
                         average_score, description_en, description_cn, 
-                        url, published_at, release_time, image
+                        url, published_at, thumbnail_url
                     ))
                     property_id = cursor.lastrowid
                     existing_properties.add(house_id)
@@ -451,11 +310,11 @@ def import_to_database(df, school_name):
                     commute_time = None
                     raw_commute_value = None
                     
-                    if school_name == 'UNSW':
+                    if school_name == 'University of New South Wales':
                         raw_commute_value = row.get('commuteTime_UNSW')
-                    elif school_name == 'USYD':
+                    elif school_name == 'University of Sydney':
                         raw_commute_value = row.get('commuteTime_USYD')
-                    elif school_name == 'UTS':
+                    elif school_name == 'University of Technology Sydney':
                         raw_commute_value = row.get('commuteTime_UTS')
                     
                     if raw_commute_value is not None and not pd.isna(raw_commute_value):
@@ -523,11 +382,11 @@ def import_to_database(df, school_name):
 
 def process_csv_file(csv_file, clean_only=False):
     if 'UNSW' in csv_file.upper():
-        school_name = 'UNSW'
+        school_name = 'University of New South Wales'
     elif 'USYD' in csv_file.upper():
-        school_name = 'USYD'
+        school_name = 'University of Sydney'
     elif 'UTS' in csv_file.upper():
-        school_name = 'UTS'
+        school_name = 'University of Technology Sydney'
     else:
         print(f"cannot find : {csv_file}")
         return

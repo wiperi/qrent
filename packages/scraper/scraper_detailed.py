@@ -11,23 +11,8 @@ import re
 import mysql.connector
 from mysql.connector import Error
 from dotenv import load_dotenv
-import os
 
-# Try to load .env from multiple possible locations
-env_paths = [
-    '.env',
-    '../.env', 
-    '../../.env',
-    '/app/.env'
-]
-
-for env_path in env_paths:
-    if os.path.exists(env_path):
-        load_dotenv(env_path)
-        break
-else:
-    # If no .env file found, try to load from environment
-    load_dotenv()
+load_dotenv('.env')
 
 DB_HOST = os.getenv("DB_HOST")
 DB_USER = os.getenv("DB_USER")
@@ -55,7 +40,7 @@ def fetch_db_data():
             desired_columns = [
                 'house_id', 'description_en', 'available_date', 
                 'published_at', 'keywords', 'average_score', 
-                'url', 'description_cn'
+                'url', 'description_cn', 'thumbnail_url'
             ]
             
             existing_columns = [col for col in desired_columns if col in available_columns]
@@ -109,7 +94,7 @@ def fetch_db_data_by_house_ids(house_ids):
             desired_columns = [
                 'house_id', 'description_en', 'available_date', 
                 'published_at', 'keywords', 'average_score', 
-                'url', 'description_cn'
+                'url', 'description_cn', 'thumbnail_url'
             ]
             
             existing_columns = [col for col in desired_columns if col in available_columns]
@@ -155,7 +140,7 @@ def scrape_property_data(university):
         print(f"Found previous day's data: {yesterday_file}")
         yesterday_data = pd.read_csv(yesterday_file)
         
-        all_required_cols = ['description_en', 'available_date', 'published_at', 'keywords', 'average_score', 'url', 'description_cn']
+        all_required_cols = ['description_en', 'available_date', 'published_at', 'keywords', 'average_score', 'url', 'description_cn', 'thumbnail_url']
         for col in all_required_cols:
             if col not in today_data.columns:
                 today_data[col] = None
@@ -180,7 +165,7 @@ def scrape_property_data(university):
         if not db_df.empty:
             if 'houseId' in today_data.columns:
                 db_df_unique = db_df.drop_duplicates(subset=['house_id'], keep='first')
-                all_required_cols = ['description_en', 'available_date', 'published_at', 'keywords', 'average_score', 'url', 'description_cn']
+                all_required_cols = ['description_en', 'available_date', 'published_at', 'keywords', 'average_score', 'url', 'description_cn', 'thumbnail_url']
 
                 for col in all_required_cols:
                     if col not in today_data.columns:
@@ -198,7 +183,7 @@ def scrape_property_data(university):
                 print("Warning: 'houseId' column not found in CSV data. Skipping DB mapping.")
         else:
             print("No matching data retrieved from the database. Initializing with None values.")
-            all_required_cols = ['description_en', 'available_date', 'published_at', 'keywords', 'average_score', 'url', 'description_cn']
+            all_required_cols = ['description_en', 'available_date', 'published_at', 'keywords', 'average_score', 'url', 'description_cn', 'thumbnail_url']
             for col in all_required_cols:
                 if col not in today_data.columns:
                     today_data[col] = None
@@ -207,6 +192,8 @@ def scrape_property_data(university):
         today_data['description_en'] = None
     if 'available_date' not in today_data.columns:
         today_data['available_date'] = None
+    if 'thumbnail_url' not in today_data.columns:
+        today_data['thumbnail_url'] = None
     
     missing_property_desc = today_data[
         (today_data['description_en'].isna()) | 
@@ -231,11 +218,23 @@ def scrape_property_data(university):
     driver = webdriver.Chrome(options=chrome_options)
     base_url = "https://www.domain.com.au/{}/"
     
+    def is_valid_image_url(img_url):
+        """Check if the image URL is valid and directly accessible (no nested URLs)"""
+        if not img_url or not img_url.startswith('http'):
+            return False
+        # Exclude nested URLs: A correct URL should have only one http:// or https://
+        # Correct: https://rimh2.domainstatic.com.au/xxx/2018745916_3_1_230904_055213-w1800-h1200
+        # Incorrect: https://rimh2.domainstatic.com.au/xxx/https://rimh2.domainstatic.com.au/xxx.jpg
+        http_count = img_url.count('http://') + img_url.count('https://')
+        return http_count == 1
+    
     def scrape_data(url):
         try:
             driver.get(url)
             time.sleep(5) 
             soup = BeautifulSoup(driver.page_source, "html.parser")
+            
+            # Scrape property description
             description_container = soup.find("div", {"data-testid": "listing-details__description"})
             if description_container:
                 headline = description_container.find("h3", {"data-testid": "listing-details__description-headline"})
@@ -243,6 +242,8 @@ def scrape_property_data(university):
                 description = (headline.text.strip() if headline else "") + " " + " ".join(p.text.strip() for p in paragraphs)
             else:
                 description = "N/A"
+            
+            # Scrape available date
             available_date = "N/A"
             date_container = soup.find("ul", {"data-testid": "listing-summary-strip"})
             if date_container:
@@ -264,24 +265,65 @@ def scrape_property_data(university):
                     available_date = datetime.strptime(cleaned, "%A, %d %B %Y")
                 except Exception as e:
                     available_date = None
+            
+            # Scrape property image URL
+            image_url = None
+            
+            # Method 1: Find images containing property address (most reliable method)
+            all_imgs = soup.find_all("img")
+            for img in all_imgs:
+                src = img.get('src', '')
+                alt = img.get('alt', '').lower()
+                # If alt contains "image" and address info, it's a property image
+                if 'image' in alt and src and 'domainstatic.com.au' in src:
+                    if is_valid_image_url(src):
+                        # Exclude logo, icon, avatar, etc.
+                        if not any(x in alt for x in ['logo', 'avatar', 'agent', 'powered by']):
+                            image_url = src
+                            break
+            
+            # Method 2: If method 1 fails, find img inside picture tag
+            if not image_url:
+                picture_tag = soup.find("picture")
+                if picture_tag:
+                    img_tag = picture_tag.find("img")
+                    if img_tag:
+                        src = img_tag.get('src') or img_tag.get('data-src')
+                        if src:
+                            full_url = src if src.startswith('http') else 'https://www.domain.com.au' + src
+                            if is_valid_image_url(full_url):
+                                image_url = full_url
+            
+            # Method 3: Find the first valid domainstatic image
+            if not image_url:
+                for img in all_imgs:
+                    src = img.get('src', '')
+                    alt = img.get('alt', '').lower()
+                    if src and 'domainstatic.com.au' in src and is_valid_image_url(src):
+                        # Exclude non-property images
+                        if not any(x in src.lower() for x in ['logo', 'avatar', 'icon', 'insight']):
+                            if not any(x in alt for x in ['logo', 'avatar', 'agent', 'powered by']):
+                                image_url = src
+                                break
 
             published_at = datetime.now()
-            return description, available_date, published_at
+            return description, available_date, published_at, image_url
 
         except Exception as e:
             print(f"Error scraping URL {url}: {e}")
             published_at = datetime.now().strftime('%Y-%m-%d')
-            return "N/A", "N/A", published_at
+            return "N/A", "N/A", published_at, None
 
     for index, row in tqdm(missing_property_desc.iterrows(), total=num_missing, desc="Property Description & Available Time"):
         address = row['Combined Address']
         url = base_url.format(address)     
-        description, avail_date, published_at = scrape_data(url)  
-        print(f": index={index}, URL={url}, description={description[:100]}, available_date={avail_date}")
+        description, avail_date, published_at, image_url = scrape_data(url)  
+        print(f": index={index}, URL={url}, description={description[:100]}, available_date={avail_date}, thumbnail_url={image_url}")
 
         today_data.at[index, 'description_en'] = description
         today_data.at[index, 'available_date'] = avail_date
         today_data.at[index, 'published_at'] = published_at
+        today_data.at[index, 'thumbnail_url'] = image_url
 
     driver.quit()
 

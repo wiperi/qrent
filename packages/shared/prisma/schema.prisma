@@ -86,7 +86,6 @@ model Property {
   url             String           @db.VarChar(255)
   publishedAt     DateTime         @map("published_at") @db.DateTime(0)
   thumbnailUrl    String           @default("") @map("thumbnail_url") @db.VarChar(500)
-  createdAt       DateTime         @default(now()) @map("created_at") @db.DateTime(0)
   region          Region           @relation(fields: [regionId], references: [id])
   property_school PropertySchool[]
   images          PropertyImage[]
