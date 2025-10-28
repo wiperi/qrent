@@ -57,7 +57,7 @@ export default function PropertyCard({
     return capitalizeEnglishWords(formatted);
   };
 
-  const keywordList = keywords.trim() ? keywords.split(' ').filter(Boolean).slice(0, 10) : [];
+  const keywordList = keywords.trim() ? keywords.split(',').map(k => k.trim()).filter(Boolean).slice(0, 10) : [];
 
   const getScoreColor = (score: number): string => {
     if (score >= 18.3) return 'bg-orange-600 text-white';
