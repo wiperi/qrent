@@ -281,9 +281,9 @@ export default function FilterModal() {
                 type="number"
                 min="0"
                 placeholder={t('min')}
-                className="rounded-xl border border-slate-200 px-3 py-2"
+                className="rounded-xl border border-slate-200 text-sm text-slate-700 placeholder-slate-400 px-3 py-2"
               />
-              <input value={bathroomsMax} onChange={e => setBathroomsMax(e.target.value)} type="number" placeholder={t('max')} className="rounded-xl border border-slate-200 px-3 py-2" />
+              <input value={bathroomsMax} onChange={e => setBathroomsMax(e.target.value)} type="number" placeholder={t('max')} className="rounded-xl border border-slate-200 text-sm text-slate-700 placeholder-slate-400 px-3 py-2" />
             </div>
           </section>
 
@@ -294,7 +294,7 @@ export default function FilterModal() {
               value={moveInDate}
               onChange={e => setMoveInDate(e.target.value)}
               type="date"
-              className="w-full rounded-xl border border-slate-200 px-3 py-2"
+              className="w-full rounded-xl border border-slate-200 text-sm text-slate-700 placeholder-slate-400 px-3 py-2"
             />
           </section>
 

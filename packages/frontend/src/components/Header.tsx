@@ -181,8 +181,8 @@ export default function Header() {
               </button>
             </div>
             <nav className="px-4 py-4 space-y-1" aria-label="Mobile">
-              <a href="#guide" className="block rounded-md px-3 py-2 text-slate-700 hover:bg-slate-100 hover:text-blue-600">{t('rentalGuide')}</a>
-              <a href="#docs" className="block rounded-md px-3 py-2 text-slate-700 hover:bg-slate-100 hover:text-blue-600">{t('documentPreparation')}</a>
+              {/* <a href="#guide" className="block rounded-md px-3 py-2 text-slate-700 hover:bg-slate-100 hover:text-blue-600">{t('rentalGuide')}</a> */}
+              {/* <a href="#docs" className="block rounded-md px-3 py-2 text-slate-700 hover:bg-slate-100 hover:text-blue-600">{t('documentPreparation')}</a> */}
               <Link href={`/${locale}/blog`} onClick={closeDrawer} className="block rounded-md px-3 py-2 text-slate-700 hover:bg-slate-100 hover:text-blue-600">{t('rentalBlog')}</Link>
               <div className="my-3 h-px bg-slate-200"></div>
               {!user ? (
