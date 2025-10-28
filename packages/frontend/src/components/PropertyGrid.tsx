@@ -21,7 +21,7 @@ export default function PropertyGrid() {
         page: 1,
         orderBy: [
           {
-            availableDate: 'desc' as const,
+            publishedAt: 'desc' as const,
           },
           {
             averageScore: 'desc' as const,
