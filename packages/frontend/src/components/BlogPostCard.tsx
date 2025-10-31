@@ -3,6 +3,7 @@
 import { useLocale } from 'next-intl';
 import Image from 'next/image';
 import Link from 'next/link';
+import { useState } from 'react';
 
 interface BlogPostCardProps {
   title: string;
@@ -22,16 +23,21 @@ export default function BlogPostCard({
   slug
 }: BlogPostCardProps) {
   const locale = useLocale();
+  const [imageError, setImageError] = useState(false);
+
+  // Fallback image URL
+  const fallbackImage = '/banner.jpg';
 
   return (
     <Link href={`/${locale}${slug}`} className="group">
       <article className="bg-white rounded-2xl border border-slate-200 shadow-sm hover:shadow-md transition-shadow overflow-hidden">
         <div className="aspect-[16/9] relative overflow-hidden">
           <Image
-            src={imageUrl}
+            src={imageError ? fallbackImage : imageUrl}
             alt={title}
             fill
             className="object-cover group-hover:scale-105 transition-transform duration-300"
+            onError={() => setImageError(true)}
           />
         </div>
         <div className="p-6">

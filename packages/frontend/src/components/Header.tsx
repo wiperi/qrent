@@ -80,7 +80,7 @@ export default function Header() {
                     className="rounded-md"
                   />
                 </Link>
-                <Link href={`/${locale}/blog`} className="hidden md:block text-slate-700 hover:text-blue-600 transition-colors font-bold">
+                <Link href={`/${locale}/notion-blog`} className="hidden md:block text-slate-700 hover:text-blue-600 transition-colors font-bold">
                   {t('rentalBlog')}
                 </Link>
               </div>
