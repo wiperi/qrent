@@ -1,14 +1,14 @@
 import NotionBlogContent from '@/components/NotionBlogContent';
 import { generateNotionBlogMetadata, getNotionBlogPost } from '@/lib/notion-blog';
+import type { NotionBlock as NotionBlockFromTypes, NotionBlogPost as NotionBlogPostFromTypes } from '@/types/blog';
 import { Metadata } from 'next';
 import { notFound } from 'next/navigation';
-import type { NotionBlock as NotionBlockFromTypes, NotionBlogPost as NotionBlogPostFromTypes } from '@/types/blog';
 
 interface PageProps {
-  params: {
+  params: Promise<{
     locale: string;
     slug: string;
-  };
+  }>;
 }
 
 // 临时禁用静态路径生成，改用动态渲染
@@ -23,7 +23,7 @@ export const dynamic = 'force-dynamic';
 
 // 生成页面元数据
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
-  const { slug, locale } = params;
+  const { slug, locale } = await params;
 
   try {
     const result = await getNotionBlogPost(slug, locale);
@@ -46,7 +46,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
 export const revalidate = 600;
 
 export default async function NotionBlogPostPage({ params }: PageProps) {
-  const { slug, locale } = params;
+  const { slug, locale } = await params;
 
   try {
     const result = await getNotionBlogPost(slug, locale);
@@ -60,7 +60,7 @@ export default async function NotionBlogPostPage({ params }: PageProps) {
     // 兜底加上 has_children 字段，实际如果 lib 返回有该字段则无影响
 
     const compatBlocks: NotionBlockFromTypes[] = result.blocks.map(block => ({
-      has_children: !!(block as any).has_children, // 强制兜底
+      has_children: !!(block as Record<string, unknown>).has_children, // 强制兜底
       ...block,
     }));
 

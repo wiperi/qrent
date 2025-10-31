@@ -2,13 +2,13 @@ import { Client } from '@notionhq/client';
 
 /**
  * Notion API 客户端配置
- * 
+ *
  * 使用前请先设置环境变量：
  * 1. 创建 .env.local 文件在 packages/frontend/ 目录下
  * 2. 添加以下环境变量：
  *    NOTION_TOKEN="secret_YOUR_TOKEN_HERE"
  *    NOTION_DATABASE_ID="YOUR_DATABASE_ID_HERE"
- * 
+ *
  * 获取 Token: https://www.notion.so/my-integrations
  * 获取 Database ID: 从你的 Notion 数据库 URL 中复制
  */
@@ -37,7 +37,7 @@ export interface NotionBlogPost {
 export interface NotionBlock {
   id: string;
   type: string;
-  [key: string]: any;
+  [key: string]: unknown;
 }
 
 /**
@@ -46,7 +46,6 @@ export interface NotionBlock {
 export const getPublishedBlogPosts = async (locale?: string): Promise<NotionBlogPost[]> => {
   const databaseId = process.env.NOTION_DATABASE_ID;
   const token = process.env.NOTION_TOKEN;
-
 
   if (!databaseId) {
     throw new Error('NOTION_DATABASE_ID 环境变量未设置');
@@ -61,32 +60,34 @@ export const getPublishedBlogPosts = async (locale?: string): Promise<NotionBlog
     const response = await fetch(`https://api.notion.com/v1/databases/${databaseId}/query`, {
       method: 'POST',
       headers: {
-        'Authorization': `Bearer ${process.env.NOTION_TOKEN}`,
+        Authorization: `Bearer ${process.env.NOTION_TOKEN}`,
         'Content-Type': 'application/json',
         'Notion-Version': '2022-06-28',
       },
       body: JSON.stringify({
-        filter: locale ? {
-          and: [
-            {
-              property: 'status',
-              select: {
-                equals: 'Published',
+        filter: locale
+          ? {
+            and: [
+              {
+                property: 'status',
+                select: {
+                  equals: 'Published',
+                },
               },
-            },
-            {
-              property: 'language',
-              select: {
-                equals: locale,
+              {
+                property: 'language',
+                select: {
+                  equals: locale,
+                },
               },
+            ],
+          }
+          : {
+            property: 'status',
+            select: {
+              equals: 'Published',
             },
-          ],
-        } : {
-          property: 'status',
-          select: {
-            equals: 'Published',
           },
-        },
         sorts: [
           {
             property: 'Published_at',
@@ -98,38 +99,40 @@ export const getPublishedBlogPosts = async (locale?: string): Promise<NotionBlog
 
     if (!response.ok) {
       const errorText = await response.text();
-      throw new Error(`Notion API error: ${response.status} ${response.statusText}. Details: ${errorText}`);
+      throw new Error(
+        `Notion API error: ${response.status} ${response.statusText}. Details: ${errorText}`
+      );
     }
 
     const data = await response.json();
 
     // 转换 Notion API 响应为我们的数据结构
-    const posts: NotionBlogPost[] = data.results.map((page: any) => {
-      const properties = page.properties;
-      const cover = page.cover;
+    const posts: NotionBlogPost[] = data.results.map((page: Record<string, unknown>) => {
+      const properties = page.properties as Record<string, Record<string, unknown>>;
+      const cover = page.cover as Record<string, unknown> | null;
 
       // 解析封面图片
       let imageUrl: string | undefined;
       if (cover) {
         if (cover.type === 'file') {
-          imageUrl = cover.file.url;
+          imageUrl = (cover.file as Record<string, unknown>)?.url as string;
         } else if (cover.type === 'external') {
-          imageUrl = cover.external.url;
+          imageUrl = (cover.external as Record<string, unknown>)?.url as string;
         }
       }
 
       return {
-        id: page.id,
-        slug: getPropertyValue(properties.slug, 'rich_text'),
-        title: getPropertyValue(properties.TItle, 'title'), // 使用实际的属性名 TItle
-        title_en: getPropertyValue(properties.TItle_en, 'rich_text'), // 使用实际的属性名 TItle_en
-        excerpt_zh: getPropertyValue(properties.excerpt_zh, 'rich_text'),
-        excerpt_en: getPropertyValue(properties.excerpt_en, 'rich_text'),
-        published_at: getPropertyValue(properties.Published_at, 'date'), // 使用实际的属性名 Published_at
-        status: getPropertyValue(properties.status, 'select'),
-        keywords: getPropertyValue(properties.keywords, 'multi_select'),
-        url: page.url,
-        language: getPropertyValue(properties.language, 'select'),
+        id: page.id as string,
+        slug: getPropertyValue(properties.slug, 'rich_text') as string,
+        title: getPropertyValue(properties.TItle, 'title') as string, // 使用实际的属性名 TItle
+        title_en: getPropertyValue(properties.TItle_en, 'rich_text') as string, // 使用实际的属性名 TItle_en
+        excerpt_zh: getPropertyValue(properties.excerpt_zh, 'rich_text') as string,
+        excerpt_en: getPropertyValue(properties.excerpt_en, 'rich_text') as string,
+        published_at: getPropertyValue(properties.Published_at, 'date') as string, // 使用实际的属性名 Published_at
+        status: getPropertyValue(properties.status, 'select') as string,
+        keywords: getPropertyValue(properties.keywords, 'multi_select') as string[],
+        url: page.url as string,
+        language: getPropertyValue(properties.language, 'select') as 'zh' | 'en',
         imageUrl,
       };
     });
@@ -144,7 +147,10 @@ export const getPublishedBlogPosts = async (locale?: string): Promise<NotionBlog
 /**
  * 根据 slug 获取单篇博客文章
  */
-export const getBlogPost = async (slug: string, locale?: string): Promise<NotionBlogPost | null> => {
+export const getBlogPost = async (
+  slug: string,
+  locale?: string
+): Promise<NotionBlogPost | null> => {
   const databaseId = process.env.NOTION_DATABASE_ID;
   if (!databaseId) {
     throw new Error('NOTION_DATABASE_ID 环境变量未设置');
@@ -155,52 +161,56 @@ export const getBlogPost = async (slug: string, locale?: string): Promise<Notion
     const response = await fetch(`https://api.notion.com/v1/databases/${databaseId}/query`, {
       method: 'POST',
       headers: {
-        'Authorization': `Bearer ${process.env.NOTION_TOKEN}`,
+        Authorization: `Bearer ${process.env.NOTION_TOKEN}`,
         'Content-Type': 'application/json',
         'Notion-Version': '2022-06-28',
       },
       body: JSON.stringify({
         filter: {
-          and: locale ? [
-            {
-              property: 'status',
-              select: {
-                equals: 'Published',
+          and: locale
+            ? [
+              {
+                property: 'status',
+                select: {
+                  equals: 'Published',
+                },
               },
-            },
-            {
-              property: 'slug',
-              rich_text: {
-                equals: slug,
+              {
+                property: 'slug',
+                rich_text: {
+                  equals: slug,
+                },
               },
-            },
-            {
-              property: 'language',
-              select: {
-                equals: locale,
+              {
+                property: 'language',
+                select: {
+                  equals: locale,
+                },
               },
-            },
-          ] : [
-            {
-              property: 'status',
-              select: {
-                equals: 'Published',
+            ]
+            : [
+              {
+                property: 'status',
+                select: {
+                  equals: 'Published',
+                },
               },
-            },
-            {
-              property: 'slug',
-              rich_text: {
-                equals: slug,
+              {
+                property: 'slug',
+                rich_text: {
+                  equals: slug,
+                },
               },
-            },
-          ],
+            ],
         },
       }),
     });
 
     if (!response.ok) {
       const errorText = await response.text();
-      throw new Error(`Notion API error: ${response.status} ${response.statusText}. Details: ${errorText}`);
+      throw new Error(
+        `Notion API error: ${response.status} ${response.statusText}. Details: ${errorText}`
+      );
     }
 
     const data = await response.json();
@@ -209,32 +219,32 @@ export const getBlogPost = async (slug: string, locale?: string): Promise<Notion
       return null;
     }
 
-    const page = data.results[0] as any;
-    const properties = page.properties;
-    const cover = page.cover;
+    const page = data.results[0] as Record<string, unknown>;
+    const properties = page.properties as Record<string, Record<string, unknown>>;
+    const cover = page.cover as Record<string, unknown> | null;
 
     // 解析封面图片
     let imageUrl: string | undefined;
     if (cover) {
       if (cover.type === 'file') {
-        imageUrl = cover.file.url;
+        imageUrl = (cover.file as Record<string, unknown>)?.url as string;
       } else if (cover.type === 'external') {
-        imageUrl = cover.external.url;
+        imageUrl = (cover.external as Record<string, unknown>)?.url as string;
       }
     }
 
     return {
-      id: page.id,
-      slug: getPropertyValue(properties.slug, 'rich_text'),
-      title: getPropertyValue(properties.TItle, 'title'), // 使用实际的属性名 TItle
-      title_en: getPropertyValue(properties.TItle_en, 'rich_text'), // 使用实际的属性名 TItle_en
-      excerpt_zh: getPropertyValue(properties.excerpt_zh, 'rich_text'),
-      excerpt_en: getPropertyValue(properties.excerpt_en, 'rich_text'),
-      published_at: getPropertyValue(properties.Published_at, 'date'), // 使用实际的属性名 Published_at
-      status: getPropertyValue(properties.status, 'select'),
-      keywords: getPropertyValue(properties.keywords, 'multi_select'),
-      url: page.url,
-      language: getPropertyValue(properties.language, 'select'),
+      id: page.id as string,
+      slug: getPropertyValue(properties.slug, 'rich_text') as string,
+      title: getPropertyValue(properties.TItle, 'title') as string, // 使用实际的属性名 TItle
+      title_en: getPropertyValue(properties.TItle_en, 'rich_text') as string, // 使用实际的属性名 TItle_en
+      excerpt_zh: getPropertyValue(properties.excerpt_zh, 'rich_text') as string,
+      excerpt_en: getPropertyValue(properties.excerpt_en, 'rich_text') as string,
+      published_at: getPropertyValue(properties.Published_at, 'date') as string, // 使用实际的属性名 Published_at
+      status: getPropertyValue(properties.status, 'select') as string,
+      keywords: getPropertyValue(properties.keywords, 'multi_select') as string[],
+      url: page.url as string,
+      language: getPropertyValue(properties.language, 'select') as 'zh' | 'en',
       imageUrl,
     };
   } catch (error) {
@@ -283,7 +293,7 @@ export const getAllBlocks = async (blockId: string): Promise<NotionBlock[]> => {
         if (block.has_children) {
           const childBlocks = await getAllBlocks(block.id);
           // 将子块添加到父块的 children 属性中
-          (block as any).children = childBlocks;
+          (block as Record<string, unknown>).children = childBlocks;
         }
       }
 
@@ -300,20 +310,20 @@ export const getAllBlocks = async (blockId: string): Promise<NotionBlock[]> => {
 /**
  * 辅助函数：从 Notion 属性中提取值
  */
-function getPropertyValue(property: any, type: string): any {
+function getPropertyValue(property: Record<string, unknown>, type: string): unknown {
   if (!property) return '';
 
   switch (type) {
     case 'title':
-      return property.title?.[0]?.plain_text || '';
+      return ((property.title as Record<string, unknown>[])?.[0] as Record<string, unknown>)?.plain_text || '';
     case 'rich_text':
-      return property.rich_text?.[0]?.plain_text || '';
+      return ((property.rich_text as Record<string, unknown>[])?.[0] as Record<string, unknown>)?.plain_text || '';
     case 'select':
-      return property.select?.name || '';
+      return (property.select as Record<string, unknown>)?.name || '';
     case 'multi_select':
-      return property.multi_select?.map((item: any) => item.name) || [];
+      return (property.multi_select as Record<string, unknown>[])?.map((item: Record<string, unknown>) => item.name) || [];
     case 'date':
-      return property.date?.start || '';
+      return (property.date as Record<string, unknown>)?.start || '';
     case 'number':
       return property.number || 0;
     case 'checkbox':
@@ -332,7 +342,7 @@ function getPropertyValue(property: any, type: string): any {
 /**
  * 将富文本数组转换为纯文本
  */
-export const richTextToPlainText = (richText: any[]): string => {
+export const richTextToPlainText = (richText: Record<string, unknown>[]): string => {
   if (!richText || !Array.isArray(richText)) return '';
   return richText.map(text => text.plain_text || '').join('');
 };
@@ -340,29 +350,32 @@ export const richTextToPlainText = (richText: any[]): string => {
 /**
  * 将富文本数组转换为 HTML
  */
-export const richTextToHtml = (richText: any[]): string => {
+export const richTextToHtml = (richText: Record<string, unknown>[]): string => {
   if (!richText || !Array.isArray(richText)) return '';
 
-  return richText.map(text => {
-    let html = text.plain_text || '';
+  return richText
+    .map(text => {
+      let html = text.plain_text || '';
 
-    // 应用格式化
-    if (text.annotations) {
-      if (text.annotations.bold) html = `<strong>${html}</strong>`;
-      if (text.annotations.italic) html = `<em>${html}</em>`;
-      if (text.annotations.strikethrough) html = `<del>${html}</del>`;
-      if (text.annotations.underline) html = `<u>${html}</u>`;
-      if (text.annotations.code) html = `<code>${html}</code>`;
-      if (text.annotations.color && text.annotations.color !== 'default') {
-        html = `<span style="color: ${text.annotations.color}">${html}</span>`;
+      // 应用格式化
+      const annotations = text.annotations as Record<string, unknown>;
+      if (annotations) {
+        if (annotations.bold) html = `<strong>${html}</strong>`;
+        if (annotations.italic) html = `<em>${html}</em>`;
+        if (annotations.strikethrough) html = `<del>${html}</del>`;
+        if (annotations.underline) html = `<u>${html}</u>`;
+        if (annotations.code) html = `<code>${html}</code>`;
+        if (annotations.color && annotations.color !== 'default') {
+          html = `<span style="color: ${annotations.color}">${html}</span>`;
+        }
       }
-    }
 
-    // 处理链接
-    if (text.href) {
-      html = `<a href="${text.href}" target="_blank" rel="noopener noreferrer">${html}</a>`;
-    }
+      // 处理链接
+      if (text.href) {
+        html = `<a href="${text.href}" target="_blank" rel="noopener noreferrer">${html}</a>`;
+      }
 
-    return html;
-  }).join('');
+      return html;
+    })
+    .join('');
 };

@@ -4,7 +4,7 @@ import {
   getBlogPost,
   getPublishedBlogPosts,
   NotionBlock,
-  NotionBlogPost
+  NotionBlogPost,
 } from './notion';
 
 /**
@@ -22,7 +22,10 @@ export async function getNotionBlogPosts(locale?: string): Promise<NotionBlogPos
 /**
  * 获取单篇博客文章及其内容（用于博客详情页面）
  */
-export async function getNotionBlogPost(slug: string, locale?: string): Promise<{
+export async function getNotionBlogPost(
+  slug: string,
+  locale?: string
+): Promise<{
   post: NotionBlogPost;
   blocks: NotionBlock[];
 } | null> {
@@ -62,7 +65,10 @@ export async function getNotionBlogSlugs(): Promise<string[]> {
  * 将 NotionBlogPost 转换为兼容现有 BlogPost 接口的格式
  * 这样可以在不破坏现有代码的情况下逐步迁移
  */
-export function convertNotionPostToBlogPost(notionPost: NotionBlogPost, locale: string = LOCALE.ZH) {
+export function convertNotionPostToBlogPost(
+  notionPost: NotionBlogPost,
+  locale: string = LOCALE.ZH
+) {
   return {
     slug: notionPost.slug,
     title: locale === LOCALE.ZH ? notionPost.title : notionPost.title_en,

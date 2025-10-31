@@ -43,5 +43,5 @@ export interface NotionBlock {
   type: string;
   has_children: boolean;
   children?: NotionBlock[];
-  [key: string]: any;
+  [key: string]: unknown;
 }
