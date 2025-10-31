@@ -1,0 +1,65 @@
+# scraper_config.yaml - Sample configuration for scraper-v2
+version: "2.0"
+
+global:
+  max_concurrent_spiders: 5
+  request_timeout: 30
+  retry_times: 3
+  retry_delay: 10
+
+sites:
+  - name: "RealEstate.com.au"
+    enabled: true
+    spider_class: "realestate_au"
+    base_url: "https://www.realestate.com.au"
+    browser:
+      user_agent: "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36"
+      viewport:
+        width: 1920
+        height: 1080
+      locale: "en-AU"
+    params:
+      locations:
+        - "sydney-nsw-2000"
+      max_pages: 3
+    request:
+      delay: [2, 5]
+      headers:
+        Accept-Language: "en-AU,en;q=0.9"
+
+  - name: "Domain.com.au"
+    enabled: true
+    spider_class: "domain_com_au"
+    base_url: "https://www.domain.com.au"
+    params:
+      max_pages: 2
+
+backup:
+  enabled: true
+  base_dir: "./data/raw"
+  retention_days: 90
+  archive_enabled: false
+  archive_after_days: 7
+
+cloud_backup:
+  enabled: false
+  delay_seconds: 1800
+
+aws:
+  region: "ap-southeast-2"
+  bucket_name: "qrent-scraper-backup"
+
+schedule:
+  time_of_day: "01:00:00"
+  timezone: "Australia/Sydney"
+  max_runtime_hours: 6
+
+logging:
+  level: "INFO"
+  retention_days: 30
+
+prometheus:
+  port: 9090
+
+health:
+  port: 8080
