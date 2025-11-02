@@ -38,16 +38,16 @@ jobs:
             
             # 停止旧容器
             echo "🛑 Stopping old container..."
-            docker-compose -f docker-compose.new.yml down || true
+            docker-compose down || true
             
             # 重新构建镜像
             echo "🔨 Building new image..."
-            docker-compose -f docker-compose.new.yml build --no-cache
+            docker-compose build --no-cache
             
             # 启动新容器
             echo "🚀 Starting new container..."
-            docker-compose -f docker-compose.new.yml up -d
+            docker-compose up -d
             
             # 查看状态
             echo "✅ Deployment complete!"
-            docker-compose -f docker-compose.new.yml ps
+            docker-compose ps
