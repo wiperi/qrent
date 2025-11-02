@@ -1,0 +1,53 @@
+name: Deploy Scraper
+
+on:
+  push:
+    branches:
+      - main
+      - master
+    paths:
+      - 'packages/scraper/**'
+  workflow_dispatch:
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+      
+      - name: Deploy to server
+        uses: appleboy/ssh-action@master
+        with:
+          host: ${{ secrets.SERVER_HOST }}
+          username: ${{ secrets.SERVER_USER }}
+          key: ${{ secrets.SERVER_SSH_KEY }}
+          script: |
+            echo "🚀 Starting deployment..."
+            
+            # 进入项目目录
+            cd /root/qrent
+            
+            # 拉取最新代码
+            echo "📥 Pulling latest code..."
+            git pull origin main || git pull origin master
+            
+            # 进入 scraper 目录
+            cd packages/scraper
+            
+            # 停止旧容器
+            echo "🛑 Stopping old container..."
+            docker-compose -f docker-compose.new.yml down || true
+            
+            # 重新构建镜像
+            echo "🔨 Building new image..."
+            docker-compose -f docker-compose.new.yml build --no-cache
+            
+            # 启动新容器
+            echo "🚀 Starting new container..."
+            docker-compose -f docker-compose.new.yml up -d
+            
+            # 查看状态
+            echo "✅ Deployment complete!"
+            docker-compose -f docker-compose.new.yml ps
