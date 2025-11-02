@@ -44,6 +44,25 @@ def safe_str(val, default=''):
         return default
     return str(val).strip()
 
+def clean_keywords(val):
+    """清理 keywords，移除引号和多余标点"""
+    if val is None or pd.isna(val) or val == '':
+        return None
+    
+    # 转换为字符串并去除首尾空格
+    text = str(val).strip()
+    
+    # 移除外层的三引号、双引号、单引号
+    text = text.strip('"""').strip("'''").strip('"').strip("'")
+    
+    # 移除内部的引号（保留逗号分隔）
+    text = text.replace('"""', '').replace("'''", '').replace('"', '').replace("'", '')
+    
+    # 清理多余空格
+    text = ' '.join(text.split())
+    
+    return text if text else None
+
 def safe_datetime(val, default=None):
     if val is None or pd.isna(val) or val == '':
         return default or datetime.now()
@@ -232,12 +251,18 @@ def import_to_database(df, school_name):
                 parking_count = safe_float(row.get('parkingCount'))
                 property_type = safe_int(row.get('propertyType'), 1)
                 available_date = safe_datetime(row.get('available_date'), None)
-                keywords = safe_str(row.get('keywords'), None) if safe_str(row.get('keywords')) else None
+                keywords = clean_keywords(row.get('keywords'))
                 average_score = safe_float(row.get('average_score'), None) if pd.notna(row.get('average_score')) else None
                 description_en = safe_str(row.get('description_en'), None) if safe_str(row.get('description_en')) else None
                 description_cn = safe_str(row.get('description_cn'), None) if safe_str(row.get('description_cn')) else None
                 url = safe_str(row.get('url'), None) if safe_str(row.get('url')) else None
-                thumbnail_url = safe_str(row.get('image'), '') if safe_str(row.get('image')) else ''
+                
+                # 支持多种图片列名：thumbnail_url 或 image
+                thumbnail_url = ''
+                if 'thumbnail_url' in df.columns and safe_str(row.get('thumbnail_url')):
+                    thumbnail_url = safe_str(row.get('thumbnail_url'))
+                elif 'image' in df.columns and safe_str(row.get('image')):
+                    thumbnail_url = safe_str(row.get('image'))
                 
                 published_at = None
                 if 'published_at' in df.columns:
@@ -250,15 +275,6 @@ def import_to_database(df, school_name):
                     published_at = datetime.now()
                 
                 if house_id in existing_properties:
-                    # Check if release_time exists for this property
-                    cursor.execute("SELECT id, release_time FROM properties WHERE house_id = %s", (house_id,))
-                    result = cursor.fetchone()
-                    property_id = result[0] if result else None
-                    existing_release_time = result[1] if result and result[1] else None
-                    
-                    # If release_time is null, set it to current time
-                    release_time = existing_release_time if existing_release_time else datetime.now()
-                    
                     update_sql = """
                         UPDATE properties SET 
                             price = %s, address = %s, region_id = %s, 
@@ -278,11 +294,12 @@ def import_to_database(df, school_name):
                         thumbnail_url, house_id
                     ))
                     
+                    cursor.execute("SELECT id FROM properties WHERE house_id = %s", (house_id,))
+                    result = cursor.fetchone()
+                    property_id = result[0] if result else None
+                    
                     update_count += 1
                 else:
-                    # For new properties, set release_time to current time
-                    release_time = datetime.now()
-                    
                     insert_sql = """
                         INSERT INTO properties (
                             price, address, region_id, bedroom_count, 
@@ -304,17 +321,27 @@ def import_to_database(df, school_name):
                     new_count += 1
                 
                 if property_id:
+                    # 先插入图片到 property_images 表（所有房源都需要，不管有没有学校关联）
+                    if thumbnail_url:
+                        # 先删除该 property 的旧图片
+                        cursor.execute("DELETE FROM property_images WHERE property_id = %s", (property_id,))
+                        # 插入新图片
+                        cursor.execute(
+                            "INSERT INTO property_images (property_id, url, display_order) VALUES (%s, %s, %s)",
+                            (property_id, thumbnail_url, 0)
+                        )
+                    
                     cursor.execute("DELETE FROM property_school WHERE property_id = %s AND school_id = %s", 
                                  (property_id, school_id))
                     
                     commute_time = None
                     raw_commute_value = None
                     
-                    if school_name == 'University of New South Wales':
+                    if school_name == 'UNSW':
                         raw_commute_value = row.get('commuteTime_UNSW')
-                    elif school_name == 'University of Sydney':
+                    elif school_name == 'USYD':
                         raw_commute_value = row.get('commuteTime_USYD')
-                    elif school_name == 'University of Technology Sydney':
+                    elif school_name == 'UTS':
                         raw_commute_value = row.get('commuteTime_UTS')
                     
                     if raw_commute_value is not None and not pd.isna(raw_commute_value):
@@ -357,12 +384,73 @@ def import_to_database(df, school_name):
         print(f"  coummte time add: {commute_inserted}")
         print(f"  commute time skip: {commute_skipped}")
         
+        # 清理过时房源：删除与该学校关联但不在当前 CSV 中的房源
+        print(f"\n🔍 checking outdated properties for {school_name}...")
+        csv_house_ids = set(df['houseId'].dropna().astype(int))
+        print(f"  CSV has {len(csv_house_ids)} house_ids")
+        
+        # 查找数据库中与该学校关联的所有 house_id
+        cursor.execute("""
+            SELECT DISTINCT p.house_id, p.id
+            FROM properties p
+            JOIN property_school ps ON p.id = ps.property_id
+            WHERE ps.school_id = %s AND p.house_id IS NOT NULL
+        """, (school_id,))
+        
+        db_properties = cursor.fetchall()
+        db_house_ids = {row[0] for row in db_properties}
+        print(f"  Database has {len(db_house_ids)} house_ids for {school_name}")
+        
+        # 找出过时的 house_id（在数据库中但不在 CSV 中）
+        outdated_house_ids = db_house_ids - csv_house_ids
+        
+        if outdated_house_ids:
+            print(f"  ⚠️  Found {len(outdated_house_ids)} outdated properties")
+            
+            # 删除这些过时房源与该学校的关联
+            deleted_count = 0
+            for house_id in outdated_house_ids:
+                try:
+                    # 获取 property_id
+                    cursor.execute("SELECT id FROM properties WHERE house_id = %s", (house_id,))
+                    result = cursor.fetchone()
+                    if result:
+                        property_id = result[0]
+                        
+                        # 删除该房源与当前学校的关联
+                        cursor.execute(
+                            "DELETE FROM property_school WHERE property_id = %s AND school_id = %s",
+                            (property_id, school_id)
+                        )
+                        
+                        # 检查该房源是否还与其他学校关联
+                        cursor.execute(
+                            "SELECT COUNT(*) FROM property_school WHERE property_id = %s",
+                            (property_id,)
+                        )
+                        remaining_schools = cursor.fetchone()[0]
+                        
+                        # 如果没有其他学校关联了，删除房源本身和图片
+                        if remaining_schools == 0:
+                            cursor.execute("DELETE FROM property_images WHERE property_id = %s", (property_id,))
+                            cursor.execute("DELETE FROM properties WHERE id = %s", (property_id,))
+                            deleted_count += 1
+                        
+                except Exception as e:
+                    print(f"    Error deleting house_id {house_id}: {e}")
+                    continue
+            
+            connection.commit()
+            print(f"  ✅ Deleted {deleted_count} outdated properties")
+        else:
+            print(f"  ✅ No outdated properties found")
+        
         cursor.execute("SELECT COUNT(*) FROM properties")
         total_properties = cursor.fetchone()[0]
         cursor.execute("SELECT COUNT(*) FROM property_school WHERE school_id = %s", (school_id,))
         total_commutes = cursor.fetchone()[0]
         
-        print(f"  property in school: {total_commutes}")
+        print(f"\n  property in school: {total_commutes}")
         print(f"  property in database {total_properties}")
         
     except Error as e:
@@ -382,11 +470,11 @@ def import_to_database(df, school_name):
 
 def process_csv_file(csv_file, clean_only=False):
     if 'UNSW' in csv_file.upper():
-        school_name = 'University of New South Wales'
+        school_name = 'UNSW'
     elif 'USYD' in csv_file.upper():
-        school_name = 'University of Sydney'
+        school_name = 'USYD'
     elif 'UTS' in csv_file.upper():
-        school_name = 'University of Technology Sydney'
+        school_name = 'UTS'
     else:
         print(f"cannot find : {csv_file}")
         return
