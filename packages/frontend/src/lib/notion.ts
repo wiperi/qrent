@@ -67,27 +67,27 @@ export const getPublishedBlogPosts = async (locale?: string): Promise<NotionBlog
       body: JSON.stringify({
         filter: locale
           ? {
-            and: [
-              {
-                property: 'status',
-                select: {
-                  equals: 'Published',
+              and: [
+                {
+                  property: 'status',
+                  select: {
+                    equals: 'Published',
+                  },
                 },
-              },
-              {
-                property: 'language',
-                select: {
-                  equals: locale,
+                {
+                  property: 'language',
+                  select: {
+                    equals: locale,
+                  },
                 },
-              },
-            ],
-          }
+              ],
+            }
           : {
-            property: 'status',
-            select: {
-              equals: 'Published',
+              property: 'status',
+              select: {
+                equals: 'Published',
+              },
             },
-          },
         sorts: [
           {
             property: 'Published_at',
@@ -169,39 +169,39 @@ export const getBlogPost = async (
         filter: {
           and: locale
             ? [
-              {
-                property: 'status',
-                select: {
-                  equals: 'Published',
+                {
+                  property: 'status',
+                  select: {
+                    equals: 'Published',
+                  },
                 },
-              },
-              {
-                property: 'slug',
-                rich_text: {
-                  equals: slug,
+                {
+                  property: 'slug',
+                  rich_text: {
+                    equals: slug,
+                  },
                 },
-              },
-              {
-                property: 'language',
-                select: {
-                  equals: locale,
+                {
+                  property: 'language',
+                  select: {
+                    equals: locale,
+                  },
                 },
-              },
-            ]
+              ]
             : [
-              {
-                property: 'status',
-                select: {
-                  equals: 'Published',
+                {
+                  property: 'status',
+                  select: {
+                    equals: 'Published',
+                  },
                 },
-              },
-              {
-                property: 'slug',
-                rich_text: {
-                  equals: slug,
+                {
+                  property: 'slug',
+                  rich_text: {
+                    equals: slug,
+                  },
                 },
-              },
-            ],
+              ],
         },
       }),
     });
@@ -315,13 +315,23 @@ function getPropertyValue(property: Record<string, unknown>, type: string): unkn
 
   switch (type) {
     case 'title':
-      return ((property.title as Record<string, unknown>[])?.[0] as Record<string, unknown>)?.plain_text || '';
+      return (
+        ((property.title as Record<string, unknown>[])?.[0] as Record<string, unknown>)
+          ?.plain_text || ''
+      );
     case 'rich_text':
-      return ((property.rich_text as Record<string, unknown>[])?.[0] as Record<string, unknown>)?.plain_text || '';
+      return (
+        ((property.rich_text as Record<string, unknown>[])?.[0] as Record<string, unknown>)
+          ?.plain_text || ''
+      );
     case 'select':
       return (property.select as Record<string, unknown>)?.name || '';
     case 'multi_select':
-      return (property.multi_select as Record<string, unknown>[])?.map((item: Record<string, unknown>) => item.name) || [];
+      return (
+        (property.multi_select as Record<string, unknown>[])?.map(
+          (item: Record<string, unknown>) => item.name
+        ) || []
+      );
     case 'date':
       return (property.date as Record<string, unknown>)?.start || '';
     case 'number':
