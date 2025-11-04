@@ -124,8 +124,8 @@ def fetch_db_data_by_house_ids(house_ids):
 
 def scrape_property_data(university):
     current_date = datetime.now().strftime('%y%m%d')
-    today_file = f"{university}_rentdata_cleaned_{current_date}.csv"
-    output_file = f"{university}_rentdata_{current_date}.csv"
+    today_file = f"data/{university}_rentdata_cleaned_{current_date}.csv"
+    output_file = f"data/{university}_rentdata_{current_date}.csv"
 
     if not os.path.exists(today_file):
         raise FileNotFoundError("Data file not found")
@@ -134,7 +134,7 @@ def scrape_property_data(university):
 
     yesterday_data = None
     yesterday_date = (datetime.now() - pd.Timedelta(days=1)).strftime('%y%m%d')
-    yesterday_file = f"{university}_rentdata_{yesterday_date}.csv"
+    yesterday_file = f"data/{university}_rentdata_{yesterday_date}.csv"
     
     if os.path.exists(yesterday_file):
         print(f"Found previous day's data: {yesterday_file}")
@@ -333,6 +333,6 @@ def scrape_property_data(university):
     df = pd.read_csv(output_file)
     df['url'] = df['Combined Address'].apply(lambda address: f"https://www.domain.com.au/{address}")
     df.drop(columns=['Combined Address'], inplace=True)
-    final_output = f"{university}_rentdata_{current_date}.csv"
+    final_output = f"data/{university}_rentdata_{current_date}.csv"
     df.to_csv(final_output, index=False)
     print(f"Save to: {final_output}")

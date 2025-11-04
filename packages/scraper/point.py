@@ -19,8 +19,8 @@ today_date = datetime.now()
 current_date = today_date.strftime('%y%m%d')
 
 # 两个目标文件
-output_file1 = f"UNSW_rentdata_{current_date}.csv"
-output_file2 = f"USYD_rentdata_{current_date}.csv"
+output_file1 = f"data/UNSW_rentdata_{current_date}.csv"
+output_file2 = f"data/USYD_rentdata_{current_date}.csv"
 
 # ========== 房屋打分相关配置 ==========
 NUM_CALLS = 2         # 调用次数

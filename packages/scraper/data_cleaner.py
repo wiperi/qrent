@@ -2,7 +2,7 @@ import pandas as pd
 from datetime import datetime
 
 def clean_rental_data(university):
-    input_file = f"{university}_full_rentaldata_uncleaned.csv"
+    input_file = f"data/{university}_full_rentaldata_uncleaned.csv"
     data = pd.read_csv(input_file)
     data['pricePerWeek'] = data['pricePerWeek'].str.extract(r'(\d+(?:,\d{3})*(?:\.\d+)?)')[0]  
     data['pricePerWeek'] = data['pricePerWeek'].str.replace(',', '', regex=False).astype(float)  
@@ -42,7 +42,7 @@ def clean_rental_data(university):
 
     current_date = datetime.now().strftime('%y%m%d')
 
-    cleaned_file_path = f"{university}_rentdata_cleaned_{current_date}.csv"
+    cleaned_file_path = f"data/{university}_rentdata_cleaned_{current_date}.csv"
 
     data.to_csv(cleaned_file_path, index=False)
     print("data cleaned and saved to", cleaned_file_path)

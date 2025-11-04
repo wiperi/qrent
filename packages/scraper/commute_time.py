@@ -120,8 +120,8 @@ def update_commute_time(university):
     calculator = CommuteCalculator(GOOGLE_MAPS_API_KEY)
     
     today = datetime.now().strftime('%y%m%d')
-    input_file = f"{university}_rentdata_{today}.csv"
-    output_file = f"{university}_rentdata_{today}.csv"
+    input_file = f"data/{university}_rentdata_{today}.csv"
+    output_file = f"data/{university}_rentdata_{today}.csv"
     
     if not os.path.exists(input_file):
         print(f"erroe: {input_file}")
@@ -138,7 +138,7 @@ def update_commute_time(university):
         data[current_commute_col] = None
     
     yesterday = (datetime.now() - timedelta(days=1)).strftime('%y%m%d')
-    yesterday_file = f"{university}_rentdata_{yesterday}.csv"
+    yesterday_file = f"data/{university}_rentdata_{yesterday}.csv"
     
     if os.path.exists(yesterday_file):
         print(f"find yesterday: {yesterday_file}")
@@ -222,7 +222,7 @@ def update_commute_time(university):
     print(f"save to {output_file}")
 
 def main():
-    csv_files = [f for f in os.listdir('.') if f.endswith('.csv')]
+    csv_files = [f for f in os.listdir('data') if f.endswith('.csv')]
     if csv_files:
         print(f"\nfind:")
         for i, file in enumerate(csv_files, 1):

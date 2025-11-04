@@ -487,7 +487,7 @@ def process_csv_file(csv_file, clean_only=False):
     import_to_database(df, school_name)
 
 def find_csv_files():
-    patterns = ['*UNSW*.csv', '*USYD*.csv', '*UTS*.csv']
+    patterns = ['data/*UNSW*.csv', 'data/*USYD*.csv', 'data/*UTS*.csv']
     found_files = []
 
     for pattern in patterns:
@@ -499,9 +499,9 @@ def find_csv_files():
 def find_today_csv_files():
     current_date = datetime.now().strftime('%y%m%d')
     today_files = [
-        f'UNSW_rentdata_{current_date}.csv',
-        f'USYD_rentdata_{current_date}.csv',
-        f'UTS_rentdata_{current_date}.csv'
+        f'data/UNSW_rentdata_{current_date}.csv',
+        f'data/USYD_rentdata_{current_date}.csv',
+        f'data/UTS_rentdata_{current_date}.csv'
     ]
 
     existing_files = []
@@ -516,8 +516,8 @@ def find_today_csv_files():
 def main():
     if len(sys.argv) < 2:
         current_date = datetime.now().strftime('%y%m%d')
-        print(f"   python csv_cleaner_and_importer.py process UNSW_rentdata_{current_date}.csv")
-        print(f"   python csv_cleaner_and_importer.py clean USYD_rentdata_{current_date}.csv")
+        print(f"   python csv_cleaner_and_importer.py process data/UNSW_rentdata_{current_date}.csv")
+        print(f"   python csv_cleaner_and_importer.py clean data/USYD_rentdata_{current_date}.csv")
         print("   python csv_cleaner_and_importer.py today")
         print("=" * 60)
         return

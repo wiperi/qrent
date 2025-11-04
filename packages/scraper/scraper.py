@@ -105,9 +105,11 @@ def scrape_data(driver, url, postcode, university):
         "propertyType": house_types,
         "houseId": house_ids,
     })
+    import os
+    os.makedirs('data', exist_ok=True)
     if university == 'UNSW':
-        filename = f"UNSW_rentaldata_suburb_{postcode}.csv"
+        filename = f"data/UNSW_rentaldata_suburb_{postcode}.csv"
     else:
-        filename = f"USYD_rentaldata_suburb_{postcode}.csv"
+        filename = f"data/USYD_rentaldata_suburb_{postcode}.csv"
     df.to_csv(filename, index=False, encoding='utf-8')
     print(f"Data for postcode {postcode} saved to {filename}.")
