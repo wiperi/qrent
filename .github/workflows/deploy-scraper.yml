@@ -3,7 +3,7 @@ name: Deploy Scraper
 on:
   push:
     branches:
-      - main
+      - scraper
     paths:
       - 'packages/scraper/**'
   workflow_dispatch:
@@ -15,6 +15,8 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v3
+        with:
+          ref: scraper
       
       - name: Deploy to server
         uses: appleboy/ssh-action@master
@@ -25,10 +27,40 @@ jobs:
           script: |
             echo "🚀 Starting deployment..."
             cd /home/deploy/qrent
-            git pull origin main
+            
+            # 切换到 scraper 分支
+            git checkout scraper
+            git pull origin scraper
+            
             cd packages/scraper
-            docker-compose down || true
+            
+            # 创建持久化目录
+            mkdir -p data logs backup
+            
+            # 备份数据
+            if [ -d data ] && [ "$(ls -A data 2>/dev/null)" ]; then
+              echo "💾 Backing up data..."
+              tar -czf backup/data_backup_$(date +%Y%m%d_%H%M%S).tar.gz data/
+              find backup/ -name "data_backup_*.tar.gz" -mtime +7 -delete
+            fi
+            
+            # 停止旧容器
+            echo "🛑 Stopping old container..."
+            docker-compose down
+            
+            # 重新构建
+            echo "🔨 Building image..."
             docker-compose build --no-cache
+            
+            # 启动容器
+            echo "🚀 Starting container..."
             docker-compose up -d
+            
+            sleep 5
+            
+            echo "📂 Data files:"
+            ls -lh data/ 2>/dev/null || echo "No data yet"
+            
             echo "✅ Deployment complete!"
             docker-compose ps
+            docker logs qrent-scraper --tail 20

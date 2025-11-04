@@ -19,8 +19,8 @@ services:
       - ./logs:/app/logs
       - ./data:/app/data
       - /tmp:/tmp
-    shm_size: 2gb
-    mem_limit: 3g
+    shm_size: 4gb
+    mem_limit: 4.3g
     networks:
       - qrent-network
 
