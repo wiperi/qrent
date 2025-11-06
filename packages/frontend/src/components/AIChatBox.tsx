@@ -1,0 +1,246 @@
+'use client';
+
+import { useAIChatStore, type Message } from '@/lib/ai-chat-store';
+import { cn } from '@/lib/utils';
+import { useEffect, useRef, useState } from 'react';
+import { FiSend, FiX, FiMessageSquare } from 'react-icons/fi';
+import { Button } from './ui/button';
+
+export function AIChatBox() {
+  const {
+    isOpen,
+    width,
+    messages,
+    isLoading,
+    closeChat,
+    addMessage,
+    setWidth,
+    setLoading,
+  } = useAIChatStore();
+
+  const [input, setInput] = useState('');
+  const [isResizing, setIsResizing] = useState(false);
+  const messagesEndRef = useRef<HTMLDivElement>(null);
+  const chatBoxRef = useRef<HTMLDivElement>(null);
+
+  // Auto-scroll to bottom when new messages arrive
+  useEffect(() => {
+    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+  }, [messages]);
+
+  // Handle send message
+  const handleSend = async () => {
+    if (!input.trim() || isLoading) return;
+
+    const userMessage = input.trim();
+    setInput('');
+    addMessage({ role: 'user', content: userMessage });
+    setLoading(true);
+
+    try {
+      const response = await fetch('/api/ai-chat', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ message: userMessage, history: messages }),
+      });
+
+      if (!response.ok) throw new Error('Failed to get response');
+
+      const data = await response.json();
+      addMessage({ role: 'assistant', content: data.message });
+    } catch (error) {
+      console.error('Error sending message:', error);
+      addMessage({
+        role: 'assistant',
+        content: 'Sorry, I encountered an error. Please try again.',
+      });
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // Handle resize
+  const handleMouseDown = (e: React.MouseEvent) => {
+    e.preventDefault();
+    setIsResizing(true);
+  };
+
+  useEffect(() => {
+    const handleMouseMove = (e: MouseEvent) => {
+      if (!isResizing || !chatBoxRef.current) return;
+
+      const windowWidth = window.innerWidth;
+      const newWidth = ((windowWidth - e.clientX) / windowWidth) * 100;
+      setWidth(newWidth);
+    };
+
+    const handleMouseUp = () => {
+      setIsResizing(false);
+    };
+
+    if (isResizing) {
+      document.addEventListener('mousemove', handleMouseMove);
+      document.addEventListener('mouseup', handleMouseUp);
+    }
+
+    return () => {
+      document.removeEventListener('mousemove', handleMouseMove);
+      document.removeEventListener('mouseup', handleMouseUp);
+    };
+  }, [isResizing, setWidth]);
+
+  return (
+    <>
+      {/* Mobile overlay */}
+      {isOpen && (
+        <div
+          className="fixed inset-0 z-40 bg-black/50 md:hidden"
+          onClick={closeChat}
+        />
+      )}
+
+      {/* Chat box */}
+      <div
+        ref={chatBoxRef}
+        className={cn(
+          'fixed right-0 top-0 z-50 flex h-full flex-col bg-background shadow-2xl transition-all duration-300 ease-in-out',
+          // Hide when closed
+          !isOpen && 'pointer-events-none',
+          // Mobile: always full width
+          isOpen ? 'w-full md:w-auto' : 'w-0',
+        )}
+        style={{
+          // Desktop: use percentage width with minimum
+          width: isOpen ? `max(300px, ${width}%)` : '0',
+        }}
+      >
+        {/* Resize handle - desktop only */}
+        <div
+          className="absolute left-0 top-0 hidden h-full w-1 cursor-ew-resize bg-border hover:bg-primary md:block"
+          onMouseDown={handleMouseDown}
+        />
+
+        {/* Header */}
+        <div className="flex items-center justify-between border-b border-border bg-card p-4">
+          <div className="flex items-center gap-2">
+            <FiMessageSquare className="h-5 w-5 text-primary" />
+            <h2 className="text-lg font-semibold">AI Assistant</h2>
+          </div>
+          <Button
+            variant="ghost"
+            size="icon"
+            onClick={closeChat}
+            className="h-8 w-8"
+          >
+            <FiX className="h-5 w-5" />
+          </Button>
+        </div>
+
+        {/* Messages */}
+        <div className="flex-1 overflow-y-auto p-4">
+          {messages.length === 0 ? (
+            <div className="flex h-full flex-col items-center justify-center text-center text-muted-foreground">
+              <FiMessageSquare className="mb-4 h-12 w-12 opacity-50" />
+              <p className="text-sm">
+                Hello! I&apos;m your AI assistant. How can I help you today?
+              </p>
+            </div>
+          ) : (
+            <div className="space-y-4">
+              {messages.map((message) => (
+                <MessageBubble key={message.id} message={message} />
+              ))}
+              {isLoading && (
+                <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                  <div className="flex gap-1">
+                    <span className="animate-bounce">.</span>
+                    <span className="animate-bounce delay-100">.</span>
+                    <span className="animate-bounce delay-200">.</span>
+                  </div>
+                  AI is typing...
+                </div>
+              )}
+              <div ref={messagesEndRef} />
+            </div>
+          )}
+        </div>
+
+        {/* Input */}
+        <div className="border-t border-border bg-card p-4">
+          <form
+            onSubmit={(e) => {
+              e.preventDefault();
+              handleSend();
+            }}
+            className="flex gap-2"
+          >
+            <input
+              type="text"
+              value={input}
+              onChange={(e) => setInput(e.target.value)}
+              placeholder="Type your message..."
+              disabled={isLoading}
+              className="flex-1 rounded-md border border-input bg-background px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-ring disabled:opacity-50"
+            />
+            <Button type="submit" disabled={!input.trim() || isLoading}>
+              <FiSend className="h-4 w-4" />
+            </Button>
+          </form>
+        </div>
+      </div>
+    </>
+  );
+}
+
+function MessageBubble({ message }: { message: Message }) {
+  const isUser = message.role === 'user';
+
+  return (
+    <div
+      className={cn(
+        'flex',
+        isUser ? 'justify-end' : 'justify-start',
+      )}
+    >
+      <div
+        className={cn(
+          'max-w-[80%] rounded-lg px-4 py-2 text-sm',
+          isUser
+            ? 'bg-primary text-primary-foreground'
+            : 'bg-muted text-foreground',
+        )}
+      >
+        <p className="whitespace-pre-wrap break-words">{message.content}</p>
+        <p className="mt-1 text-xs opacity-70">
+          {new Date(message.timestamp).toLocaleTimeString([], {
+            hour: '2-digit',
+            minute: '2-digit',
+          })}
+        </p>
+      </div>
+    </div>
+  );
+}
+
+export function AIChatToggleButton() {
+  const { isOpen, openChat } = useAIChatStore();
+
+  if (isOpen) return null;
+
+  return (
+    <Button
+      onClick={openChat}
+      size="icon"
+      className={cn(
+        'fixed z-[70] shadow-lg transition-all hover:scale-110',
+        // Mobile: bottom-right corner
+        'bottom-6 right-6 h-12 w-12',
+        // Desktop: top-right corner
+        'md:bottom-auto md:top-8 md:right-8 md:h-14 md:w-14',
+      )}
+      aria-label="Open AI Assistant"
+    >
+      <FiMessageSquare className="h-6 w-6" />
+    </Button>
+  );
+}
