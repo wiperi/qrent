@@ -4,14 +4,29 @@ import { useTRPCClient } from '@/lib/trpc';
 import { SCHOOL } from '@qrent/shared/enum';
 import { useQuery } from '@tanstack/react-query';
 import { useTranslations } from 'next-intl';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import PropertyCard from './PropertyCard';
 import Section from './Section';
+
+const SUBSCRIPTIONS_CACHE_KEY = 'user-subscriptions-cache';
 
 export default function PropertyGrid() {
   const t = useTranslations('PropertyGrid');
   const [selectedUniversity, setSelectedUniversity] = useState(SCHOOL.UNSW);
   const trpc = useTRPCClient();
+  
+  // 从 localStorage 读取缓存的收藏列表
+  const getCachedSubscriptions = () => {
+    if (typeof window === 'undefined') return [];
+    try {
+      const cached = localStorage.getItem(SUBSCRIPTIONS_CACHE_KEY);
+      return cached ? JSON.parse(cached) : [];
+    } catch {
+      return [];
+    }
+  };
+  
+  // 获取房产列表
   const { data, isPending, error } = useQuery({
     queryKey: ['properties.search', selectedUniversity],
     queryFn: () =>
@@ -29,6 +44,26 @@ export default function PropertyGrid() {
         ],
       }),
   });
+
+  // 获取用户收藏列表
+  const { data: subscriptions, isLoading: subscriptionsLoading } = useQuery({
+    queryKey: ['properties.getSubscriptions'],
+    queryFn: () => trpc.properties.getSubscriptions.query(),
+    enabled: typeof window !== 'undefined' && !!localStorage.getItem('auth-token'),
+    initialData: getCachedSubscriptions(), // 使用缓存作为初始数据
+  });
+
+  // 创建收藏 ID 的 Set 用于快速查找
+  const subscribedPropertyIds = new Set(
+    subscriptions?.map((sub: any) => sub.id) || []
+  );
+
+  // 当 subscriptions 更新时，保存到 localStorage
+  useEffect(() => {
+    if (typeof window !== 'undefined' && subscriptions && subscriptions.length >= 0) {
+      localStorage.setItem(SUBSCRIPTIONS_CACHE_KEY, JSON.stringify(subscriptions));
+    }
+  }, [subscriptions]);
 
   const getUniversityColors = (school: string, isSelected: boolean) => {
     const colors = {
@@ -113,6 +148,10 @@ export default function PropertyGrid() {
         {properties.map(property => (
           <PropertyCard
             key={property.id as string | number}
+            id={property.id}
+            isSubscribed={subscribedPropertyIds.has(property.id)}
+            subscriptionsLoading={subscriptionsLoading}
+            thumbnailUrl={property.thumbnailUrl}
             address={property.address}
             region={property.region || ''}
             price={property.price}

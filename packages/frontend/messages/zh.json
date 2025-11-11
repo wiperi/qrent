@@ -230,6 +230,9 @@
     "available": "可入住",
     "published": "发布于",
     "minToUniversity": "分钟到学校",
+    "source": "来源",
+    "favorite": "收藏",
+    "unfavorite": "取消收藏",
     "keywords": {
       "bedroom": "卧室",
       "bedrooms": "卧室",
