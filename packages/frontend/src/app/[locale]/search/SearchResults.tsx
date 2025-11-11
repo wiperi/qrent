@@ -1,4 +1,3 @@
-
 'use client';
 
 import PropertyCard from '@/components/PropertyCard';
@@ -43,6 +42,7 @@ type Property = {
   keywords: string
   availableDate?: string | null
   publishedAt: string
+  thumbnailUrl?: string
 }
 
 export default function SearchResults({ searchParams }: { searchParams: SearchParams }) {
@@ -120,7 +120,6 @@ export default function SearchResults({ searchParams }: { searchParams: SearchPa
               <Pagination current={page} totalPages={totalPages} />
             </div>
 
-            {/* 注意：如果 useQuery 不支持 suspense 这里写 Suspense 会报错，可以直接移除 Suspense 包裹 */}
             {isPending ? (
               <ResultsSkeleton />
             ) : error ? (
@@ -146,6 +145,7 @@ export default function SearchResults({ searchParams }: { searchParams: SearchPa
                     keywords={property.keywords}
                     availableDate={property.availableDate}
                     publishedAt={property.publishedAt}
+                    thumbnailUrl={property.thumbnailUrl || ''}
                   />
                 ))}
               </div>
@@ -300,6 +300,7 @@ function ResultsSkeleton() {
     <div className="mt-6 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
       {Array.from({ length: 6 }).map((_, i) => (
         <div key={i} className="animate-pulse overflow-hidden rounded-2xl border border-slate-200 bg-white">
+          <div className="h-48 bg-slate-200" />
           <div className="p-4 space-y-3">
             <div className="h-4 bg-slate-200 rounded w-2/3" />
             <div className="h-3 bg-slate-200 rounded w-1/2" />
