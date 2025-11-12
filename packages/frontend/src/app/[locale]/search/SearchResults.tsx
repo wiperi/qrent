@@ -133,6 +133,7 @@ export default function SearchResults({ searchParams }: { searchParams: SearchPa
                 {properties.map(property => (
                   <PropertyCard
                     key={property.id}
+                    id={property.id}
                     address={property.address}
                     region={property.region || ''}
                     price={property.price}

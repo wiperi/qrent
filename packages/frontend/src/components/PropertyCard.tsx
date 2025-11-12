@@ -8,7 +8,7 @@ import { useTRPCClient } from '@/lib/trpc';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 
 interface PropertyCardProps {
-  id: number;
+  id?: number;
   address: string;
   region: string;
   price: number;
@@ -61,7 +61,8 @@ export default function PropertyCard({
   // 订阅/收藏 mutation
   const subscribeMutation = useMutation({
     mutationFn: async () => {
-      return await trpcClient.properties.subscribe.mutate({ propertyId: id });
+      if (!id) throw new Error('Property ID is required');
+      return await trpcClient.properties.subscribe.mutate({ propertyId: id! });
     },
     onSuccess: () => {
       // 刷新收藏列表
@@ -85,7 +86,8 @@ export default function PropertyCard({
   // 取消订阅 mutation
   const unsubscribeMutation = useMutation({
     mutationFn: async () => {
-      return await trpcClient.properties.unsubscribe.mutate({ propertyId: id });
+      if (!id) throw new Error('Property ID is required');
+      return await trpcClient.properties.unsubscribe.mutate({ propertyId: id! });
     },
     onSuccess: () => {
       // 刷新收藏列表
