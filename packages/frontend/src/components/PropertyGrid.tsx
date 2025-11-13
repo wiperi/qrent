@@ -10,6 +10,10 @@ import Section from './Section';
 
 const SUBSCRIPTIONS_CACHE_KEY = 'user-subscriptions-cache';
 
+interface Subscription {
+  id: number;
+}
+
 export default function PropertyGrid() {
   const t = useTranslations('PropertyGrid');
   const [selectedUniversity, setSelectedUniversity] = useState(SCHOOL.UNSW);
@@ -55,7 +59,7 @@ export default function PropertyGrid() {
 
   // 创建收藏 ID 的 Set 用于快速查找
   const subscribedPropertyIds = new Set(
-    subscriptions?.map((sub: any) => sub.id) || []
+    subscriptions?.map((sub: Subscription) => sub.id) || []
   );
 
   // 当 subscriptions 更新时，保存到 localStorage

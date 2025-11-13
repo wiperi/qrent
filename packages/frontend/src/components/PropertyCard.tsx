@@ -68,8 +68,8 @@ export default function PropertyCard({
       // 刷新收藏列表
       queryClient.invalidateQueries({ queryKey: ['properties.getSubscriptions'] });
     },
-    onError: (error: any) => {
-      const errorMessage = error?.message || '';
+    onError: (error: unknown) => {
+      const errorMessage = error instanceof Error ? error.message : '';
       
       // 如果是"已经收藏过"的错误，不回滚 UI
       if (errorMessage.toLowerCase().includes('already subscribed')) {
@@ -93,7 +93,7 @@ export default function PropertyCard({
       // 刷新收藏列表
       queryClient.invalidateQueries({ queryKey: ['properties.getSubscriptions'] });
     },
-    onError: (error: any) => {
+    onError: () => {
       // 回滚 UI 并提示
       setIsFavorited(true);
       alert('取消收藏失败，请重试');
