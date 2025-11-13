@@ -316,19 +316,25 @@ export default function PropertyCard({
               {formatAddress(address)}
             </h3>
             
-            {/* Region and badges in same line */}
-            <div className="flex items-center gap-2 mt-0.5">
+            {/* Region and badges - 分成两行，徽章始终在一起 */}
+            <div className="flex flex-col gap-1 mt-0.5">
+              {/* 第一行：地区名 */}
               <p className="text-sm text-white/90 drop-shadow-lg">
                 {formatRegion(region)}
               </p>
               
-              <span className="bg-blue-600 text-white px-2.5 py-1 rounded text-xs font-medium whitespace-nowrap">
-                {propertyTypeName}
-              </span>
-              {availableDate && formatAvailableDate(availableDate) && (
-                <span className="bg-green-600 text-white px-2.5 py-1 rounded text-xs font-medium whitespace-nowrap">
-                  {formatAvailableDate(availableDate)}
-                </span>
+              {/* 第二行：两个徽章（如果有的话） */}
+              {(propertyTypeName || (availableDate && formatAvailableDate(availableDate))) && (
+                <div className="flex items-center gap-2">
+                  <span className="bg-blue-600 text-white px-2.5 py-1 rounded text-xs font-medium whitespace-nowrap">
+                    {propertyTypeName}
+                  </span>
+                  {availableDate && formatAvailableDate(availableDate) && (
+                    <span className="bg-green-600 text-white px-2.5 py-1 rounded text-xs font-medium whitespace-nowrap">
+                      {formatAvailableDate(availableDate)}
+                    </span>
+                  )}
+                </div>
               )}
             </div>
           </div>
