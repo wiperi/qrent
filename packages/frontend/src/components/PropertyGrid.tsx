@@ -8,7 +8,7 @@ import { useState, useEffect } from 'react';
 import PropertyCard from './PropertyCard';
 import Section from './Section';
 
-const SUBSCRIPTIONS_CACHE_KEY = 'user-subscriptions-cache';
+// const SUBSCRIPTIONS_CACHE_KEY = 'user-subscriptions-cache';
 
 interface Subscription {
   id: number;
@@ -20,15 +20,17 @@ export default function PropertyGrid() {
   const trpc = useTRPCClient();
   
   // 从 localStorage 读取缓存的收藏列表
-  const getCachedSubscriptions = () => {
-    if (typeof window === 'undefined') return [];
-    try {
-      const cached = localStorage.getItem(SUBSCRIPTIONS_CACHE_KEY);
-      return cached ? JSON.parse(cached) : [];
-    } catch {
-      return [];
-    }
-  };
+  // 注意：缓存到localStorage会造成不一致问题。PC端修改无法同步到手机端。
+  // 正常方案是后端返回房源的时候带上标记是否收藏。
+  // const getCachedSubscriptions = () => {
+  //   if (typeof window === 'undefined') return [];
+  //   try {
+  //     const cached = localStorage.getItem(SUBSCRIPTIONS_CACHE_KEY);
+  //     return cached ? JSON.parse(cached) : [];
+  //   } catch {
+  //     return [];
+  //   }
+  // };
   
   // 获取房产列表
   const { data, isPending, error } = useQuery({
@@ -54,7 +56,7 @@ export default function PropertyGrid() {
     queryKey: ['properties.getSubscriptions'],
     queryFn: () => trpc.properties.getSubscriptions.query(),
     enabled: typeof window !== 'undefined' && !!localStorage.getItem('auth-token'),
-    initialData: getCachedSubscriptions(), // 使用缓存作为初始数据
+    // initialData: getCachedSubscriptions(), // 注释掉：localStorage缓存会造成多端不一致
   });
 
   // 创建收藏 ID 的 Set 用于快速查找
@@ -63,11 +65,12 @@ export default function PropertyGrid() {
   );
 
   // 当 subscriptions 更新时，保存到 localStorage
-  useEffect(() => {
-    if (typeof window !== 'undefined' && subscriptions && subscriptions.length >= 0) {
-      localStorage.setItem(SUBSCRIPTIONS_CACHE_KEY, JSON.stringify(subscriptions));
-    }
-  }, [subscriptions]);
+  // 注释掉：localStorage缓存会造成多端不一致
+  // useEffect(() => {
+  //   if (typeof window !== 'undefined' && subscriptions && subscriptions.length >= 0) {
+  //     localStorage.setItem(SUBSCRIPTIONS_CACHE_KEY, JSON.stringify(subscriptions));
+  //   }
+  // }, [subscriptions]);
 
   const getUniversityColors = (school: string, isSelected: boolean) => {
     const colors = {

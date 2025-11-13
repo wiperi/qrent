@@ -42,7 +42,7 @@ type Property = {
   keywords: string
   availableDate?: string | null
   publishedAt: string
-  thumbnailUrl?: string
+  thumbnailUrl: string
 }
 
 export default function SearchResults({ searchParams }: { searchParams: SearchParams }) {
@@ -89,6 +89,18 @@ export default function SearchResults({ searchParams }: { searchParams: SearchPa
     queryKey: ['properties.search', searchFilters],
     queryFn: () => trpc.properties.search.query(searchFilters)
   })
+
+  // 获取用户收藏列表
+  const { data: subscriptions, isLoading: subscriptionsLoading } = useQuery({
+    queryKey: ['properties.getSubscriptions'],
+    queryFn: () => trpc.properties.getSubscriptions.query(),
+    enabled: typeof window !== 'undefined' && !!localStorage.getItem('auth-token'),
+  })
+
+  // 创建收藏 ID 的 Set 用于快速查找
+  const subscribedPropertyIds = new Set(
+    subscriptions?.map((sub: { id: number }) => sub.id) || []
+  )
 
   const properties: Property[] = data?.properties || []
   const searchSummary = {
@@ -146,7 +158,9 @@ export default function SearchResults({ searchParams }: { searchParams: SearchPa
                     keywords={property.keywords}
                     availableDate={property.availableDate}
                     publishedAt={property.publishedAt}
-                    thumbnailUrl={property.thumbnailUrl || ''}
+                    thumbnailUrl={property.thumbnailUrl}
+                    isSubscribed={subscribedPropertyIds.has(property.id)}
+                    subscriptionsLoading={subscriptionsLoading}
                   />
                 ))}
               </div>

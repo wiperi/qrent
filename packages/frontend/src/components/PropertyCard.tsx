@@ -21,8 +21,8 @@ interface PropertyCardProps {
   keywords: string;
   availableDate?: string | null;
   publishedAt: string;
-  thumbnailUrl?: string;
-  isSubscribed?: boolean;
+  thumbnailUrl: string;
+  isSubscribed: boolean;
   subscriptionsLoading?: boolean;
 }
 
@@ -41,7 +41,7 @@ export default function PropertyCard({
   availableDate,
   publishedAt,
   thumbnailUrl,
-  isSubscribed = false,
+  isSubscribed,
   subscriptionsLoading = false,
 }: PropertyCardProps) {
   const [isFavorited, setIsFavorited] = useState(isSubscribed);
