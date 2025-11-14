@@ -146,7 +146,7 @@ export default function Header() {
               </div>
 
               {/* Mobile hamburger */}
-              <div className="flex items-center">
+              <div className="flex items-center md:hidden">
                 <LanguageSwitcher />
                 <button
                   onClick={toggleDrawer}

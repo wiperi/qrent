@@ -1,11 +1,11 @@
 import { LOCALE } from '@qrent/shared/enum';
 import { useLocale, useTranslations } from 'next-intl';
-import { FaBath, FaHeart } from 'react-icons/fa';
-import { IoBed, IoHeartOutline } from 'react-icons/io5';
+import { FaBath } from 'react-icons/fa';
+import { IoBed } from 'react-icons/io5';
 import { useTRPCClient } from '@/lib/trpc';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { useState } from 'react';
-
+import Image from 'next/image';
 interface PropertyCardProps {
   address: string;
   region: string;
@@ -44,9 +44,6 @@ export default function PropertyCard({
   const t = useTranslations('PropertyCard');
   const locale = useLocale();
   const propertyTypeName = propertyType === 1 ? t('house') : t('apartment');
-  const defaultThumbnail =
-    'https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?w=800&h=600&fit=crop';
-
   const trpc = useTRPCClient();
   const queryClient = useQueryClient();
   const [isSubscribing, setIsSubscribing] = useState(false);
@@ -218,22 +215,42 @@ export default function PropertyCard({
               <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
             </svg>
           </div>
-
-          {/* <button className="bg-white rounded-full p-1.5 shadow-md hover:scale-110 transition-transform">
-            <svg
-              className="w-4 h-4 text-gray-600"
-              fill="none"
-              viewBox="0 0 24 24"
-              stroke="currentColor"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"
-              />
-            </svg>
-          </button> */}
+         
+          <button
+            onClick={handleSubscribeToggle}
+            disabled={isSubscribing || !propertyId}
+            className={`rounded-full p-1.5 shadow-md hover:scale-110 transition-transform ${
+        localSubscribed
+          ? 'bg-orange-500 text-white'
+          : 'bg-white text-orange-500 hover:bg-orange-50'
+      } ${isSubscribing ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'}`}
+            title={localSubscribed ? t('unsubscribe') : t('subscribe')}
+          >
+            {localSubscribed ? (
+              <svg
+                className="w-4 h-4 text-white"
+                fill="currentColor" 
+                viewBox="0 0 24 24"
+                stroke="none" 
+              >
+                <path d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
+              </svg>
+            ) : (
+              <svg
+                className="w-4 h-4 text-orange-600"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"
+                />
+              </svg>
+            )}
+          </button>
         </div>
 
         {/* Bottom left: House type and Available date badges */}

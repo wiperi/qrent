@@ -290,7 +290,9 @@
       "walkable": "步行可达",
       "trains": "火车",
       "beach": "海滩",
-      "elegance": "优雅"
+      "elegance": "优雅",
+      "subscribe": "加入收藏",
+      "unsubscribe": "取消收藏"
     }
   }
 }

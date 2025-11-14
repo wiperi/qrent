@@ -291,7 +291,9 @@
       "walkable": "walkable",
       "trains": "trains",
       "beach": "beach",
-      "elegance": "elegance"
+      "elegance": "elegance",
+      "subscribe": "Add to Favorites",
+      "unsubscribe": "Remove from Favorites"
     }
   }
 }
