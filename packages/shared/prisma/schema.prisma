@@ -68,6 +68,15 @@ model Preference {
   @@map("preferences")
 }
 
+enum RoomType {
+  entire_home
+  primary_bedroom
+  secondary_bedroom
+  shared_bedroom
+  living_room
+  study_room
+}
+
 model Property {
   id              Int              @id @default(autoincrement()) @db.UnsignedInt
   price           Int              @db.UnsignedInt
@@ -86,6 +95,7 @@ model Property {
   url             String           @db.VarChar(255)
   publishedAt     DateTime         @map("published_at") @db.DateTime(0)
   thumbnailUrl    String           @default("") @map("thumbnail_url") @db.VarChar(500)
+  availableArea   RoomType         @default(entire_home) @map("available_area")
   region          Region           @relation(fields: [regionId], references: [id])
   property_school PropertySchool[]
   images          PropertyImage[]
