@@ -92,7 +92,10 @@ export default function SearchResults({ searchParams }: { searchParams: SearchPa
     queryFn: () => trpc.properties.search.query(searchFilters)
   })
 
-  const properties: Property[] = data?.properties || []
+  const properties = data?.properties || []
+
+  // properties[0].thumbnailUrl
+
   const searchSummary = {
     totalCount: data?.totalCount || 0,
     filteredCount: data?.filteredCount || 0,
