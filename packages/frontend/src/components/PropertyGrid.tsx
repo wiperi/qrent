@@ -121,10 +121,13 @@ export default function PropertyGrid() {
             propertyType={property.propertyType}
             commuteTime={property.commuteTime ?? undefined}
             url={property.url}
+            thumbnailUrl={property.thumbnailUrl}
+            subscribed={property.subscribed}
             averageScore={property.averageScore}
             keywords={property.keywords}
             availableDate={property.availableDate}
             publishedAt={property.publishedAt}
+            propertyId={property.id as number}
           />
         ))}
       </div>

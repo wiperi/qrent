@@ -1,7 +1,10 @@
 import { LOCALE } from '@qrent/shared/enum';
 import { useLocale, useTranslations } from 'next-intl';
-import { FaBath } from 'react-icons/fa';
-import { IoBed } from 'react-icons/io5';
+import { FaBath, FaHeart } from 'react-icons/fa';
+import { IoBed, IoHeartOutline } from 'react-icons/io5';
+import { useTRPCClient } from '@/lib/trpc';
+import { useMutation, useQueryClient } from '@tanstack/react-query';
+import { useState } from 'react';
 
 interface PropertyCardProps {
   address: string;
@@ -16,6 +19,9 @@ interface PropertyCardProps {
   keywords: string;
   availableDate?: string | null;
   publishedAt: string;
+  thumbnailUrl: string;
+  subscribed?: boolean;
+  propertyId?: number;
 }
 
 export default function PropertyCard({
@@ -31,10 +37,78 @@ export default function PropertyCard({
   keywords,
   availableDate,
   publishedAt,
+  thumbnailUrl,
+  subscribed,
+  propertyId,
 }: PropertyCardProps) {
   const t = useTranslations('PropertyCard');
   const locale = useLocale();
   const propertyTypeName = propertyType === 1 ? t('house') : t('apartment');
+  const defaultThumbnail =
+    'https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?w=800&h=600&fit=crop';
+
+  const trpc = useTRPCClient();
+  const queryClient = useQueryClient();
+  const [isSubscribing, setIsSubscribing] = useState(false);
+  const [localSubscribed, setLocalSubscribed] = useState(subscribed || false);
+
+  const subscribeMutation = useMutation({
+    mutationFn: async (propertyId: number) => {
+      return await trpc.properties.subscribe.mutate({ propertyId });
+    },
+    onSuccess: () => {
+      setLocalSubscribed(true);
+      queryClient.invalidateQueries({ queryKey: ['properties'] });
+    },
+    onError: (error: any) => {
+      // 如果是409错误（已订阅），静默处理并将状态改为已订阅
+      if (error?.data?.code === 'CONFLICT') {
+        // 静默处理，不显示错误，但更新本地状态
+        setLocalSubscribed(true);
+      } else {
+        console.error('Failed to subscribe:', error);
+      }
+    },
+    onSettled: () => {
+      setIsSubscribing(false);
+    },
+  });
+
+  const unsubscribeMutation = useMutation({
+    mutationFn: async (propertyId: number) => {
+      return await trpc.properties.unsubscribe.mutate({ propertyId });
+    },
+    onSuccess: () => {
+      setLocalSubscribed(false);
+      queryClient.invalidateQueries({ queryKey: ['properties'] });
+    },
+    onError: (error: any) => {
+      // 如果是404错误（未订阅），静默处理并将状态改为未订阅
+      if (error?.data?.code === 'NOT_FOUND') {
+        // 静默处理，不显示错误，但更新本地状态
+        setLocalSubscribed(false);
+      } else {
+        console.error('Failed to unsubscribe:', error);
+      }
+    },
+    onSettled: () => {
+      setIsSubscribing(false);
+    },
+  });
+
+  const handleSubscribeToggle = async (e: React.MouseEvent) => {
+    e.stopPropagation();
+    e.preventDefault();
+    if (!propertyId || isSubscribing) return;
+
+    setIsSubscribing(true);
+
+    if (localSubscribed) {
+      unsubscribeMutation.mutate(propertyId);
+    } else {
+      subscribeMutation.mutate(propertyId);
+    }
+  };
 
   const capitalizeEnglishWords = (text: string) => {
     return text.replace(/\b[a-zA-Z]+\b/g, word => {
@@ -119,16 +193,32 @@ export default function PropertyCard({
   const content = (
     <>
       {/* Score badge in top right */}
-      <div
-        className={`absolute top-3 right-3 flex items-center gap-1 px-2 py-1 rounded-full text-xs font-semibold ${getScoreColor(averageScore)}`}
-      >
-        <span>{averageScore.toFixed(1)}</span>
-        <svg className="w-3 h-3 fill-current" viewBox="0 0 20 20">
-          <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
-        </svg>
+      <div className='absolute top-4 right-2 flex items-center justify-center align-middle gap-1'>
+        <div
+          className={`flex items-center gap-1 px-2 py-1 rounded-full text-xs font-semibold ${getScoreColor(averageScore)}`}
+        >
+          <span>{averageScore.toFixed(1)}</span>
+          <svg className="w-3 h-3 fill-current" viewBox="0 0 20 20">
+            <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
+          </svg>
+        </div>
+        <button
+          onClick={handleSubscribeToggle}
+          disabled={isSubscribing || !propertyId}
+          className={`flex items-center justify-center w-6 h-6 rounded-full text-xs font-semibold transition-all shadow-[0_0_5px_rgba(0,0,0,0.15)] ${
+            localSubscribed ? 'bg-red-500 text-white' : 'bg-white text-red-500 hover:bg-red-50'
+          } ${isSubscribing ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'}`}
+          title={localSubscribed ? '取消收藏' : '收藏'}
+        >
+          {localSubscribed ? (
+            <FaHeart className="w-4 h-4" />
+          ) : (
+            <IoHeartOutline className="w-4 h-4" />
+          )}
+        </button>
       </div>
 
-      <h3 className="text-base font-semibold text-slate-900 pr-16">{formatAddress(address)}</h3>
+      <h3 className="text-base font-semibold text-slate-900 pr-18">{formatAddress(address)}</h3>
       <p className="mt-1 text-sm text-slate-500">{formatRegion(region)}</p>
       <p className="mt-3 text-brand font-semibold text-lg">
         ${price.toLocaleString()}
