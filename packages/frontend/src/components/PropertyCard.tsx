@@ -47,7 +47,9 @@ export default function PropertyCard({
 }: PropertyCardProps) {
   const [isFavorited, setIsFavorited] = useState(isSubscribed);
   const [addressFontSize, setAddressFontSize] = useState(18);
+  const [visibleKeywordCount, setVisibleKeywordCount] = useState(0);
   const addressRef = useRef<HTMLHeadingElement>(null);
+  const keywordContainerRef = useRef<HTMLDivElement>(null);
   const t = useTranslations('PropertyCard');
   const locale = useLocale();
   const propertyTypeName = propertyType === 1 ? t('house') : t('apartment');
@@ -160,6 +162,61 @@ export default function PropertyCard({
         .filter(Boolean)
         .slice(0, 10)
     : [];
+
+  // 动态计算能显示的关键词数量（确保完整显示，不截断）
+  useEffect(() => {
+    if (keywordList.length === 0) return;
+
+    const calculateVisibleKeywords = () => {
+      const container = keywordContainerRef.current;
+      if (!container) return;
+
+      // 最大允许高度（约4行，每行约28-30px，留一点余量）
+      const maxHeight = 115;
+      
+      // 临时创建一个测试容器来测量高度
+      const testContainer = container.cloneNode(false) as HTMLElement;
+      testContainer.style.position = 'absolute';
+      testContainer.style.visibility = 'hidden';
+      testContainer.style.width = container.offsetWidth + 'px';
+      container.parentElement?.appendChild(testContainer);
+
+      let visibleCount = 0;
+      
+      // 逐个添加标签并测量高度
+      for (let i = 0; i < keywordList.length; i++) {
+        const span = document.createElement('span');
+        span.className = 'px-2 py-1 bg-blue-100 text-blue-800 text-xs rounded-full whitespace-nowrap flex-shrink-0';
+        span.textContent = keywordList[i];
+        testContainer.appendChild(span);
+        
+        // 检查添加这个标签后的高度
+        if (testContainer.offsetHeight <= maxHeight) {
+          visibleCount = i + 1;
+        } else {
+          // 如果超过了，就不再添加
+          break;
+        }
+      }
+      
+      // 清理测试容器
+      testContainer.remove();
+      
+      // 设置可见的标签数量
+      setVisibleKeywordCount(visibleCount);
+    };
+
+    // 使用 setTimeout 确保 DOM 已完全渲染
+    const timer = setTimeout(calculateVisibleKeywords, 0);
+
+    // 监听窗口大小变化
+    window.addEventListener('resize', calculateVisibleKeywords);
+    
+    return () => {
+      clearTimeout(timer);
+      window.removeEventListener('resize', calculateVisibleKeywords);
+    };
+  }, [keywordList]);
 
   // 从 URL 提取网站名称
   const getWebsiteName = (url: string): string => {
@@ -315,10 +372,10 @@ export default function PropertyCard({
 
           {/* Bottom left: Property info overlay on image */}
           <div className="absolute bottom-0 left-0 right-0 p-4 z-10">
-            {/* Address */}
+            {/* Address - 修复溢出问题 */}
             <h3
               ref={addressRef}
-              className="font-semibold text-white drop-shadow-lg whitespace-nowrap"
+              className="font-semibold text-white drop-shadow-lg line-clamp-2 break-words"
               style={{ fontSize: `${addressFontSize}px` }}
             >
               {formatAddress(address)}
@@ -385,12 +442,6 @@ export default function PropertyCard({
           </p>
         )}
 
-        {/* 来源网站 */}
-        {/* <p className="mt-2 text-xs text-gray-600">
-          <span className="font-medium">{t('source') + ': '}</span>
-          <span>{websiteName}</span>
-        </p> */}
-
         {/* Divider line */}
         {(keywordList.length > 0 || isFlatmates) && (
           <hr className="my-3 border-t border-gray-200" />
@@ -401,11 +452,14 @@ export default function PropertyCard({
           <div className="mt-2 text-xs text-gray-500 leading-relaxed">{t('flatmatesWarning')}</div>
         ) : (
           keywordList.length > 0 && (
-            <div className="mt-2 flex flex-wrap gap-1 overflow-hidden max-h-[120px]">
-              {keywordList.map((keyword, index) => (
+            <div 
+              ref={keywordContainerRef}
+              className="mt-2 flex flex-wrap gap-1.5 content-start overflow-hidden"
+            >
+              {keywordList.slice(0, visibleKeywordCount || keywordList.length).map((keyword, index) => (
                 <span
                   key={index}
-                  className="px-2 py-1 bg-blue-100 text-blue-800 text-xs rounded-full whitespace-nowrap"
+                  className="px-2 py-1 bg-blue-100 text-blue-800 text-xs rounded-full whitespace-nowrap flex-shrink-0"
                 >
                   {keyword}
                 </span>
