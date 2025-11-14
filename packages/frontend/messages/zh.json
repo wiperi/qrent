@@ -238,6 +238,9 @@
     "published": "发布于",
     "minToUniversity": "分钟到学校",
     "source": "来源网站",
+    "flatmatesWarning": "温馨提示：该网站信息鱼龙混杂，潜在风险需自行判断，请谨慎选择。",
+    "subscribe": "加入收藏",
+    "unsubscribe": "取消收藏",
     "keywords": {
       "bedroom": "卧室",
       "bedrooms": "卧室",
@@ -290,9 +293,7 @@
       "walkable": "步行可达",
       "trains": "火车",
       "beach": "海滩",
-      "elegance": "优雅",
-      "subscribe": "加入收藏",
-      "unsubscribe": "取消收藏"
+      "elegance": "优雅"
     }
   }
 }
