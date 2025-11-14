@@ -60,7 +60,7 @@ export default function PropertyCard({
       setLocalSubscribed(true);
       queryClient.invalidateQueries({ queryKey: ['properties'] });
     },
-    onError: (error: any) => {
+    onError: (error: { data?: { code: string } }) => {
       // 如果是409错误（已订阅），静默处理并将状态改为已订阅
       if (error?.data?.code === 'CONFLICT') {
         // 静默处理，不显示错误，但更新本地状态
@@ -82,7 +82,7 @@ export default function PropertyCard({
       setLocalSubscribed(false);
       queryClient.invalidateQueries({ queryKey: ['properties'] });
     },
-    onError: (error: any) => {
+    onError: (error: { data?: { code: string } }) => {
       // 如果是404错误（未订阅），静默处理并将状态改为未订阅
       if (error?.data?.code === 'NOT_FOUND') {
         // 静默处理，不显示错误，但更新本地状态
