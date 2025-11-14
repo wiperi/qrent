@@ -28,7 +28,6 @@ interface PropertyCardProps {
 }
 
 export default function PropertyCard({
-  id,
   address,
   region,
   price,

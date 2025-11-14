@@ -83,6 +83,7 @@ export default function FavoritePage() {
                 publishedAt={property.publishedAt}
                 subscribed={property.subscribed}
                 propertyId={property.id as number}
+                id={property.id as number}
               />
             ))}
           </div>
