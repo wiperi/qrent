@@ -1,4 +1,9 @@
 {
+  "FavoritePage": {
+    "title": "我的收藏",
+    "emptyState": "您还没有保存任何房产到收藏夹。浏览房产并点击五角星图标将它们添加到这里。",
+    "errorState": "加载收藏列表失败，请稍后重试。"
+  },
   "Header": {
     "login": "登录",
     "signup": "注册",
@@ -8,7 +13,9 @@
     "closeMenu": "关闭菜单",
     "rentalGuide": "租房指南",
     "documentPreparation": "文件准备",
-    "rentalBlog": "租房论坛"
+    "rentalBlog": "租房论坛",
+    "favorite": "我的收藏",
+    "homepage": "首页"
   },
   "SearchBar": {
     "placeholder": "按城市、地址或学校搜索...",

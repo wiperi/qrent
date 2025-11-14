@@ -1,4 +1,9 @@
 {
+  "FavoritePage": {
+    "title": "My Favorites",
+    "emptyState": "You haven't saved any properties to your favorites yet. Browse properties and click the star icon to add them here.",
+    "errorState": "Failed to load favorites. Please try again later."
+  },
   "Header": {
     "login": "Log in",
     "signup": "Sign up",
@@ -8,7 +13,9 @@
     "closeMenu": "Close menu",
     "rentalGuide": "Rental Guide",
     "documentPreparation": "Document Preparation",
-    "rentalBlog": "Rental Blog"
+    "rentalBlog": "Rental Blog",
+    "favorite": "Favorites",
+    "homepage": "Homepage"
   },
   "SearchBar": {
     "placeholder": "Search by city, address or school...",
@@ -26,13 +33,7 @@
     "fourBedrooms": "4 bedrooms",
     "fivePlusBedrooms": "5+ bedrooms"
   },
-  "PropertyCard": {
-    "bedrooms": "bedrooms",
-    "bathrooms": "bathrooms",
-    "parking": "parking",
-    "availableFrom": "Available from",
-    "viewDetails": "View Details"
-  },
+
   "FilterModal": {
     "title": "Filters",
     "priceRange": "Price Range",

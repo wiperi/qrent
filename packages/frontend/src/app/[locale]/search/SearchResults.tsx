@@ -39,6 +39,8 @@ type Property = {
   description?: string | null
   commuteTime?: number | null
   url: string
+  thumbnailUrl: string
+  subscribed: boolean
   averageScore: number
   keywords: string
   availableDate?: string | null
@@ -142,10 +144,13 @@ export default function SearchResults({ searchParams }: { searchParams: SearchPa
                     propertyType={property.propertyType}
                     commuteTime={property.commuteTime ?? undefined}
                     url={property.url}
+                    thumbnailUrl={property.thumbnailUrl}
+                    subscribed={property.subscribed}
                     averageScore={property.averageScore}
                     keywords={property.keywords}
                     availableDate={property.availableDate}
                     publishedAt={property.publishedAt}
+                    propertyId={property.id as number}
                   />
                 ))}
               </div>
