@@ -1,7 +1,7 @@
 'use client';
 
 import { useMemo } from 'react';
-import { useLocale, useTranslations } from 'next-intl';
+import { useTranslations } from 'next-intl';
 import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 import { MdClose } from 'react-icons/md';
 import { PROPERTY_TYPE } from '@qrent/shared/enum';
@@ -12,19 +12,9 @@ export default function CurrentFiltersBar({ className = '' }: { className?: stri
   const router = useRouter();
   const pathname = usePathname();
   const searchParams = useSearchParams();
-  const locale = useLocale();
   const tm = useTranslations('FilterModal');
 
   const tags = useMemo<Tag[]>(() => {
-    // Move L object inside useMemo to avoid dependency issues
-    const L = {
-      priceLabel: locale === 'zh' ? '价格' : 'Price',
-      bedSuffix: locale === 'zh' ? '卧' : 'BR',
-      bathSuffix: locale === 'zh' ? '卫' : 'BA',
-      minutes: locale === 'zh' ? '分钟' : 'min',
-      ratingSuffix: locale === 'zh' ? '分' : '',
-    };
-
     const p = searchParams;
     const read = (k: string) => p.get(k) ?? '';
     const has = (k: string) => {
@@ -46,31 +36,35 @@ export default function CurrentFiltersBar({ className = '' }: { className?: stri
     if (has('priceMin') || has('priceMax')) {
       const min = read('priceMin'), max = read('priceMax');
       const val = has('priceMin') && has('priceMax') ? `$${min} ~ $${max}` : has('priceMin') ? `≥$${min}` : `≤$${max}`;
-      list.push({ key: 'price', label: L.priceLabel, value: val });
+      list.push({ key: 'price', label: tm('price'), value: val });
     }
 
     if (has('bedroomsMin') || has('bedroomsMax')) {
       const min = read('bedroomsMin'), max = read('bedroomsMax');
-      const val = has('bedroomsMin') && has('bedroomsMax') ? `${min}~${max}${L.bedSuffix}` : has('bedroomsMin') ? `≥${min}${L.bedSuffix}` : `≤${max}${L.bedSuffix}`;
+      const bedSuffix = tm('bedroomSuffix');
+      const val = has('bedroomsMin') && has('bedroomsMax') ? `${min}~${max}${bedSuffix}` : has('bedroomsMin') ? `≥${min}${bedSuffix}` : `≤${max}${bedSuffix}`;
       list.push({ key: 'bedrooms', label: tm('bedrooms'), value: val });
     }
 
     if (has('bathroomsMin') || has('bathroomsMax')) {
       const min = read('bathroomsMin'), max = read('bathroomsMax');
-      const val = has('bathroomsMin') && has('bathroomsMax') ? `${min}~${max}${L.bathSuffix}` : has('bathroomsMin') ? `≥${min}${L.bathSuffix}` : `≤${max}${L.bathSuffix}`;
+      const bathSuffix = tm('bathroomSuffix');
+      const val = has('bathroomsMin') && has('bathroomsMax') ? `${min}~${max}${bathSuffix}` : has('bathroomsMin') ? `≥${min}${bathSuffix}` : `≤${max}${bathSuffix}`;
       list.push({ key: 'bathrooms', label: tm('bathrooms'), value: val });
     }
 
     if (has('commuteMin') || has('commuteMax')) {
       const min = read('commuteMin'), max = read('commuteMax');
-      const val = has('commuteMin') && has('commuteMax') ? `${min}~${max}${L.minutes}` : has('commuteMin') ? `≥${min}${L.minutes}` : `≤${max}${L.minutes}`;
-      list.push({ key: 'commute', label: (locale === 'zh' ? '通勤' : 'Commute'), value: val });
+      const minutes = tm('minutes');
+      const val = has('commuteMin') && has('commuteMax') ? `${min}~${max}${minutes}` : has('commuteMin') ? `≥${min}${minutes}` : `≤${max}${minutes}`;
+      list.push({ key: 'commute', label: tm('commute'), value: val });
     }
 
     if (has('rating')) {
       const ratingValue = Number(read('rating'));
       if (ratingValue !== 13) {
-        list.push({ key: 'rating', label: tm('rating'), value: `${read('rating')}${L.ratingSuffix}` });
+        const ratingSuffix = tm('ratingSuffix');
+        list.push({ key: 'rating', label: tm('rating'), value: `${read('rating')}${ratingSuffix}` });
       }
     }
 
@@ -91,12 +85,7 @@ export default function CurrentFiltersBar({ className = '' }: { className?: stri
     }
 
     return list;
-  }, [searchParams, tm, locale]);
-
-  const L = {
-    current: locale === 'zh' ? '当前筛选：' : 'Current filters:',
-    clear: locale === 'zh' ? '清空' : 'Clear all',
-  };
+  }, [searchParams, tm]);
 
   if (tags.length === 0) return null;
 
@@ -143,7 +132,7 @@ export default function CurrentFiltersBar({ className = '' }: { className?: stri
 
   return (
     <div className={`flex items-center flex-wrap gap-3 gap-y-2 ${className}`}>
-      <span className="text-sm font-medium text-slate-700 whitespace-nowrap select-none">{L.current}</span>
+      <span className="text-sm font-medium text-slate-700 whitespace-nowrap select-none">{tm('currentFilters')}</span>
 
       {tags.map(tag => (
         <div
@@ -155,7 +144,7 @@ export default function CurrentFiltersBar({ className = '' }: { className?: stri
           <button
             type="button"
             aria-label="remove filter"
-            title="移除此筛选"
+            title={tm('clearAllFilters')}
             onClick={() => removeOne(tag.key)}
             className="ml-2 inline-flex h-5 w-5 items-center justify-center rounded-full hover:bg-blue-200 focus:outline-none"
           >
@@ -168,7 +157,7 @@ export default function CurrentFiltersBar({ className = '' }: { className?: stri
         onClick={clearAll}
         className="text-sm text-blue-600 hover:text-blue-700 font-medium whitespace-nowrap ml-1"
       >
-        {L.clear}
+        {tm('clearAllFilters')}
       </button>
     </div>
   );

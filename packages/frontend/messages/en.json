@@ -42,7 +42,15 @@
     "apartment": "Apartment",
     "min": "Min",
     "max": "Max",
-    "rating": "Rating"
+    "rating": "Rating",
+    "price": "Price",
+    "bedroomSuffix": "BR",
+    "bathroomSuffix": "BA",
+    "minutes": "min",
+    "ratingSuffix": "",
+    "commute": "Commute",
+    "currentFilters": "Current filters:",
+    "clearAllFilters": "Clear all"
   },
   "Auth": {
     "loginTitle": "Welcome back",

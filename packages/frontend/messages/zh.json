@@ -42,7 +42,15 @@
     "apartment": "公寓",
     "min": "最小值",
     "max": "最大值",
-    "rating": "评分"
+    "rating": "评分",
+    "price": "价格",
+    "bedroomSuffix": "卧",
+    "bathroomSuffix": "卫",
+    "minutes": "分钟",
+    "ratingSuffix": "分",
+    "commute": "通勤",
+    "currentFilters": "当前筛选：",
+    "clearAllFilters": "清空"
   },
   "Auth": {
     "loginTitle": "欢迎回来",
