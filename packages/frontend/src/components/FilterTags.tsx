@@ -87,8 +87,6 @@ export default function CurrentFiltersBar({ className = '' }: { className?: stri
     return list;
   }, [searchParams, tm]);
 
-  if (tags.length === 0) return null;
-
   const buildHref = (params: URLSearchParams) => { 
     params.set('page', '1'); 
     return `${pathname}?${params.toString()}`; 
@@ -130,35 +128,39 @@ export default function CurrentFiltersBar({ className = '' }: { className?: stri
     router.push(buildHref(params));
   };
 
+  if (tags.length === 0) return null;
+
   return (
-    <div className={`flex items-center flex-wrap gap-3 gap-y-2 ${className}`}>
-      <span className="text-sm font-medium text-slate-700 whitespace-nowrap select-none">{tm('currentFilters')}</span>
+    <div className="mt-4 rounded-xl border border-slate-200 bg-white px-4 py-3 shadow">
+      <div className={`flex items-center flex-wrap gap-3 gap-y-2 ${className}`}>
+        <span className="text-sm font-medium text-slate-700 whitespace-nowrap select-none">{tm('currentFilters')}</span>
 
-      {tags.map(tag => (
-        <div
-          key={tag.key}
-          className="inline-flex items-center rounded-full bg-blue-50 text-blue-700 border border-blue-200 px-3 py-1.5 text-sm select-none cursor-default"
-        >
-          {tag.label && <span className="font-medium mr-1">{tag.label}:</span>}
-          <span>{tag.value}</span>
-          <button
-            type="button"
-            aria-label="remove filter"
-            title={tm('clearAllFilters')}
-            onClick={() => removeOne(tag.key)}
-            className="ml-2 inline-flex h-5 w-5 items-center justify-center rounded-full hover:bg-blue-200 focus:outline-none"
+        {tags.map(tag => (
+          <div
+            key={tag.key}
+            className="inline-flex items-center rounded-full bg-blue-50 text-blue-700 border border-blue-200 px-3 py-1.5 text-sm select-none cursor-default"
           >
-            <MdClose className="w-4 h-4" />
-          </button>
-        </div>
-      ))}
+            {tag.label && <span className="font-medium mr-1">{tag.label}:</span>}
+            <span>{tag.value}</span>
+            <button
+              type="button"
+              aria-label="remove filter"
+              title={tm('clearAllFilters')}
+              onClick={() => removeOne(tag.key)}
+              className="ml-2 inline-flex h-5 w-5 items-center justify-center rounded-full hover:bg-blue-200 focus:outline-none"
+            >
+              <MdClose className="w-4 h-4" />
+            </button>
+          </div>
+        ))}
 
-      <button
-        onClick={clearAll}
-        className="text-sm text-blue-600 hover:text-blue-700 font-medium whitespace-nowrap ml-1"
-      >
-        {tm('clearAllFilters')}
-      </button>
+        <button
+          onClick={clearAll}
+          className="text-sm text-blue-600 hover:text-blue-700 font-medium whitespace-nowrap ml-1"
+        >
+          {tm('clearAllFilters')}
+        </button>
+      </div>
     </div>
   );
 }

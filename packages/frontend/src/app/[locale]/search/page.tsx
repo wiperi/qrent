@@ -11,17 +11,6 @@ type SearchParams = {
 
 export default async function SearchPage({ searchParams }: { searchParams: Promise<SearchParams> }) {
   const params = await searchParams;
-    //横向: 添加
-    const hasFilter = [
-    'propertyType',
-    'priceMin', 'priceMax',
-    'bedroomsMin', 'bedroomsMax',
-    'bathroomsMin', 'bathroomsMax',
-    'commuteMin', 'commuteMax',
-    'rating',
-    'moveInDate',
-    'areas'
-  ].some(key => params[key as keyof typeof params]);
 
   return (
     <main>
@@ -31,11 +20,7 @@ export default async function SearchPage({ searchParams }: { searchParams: Promi
           <SearchBar />
           
           {/*横向*/}
-          {hasFilter && (
-            <div className="mt-4 rounded-xl border border-slate-200 bg-white px-4 py-3 shadow">
-              <CurrentFiltersBar />
-            </div>
-          )}
+          <CurrentFiltersBar />
         </div>
       </section>
 
