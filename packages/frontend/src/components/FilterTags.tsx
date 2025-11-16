@@ -15,17 +15,16 @@ export default function CurrentFiltersBar({ className = '' }: { className?: stri
   const locale = useLocale();
   const tm = useTranslations('FilterModal');
 
-  const L = {
-     current: locale === 'zh' ? '当前筛选：' : 'Current filters:',
-     clear: locale === 'zh' ? '清空' : 'Clear all',
-     priceLabel: locale === 'zh' ? '价格' : 'Price',
-     bedSuffix: locale === 'zh' ? '卧' : 'BR',
-     bathSuffix: locale === 'zh' ? '卫' : 'BA',
-     minutes: locale === 'zh' ? '分钟' : 'min',
-     ratingSuffix: locale === 'zh' ? '分' : '',
-  };
-
   const tags = useMemo<Tag[]>(() => {
+    // Move L object inside useMemo to avoid dependency issues
+    const L = {
+      priceLabel: locale === 'zh' ? '价格' : 'Price',
+      bedSuffix: locale === 'zh' ? '卧' : 'BR',
+      bathSuffix: locale === 'zh' ? '卫' : 'BA',
+      minutes: locale === 'zh' ? '分钟' : 'min',
+      ratingSuffix: locale === 'zh' ? '分' : '',
+    };
+
     const p = searchParams;
     const read = (k: string) => p.get(k) ?? '';
     const has = (k: string) => {
@@ -40,7 +39,7 @@ export default function CurrentFiltersBar({ className = '' }: { className?: stri
       const map: Record<number, string> = {
         [PROPERTY_TYPE.House]: tm('house'),
         [PROPERTY_TYPE.Apartment]: tm('apartment'),
-      } as any;
+      };
       list.push({ key: 'propertyType', label: tm('propertyType'), value: map[type] ?? String(type) });
     }
 
@@ -94,22 +93,44 @@ export default function CurrentFiltersBar({ className = '' }: { className?: stri
     return list;
   }, [searchParams, tm, locale]);
 
+  const L = {
+    current: locale === 'zh' ? '当前筛选：' : 'Current filters:',
+    clear: locale === 'zh' ? '清空' : 'Clear all',
+  };
+
   if (tags.length === 0) return null;
 
-  const buildHref = (params: URLSearchParams) => { params.set('page', '1'); return `${pathname}?${params.toString()}`; };
+  const buildHref = (params: URLSearchParams) => { 
+    params.set('page', '1'); 
+    return `${pathname}?${params.toString()}`; 
+  };
 
   const removeOne = (key: string) => {
     const params = new URLSearchParams(searchParams.toString());
-    if (key === 'price') { params.delete('priceMin'); params.delete('priceMax'); }
-    else if (key === 'bedrooms') { params.delete('bedroomsMin'); params.delete('bedroomsMax'); }
-    else if (key === 'bathrooms') { params.delete('bathroomsMin'); params.delete('bathroomsMax'); }
-    else if (key === 'commute') { params.delete('commuteMin'); params.delete('commuteMax'); }
-    else if (key === 'moveInDate') { params.delete('moveInDate'); }
-    else if (key === 'propertyType' || key === 'rating' || key === 'university') { params.delete(key); }
-    else if (key.startsWith('area:')) {
+    if (key === 'price') { 
+      params.delete('priceMin'); 
+      params.delete('priceMax'); 
+    } else if (key === 'bedrooms') { 
+      params.delete('bedroomsMin'); 
+      params.delete('bedroomsMax'); 
+    } else if (key === 'bathrooms') { 
+      params.delete('bathroomsMin'); 
+      params.delete('bathroomsMax'); 
+    } else if (key === 'commute') { 
+      params.delete('commuteMin'); 
+      params.delete('commuteMax'); 
+    } else if (key === 'moveInDate') { 
+      params.delete('moveInDate'); 
+    } else if (key === 'propertyType' || key === 'rating' || key === 'university') { 
+      params.delete(key); 
+    } else if (key.startsWith('area:')) {
       const name = key.slice(5);
       const left = (params.get('areas') || '').split(',').map(s => s.trim()).filter(Boolean).filter(a => a !== name);
-      left.length ? params.set('areas', left.join(',')) : params.delete('areas');
+      if (left.length) {
+        params.set('areas', left.join(','));
+      } else {
+        params.delete('areas');
+      }
     }
     router.push(buildHref(params));
   };
@@ -152,4 +173,3 @@ export default function CurrentFiltersBar({ className = '' }: { className?: stri
     </div>
   );
 }
-
