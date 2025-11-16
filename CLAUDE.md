@@ -27,7 +27,7 @@ Built with:
 # Development (all packages)
 pnpm dev
 
-# Build all packages  
+# Build all packages
 pnpm build
 
 # Run tests across all packages
@@ -39,9 +39,9 @@ pnpm start:backend
 pnpm test:backend
 
 # Linting and formatting
-pnpm lint:eslint
-pnpm lint:write    # Format with Prettier
-pnpm lint:check    # Check formatting
+pnpm lint
+pnpm style:write    # Format with Prettier
+pnpm style          # Check formatting
 ```
 
 ### Package-Specific Commands
@@ -54,7 +54,7 @@ pnpm build        # Compile TypeScript
 pnpm test         # Run Jest tests
 ```
 
-**Frontend v2** (`packages/frontend-v2`):
+**Frontend** (`packages/frontend`):
 ```bash
 pnpm dev          # Next.js dev with Turbopack
 pnpm build        # Production build
@@ -75,31 +75,33 @@ pnpm db:seed      # Seed database
 
 ### Monorepo Structure
 - `packages/backend/` - Express + tRPC API server
-- `packages/frontend-v2/` - Next.js 15 frontend (current)
-- `packages/frontend/` - Next.js frontend (legacy)
+- `packages/frontend/` - Next.js 15 frontend
 - `packages/shared/` - Shared utilities, Prisma schema, types
-- `packages/scraper/` - Python property scraping service
+- `packages/scraper/` - Python property scraping service (legacy)
+- `packages/tt.scraper-v2/` - Python property scraping service (current)
 
 ### Backend Architecture
 - **Server**: Express.js with tRPC mounted at `/trpc` endpoint
 - **Authentication**: JWT tokens with middleware at `authenticate` function
-- **Database**: Prisma ORM with MySQL, models include User, Property, EmailPreference, UserSession
-- **Error Handling**: Custom `HttpError` class with unified tRPC error formatting
+- **Database**: Prisma ORM with MySQL, models include User, Property, EmailPreference, UserSession, School, Region, PropertySchool
+- **Error Handling**: Custom `HttpError` class with unified tRPC error formatting via `httpStatusToTrpcCode`
 - **Structure**:
   - `src/controllers/` - Traditional REST controllers (being migrated to tRPC)
-  - `src/trpc/routers/` - tRPC procedure definitions
+  - `src/trpc/routers/` - tRPC procedure definitions (auth, properties, users, propertyStats)
   - `src/services/` - Business logic layer
   - `src/routes/` - Express route definitions
+  - `src/utils/` - Helper functions, Redis client, cron jobs
 
-### Frontend Architecture (v2)
+### Frontend Architecture
 - **Framework**: Next.js 15 with App Router and React 19
 - **Styling**: Tailwind CSS v4
-- **API Layer**: tRPC client with React Query integration
+- **API Layer**: tRPC client with React Query integration via `@trpc/tanstack-react-query`
 - **Testing**: Vitest with unit and integration test separation
+- **Authentication**: JWT tokens stored in localStorage, sent via Bearer header
 - **Structure**:
   - `src/app/` - Next.js app directory with pages
   - `src/components/` - React components
-  - `src/lib/` - Utilities including tRPC client setup
+  - `src/lib/` - Utilities including tRPC client setup ([trpc.ts](packages/frontend/src/lib/trpc.ts))
 
 ### Shared Package
 - **Database Schema**: `prisma/schema.prisma` defines all models
@@ -112,11 +114,12 @@ pnpm db:seed      # Seed database
    - `DATABASE_URL` - MySQL connection string
    - `BACKEND_LISTEN_HOST` and `BACKEND_LISTEN_PORT`
    - `BACKEND_JWT_SECRET_KEY`
+   - `REDIS_URL` - Redis connection string
    - `NEXT_PUBLIC_BACKEND_URL` for frontend
 
 2. **Docker Development** (recommended):
    ```bash
-   docker compose up  # Starts MySQL, Redis, and backend
+   docker compose up -d db redis  # Starts MySQL and Redis only
    ```
 
 3. **Local Development**:
@@ -131,7 +134,14 @@ pnpm db:seed      # Seed database
 - Backend exposes type-safe procedures via `/trpc` endpoint
 - Frontend uses `@trpc/react-query` for data fetching
 - Authentication handled via Bearer token headers
-- Error handling unified between HTTP status codes and tRPC error codes
+- Error handling unified between HTTP status codes and tRPC error codes via `httpStatusToTrpcCode` in [packages/backend/src/trpc/trpc.ts](packages/backend/src/trpc/trpc.ts)
+- tRPC context created in [packages/backend/src/trpc/context.ts](packages/backend/src/trpc/context.ts)
+
+### Authentication Flow
+- JWT tokens generated with 90-day expiration via `generateToken` in [packages/backend/src/utils/helper.ts](packages/backend/src/utils/helper.ts)
+- `authenticate` middleware in [packages/backend/src/utils/helper.ts](packages/backend/src/utils/helper.ts) verifies tokens
+- Whitelist paths: `/auth/login`, `/auth/register`, `/echo`, `/properties/search`, `/property-stats`
+- Frontend stores tokens in localStorage and sends via Authorization header
 
 ### Database Access
 - All database operations use Prisma client from `@qrent/shared`
@@ -140,15 +150,16 @@ pnpm db:seed      # Seed database
 
 ### Testing Strategy
 - Backend: Jest for unit tests
-- Frontend v2: Vitest with separate unit/integration test directories
+- Frontend: Vitest with separate unit/integration test directories
 - Integration tests include full tRPC client setup
 
 ### Code Quality
-- ESLint configured for TypeScript with strict rules
+- ESLint configured for TypeScript with strict rules in [eslint.config.mjs](eslint.config.mjs)
 - Prettier for code formatting
 - TypeScript strict mode enabled across all packages
+- Backend allows console logs, frontend warns on console usage
 
 ## Migration Notes
 - System is transitioning from REST endpoints to tRPC
-- Frontend v1 is legacy, active development on v2
-- Some REST routes still exist for compatibility (e.g., rental letter generation)
+- Some REST routes still exist for compatibility (e.g., rental letter generation at `/api/generate-rental-letter`)
+- tRPC router structure in [packages/backend/src/trpc/routers/index.ts](packages/backend/src/trpc/routers/index.ts)

@@ -1,4 +1,3 @@
-
 'use client';
 
 import PropertyCard from '@/components/PropertyCard';
@@ -26,23 +25,6 @@ type SearchParams = {
   rating?: string
   moveInDate?: string
   areas?: string
-}
-
-type Property = {
-  id: number
-  address: string
-  region: string | null
-  price: number
-  bedroomCount?: number
-  bathroomCount?: number
-  propertyType: number
-  description?: string | null
-  commuteTime?: number | null
-  url: string
-  averageScore: number
-  keywords: string
-  availableDate?: string | null
-  publishedAt: string
 }
 
 export default function SearchResults({ searchParams }: { searchParams: SearchParams }) {
@@ -90,10 +72,20 @@ export default function SearchResults({ searchParams }: { searchParams: SearchPa
     queryFn: () => trpc.properties.search.query(searchFilters)
   })
 
+  // Deprecated: use subscriptions field from PropertyCard directly
+  // // 获取用户收藏列表
+  // const { data: subscriptions, isLoading: subscriptionsLoading } = useQuery({
+  //   queryKey: ['properties.getSubscriptions'],
+  //   queryFn: () => trpc.properties.getSubscriptions.query(),
+  //   enabled: typeof window !== 'undefined' && !!localStorage.getItem('auth-token'),
+  // })
+
+  // // 创建收藏 ID 的 Set 用于快速查找
+  // const subscribedPropertyIds = new Set(
+  //   subscriptions?.map((sub: { id: number }) => sub.id) || []
+  // )
+
   const properties = data?.properties || []
-
-  // properties[0].thumbnailUrl
-
   const searchSummary = {
     totalCount: data?.totalCount || 0,
     filteredCount: data?.filteredCount || 0,
@@ -123,7 +115,6 @@ export default function SearchResults({ searchParams }: { searchParams: SearchPa
               <Pagination current={page} totalPages={totalPages} />
             </div>
 
-            {/* 注意：如果 useQuery 不支持 suspense 这里写 Suspense 会报错，可以直接移除 Suspense 包裹 */}
             {isPending ? (
               <ResultsSkeleton />
             ) : error ? (
@@ -137,6 +128,7 @@ export default function SearchResults({ searchParams }: { searchParams: SearchPa
                 {properties.map(property => (
                   <PropertyCard
                     key={property.id}
+                    id={property.id}
                     address={property.address}
                     region={property.region || ''}
                     price={property.price}
@@ -150,6 +142,8 @@ export default function SearchResults({ searchParams }: { searchParams: SearchPa
                     availableDate={property.availableDate}
                     publishedAt={property.publishedAt}
                     thumbnailUrl={property.thumbnailUrl}
+                    isSubscribed={false}
+                    subscriptionsLoading={false}
                   />
                 ))}
               </div>
@@ -304,6 +298,7 @@ function ResultsSkeleton() {
     <div className="mt-6 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
       {Array.from({ length: 6 }).map((_, i) => (
         <div key={i} className="animate-pulse overflow-hidden rounded-2xl border border-slate-200 bg-white">
+          <div className="h-48 bg-slate-200" />
           <div className="p-4 space-y-3">
             <div className="h-4 bg-slate-200 rounded w-2/3" />
             <div className="h-3 bg-slate-200 rounded w-1/2" />

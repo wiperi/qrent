@@ -1,4 +1,4 @@
-# BlueEstate Rentals - Frontend V2
+# Qrent Frontend
 
 A modern, responsive rental property platform built with Next.js, TypeScript, and Tailwind CSS.
 

@@ -3,6 +3,8 @@ import AppTRPCProvider from '@/lib/trpc-provider';
 import type { Metadata } from 'next';
 import Script from 'next/script';
 import './globals.css';
+import { AIChatBox, AIChatToggleButton } from '@/components/AIChatBox';
+import { MainContentWrapper } from '@/components/MainContentWrapper';
 
 export const metadata: Metadata = {
   title: 'Qrent - Your Perfect Home Awaits',
@@ -39,45 +41,13 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
             `,
           }}
         />
-        {/* Dify Chatbot Configuration */}
-        <Script id="dify-chatbot-config" strategy="afterInteractive">
-          {`
-            window.difyChatbotConfig = {
-              token: 'Pk5JLyWtauKU4b1H',
-              systemVariables: {
-                // user_id: 'YOU CAN DEFINE USER ID HERE',
-                // conversation_id: 'YOU CAN DEFINE CONVERSATION ID HERE, IT MUST BE A VALID UUID',
-              },
-            }
-          `}
-        </Script>
-        <Script
-          src="https://udify.app/embed.min.js"
-          id="Pk5JLyWtauKU4b1H"
-          strategy="afterInteractive"
-          defer
-        />
-        {/* Dify Chatbot Custom Styles */}
-        <style
-          dangerouslySetInnerHTML={{
-            __html: `
-            #dify-chatbot-bubble-button {
-              background-color: #1C64F2 !important;
-              transform: scale(1.5) !important;
-
-            }
-            #dify-chatbot-bubble-window {
-              width: 24rem !important;
-              height: 40rem !important;
-            }
-          `,
-          }}
-        ></style>
       </head>
       <body className="bg-white text-slate-800 antialiased">
         <AppTRPCProvider>
           <AuthProvider>
-            {children}
+            <MainContentWrapper>{children}</MainContentWrapper>
+            <AIChatToggleButton />
+            <AIChatBox />
           </AuthProvider>
         </AppTRPCProvider>
       </body>

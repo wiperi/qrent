@@ -12,6 +12,8 @@ export default function PropertyGrid() {
   const t = useTranslations('PropertyGrid');
   const [selectedUniversity, setSelectedUniversity] = useState(SCHOOL.UNSW);
   const trpc = useTRPCClient();
+
+  // 获取房产列表
   const { data, isPending, error } = useQuery({
     queryKey: ['properties.search', selectedUniversity],
     queryFn: () =>
@@ -29,6 +31,26 @@ export default function PropertyGrid() {
         ],
       }),
   });
+
+  // @Deprecated: 后端应该直接返回房源状态
+  // // 获取用户收藏列表
+  // const { data: subscriptions, isLoading: subscriptionsLoading } = useQuery({
+  //   queryKey: ['properties.getSubscriptions'],
+  //   queryFn: () => trpc.properties.getSubscriptions.query(),
+  //   enabled: typeof window !== 'undefined' && !!localStorage.getItem('auth-token'),
+  //   // initialData: getCachedSubscriptions(), // 注释掉：localStorage缓存会造成多端不一致
+  // });
+
+  // // 创建收藏 ID 的 Set 用于快速查找
+  // const subscribedPropertyIds = new Set(subscriptions?.map((sub: Subscription) => sub.id) || []);
+
+  // 当 subscriptions 更新时，保存到 localStorage
+  // 注释掉：localStorage缓存会造成多端不一致
+  // useEffect(() => {
+  //   if (typeof window !== 'undefined' && subscriptions && subscriptions.length >= 0) {
+  //     localStorage.setItem(SUBSCRIPTIONS_CACHE_KEY, JSON.stringify(subscriptions));
+  //   }
+  // }, [subscriptions]);
 
   const getUniversityColors = (school: string, isSelected: boolean) => {
     const colors = {
@@ -112,7 +134,8 @@ export default function PropertyGrid() {
       <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
         {properties.map(property => (
           <PropertyCard
-            key={property.id as string | number}
+            id={property.id}
+            key={property.id}
             address={property.address}
             region={property.region || ''}
             price={property.price}
@@ -126,6 +149,8 @@ export default function PropertyGrid() {
             availableDate={property.availableDate}
             publishedAt={property.publishedAt}
             thumbnailUrl={property.thumbnailUrl}
+            isSubscribed={false}
+            subscriptionsLoading={false}
           />
         ))}
       </div>

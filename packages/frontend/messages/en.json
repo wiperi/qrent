@@ -26,13 +26,6 @@
     "fourBedrooms": "4 bedrooms",
     "fivePlusBedrooms": "5+ bedrooms"
   },
-  "PropertyCard": {
-    "bedrooms": "bedrooms",
-    "bathrooms": "bathrooms",
-    "parking": "parking",
-    "availableFrom": "Available from",
-    "viewDetails": "View Details"
-  },
   "FilterModal": {
     "title": "Filters",
     "priceRange": "Price Range",
@@ -238,6 +231,7 @@
     "published": "Published on",
     "minToUniversity": "min to university",
     "source": "Source",
+    "flatmatesWarning": "Friendly reminder: Information on this website varies in quality. Please exercise caution and assess potential risks yourself.",
     "keywords": {
       "bedroom": "bedroom",
       "bedrooms": "bedrooms",
