@@ -23,7 +23,9 @@ export interface BlogPost extends BlogPostFrontmatter {
 
 // 重新导出 Notion 相关类型，保持向后兼容性
 export type {
-  BlogPostStatusType, BlogPost as NotionBlogPost, SupportedLanguageType
+  BlogPostStatusType,
+  BlogPost as NotionBlogPost,
+  SupportedLanguageType,
 } from '@/lib/notion';
 
 // Notion 内容块类型（保持现有接口）

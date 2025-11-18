@@ -3,7 +3,7 @@ import { z } from 'zod';
 
 /**
  * 类型安全的 Notion API 客户端
- * 
+ *
  * 基于严格的类型定义，避免强制类型转换
  * 支持完整的错误处理和数据验证
  */
@@ -35,9 +35,12 @@ const RichTextSchema = z.object({
   type: z.literal('text'),
   text: z.object({
     content: z.string(),
-    link: z.object({
-      url: z.string(),
-    }).nullable().optional(),
+    link: z
+      .object({
+        url: z.string(),
+      })
+      .nullable()
+      .optional(),
   }),
   annotations: z.object({
     bold: z.boolean(),
@@ -73,66 +76,48 @@ const DateSchema = z.object({
 });
 
 // ==================== 博客文章属性类型定义 ====================
-
-// 根据你提供的数据库结构定义严格的属性类型
+// 目前不直接在 Notion 响应 schema 中使用，保留业务字段结构的参考定义
 const BlogPostPropertiesSchema = z.object({
-  // Title | Title | 文章标题（中文）- 默认属性
   Title: z.object({
     id: z.string(),
     type: z.literal('title'),
     title: z.array(RichTextSchema),
   }),
-
-  // Title_en | Text | 文章标题（英文）
   Title_en: z.object({
     id: z.string(),
     type: z.literal('rich_text'),
     rich_text: z.array(RichTextSchema),
   }),
-
-  // slug | Text | URL路径，必须唯一
   slug: z.object({
     id: z.string(),
     type: z.literal('rich_text'),
     rich_text: z.array(RichTextSchema),
   }),
-
-  // status | Select | 发布状态：Published/Draft/Archived
   status: z.object({
     id: z.string(),
     type: z.literal('select'),
     select: SelectOptionSchema.nullable(),
   }),
-
-  // Published_at | Date | 发布日期
   Published_at: z.object({
     id: z.string(),
     type: z.literal('date'),
     date: DateSchema.nullable(),
   }),
-
-  // excerpt_zh | Text | 摘要（中文）
   excerpt_zh: z.object({
     id: z.string(),
     type: z.literal('rich_text'),
     rich_text: z.array(RichTextSchema),
   }),
-
-  // excerpt_en | Text | 摘要（英文）
   excerpt_en: z.object({
     id: z.string(),
     type: z.literal('rich_text'),
     rich_text: z.array(RichTextSchema),
   }),
-
-  // keywords | Multi-select | 关键词标签
   keywords: z.object({
     id: z.string(),
     type: z.literal('multi_select'),
     multi_select: z.array(MultiSelectOptionSchema),
   }),
-
-  // language | select | 语言
   language: z.object({
     id: z.string(),
     type: z.literal('select'),
@@ -143,59 +128,75 @@ const BlogPostPropertiesSchema = z.object({
 // ==================== Notion 页面类型定义 ====================
 
 // 这里只对页面的基础结构做校验，properties 保持宽松，避免因为数据库字段差异导致整体失败
-const NotionPageSchema = z.object({
-  object: z.literal('page'),
-  id: z.string(),
-  created_time: z.string(),
-  last_edited_time: z.string(),
-  created_by: z.object({
-    object: z.literal('user'),
+const NotionPageSchema = z
+  .object({
+    object: z.literal('page'),
     id: z.string(),
-  }),
-  last_edited_by: z.object({
-    object: z.literal('user'),
-    id: z.string(),
-  }),
-  cover: z.object({
-    type: z.enum(['external', 'file']),
-    external: z.object({
-      url: z.string(),
-    }).optional(),
-    file: z.object({
-      url: z.string(),
-      expiry_time: z.string(),
-    }).optional(),
-  }).nullable(),
-  icon: z.object({
-    type: z.enum(['emoji', 'external', 'file']),
-    emoji: z.string().optional(),
-    external: z.object({
-      url: z.string(),
-    }).optional(),
-    file: z.object({
-      url: z.string(),
-      expiry_time: z.string(),
-    }).optional(),
-  }).nullable(),
-  parent: z.object({
-    type: z.literal('database_id'),
-    database_id: z.string(),
-  }),
-  archived: z.boolean(),
-  // 这里不再强绑定 BlogPostPropertiesSchema，而是接受任意属性，
-  // 具体字段在 transformNotionPageToBlogPost 中处理
-  properties: z.record(z.unknown()),
-  url: z.string(),
-  public_url: z.string().nullable(),
-}).passthrough();
+    created_time: z.string(),
+    last_edited_time: z.string(),
+    created_by: z.object({
+      object: z.literal('user'),
+      id: z.string(),
+    }),
+    last_edited_by: z.object({
+      object: z.literal('user'),
+      id: z.string(),
+    }),
+    cover: z
+      .object({
+        type: z.enum(['external', 'file']),
+        external: z
+          .object({
+            url: z.string(),
+          })
+          .optional(),
+        file: z
+          .object({
+            url: z.string(),
+            expiry_time: z.string(),
+          })
+          .optional(),
+      })
+      .nullable(),
+    icon: z
+      .object({
+        type: z.enum(['emoji', 'external', 'file']),
+        emoji: z.string().optional(),
+        external: z
+          .object({
+            url: z.string(),
+          })
+          .optional(),
+        file: z
+          .object({
+            url: z.string(),
+            expiry_time: z.string(),
+          })
+          .optional(),
+      })
+      .nullable(),
+    parent: z.object({
+      type: z.literal('database_id'),
+      database_id: z.string(),
+    }),
+    archived: z.boolean(),
+    // 这里不再强绑定 BlogPostPropertiesSchema，而是接受任意属性，
+    // 具体字段在 transformNotionPageToBlogPost 中处理
+    properties: z.record(z.unknown()),
+    url: z.string(),
+    public_url: z.string().nullable(),
+  })
+  .passthrough();
 
 // Notion API 查询响应类型：只校验基础字段，其他字段放宽
-const NotionQueryResponseSchema = z.object({
-  object: z.literal('list'),
-  results: z.array(NotionPageSchema),
-  next_cursor: z.string().nullable().optional(),
-  has_more: z.boolean().optional(),
-}).passthrough();
+const NotionQueryResponseSchema = z
+  .object({
+    object: z.literal('list'),
+    results: z.array(NotionPageSchema),
+    next_cursor: z.string().nullable().optional(),
+    has_more: z.boolean().optional(),
+  })
+  .passthrough();
 
 // ==================== 业务类型定义 ====================
 
@@ -206,7 +207,7 @@ export const BlogPostStatus = {
   ARCHIVED: 'Archived',
 } as const;
 
-export type BlogPostStatusType = typeof BlogPostStatus[keyof typeof BlogPostStatus];
+export type BlogPostStatusType = (typeof BlogPostStatus)[keyof typeof BlogPostStatus];
 
 // 支持的语言枚举
 export const SupportedLanguage = {
@@ -214,7 +215,7 @@ export const SupportedLanguage = {
   EN: 'en',
 } as const;
 
-export type SupportedLanguageType = typeof SupportedLanguage[keyof typeof SupportedLanguage];
+export type SupportedLanguageType = (typeof SupportedLanguage)[keyof typeof SupportedLanguage];
 
 // 最终的博客文章类型
 export const BlogPostSchema = z.object({
@@ -238,6 +239,15 @@ export type BlogPost = z.infer<typeof BlogPostSchema>;
 export type NotionPage = z.infer<typeof NotionPageSchema>;
 export type NotionQueryResponse = z.infer<typeof NotionQueryResponseSchema>;
 
+// Notion 内容块类型（为了向后兼容）
+export interface NotionBlock {
+  id: string;
+  type: string;
+  has_children: boolean;
+  children?: NotionBlock[];
+  [key: string]: unknown;
+}
+
 // ==================== 辅助函数 ====================
 
 /**
@@ -251,21 +261,23 @@ function extractPlainText(richText: z.infer<typeof RichTextSchema>[]): string {
  * 从富文本数组中提取 HTML
  */
 function extractHtml(richText: z.infer<typeof RichTextSchema>[]): string {
-  return richText.map(text => {
-    let html = text.plain_text;
+  return richText
+    .map(text => {
+      let html = text.plain_text;
 
-    if (text.annotations.bold) html = `<strong>${html}</strong>`;
-    if (text.annotations.italic) html = `<em>${html}</em>`;
-    if (text.annotations.strikethrough) html = `<del>${html}</del>`;
-    if (text.annotations.underline) html = `<u>${html}</u>`;
-    if (text.annotations.code) html = `<code>${html}</code>`;
+      if (text.annotations.bold) html = `<strong>${html}</strong>`;
+      if (text.annotations.italic) html = `<em>${html}</em>`;
+      if (text.annotations.strikethrough) html = `<del>${html}</del>`;
+      if (text.annotations.underline) html = `<u>${html}</u>`;
+      if (text.annotations.code) html = `<code>${html}</code>`;
 
-    if (text.href) {
-      html = `<a href="${text.href}" target="_blank" rel="noopener noreferrer">${html}</a>`;
-    }
+      if (text.href) {
+        html = `<a href="${text.href}" target="_blank" rel="noopener noreferrer">${html}</a>`;
+      }
 
-    return html;
-  }).join('');
+      return html;
+    })
+    .join('');
 }
 
 /**
@@ -286,33 +298,131 @@ function getCoverUrl(cover: NotionPage['cover']): string | undefined {
 }
 
 /**
+ * 安全地从 Notion 属性中提取富文本内容
+ */
+function safeExtractRichText(property: unknown): string {
+  try {
+    if (typeof property === 'object' && property !== null) {
+      const prop = property as Record<string, unknown>;
+
+      // 处理 title 类型
+      if (prop.type === 'title' && Array.isArray(prop.title)) {
+        return extractPlainText(prop.title);
+      }
+
+      // 处理 rich_text 类型
+      if (prop.type === 'rich_text' && Array.isArray(prop.rich_text)) {
+        return extractPlainText(prop.rich_text);
+      }
+    }
+  } catch (error) {
+    console.warn('提取富文本失败:', error);
+  }
+
+  return '';
+}
+
+/**
+ * 安全地从 Notion 属性中提取选择项内容
+ */
+function safeExtractSelect(property: unknown): string {
+  try {
+    if (typeof property === 'object' && property !== null) {
+      const prop = property as Record<string, unknown>;
+      if (
+        prop.type === 'select' &&
+        typeof prop.select === 'object' &&
+        prop.select !== null &&
+        typeof (prop.select as Record<string, unknown>).name === 'string'
+      ) {
+        return (prop.select as Record<string, unknown>).name as string;
+      }
+    }
+  } catch (error) {
+    console.warn('提取选择项失败:', error);
+  }
+
+  return '';
+}
+
+/**
+ * 安全地从 Notion 属性中提取多选项内容
+ */
+function safeExtractMultiSelect(property: unknown): string[] {
+  try {
+    if (typeof property === 'object' && property !== null) {
+      const prop = property as Record<string, unknown>;
+      if (prop.type === 'multi_select' && Array.isArray(prop.multi_select)) {
+        return prop.multi_select
+          .filter((item: unknown) =>
+            typeof item === 'object' &&
+            item !== null &&
+            typeof (item as Record<string, unknown>).name === 'string'
+          )
+          .map((item: unknown) => (item as Record<string, unknown>).name as string);
+      }
+    }
+  } catch (error) {
+    console.warn('提取多选项失败:', error);
+  }
+
+  return [];
+}
+
+/**
+ * 安全地从 Notion 属性中提取日期内容
+ */
+function safeExtractDate(property: unknown): string {
+  try {
+    if (typeof property === 'object' && property !== null) {
+      const prop = property as Record<string, unknown>;
+      if (
+        prop.type === 'date' &&
+        typeof prop.date === 'object' &&
+        prop.date !== null &&
+        typeof (prop.date as Record<string, unknown>).start === 'string'
+      ) {
+        return (prop.date as Record<string, unknown>).start as string;
+      }
+    }
+  } catch (error) {
+    console.warn('提取日期失败:', error);
+  }
+
+  return '';
+}
+
+/**
  * 将 Notion 页面转换为博客文章
  */
 function transformNotionPageToBlogPost(page: NotionPage): BlogPost {
   const properties = page.properties;
 
-  // 提取各个字段的值
-  const title = extractPlainText(properties.Title.title);
-  const title_en = extractPlainText(properties.Title_en.rich_text);
-  const slug = extractPlainText(properties.slug.rich_text);
-  const excerpt_zh = extractPlainText(properties.excerpt_zh.rich_text);
-  const excerpt_en = extractPlainText(properties.excerpt_en.rich_text);
-  const keywords = properties.keywords.multi_select.map(option => option.name);
+  // 安全地提取各个字段的值
+  const title = safeExtractRichText(properties.Title);
+  const title_en = safeExtractRichText(properties.Title_en);
+  const slug = safeExtractRichText(properties.slug);
+  const excerpt_zh = safeExtractRichText(properties.excerpt_zh);
+  const excerpt_en = safeExtractRichText(properties.excerpt_en);
+  const keywords = safeExtractMultiSelect(properties.keywords);
 
   // 处理状态
-  const statusName = properties.status.select?.name;
+  const statusName = safeExtractSelect(properties.status);
   if (!statusName || !Object.values(BlogPostStatus).includes(statusName as BlogPostStatusType)) {
     throw new Error(`无效的状态值: ${statusName}`);
   }
 
   // 处理语言
-  const languageName = properties.language.select?.name;
-  if (!languageName || !Object.values(SupportedLanguage).includes(languageName as SupportedLanguageType)) {
+  const languageName = safeExtractSelect(properties.language);
+  if (
+    !languageName ||
+    !Object.values(SupportedLanguage).includes(languageName as SupportedLanguageType)
+  ) {
     throw new Error(`无效的语言值: ${languageName}`);
   }
 
   // 处理发布日期
-  const publishedAt = properties.Published_at.date?.start;
+  const publishedAt = safeExtractDate(properties.Published_at);
   if (!publishedAt) {
     throw new Error('发布日期不能为空');
   }
@@ -359,7 +469,10 @@ export class NotionApiError extends Error {
 }
 
 export class NotionValidationError extends Error {
-  constructor(message: string, public readonly details?: unknown) {
+  constructor(
+    message: string,
+    public readonly details?: unknown
+  ) {
     super(message);
     this.name = 'NotionValidationError';
   }
@@ -389,7 +502,7 @@ export class TypeSafeNotionClient {
       const response = await fetch(`https://api.notion.com/v1/databases/${this.databaseId}/query`, {
         method: 'POST',
         headers: {
-          'Authorization': `Bearer ${process.env.NOTION_TOKEN}`,
+          Authorization: `Bearer ${process.env.NOTION_TOKEN}`,
           'Content-Type': 'application/json',
           'Notion-Version': '2022-06-28',
         },
@@ -421,10 +534,7 @@ export class TypeSafeNotionClient {
       // 验证 API 响应格式
       const result = NotionQueryResponseSchema.safeParse(data);
       if (!result.success) {
-        throw new NotionValidationError(
-          'Notion API 返回的数据格式不正确',
-          result.error.issues
-        );
+        throw new NotionValidationError('Notion API 返回的数据格式不正确', result.error.issues);
       }
 
       return result.data;
@@ -432,7 +542,9 @@ export class TypeSafeNotionClient {
       if (error instanceof NotionApiError || error instanceof NotionValidationError) {
         throw error;
       }
-      throw new NotionApiError(`查询数据库失败: ${error instanceof Error ? error.message : String(error)}`);
+      throw new NotionApiError(
+        `查询数据库失败: ${error instanceof Error ? error.message : String(error)}`
+      );
     }
   }
 
@@ -442,27 +554,29 @@ export class TypeSafeNotionClient {
   async getPublishedBlogPosts(language?: SupportedLanguageType): Promise<BlogPost[]> {
     try {
       // 构建过滤条件
-      const filter = language ? {
-        and: [
-          {
-            property: 'status',
-            select: {
-              equals: BlogPostStatus.PUBLISHED,
+      const filter = language
+        ? {
+          and: [
+            {
+              property: 'status',
+              select: {
+                equals: BlogPostStatus.PUBLISHED,
+              },
             },
-          },
-          {
-            property: 'language',
-            select: {
-              equals: language,
+            {
+              property: 'language',
+              select: {
+                equals: language,
+              },
             },
+          ],
+        }
+        : {
+          property: 'status',
+          select: {
+            equals: BlogPostStatus.PUBLISHED,
           },
-        ],
-      } : {
-        property: 'status',
-        select: {
-          equals: BlogPostStatus.PUBLISHED,
-        },
-      };
+        };
 
       // 构建排序条件
       const sorts = [
@@ -500,14 +614,19 @@ export class TypeSafeNotionClient {
       if (error instanceof NotionApiError || error instanceof NotionValidationError) {
         throw error;
       }
-      throw new NotionApiError(`获取博客文章失败: ${error instanceof Error ? error.message : String(error)}`);
+      throw new NotionApiError(
+        `获取博客文章失败: ${error instanceof Error ? error.message : String(error)}`
+      );
     }
   }
 
   /**
    * 根据 slug 获取单篇博客文章
    */
-  async getBlogPostBySlug(slug: string, language?: SupportedLanguageType): Promise<BlogPost | null> {
+  async getBlogPostBySlug(
+    slug: string,
+    language?: SupportedLanguageType
+  ): Promise<BlogPost | null> {
     try {
       // 构建过滤条件
       const filter = {
@@ -524,12 +643,16 @@ export class TypeSafeNotionClient {
               equals: slug,
             },
           },
-          ...(language ? [{
-            property: 'language',
-            select: {
-              equals: language,
-            },
-          }] : []),
+          ...(language
+            ? [
+              {
+                property: 'language',
+                select: {
+                  equals: language,
+                },
+              },
+            ]
+            : []),
         ],
       };
 
@@ -549,23 +672,27 @@ export class TypeSafeNotionClient {
       if (error instanceof NotionApiError || error instanceof NotionValidationError) {
         throw error;
       }
-      throw new NotionApiError(`获取博客文章失败 (slug: ${slug}): ${error instanceof Error ? error.message : String(error)}`);
+      throw new NotionApiError(
+        `获取博客文章失败 (slug: ${slug}): ${error instanceof Error ? error.message : String(error)}`
+      );
     }
   }
 
   /**
    * 获取博客文章内容块
    */
-  async getBlogPostContent(pageId: string): Promise<any[]> {
+  async getBlogPostContent(pageId: string): Promise<NotionBlock[]> {
     try {
       const response = await this.client.blocks.children.list({
         block_id: pageId,
         page_size: 100,
       });
 
-      return response.results;
+      return response.results as NotionBlock[];
     } catch (error) {
-      throw new NotionApiError(`获取页面内容失败 (${pageId}): ${error instanceof Error ? error.message : String(error)}`);
+      throw new NotionApiError(
+        `获取页面内容失败 (${pageId}): ${error instanceof Error ? error.message : String(error)}`
+      );
     }
   }
 }
@@ -592,14 +719,17 @@ export async function getPublishedBlogPosts(language?: SupportedLanguageType): P
 /**
  * 根据 slug 获取单篇博客文章
  */
-export async function getBlogPostBySlug(slug: string, language?: SupportedLanguageType): Promise<BlogPost | null> {
+export async function getBlogPostBySlug(
+  slug: string,
+  language?: SupportedLanguageType
+): Promise<BlogPost | null> {
   return getClient().getBlogPostBySlug(slug, language);
 }
 
 /**
  * 获取博客文章内容
  */
-export async function getBlogPostContent(pageId: string): Promise<any[]> {
+export async function getBlogPostContent(pageId: string): Promise<NotionBlock[]> {
   return getClient().getBlogPostContent(pageId);
 }
 
@@ -646,6 +776,6 @@ export async function getBlogPost(slug: string, locale?: string): Promise<BlogPo
 /**
  * @deprecated 使用 getBlogPostContent 替代
  */
-export async function getAllBlocks(blockId: string): Promise<any[]> {
+export async function getAllBlocks(blockId: string): Promise<NotionBlock[]> {
   return getBlogPostContent(blockId);
 }
