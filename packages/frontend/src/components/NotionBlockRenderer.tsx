@@ -1,5 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { NotionBlock, richTextToHtml } from '@/lib/notion';
+import { richTextToHtml } from '@/lib/notion';
+import type { NotionBlock } from '@/types/blog';
 import Image from 'next/image';
 import React from 'react';
 

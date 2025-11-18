@@ -35,11 +35,11 @@ export default function NotionBlogContent({ post, blocks }: NotionBlogContentPro
   // 格式化日期
   const formatDate = (dateString: string) => {
     const date = new Date(dateString);
-    return date.toLocaleDateString(locale === LOCALE.ZH ? 'zh-CN' : 'en-US', {
-      year: 'numeric',
-      month: 'long',
-      day: 'numeric',
-    });
+    const formatter = new Intl.DateTimeFormat(
+      locale === LOCALE.ZH ? 'zh-CN' : 'en-US',
+      { year: 'numeric', month: 'long', day: 'numeric', timeZone: 'UTC' }
+    );
+    return formatter.format(date);
   };
 
   return (
@@ -48,7 +48,7 @@ export default function NotionBlogContent({ post, blocks }: NotionBlogContentPro
         {/* 返回按钮 */}
         <div className="mb-8">
           <Link
-            href={`/${locale}/notion-blog`}
+            href={`/${locale}/blog`}
             className="inline-flex items-center text-slate-600 hover:text-blue-600 transition-colors"
           >
             <HiArrowLeft className="w-4 h-4 mr-2" />
@@ -162,7 +162,7 @@ export default function NotionBlogContent({ post, blocks }: NotionBlogContentPro
         {/* 返回顶部按钮 */}
         <div className="mt-8 text-center">
           <Link
-            href={`/${locale}/notion-blog`}
+            href={`/${locale}/blog`}
             className="inline-flex items-center text-slate-600 hover:text-blue-600 transition-colors"
           >
             <HiArrowLeft className="w-4 h-4 mr-2" />

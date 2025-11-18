@@ -20,11 +20,6 @@ export default function Header() {
   const t = useTranslations('Header')
   const locale = useLocale()
 
-  const openDrawer = () => {
-    setIsDrawerOpen(true)
-    document.body.classList.add('overflow-hidden')
-  }
-
   const closeDrawer = () => {
     setIsDrawerOpen(false)
     document.body.classList.remove('overflow-hidden')
@@ -80,7 +75,7 @@ export default function Header() {
                     className="rounded-md"
                   />
                 </Link>
-                <Link href={`/${locale}/notion-blog`} className="hidden md:block text-slate-700 hover:text-blue-600 transition-colors font-bold">
+                <Link href={`/${locale}/blog`} className="hidden md:block text-slate-700 hover:text-blue-600 transition-colors font-bold">
                   {t('rentalBlog')}
                 </Link>
               </div>

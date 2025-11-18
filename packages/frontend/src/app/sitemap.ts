@@ -1,14 +1,8 @@
 import { SUPPORTED_LOCALES } from '@qrent/shared/utils/helper';
 import type { MetadataRoute } from 'next';
 
-// Blog posts - you can later fetch these dynamically from your CMS/database
-const blogPosts = [
-  'bills-furniture-worth',
-  'qrent-product-hunt',
-  'rental-inspection-checklist',
-  'sydney-uni-rental-prices',
-  'unsw-rental-analysis',
-];
+// Blog posts are now served from Notion; omit hardcoded slugs
+const blogPosts: string[] = [];
 
 // Static pages with their priorities and change frequencies
 const staticPages = [

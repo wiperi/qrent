@@ -1,18 +1,28 @@
 import { LOCALE } from '@qrent/shared/enum';
 import {
-  getAllBlocks,
-  getBlogPost,
+  getBlogPostBySlug,
+  getBlogPostContent,
   getPublishedBlogPosts,
-  NotionBlock,
-  NotionBlogPost,
+  SupportedLanguage,
+  type BlogPost as NotionBlogPost,
 } from './notion';
+
+// 为了向后兼容，定义 NotionBlock 类型
+export interface NotionBlock {
+  id: string;
+  type: string;
+  has_children: boolean;
+  children?: NotionBlock[];
+  [key: string]: unknown;
+}
 
 /**
  * 获取所有已发布的博客文章（用于博客列表页面）
  */
 export async function getNotionBlogPosts(locale?: string): Promise<NotionBlogPost[]> {
   try {
-    return await getPublishedBlogPosts(locale);
+    const language = locale === 'en' ? SupportedLanguage.EN : SupportedLanguage.ZH;
+    return await getPublishedBlogPosts(language);
   } catch (error) {
     console.error('获取 Notion 博客文章失败:', error);
     return [];
@@ -30,16 +40,17 @@ export async function getNotionBlogPost(
   blocks: NotionBlock[];
 } | null> {
   try {
-    const post = await getBlogPost(slug, locale);
+    const language = locale === 'en' ? SupportedLanguage.EN : SupportedLanguage.ZH;
+    const post = await getBlogPostBySlug(slug, language);
     if (!post) {
       return null;
     }
 
-    const blocks = await getAllBlocks(post.id);
+    const blocks = await getBlogPostContent(post.id);
 
     return {
       post,
-      blocks,
+      blocks: blocks as NotionBlock[],
     };
   } catch (error) {
     console.error(`获取 Notion 博客文章 ${slug} 失败:`, error);
