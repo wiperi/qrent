@@ -354,10 +354,11 @@ function safeExtractMultiSelect(property: unknown): string[] {
       const prop = property as Record<string, unknown>;
       if (prop.type === 'multi_select' && Array.isArray(prop.multi_select)) {
         return prop.multi_select
-          .filter((item: unknown) =>
-            typeof item === 'object' &&
-            item !== null &&
-            typeof (item as Record<string, unknown>).name === 'string'
+          .filter(
+            (item: unknown) =>
+              typeof item === 'object' &&
+              item !== null &&
+              typeof (item as Record<string, unknown>).name === 'string'
           )
           .map((item: unknown) => (item as Record<string, unknown>).name as string);
       }
@@ -556,27 +557,27 @@ export class TypeSafeNotionClient {
       // 构建过滤条件
       const filter = language
         ? {
-          and: [
-            {
-              property: 'status',
-              select: {
-                equals: BlogPostStatus.PUBLISHED,
+            and: [
+              {
+                property: 'status',
+                select: {
+                  equals: BlogPostStatus.PUBLISHED,
+                },
               },
-            },
-            {
-              property: 'language',
-              select: {
-                equals: language,
+              {
+                property: 'language',
+                select: {
+                  equals: language,
+                },
               },
-            },
-          ],
-        }
+            ],
+          }
         : {
-          property: 'status',
-          select: {
-            equals: BlogPostStatus.PUBLISHED,
-          },
-        };
+            property: 'status',
+            select: {
+              equals: BlogPostStatus.PUBLISHED,
+            },
+          };
 
       // 构建排序条件
       const sorts = [
@@ -645,13 +646,13 @@ export class TypeSafeNotionClient {
           },
           ...(language
             ? [
-              {
-                property: 'language',
-                select: {
-                  equals: language,
+                {
+                  property: 'language',
+                  select: {
+                    equals: language,
+                  },
                 },
-              },
-            ]
+              ]
             : []),
         ],
       };
