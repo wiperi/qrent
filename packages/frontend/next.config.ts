@@ -1,12 +1,12 @@
 /**
- * Next.js Configuration File
+ * Next.js 配置文件
  *
- * This file configures the Next.js application with:
- * - Environment variable loading from multiple .env files (root and local)
- * - Next-intl plugin for internationalization
- * - Image optimization settings for external domains (Notion CDN)
- * - ESLint configuration
- * - Turbopack for development
+ * 此文件配置 Next.js 应用程序，包括：
+ * - 从多个 .env 文件加载环境变量（根目录和本地）
+ * - Next-intl 插件用于国际化
+ * - 外部域名的图片优化设置（Notion CDN）
+ * - ESLint 配置
+ * - Turbopack 用于开发环境
  */
 import { config as dotenvConfig } from 'dotenv';
 import type { NextConfig } from 'next';

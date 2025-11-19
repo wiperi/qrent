@@ -1,16 +1,16 @@
 /**
- * Blog Type Definitions
+ * 博客类型定义
  *
- * Defines TypeScript interfaces for blog post data structures.
- * Supports both legacy filesystem-based blog posts and new Notion-powered blog system.
+ * 定义博客文章数据结构的 TypeScript 接口。
+ * 支持旧版基于文件系统的博客文章和新的 Notion 驱动博客系统。
  *
- * Types:
- * - BlogPostFrontmatter: Metadata extracted from blog post frontmatter
- * - BlogPost: Complete blog post with content and excerpt
- * - NotionBlogPost: Re-exported from Notion API client for backward compatibility
- * - NotionBlock: Notion content block structure (from Notion API)
- * - BlogPostStatusType: Status enum (Published/Draft/Archived)
- * - SupportedLanguageType: Language enum (EN/ZH)
+ * 类型：
+ * - BlogPostFrontmatter：从博客文章前言提取的元数据
+ * - BlogPost：包含内容和摘要的完整博客文章
+ * - NotionBlogPost：从 Notion API 客户端重新导出，保持向后兼容性
+ * - NotionBlock：Notion 内容块结构（来自 Notion API）
+ * - BlogPostStatusType：状态枚举（已发布/草稿/已归档）
+ * - SupportedLanguageType：语言枚举（英语/中文）
  */
 export interface BlogPostFrontmatter {
   slug: string;

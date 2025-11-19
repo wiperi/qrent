@@ -1,14 +1,14 @@
 /**
- * Sitemap Generator
+ * 站点地图生成器
  *
- * Generates XML sitemap for SEO purposes with all localized URLs.
- * Supports dynamic blog posts from Notion CMS and static pages.
+ * 生成包含所有本地化 URL 的 XML 站点地图，用于 SEO 优化。
+ * 支持来自 Notion CMS 的动态博客文章和静态页面。
  *
- * Features:
- * - Multi-locale support (generates URLs for all supported languages)
- * - Static pages with custom priorities and change frequencies
- * - Dynamic blog post URLs (fetched from Notion at build time)
- * - SEO optimization with proper lastModified dates
+ * 功能：
+ * - 多语言支持（为所有支持的语言生成 URL）
+ * - 静态页面配置自定义优先级和更新频率
+ * - 动态博客文章 URL（构建时从 Notion 获取）
+ * - 使用正确的 lastModified 日期进行 SEO 优化
  */
 import { SUPPORTED_LOCALES } from '@qrent/shared/utils/helper';
 import type { MetadataRoute } from 'next';

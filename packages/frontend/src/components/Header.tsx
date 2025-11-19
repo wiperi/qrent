@@ -1,17 +1,16 @@
 /**
- * Header Component
+ * 页头组件
  * 
- * Main navigation header for the QRent application.
- * Provides responsive navigation with mobile drawer, user authentication,
- * and language switching functionality.
+ * QRent 应用程序的主导航页头。
+ * 提供响应式导航，包括移动端抽屉、用户认证和语言切换功能。
  * 
- * Features:
- * - Responsive design (desktop navigation bar + mobile drawer)
- * - User authentication state management (login/logout)
- * - Language switcher for internationalization
- * - Navigation links to main sections (About, Blog, Team, Contact)
- * - User menu with profile access
- * - Authentication modal for login/signup
+ * 功能：
+ * - 响应式设计（桌面导航栏 + 移动端抽屉）
+ * - 用户认证状态管理（登录/登出）
+ * - 国际化语言切换器
+ * - 主要板块的导航链接（关于、博客、团队、联系）
+ * - 用户菜单，提供个人资料访问
+ * - 登录/注册认证模态框
  */
 'use client'
 

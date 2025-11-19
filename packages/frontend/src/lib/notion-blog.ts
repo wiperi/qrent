@@ -1,21 +1,21 @@
 /**
- * Notion Blog API Wrapper
+ * Notion 博客 API 包装器
  *
- * Provides high-level functions for fetching blog posts from Notion CMS.
- * Acts as an adapter layer between the application and the lower-level Notion API client.
+ * 提供从 Notion CMS 获取博客文章的高级函数。
+ * 充当应用程序与底层 Notion API 客户端之间的适配器层。
  *
- * Features:
- * - Fetches all published blog posts with locale filtering
- * - Retrieves individual blog posts by slug
- * - Fetches complete blog post content (metadata + all blocks)
- * - Generates SEO metadata for blog posts
- * - Gets all blog post slugs for static generation
- * - Error handling with fallback values
+ * 功能：
+ * - 获取所有已发布的博客文章，支持语言环境过滤
+ * - 通过 slug 检索单篇博客文章
+ * - 获取完整的博客文章内容（元数据 + 所有内容块）
+ * - 为博客文章生成 SEO 元数据
+ * - 获取所有博客文章 slug 用于静态生成
+ * - 错误处理并提供后备值
  *
- * Data Flow:
- * 1. List page: getNotionBlogPosts() → returns post metadata only (no content blocks)
- * 2. Detail page: getNotionBlogPost() → returns metadata + all content blocks recursively
- * 3. Static generation: getNotionBlogSlugs() → returns all slugs for pre-rendering
+ * 数据流：
+ * 1. 列表页：getNotionBlogPosts() → 仅返回文章元数据（无内容块）
+ * 2. 详情页：getNotionBlogPost() → 返回元数据 + 递归加载所有内容块
+ * 3. 静态生成：getNotionBlogSlugs() → 返回所有 slug 用于预渲染
  */
 import { LOCALE } from '@qrent/shared/enum';
 import {

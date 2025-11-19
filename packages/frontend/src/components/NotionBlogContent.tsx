@@ -1,17 +1,16 @@
 /**
- * Notion Blog Content Component
+ * Notion 博客内容组件
  * 
- * Client-side component that renders the full blog post content from Notion.
- * Displays post metadata (title, date, reading time, keywords) and renders
- * all Notion blocks recursively.
+ * 客户端组件，渲染来自 Notion 的完整博客文章内容。
+ * 显示文章元数据（标题、日期、阅读时间、关键词）并递归渲染所有 Notion 块。
  * 
- * Features:
- * - Displays localized blog post title based on current language
- * - Shows formatted publication date
- * - Estimates and displays reading time based on block count
- * - Renders keyword tags with expand/collapse functionality
- * - Back navigation to blog listing
- * - Recursive rendering of Notion blocks via NotionBlockRenderer
+ * 功能：
+ * - 根据当前语言显示本地化的博客文章标题
+ * - 显示格式化的发布日期
+ * - 根据内容块数量估算并显示阅读时间
+ * - 渲染关键词标签，支持展开/收起功能
+ * - 返回博客列表的导航
+ * - 通过 NotionBlockRenderer 递归渲染 Notion 块
  */
 'use client';
 

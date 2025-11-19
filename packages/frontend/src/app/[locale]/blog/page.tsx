@@ -1,15 +1,15 @@
 /**
- * Blog Listing Page
+ * 博客列表页
  * 
- * Displays all published blog posts from Notion CMS in a card grid layout.
- * Posts are fetched from Notion API and filtered by locale (language).
+ * 以卡片网格布局展示来自 Notion CMS 的所有已发布博客文章。
+ * 文章从 Notion API 获取，并根据语言环境进行过滤。
  * 
- * Features:
- * - Displays blog post cards with image, title, excerpt, and metadata
- * - Locale-aware filtering (shows posts matching current language)
- * - Fallback images for posts without cover images
- * - ISR (Incremental Static Regeneration) with 10-minute cache
- * - Empty state message when no posts available
+ * 功能：
+ * - 展示包含图片、标题、摘要和元数据的博客文章卡片
+ * - 语言环境过滤（显示与当前语言匹配的文章）
+ * - 为没有封面图片的文章提供后备图片
+ * - ISR（增量静态再生成）10 分钟缓存
+ * - 无文章时显示空状态消息
  */
 import BlogPostCard from '@/components/BlogPostCard';
 import { getNotionBlogPosts } from '@/lib/notion-blog';

@@ -1,15 +1,15 @@
 /**
- * Blog Post Detail Page
+ * 博客文章详情页
  * 
- * Displays individual blog posts from Notion CMS.
- * This page dynamically fetches blog post content from Notion API based on the slug parameter.
+ * 展示来自 Notion CMS 的单篇博客文章。
+ * 此页面根据 slug 参数从 Notion API 动态获取博客文章内容。
  * 
- * Features:
- * - Dynamic route generation for all blog posts (generateStaticParams)
- * - SEO metadata generation from Notion post properties
- * - ISR (Incremental Static Regeneration) with 10-minute cache
- * - Fallback to 404 when post not found
- * - Recursive rendering of Notion blocks with nested content support
+ * 功能：
+ * - 为所有博客文章动态生成路由（generateStaticParams）
+ * - 从 Notion 文章属性生成 SEO 元数据
+ * - ISR（增量静态再生成）10 分钟缓存
+ * - 文章未找到时返回 404
+ * - 递归渲染 Notion 块，支持嵌套内容
  */
 import NotionBlogContent from '@/components/NotionBlogContent';
 import { generateNotionBlogMetadata, getNotionBlogPost } from '@/lib/notion-blog';
