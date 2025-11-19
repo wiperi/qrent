@@ -1,6 +1,6 @@
 /**
  * Next.js Configuration File
- * 
+ *
  * This file configures the Next.js application with:
  * - Environment variable loading from multiple .env files (root and local)
  * - Next-intl plugin for internationalization

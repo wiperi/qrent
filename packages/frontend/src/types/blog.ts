@@ -1,9 +1,9 @@
 /**
  * Blog Type Definitions
- * 
+ *
  * Defines TypeScript interfaces for blog post data structures.
  * Supports both legacy filesystem-based blog posts and new Notion-powered blog system.
- * 
+ *
  * Types:
  * - BlogPostFrontmatter: Metadata extracted from blog post frontmatter
  * - BlogPost: Complete blog post with content and excerpt
