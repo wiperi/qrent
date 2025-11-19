@@ -1,3 +1,16 @@
+/**
+ * Blog Listing Page
+ * 
+ * Displays all published blog posts from Notion CMS in a card grid layout.
+ * Posts are fetched from Notion API and filtered by locale (language).
+ * 
+ * Features:
+ * - Displays blog post cards with image, title, excerpt, and metadata
+ * - Locale-aware filtering (shows posts matching current language)
+ * - Fallback images for posts without cover images
+ * - ISR (Incremental Static Regeneration) with 10-minute cache
+ * - Empty state message when no posts available
+ */
 import BlogPostCard from '@/components/BlogPostCard';
 import { getNotionBlogPosts } from '@/lib/notion-blog';
 import { LOCALE } from '@qrent/shared/enum';

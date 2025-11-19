@@ -1,3 +1,17 @@
+/**
+ * Blog Type Definitions
+ * 
+ * Defines TypeScript interfaces for blog post data structures.
+ * Supports both legacy filesystem-based blog posts and new Notion-powered blog system.
+ * 
+ * Types:
+ * - BlogPostFrontmatter: Metadata extracted from blog post frontmatter
+ * - BlogPost: Complete blog post with content and excerpt
+ * - NotionBlogPost: Re-exported from Notion API client for backward compatibility
+ * - NotionBlock: Notion content block structure (from Notion API)
+ * - BlogPostStatusType: Status enum (Published/Draft/Archived)
+ * - SupportedLanguageType: Language enum (EN/ZH)
+ */
 export interface BlogPostFrontmatter {
   slug: string;
   title: string;

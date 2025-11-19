@@ -1,3 +1,18 @@
+/**
+ * Notion Blog Content Component
+ * 
+ * Client-side component that renders the full blog post content from Notion.
+ * Displays post metadata (title, date, reading time, keywords) and renders
+ * all Notion blocks recursively.
+ * 
+ * Features:
+ * - Displays localized blog post title based on current language
+ * - Shows formatted publication date
+ * - Estimates and displays reading time based on block count
+ * - Renders keyword tags with expand/collapse functionality
+ * - Back navigation to blog listing
+ * - Recursive rendering of Notion blocks via NotionBlockRenderer
+ */
 'use client';
 
 import React from 'react';

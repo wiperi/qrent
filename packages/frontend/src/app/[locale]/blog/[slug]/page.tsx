@@ -1,3 +1,16 @@
+/**
+ * Blog Post Detail Page
+ * 
+ * Displays individual blog posts from Notion CMS.
+ * This page dynamically fetches blog post content from Notion API based on the slug parameter.
+ * 
+ * Features:
+ * - Dynamic route generation for all blog posts (generateStaticParams)
+ * - SEO metadata generation from Notion post properties
+ * - ISR (Incremental Static Regeneration) with 10-minute cache
+ * - Fallback to 404 when post not found
+ * - Recursive rendering of Notion blocks with nested content support
+ */
 import NotionBlogContent from '@/components/NotionBlogContent';
 import { generateNotionBlogMetadata, getNotionBlogPost } from '@/lib/notion-blog';
 import type { NotionBlock as NotionBlockFromTypes, NotionBlogPost as NotionBlogPostFromTypes } from '@/types/blog';

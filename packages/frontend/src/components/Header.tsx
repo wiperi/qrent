@@ -1,3 +1,18 @@
+/**
+ * Header Component
+ * 
+ * Main navigation header for the QRent application.
+ * Provides responsive navigation with mobile drawer, user authentication,
+ * and language switching functionality.
+ * 
+ * Features:
+ * - Responsive design (desktop navigation bar + mobile drawer)
+ * - User authentication state management (login/logout)
+ * - Language switcher for internationalization
+ * - Navigation links to main sections (About, Blog, Team, Contact)
+ * - User menu with profile access
+ * - Authentication modal for login/signup
+ */
 'use client'
 
 import { useAuth } from '@/hooks/use-auth'

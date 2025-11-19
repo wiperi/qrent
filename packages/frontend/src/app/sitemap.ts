@@ -1,3 +1,15 @@
+/**
+ * Sitemap Generator
+ * 
+ * Generates XML sitemap for SEO purposes with all localized URLs.
+ * Supports dynamic blog posts from Notion CMS and static pages.
+ * 
+ * Features:
+ * - Multi-locale support (generates URLs for all supported languages)
+ * - Static pages with custom priorities and change frequencies
+ * - Dynamic blog post URLs (fetched from Notion at build time)
+ * - SEO optimization with proper lastModified dates
+ */
 import { SUPPORTED_LOCALES } from '@qrent/shared/utils/helper';
 import type { MetadataRoute } from 'next';
 

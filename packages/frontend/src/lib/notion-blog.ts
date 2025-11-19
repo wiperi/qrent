@@ -1,3 +1,22 @@
+/**
+ * Notion Blog API Wrapper
+ * 
+ * Provides high-level functions for fetching blog posts from Notion CMS.
+ * Acts as an adapter layer between the application and the lower-level Notion API client.
+ * 
+ * Features:
+ * - Fetches all published blog posts with locale filtering
+ * - Retrieves individual blog posts by slug
+ * - Fetches complete blog post content (metadata + all blocks)
+ * - Generates SEO metadata for blog posts
+ * - Gets all blog post slugs for static generation
+ * - Error handling with fallback values
+ * 
+ * Data Flow:
+ * 1. List page: getNotionBlogPosts() → returns post metadata only (no content blocks)
+ * 2. Detail page: getNotionBlogPost() → returns metadata + all content blocks recursively
+ * 3. Static generation: getNotionBlogSlugs() → returns all slugs for pre-rendering
+ */
 import { LOCALE } from '@qrent/shared/enum';
 import {
   getBlogPostBySlug,
