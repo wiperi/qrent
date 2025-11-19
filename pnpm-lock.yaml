@@ -131,7 +131,7 @@ importers:
     dependencies:
       '@google/genai':
         specifier: ^1.29.1
-        version: 1.29.1
+        version: 1.30.0
       '@hookform/resolvers':
         specifier: ^5.2.2
         version: 5.2.2(react-hook-form@7.62.0(react@19.1.0))
@@ -807,8 +807,8 @@ packages:
   '@formatjs/intl-localematcher@0.6.2':
     resolution: {integrity: sha512-XOMO2Hupl0wdd172Y06h6kLpBz6Dv+J4okPLl4LPtzbr8f66WbIoy4ev98EBuZ6ZK4h5ydTN6XneT4QVpD7cdA==}
 
-  '@google/genai@1.29.1':
-    resolution: {integrity: sha512-Buywpq0A6xf9cOdhiWCi5KUiDBbZkjCH5xbl+xxNQRItoYQgd31p0OKyn5cUnT0YNzC/pAmszqXoOc7kncqfFQ==}
+  '@google/genai@1.30.0':
+    resolution: {integrity: sha512-3MRcgczBFbUat1wIlZoLJ0vCCfXgm7Qxjh59cZi2X08RgWLtm9hKOspzp7TOg1TV2e26/MLxR2GR5yD5GmBV2w==}
     engines: {node: '>=20.0.0'}
     peerDependencies:
       '@modelcontextprotocol/sdk': ^1.20.1
@@ -1138,6 +1138,10 @@ packages:
   '@nolyfill/is-core-module@1.0.39':
     resolution: {integrity: sha512-nn5ozdjYQpUCZlWGuxcJY/KpxkWQs4DcbMCmKojjyrYDEAGy4Ce19NN4v5MduafTwJlbKc99UA8YhSVqq9yPZA==}
     engines: {node: '>=12.4.0'}
+
+  '@notionhq/client@5.3.0':
+    resolution: {integrity: sha512-pISuJLrP6XwxnmMZ79jT2XkMHFtbQvslfs6Rqdd29ge0KAmJOuhtWZxE1WXO7h03cj/gVAL2PiAjpFuIWrWJ3w==}
+    engines: {node: '>=18'}
 
   '@pkgjs/parseargs@0.11.0':
     resolution: {integrity: sha512-+1VkjdD0QBLPodGrJUeqarH8VAIvQODIbwh9XpP5Syisf7YoQgsJKPNFoqqLQlu+VQ/tVSshMR6loPMn8U+dPg==}
@@ -2787,8 +2791,8 @@ packages:
     resolution: {integrity: sha512-XxwI8EOhVQgWp6iDL+3b0r86f4d6AX6zSU55HfB4ydCEuXLXc5FcYeOu+nnGftS4TEju/11rt4KJPTMgbfmv4A==}
     engines: {node: '>=10.13.0'}
 
-  glob@10.4.5:
-    resolution: {integrity: sha512-7Bv8RF0k6xjo7d4A/PxYLbUCfb6c+Vpd2/mB2yRDlew7Jb5hEXiCD9ibfO7wpk8i4sevK6DFny9h7EYbM3/sHg==}
+  glob@10.5.0:
+    resolution: {integrity: sha512-DfXN8DfhJ7NH3Oe7cFmu3NCu1wKbkReJ8TorzSAFbSKrlNaQSKfIzqYqVY8zlbs2NLBbWpRiU52GX2PbaBVNkg==}
     hasBin: true
 
   glob@7.2.3:
@@ -5347,7 +5351,7 @@ snapshots:
     dependencies:
       tslib: 2.8.1
 
-  '@google/genai@1.29.1':
+  '@google/genai@1.30.0':
     dependencies:
       google-auth-library: 10.5.0
       ws: 8.18.3
@@ -7586,7 +7590,7 @@ snapshots:
     dependencies:
       is-glob: 4.0.3
 
-  glob@10.4.5:
+  glob@10.5.0:
     dependencies:
       foreground-child: 3.3.1
       jackspeak: 3.4.3
@@ -9390,7 +9394,7 @@ snapshots:
 
   rimraf@5.0.10:
     dependencies:
-      glob: 10.4.5
+      glob: 10.5.0
 
   rollup@4.48.1:
     dependencies:
