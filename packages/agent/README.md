@@ -1,169 +1,169 @@
-? Qrent AI ¡ª RAG ×â·¿ÖÇÄÜÖúÊÖ
+ğŸ  Qrent AI â€” RAG ç§Ÿæˆ¿æ™ºèƒ½åŠ©æ‰‹
 
-Ò»¸ö»ùÓÚ LangGraph + LlamaIndex + °¢ÀïÔÆ°ÙÁ¶£¨DashScope£©µÄ¶àÖÇÄÜÌå×â·¿·ÖÎöÏµÍ³
-£¨Renting AI Assistant with Multi-Agent Workflow£©
+ä¸€ä¸ªåŸºäº LangGraph + LlamaIndex + é˜¿é‡Œäº‘ç™¾ç‚¼ï¼ˆDashScopeï¼‰çš„å¤šæ™ºèƒ½ä½“ç§Ÿæˆ¿åˆ†æç³»ç»Ÿ
+ï¼ˆRenting AI Assistant with Multi-Agent Workflowï¼‰
 
-? ÏîÄ¿¼ò½é
+ğŸ“Œ é¡¹ç›®ç®€ä»‹
 
-Qrent AI ÊÇÒ»¸öÃæÏò°Ä´óÀûÑÇ£¨ÓÈÆäÊÇ NSW µØÇø£©Ñ§ÉúÓëĞÂÒÆÃñµÄ ×â·¿ÖÇÄÜ·ÖÎöÏµÍ³¡£
-Ëü½áºÏ ¶àÖÇÄÜÌå£¨LangGraph£©+ RAG ÖªÊ¶¼ìË÷£¨LlamaIndex£©+ °ÙÁ¶ DocMind ÎÄµµ½âÎö£¬ÊµÏÖÒÔÏÂ¹¦ÄÜ£º
+Qrent AI æ˜¯ä¸€ä¸ªé¢å‘æ¾³å¤§åˆ©äºšï¼ˆå°¤å…¶æ˜¯ NSW åœ°åŒºï¼‰å­¦ç”Ÿä¸æ–°ç§»æ°‘çš„ ç§Ÿæˆ¿æ™ºèƒ½åˆ†æç³»ç»Ÿã€‚
+å®ƒç»“åˆ å¤šæ™ºèƒ½ä½“ï¼ˆLangGraphï¼‰+ RAG çŸ¥è¯†æ£€ç´¢ï¼ˆLlamaIndexï¼‰+ ç™¾ç‚¼ DocMind æ–‡æ¡£è§£æï¼Œå®ç°ä»¥ä¸‹åŠŸèƒ½ï¼š
 
-ºÏ¹æÉó²é£ºÊ¶±ğÓÃ»§×â·¿ĞèÇóÖĞ²»ºÏÀí»òÓë°ÄÖŞÕş²ß³åÍ»µÄÌõÄ¿
+åˆè§„å®¡æŸ¥ï¼šè¯†åˆ«ç”¨æˆ·ç§Ÿæˆ¿éœ€æ±‚ä¸­ä¸åˆç†æˆ–ä¸æ¾³æ´²æ”¿ç­–å†²çªçš„æ¡ç›®
 
-ĞèÇóÓÅ»¯£º»ùÓÚÊÂÊµÌá¹©¿ÉÖ´ĞĞ½¨Òé£¨Ô¤Ëã¡¢½»Í¨¡¢ÇøÓòÑ¡Ôñ£©
+éœ€æ±‚ä¼˜åŒ–ï¼šåŸºäºäº‹å®æä¾›å¯æ‰§è¡Œå»ºè®®ï¼ˆé¢„ç®—ã€äº¤é€šã€åŒºåŸŸé€‰æ‹©ï¼‰
 
-ÖªÊ¶¿â¼ìË÷£º´Ó±¾µØ¹¹½¨µÄÏòÁ¿ÖªÊ¶¿âÖĞ»ñÈ¡×â·¿·¨¹æ¡¢Á÷³Ì¡¢·çÏÕµÈĞÅÏ¢
+çŸ¥è¯†åº“æ£€ç´¢ï¼šä»æœ¬åœ°æ„å»ºçš„å‘é‡çŸ¥è¯†åº“ä¸­è·å–ç§Ÿæˆ¿æ³•è§„ã€æµç¨‹ã€é£é™©ç­‰ä¿¡æ¯
 
-×Ô¶¯±¨¸æ£ºÉú³É½á¹¹»¯ Markdown ×â·¿½¨Òé±¨¸æ
+è‡ªåŠ¨æŠ¥å‘Šï¼šç”Ÿæˆç»“æ„åŒ– Markdown ç§Ÿæˆ¿å»ºè®®æŠ¥å‘Š
 
-Õû¸ö pipeline ·ÖÎª 3 ¸ö½×¶Î£º
+æ•´ä¸ª pipeline åˆ†ä¸º 3 ä¸ªé˜¶æ®µï¼š
 
-Compliance Agent£¨ºÏ¹æ¼ì²é£©
+Compliance Agentï¼ˆåˆè§„æ£€æŸ¥ï¼‰
 
-Inquiry Agent£¨ÓÅ»¯½¨Òé£©
+Inquiry Agentï¼ˆä¼˜åŒ–å»ºè®®ï¼‰
 
-Reporting Agent£¨±¨¸æÊä³ö£©
+Reporting Agentï¼ˆæŠ¥å‘Šè¾“å‡ºï¼‰
 
-? ÏîÄ¿½á¹¹ËµÃ÷
+ğŸ“‚ é¡¹ç›®ç»“æ„è¯´æ˜
 
-ÏîÄ¿µÄÖ÷ÒªÄ¿Â¼ÈçÏÂ£º
+é¡¹ç›®çš„ä¸»è¦ç›®å½•å¦‚ä¸‹ï¼š
 
 packages/
-©¸©¤©¤ agent/
-    ©À©¤©¤ aivenv/                  # ĞéÄâ»·¾³
-    ©À©¤©¤ knowledge/               # ÊÖ¶¯·ÅÖÃµÄÖªÊ¶¿âÎÄµµ£¨PDF/MD/DOCX£©
-    ©À©¤©¤ Qrent_knowledge_base/    # ³Ö¾Ã»¯ºóµÄÏòÁ¿Êı¾İ¿â£¨×Ô¶¯Éú³É£©
-    ©À©¤©¤ .env                     # API Key ÅäÖÃ£¨ĞèÊÖ¶¯´´½¨£©
-    ©À©¤©¤ .gitignore               # Git ºöÂÔ¹æÔò
-    ©À©¤©¤ agent.py                 # ¶àÖÇÄÜÌå£¨LangGraph£©Ö÷Á÷³Ì
-    ©À©¤©¤ app.py                   # FastAPI ½Ó¿ÚÈë¿Ú£¨ÈôÊ¹ÓÃ£©
-    ©À©¤©¤ build_knowledge_base.py  # ¹¹½¨ RAG ÏòÁ¿ÖªÊ¶¿â½Å±¾
-    ©À©¤©¤ frontParse.py            # ½âÎöÇ°¶ËÎÊ¾í£¬×ª³É×ÔÈ»ÓïÑÔĞèÇó
-    ©¸©¤©¤ rag_tool.py              # RAG ¼ìË÷¹¤¾ß£¨LangChain Tool ¸ñÊ½£©
+â””â”€â”€ agent/
+    â”œâ”€â”€ aivenv/                  # è™šæ‹Ÿç¯å¢ƒ
+    â”œâ”€â”€ knowledge/               # æ‰‹åŠ¨æ”¾ç½®çš„çŸ¥è¯†åº“æ–‡æ¡£ï¼ˆPDF/MD/DOCXï¼‰
+    â”œâ”€â”€ Qrent_knowledge_base/    # æŒä¹…åŒ–åçš„å‘é‡æ•°æ®åº“ï¼ˆè‡ªåŠ¨ç”Ÿæˆï¼‰
+    â”œâ”€â”€ .env                     # API Key é…ç½®ï¼ˆéœ€æ‰‹åŠ¨åˆ›å»ºï¼‰
+    â”œâ”€â”€ .gitignore               # Git å¿½ç•¥è§„åˆ™
+    â”œâ”€â”€ agent.py                 # å¤šæ™ºèƒ½ä½“ï¼ˆLangGraphï¼‰ä¸»æµç¨‹
+    â”œâ”€â”€ app.py                   # FastAPI æ¥å£å…¥å£ï¼ˆè‹¥ä½¿ç”¨ï¼‰
+    â”œâ”€â”€ build_knowledge_base.py  # æ„å»º RAG å‘é‡çŸ¥è¯†åº“è„šæœ¬
+    â”œâ”€â”€ frontParse.py            # è§£æå‰ç«¯é—®å·ï¼Œè½¬æˆè‡ªç„¶è¯­è¨€éœ€æ±‚
+    â””â”€â”€ rag_tool.py              # RAG æ£€ç´¢å·¥å…·ï¼ˆLangChain Tool æ ¼å¼ï¼‰
 
-? »·¾³±äÁ¿ÅäÖÃ£¨.env£©
+ğŸ”‘ ç¯å¢ƒå˜é‡é…ç½®ï¼ˆ.envï¼‰
 
-ÔÚ packages/agent/.env ÄÚÅäÖÃ°¢ÀïÔÆ°ÙÁ¶ API Key Óë OPENAI API KEY£º
+åœ¨ packages/agent/.env å†…é…ç½®é˜¿é‡Œäº‘ç™¾ç‚¼ API Key ä¸ OPENAI API KEYï¼š
 
-BAILIAN_API_KEY=ÄãµÄAPIKey
-OPENAI API KEY = ÄãµÄAPIKey
+BAILIAN_API_KEY=ä½ çš„APIKey
+OPENAI API KEY = ä½ çš„APIKey
 
-? °²×°ÒÀÀµ
+ğŸ“˜ å®‰è£…ä¾èµ–
 
-È·±£Äã´¦ÓÚ agent Ä¿Â¼ÏÂ£º
+ç¡®ä¿ä½ å¤„äº agent ç›®å½•ä¸‹ï¼š
 
 cd packages/agent
 pip install -r requirements.txt
 
 
-Èç¹ûÄãÊ¹ÓÃĞéÄâ»·¾³£¨ÍÆ¼ö£©£º
+å¦‚æœä½ ä½¿ç”¨è™šæ‹Ÿç¯å¢ƒï¼ˆæ¨èï¼‰ï¼š
 
 python -m venv aivenv
 source aivenv/bin/activate   # macOS / Linux
 aivenv\Scripts\activate      # Windows
 
-? ¹¹½¨±¾µØ×â·¿ÖªÊ¶¿â£¨RAG£©
+ğŸ“š æ„å»ºæœ¬åœ°ç§Ÿæˆ¿çŸ¥è¯†åº“ï¼ˆRAGï¼‰
 
-½«ÄãµÄ PDF / DOCX / Markdown ÎÄ¼ş·Å½ø£º
+å°†ä½ çš„ PDF / DOCX / Markdown æ–‡ä»¶æ”¾è¿›ï¼š
 
 packages/agent/knowledge/
 
 
-È»ºóÔËĞĞ£º
+ç„¶åè¿è¡Œï¼š
 
 python build_knowledge_base.py
 
 
-¸Ã½Å±¾»á£º
+è¯¥è„šæœ¬ä¼šï¼š
 
-Ê¹ÓÃ DocMind ½âÎöÎÄ¼şÄÚÈİ£¨¾«×¼Ê¶±ğ PDF/Í¼Æ¬/±í¸ñ£©
+ä½¿ç”¨ DocMind è§£ææ–‡ä»¶å†…å®¹ï¼ˆç²¾å‡†è¯†åˆ« PDF/å›¾ç‰‡/è¡¨æ ¼ï¼‰
 
-×Ô¶¯ÇĞ·Ö chunk£¨512 tokens£©
+è‡ªåŠ¨åˆ‡åˆ† chunkï¼ˆ512 tokensï¼‰
 
-Ê¹ÓÃ DashScope Embedding v2 ½øĞĞÏòÁ¿»¯
+ä½¿ç”¨ DashScope Embedding v2 è¿›è¡Œå‘é‡åŒ–
 
-¹¹½¨²¢±£´æ RAG ÏòÁ¿¿âµ½£º
+æ„å»ºå¹¶ä¿å­˜ RAG å‘é‡åº“åˆ°ï¼š
 
 packages/agent/Qrent_knowledge_base/
 
 
-³É¹¦ºóÊä³ö£º
+æˆåŠŸåè¾“å‡ºï¼š
 
-? Íê³É£¡ÎÄµµÊı: X
+âœ… å®Œæˆï¼æ–‡æ¡£æ•°: X
 
-? ÔËĞĞ¶àÖÇÄÜÌåÖ÷Á÷³Ì
+ğŸ¤– è¿è¡Œå¤šæ™ºèƒ½ä½“ä¸»æµç¨‹
 
-Äã¿ÉÒÔ¶ÔÓÃ»§ÎÊ¾íÄ£ÄâÔËĞĞ£º
+ä½ å¯ä»¥å¯¹ç”¨æˆ·é—®å·æ¨¡æ‹Ÿè¿è¡Œï¼š
 
 python agent.py
 
 
-ÄÚ²¿Âß¼­°üÀ¨£º
+å†…éƒ¨é€»è¾‘åŒ…æ‹¬ï¼š
 
-µ÷ÓÃ parse_user_survey() Éú³É×ÔÈ»ÓïÑÔĞèÇó
+è°ƒç”¨ parse_user_survey() ç”Ÿæˆè‡ªç„¶è¯­è¨€éœ€æ±‚
 
-ÒÀ´Îµ÷ÓÃ 3 ¸ö LangGraph Agent
+ä¾æ¬¡è°ƒç”¨ 3 ä¸ª LangGraph Agent
 
-Á÷Ê½´òÓ¡ºÏ¹æ¼ì²é / ÓÅ»¯½¨Òé / ×îÖÕ±¨¸æ
+æµå¼æ‰“å°åˆè§„æ£€æŸ¥ / ä¼˜åŒ–å»ºè®® / æœ€ç»ˆæŠ¥å‘Š
 
-? RAG ¹¤¾ß£¨rag_tool.py£©
+ğŸ” RAG å·¥å…·ï¼ˆrag_tool.pyï¼‰
 
-search_qrent_knowledge ÊÇÌá¹©¸øÖÇÄÜÌåµÄ¹¤¾ßº¯Êı£º
+search_qrent_knowledge æ˜¯æä¾›ç»™æ™ºèƒ½ä½“çš„å·¥å…·å‡½æ•°ï¼š
 
 @tool
 def search_qrent_knowledge(query: str) -> str:
 
 
-Ëü»á£º
+å®ƒä¼šï¼š
 
-¼ÓÔØ±¾µØ Qrent_knowledge_base
+åŠ è½½æœ¬åœ° Qrent_knowledge_base
 
-Ê¹ÓÃÏòÁ¿¼ìË÷
+ä½¿ç”¨å‘é‡æ£€ç´¢
 
-·µ»Ø×î½Ó½üµÄ 3 ¸öÖªÊ¶¿é
+è¿”å›æœ€æ¥è¿‘çš„ 3 ä¸ªçŸ¥è¯†å—
 
-¹©ÖÇÄÜÌåµ÷ÓÃÑéÖ¤ÊÂÊµ
+ä¾›æ™ºèƒ½ä½“è°ƒç”¨éªŒè¯äº‹å®
 
-µäĞÍÓÃÍ¾£º
+å…¸å‹ç”¨é€”ï¼š
 
-×â·¿Á÷³ÌÊÇÊ²Ã´£¿
+ç§Ÿæˆ¿æµç¨‹æ˜¯ä»€ä¹ˆï¼Ÿ
 
-NSW µÄ·¨ÂÉÔÊĞí³èÎïÂğ£¿
+NSW çš„æ³•å¾‹å…è®¸å® ç‰©å—ï¼Ÿ
 
-Ashfield µÄ°²È«ĞÔÈçºÎ£¿
+Ashfield çš„å®‰å…¨æ€§å¦‚ä½•ï¼Ÿ
 
-³ö×â·¿µÄ³£¼ûÆ­¾Ö£¿
+å‡ºç§Ÿæˆ¿çš„å¸¸è§éª—å±€ï¼Ÿ
 
-?? Agent ¼Ü¹¹£¨LangGraph£©
+âš™ï¸ Agent æ¶æ„ï¼ˆLangGraphï¼‰
 
-Ö÷ÒªºËĞÄ´úÂëÔÚ agent.py£º
+ä¸»è¦æ ¸å¿ƒä»£ç åœ¨ agent.pyï¼š
 
-×Ô¶¨Òå create_streaming_agent()
+è‡ªå®šä¹‰ create_streaming_agent()
 
-Ö§³Ö LLM ¹¤¾ßµ÷ÓÃ
+æ”¯æŒ LLM å·¥å…·è°ƒç”¨
 
-Ê¹ÓÃ StateGraph ¿ØÖÆ agent ¡ú tools ¡ú agent Ñ­»·
+ä½¿ç”¨ StateGraph æ§åˆ¶ agent â†’ tools â†’ agent å¾ªç¯
 
-ÍêÕûÈı½×¶Î pipeline£º
+å®Œæ•´ä¸‰é˜¶æ®µ pipelineï¼š
 
-Agent	¹¦ÄÜËµÃ÷
-Task1 Compliance	¼ì²éĞèÇóÊÇ·ñºÏ¹æ
-Task2 Inquiry	¸ø³ö¿ÉÖ´ĞĞ½¨Òé
-Task3 Reporting	Éú³É Markdown ±¨¸æ
-? Æô¶¯ API ·şÎñ£¨ÈçÊ¹ÓÃ FastAPI£©
+Agent	åŠŸèƒ½è¯´æ˜
+Task1 Compliance	æ£€æŸ¥éœ€æ±‚æ˜¯å¦åˆè§„
+Task2 Inquiry	ç»™å‡ºå¯æ‰§è¡Œå»ºè®®
+Task3 Reporting	ç”Ÿæˆ Markdown æŠ¥å‘Š
+ğŸŒ å¯åŠ¨ API æœåŠ¡ï¼ˆå¦‚ä½¿ç”¨ FastAPIï¼‰
 
-Èç¹û app.py Ê¹ÓÃ FastAPI£º
+å¦‚æœ app.py ä½¿ç”¨ FastAPIï¼š
 
 uvicorn app:app --reload
 
-? ÒÀÀµÁĞ±í
+ğŸ“¦ ä¾èµ–åˆ—è¡¨
 
-Çë²Î¿¼£º
+è¯·å‚è€ƒï¼š
 
 packages/agent/requirements.txt
 
 
-°üº¬£º
+åŒ…å«ï¼š
 
 langchain
 
@@ -173,25 +173,25 @@ llama-index
 
 dashscope
 
-fastapi£¨ÈçĞè£©
+fastapiï¼ˆå¦‚éœ€ï¼‰
 
-uvicorn£¨ÈçĞè£©
+uvicornï¼ˆå¦‚éœ€ï¼‰
 
-?? Êı¾İÂ·¾¶ËµÃ÷
-Â·¾¶	×÷ÓÃ
-knowledge/	Ô­Ê¼ÎÄµµ£¨ÊÖ¶¯·ÅÖÃ£©
-Qrent_knowledge_base/	¹¹½¨ºóµÄÏòÁ¿Êı¾İ¿â£¨×Ô¶¯Éú³É£©
+ğŸ—ƒï¸ æ•°æ®è·¯å¾„è¯´æ˜
+è·¯å¾„	ä½œç”¨
+knowledge/	åŸå§‹æ–‡æ¡£ï¼ˆæ‰‹åŠ¨æ”¾ç½®ï¼‰
+Qrent_knowledge_base/	æ„å»ºåçš„å‘é‡æ•°æ®åº“ï¼ˆè‡ªåŠ¨ç”Ÿæˆï¼‰
 .env	API Key
-agent.py	Ö÷Á÷³Ì
-rag_tool.py	RAG ¹¤¾ß
-? ÏîÄ¿ÁÁµã
+agent.py	ä¸»æµç¨‹
+rag_tool.py	RAG å·¥å…·
+ğŸš€ é¡¹ç›®äº®ç‚¹
 
-¸ßÖÊÁ¿ÎÄµµÀí½â£¨°¢Àï DocMind£©
+é«˜è´¨é‡æ–‡æ¡£ç†è§£ï¼ˆé˜¿é‡Œ DocMindï¼‰
 
-¾«×¼¼ìË÷£¨DashScope embedding v2£©
+ç²¾å‡†æ£€ç´¢ï¼ˆDashScope embedding v2ï¼‰
 
-¶àÖÇÄÜÌåĞ­×÷£¨LangGraph£©
+å¤šæ™ºèƒ½ä½“åä½œï¼ˆLangGraphï¼‰
 
-½á¹¹»¯ RAG Êä³ö
+ç»“æ„åŒ– RAG è¾“å‡º
 
-¿ÉÀ©Õ¹ FastAPI ·şÎñ
+å¯æ‰©å±• FastAPI æœåŠ¡
