@@ -94,7 +94,7 @@ export async function getRecommendedPosts(
       const intersection = post.keywords.filter(k => keywords.includes(k));
       return {
         ...post,
-        score: intersection.length
+        score: intersection.length,
       };
     });
 
@@ -150,15 +150,15 @@ export function convertNotionPostToBlogPost(
       author: {
         '@type': 'Organization',
         name: 'Qrent',
-        url: 'https://qrent.com.au'
+        url: 'https://qrent.com.au',
       },
       publisher: {
         '@type': 'Organization',
         name: 'Qrent',
         logo: {
           '@type': 'ImageObject',
-          url: 'https://qrent.com.au/qrent-logo.svg'
-        }
+          url: 'https://qrent.com.au/qrent-logo.svg',
+        },
       },
       description: locale === LOCALE.ZH ? notionPost.excerpt_zh : notionPost.excerpt_en,
       keywords: notionPost.keywords.join(', '),
