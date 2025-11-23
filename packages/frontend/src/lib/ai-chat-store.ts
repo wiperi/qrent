@@ -11,7 +11,7 @@ const WELCOME_MESSAGE: Message = {
   id: 'welcome-message',
   role: 'assistant',
   content:
-    "🏠 Welcome to QRent! I've studied hundreds of rental guides. Tell me where you are in the process and I'll help you find your dream home.\n\n🏠 欢迎来到QRent！我总结了数百篇租房攻略。告诉我你处于哪个环节和需求，让我帮你租到dream home。",
+    "🏠 Welcome to QRent! I've studied hundreds of high-quality rental guides and insights from students who've been through the process. The rental process in Australia typically includes: 🔍 searching for properties → 📅 booking viewings → 📄 preparing documents → 🏃 submitting applications on viewing day → 💰 paying deposit → 🔑 moving in. Tell me which stage you're at and what you need, and I'll help you make the right choice and find your dream home!\n\n🏠 欢迎来到QRent！我总结了数百篇高质量的租房攻略和学长学姐们的租房心得。澳洲的租房流程大致如下：🔍 选房 → 📅 预约看房 → 📄 准备文书 → 🏃 看房当天提交申请 → 💰 交押金 → 🔑 准备入住。告诉我你处于哪个环节和你的需求，让我来帮助你做出正确选择，租到你的下一个dream home！",
   timestamp: new Date('2024-01-01T00:00:00Z'),
 };
 
