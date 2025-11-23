@@ -1,5 +1,5 @@
 import NotionBlogContent from '@/components/NotionBlogContent';
-import { generateNotionBlogMetadata, getNotionBlogPost } from '@/lib/notion-blog';
+import { generateNotionBlogMetadata, getNotionBlogPost, getRecommendedPosts } from '@/lib/notion-blog';
 import type { NotionBlock as NotionBlockFromTypes, NotionBlogPost as NotionBlogPostFromTypes } from '@/types/blog';
 import { Metadata } from 'next';
 import { notFound } from 'next/navigation';
@@ -64,11 +64,28 @@ export default async function BlogPostPage({ params }: PageProps) {
       notFound();
     }
 
+    // 获取推荐文章
+    const relatedPosts = await getRecommendedPosts(
+      result.post.slug,
+      result.post.keywords,
+      locale
+    );
+
     const compatBlocks: NotionBlockFromTypes[] = result.blocks.map(
       block => block as NotionBlockFromTypes
     );
 
-    return <NotionBlogContent post={result.post as NotionBlogPostFromTypes} blocks={compatBlocks} />;
+    const compatRelatedPosts: NotionBlogPostFromTypes[] = relatedPosts.map(
+      post => post as NotionBlogPostFromTypes
+    );
+
+    return (
+      <NotionBlogContent
+        post={result.post as NotionBlogPostFromTypes}
+        blocks={compatBlocks}
+        relatedPosts={compatRelatedPosts}
+      />
+    );
   } catch (error) {
     console.error(`加载博客文章失败 (${slug}):`, error);
 

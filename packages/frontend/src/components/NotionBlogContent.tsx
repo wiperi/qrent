@@ -1,20 +1,21 @@
 'use client';
 
-import React from 'react';
 import { NotionBlock, NotionBlogPost } from '@/types/blog';
 import { LOCALE } from '@qrent/shared/enum';
 import { useLocale, useTranslations } from 'next-intl';
 import Link from 'next/link';
 import { useState } from 'react';
 import { HiArrowLeft, HiCalendar, HiClock, HiTag } from 'react-icons/hi';
+import BlogPostCard from './BlogPostCard';
 import NotionBlockRenderer from './NotionBlockRenderer';
 
 interface NotionBlogContentProps {
   post: NotionBlogPost;
   blocks: NotionBlock[];
+  relatedPosts?: NotionBlogPost[];
 }
 
-export default function NotionBlogContent({ post, blocks }: NotionBlogContentProps) {
+export default function NotionBlogContent({ post, blocks, relatedPosts = [] }: NotionBlogContentProps) {
   const locale = useLocale();
   const t = useTranslations('Blog');
   const [isExpanded, setIsExpanded] = useState(false);
@@ -135,6 +136,28 @@ export default function NotionBlogContent({ post, blocks }: NotionBlogContentPro
             ))}
           </div>
         </article>
+
+        {/* 相关文章推荐 */}
+        {relatedPosts.length > 0 && (
+          <section className="mt-16 pt-12 border-t border-slate-200">
+            <h2 className="text-2xl font-bold text-slate-900 mb-8">
+              {locale === LOCALE.ZH ? '相关阅读' : 'Recommended for you'}
+            </h2>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+              {relatedPosts.map((post) => (
+                <BlogPostCard
+                  key={post.id}
+                  title={locale === LOCALE.ZH ? post.title : post.title_en}
+                  author="Qrent Team"
+                  date={formatDate(post.published_at)}
+                  preview={locale === LOCALE.ZH ? post.excerpt_zh : post.excerpt_en}
+                  imageUrl={post.cover_url || '/banner.jpg'}
+                  slug={`/blog/${post.slug}`}
+                />
+              ))}
+            </div>
+          </section>
+        )}
 
         {/* 文章底部 */}
         <footer className="mt-12 pt-8 border-t border-slate-200">

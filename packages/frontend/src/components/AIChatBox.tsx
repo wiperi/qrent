@@ -2,11 +2,13 @@
 
 import { useAIChatStore, type Message } from '@/lib/ai-chat-store';
 import { cn } from '@/lib/utils';
+import { usePathname } from 'next/navigation';
 import { useEffect, useRef, useState } from 'react';
-import { FiSend, FiX, FiMessageSquare } from 'react-icons/fi';
+import { FiChevronsRight, FiMessageSquare, FiSend, FiSidebar } from 'react-icons/fi';
 import { Button } from './ui/button';
 
 export function AIChatBox() {
+  const pathname = usePathname();
   const {
     isOpen,
     width,
@@ -22,6 +24,9 @@ export function AIChatBox() {
   const [isResizing, setIsResizing] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const chatBoxRef = useRef<HTMLDivElement>(null);
+
+  // Check if we are on the home page (root or localized root)
+  const isHomePage = pathname === '/' || /^\/[a-z]{2}$/.test(pathname);
 
   // Auto-scroll to bottom when new messages arrive
   useEffect(() => {
@@ -89,6 +94,14 @@ export function AIChatBox() {
     };
   }, [isResizing, setWidth]);
 
+  useEffect(() => {
+    if (!isHomePage && isOpen) {
+      closeChat();
+    }
+  }, [pathname, isHomePage, isOpen, closeChat]);
+
+  if (!isHomePage) return null;
+
   return (
     <>
       {/* Mobile overlay */}
@@ -131,8 +144,9 @@ export function AIChatBox() {
             size="icon"
             onClick={closeChat}
             className="h-8 w-8"
+            title="Collapse chat"
           >
-            <FiX className="h-5 w-5" />
+            <FiChevronsRight className="h-5 w-5" />
           </Button>
         </div>
 
@@ -223,9 +237,13 @@ function MessageBubble({ message }: { message: Message }) {
 }
 
 export function AIChatToggleButton() {
+  const pathname = usePathname();
   const { isOpen, openChat } = useAIChatStore();
 
-  if (isOpen) return null;
+  // Check if we are on the home page (root or localized root)
+  const isHomePage = pathname === '/' || /^\/[a-z]{2}$/.test(pathname);
+
+  if (isOpen || !isHomePage) return null;
 
   return (
     <Button
@@ -240,7 +258,7 @@ export function AIChatToggleButton() {
       )}
       aria-label="Open AI Assistant"
     >
-      <FiMessageSquare className="h-6 w-6" />
+      <FiSidebar className="h-6 w-6" />
     </Button>
   );
 }

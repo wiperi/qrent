@@ -28,7 +28,7 @@ interface AIChatState {
 
 export const useAIChatStore = create<AIChatState>(set => ({
   // Initial state
-  isOpen: false,
+  isOpen: true,
   width: 30, // 30% of screen width
   messages: [],
   isLoading: false,
