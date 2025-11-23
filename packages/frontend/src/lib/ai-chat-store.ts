@@ -10,8 +10,9 @@ export interface Message {
 const WELCOME_MESSAGE: Message = {
   id: 'welcome-message',
   role: 'assistant',
-  content: '🏠 Welcome to QRent! I\'ve studied hundreds of rental guides. Tell me where you are in the process and I\'ll help you find your dream home.\n\n🏠 欢迎来到QRent！我总结了数百篇租房攻略。告诉我你处于哪个环节和需求，让我帮你租到dream home。',
-  timestamp: new Date('2025-01-01T00:00:00Z'),
+  content:
+    "🏠 Welcome to QRent! I've studied hundreds of rental guides. Tell me where you are in the process and I'll help you find your dream home.\n\n🏠 欢迎来到QRent！我总结了数百篇租房攻略。告诉我你处于哪个环节和需求，让我帮你租到dream home。",
+  timestamp: new Date('2024-01-01T00:00:00Z'),
 };
 
 interface AIChatState {
