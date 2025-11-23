@@ -1,0 +1,55 @@
+{
+  "meta": {
+    "version": 1,
+    "saved_at": "2025-11-20T08:07:00Z",
+    "frontend_raw_data": {
+      "minBudget": "359",
+      "maxBudget": "516",
+      "includeBills": "不包含",
+      "university": "新南威尔士大学（UNSW）",
+      "commuteTime": "30 分钟",
+      "roomType": "Studio",
+      "sharedRoom": "不愿意",
+      "moveInDate": "2025/12/19",
+      "leaseTerm": "12 个月"
+    },
+    "converted_data": {
+      "budgetMin": "359",
+      "budgetMax": "516",
+      "weeklyTotal": "437",
+      "billsIncluded": "不包含",
+      "propertyType": "Studio",
+      "furnished": true,
+      "coRent": "no",
+      "commute": "30",
+      "moveIn": "2025/12/19",
+      "leaseMonths": "12",
+      "acceptOverpriced": null,
+      "acceptSmall": null,
+      "university": "新南威尔士大学（UNSW）",
+      "flexibility": []
+    }
+  },
+  "survey": {
+    "budget": {
+      "weekly_min": 359,
+      "weekly_max": 516,
+      "weekly_total": 437,
+      "bills_included": false
+    },
+    "property": {
+      "type": "Studio",
+      "furnished": true,
+      "co_rent": "no",
+      "accept_overpriced": null,
+      "accept_small": null
+    },
+    "lifestyle": {
+      "commute": "30",
+      "move_in": "2025/12/19",
+      "lease_months": 12,
+      "university": "新南威尔士大学（UNSW）",
+      "flexibility": []
+    }
+  }
+}
