@@ -5,7 +5,7 @@ import Link from 'next/link';
 import { useState } from 'react';
 import { FaCheck } from 'react-icons/fa';
 import { MdEmail } from 'react-icons/md';
-import { SiGithub, SiXiaohongshu } from 'react-icons/si';
+import { SiGithub, SiInstagram, SiLinkedin, SiX, SiXiaohongshu } from 'react-icons/si';
 
 export default function Footer() {
   const [showCheckmark, setShowCheckmark] = useState(false);
@@ -47,7 +47,7 @@ export default function Footer() {
             </ul>
           </nav>
 
-          <div className="flex items-start sm:items-center gap-4">
+          <div className="flex items-start sm:items-center gap-4 flex-wrap">
             <a
               href="https://www.xiaohongshu.com/user/profile/63f617c9000000000f011eb7"
               target="_blank"
@@ -65,6 +65,33 @@ export default function Footer() {
               className="inline-flex h-10 w-10 items-center justify-center rounded-full border border-slate-200 text-slate-700 hover:text-white hover:bg-slate-900 hover:border-slate-900 transition"
             >
               <SiGithub className="h-5 w-5" />
+            </a>
+            <a
+              href="https://www.instagram.com/qrent.au"
+              target="_blank"
+              rel="noopener noreferrer"
+              aria-label="Instagram"
+              className="inline-flex h-10 w-10 items-center justify-center rounded-full border border-slate-200 text-slate-700 hover:text-white hover:bg-gradient-to-br hover:from-purple-600 hover:via-pink-500 hover:to-orange-400 hover:border-pink-500 transition"
+            >
+              <SiInstagram className="h-5 w-5" />
+            </a>
+            <a
+              href="https://au.linkedin.com/company/qrentau"
+              target="_blank"
+              rel="noopener noreferrer"
+              aria-label="LinkedIn"
+              className="inline-flex h-10 w-10 items-center justify-center rounded-full border border-slate-200 text-slate-700 hover:text-white hover:bg-blue-700 hover:border-blue-700 transition"
+            >
+              <SiLinkedin className="h-5 w-5" />
+            </a>
+            <a
+              href="https://x.com/Qrent_aurent"
+              target="_blank"
+              rel="noopener noreferrer"
+              aria-label="X (Twitter)"
+              className="inline-flex h-10 w-10 items-center justify-center rounded-full border border-slate-200 text-slate-700 hover:text-white hover:bg-black hover:border-black transition"
+            >
+              <SiX className="h-5 w-5" />
             </a>
             <div className="relative">
               <button

@@ -15,6 +15,7 @@ export function AIChatBox() {
     messages,
     isLoading,
     closeChat,
+    openChat,
     addMessage,
     setWidth,
     setLoading,
@@ -27,6 +28,13 @@ export function AIChatBox() {
 
   // Check if we are on the home page (root or localized root)
   const isHomePage = pathname === '/' || /^\/[a-z]{2}$/.test(pathname);
+
+  // Auto-open on desktop, keep closed on mobile (client-side only to avoid hydration issues)
+  useEffect(() => {
+    if (isHomePage && !isOpen && window.innerWidth >= 768) {
+      openChat();
+    }
+  }, []);
 
   // Auto-scroll to bottom when new messages arrive
   useEffect(() => {
@@ -208,6 +216,12 @@ export function AIChatBox() {
 
 function MessageBubble({ message }: { message: Message }) {
   const isUser = message.role === 'user';
+  const [isMounted, setIsMounted] = useState(false);
+
+  // Only show timestamp on client-side to avoid hydration mismatch
+  useEffect(() => {
+    setIsMounted(true);
+  }, []);
 
   return (
     <div
@@ -225,12 +239,14 @@ function MessageBubble({ message }: { message: Message }) {
         )}
       >
         <p className="whitespace-pre-wrap break-words">{message.content}</p>
-        <p className="mt-1 text-xs opacity-70">
-          {new Date(message.timestamp).toLocaleTimeString([], {
-            hour: '2-digit',
-            minute: '2-digit',
-          })}
-        </p>
+        {isMounted && (
+          <p className="mt-1 text-xs opacity-70">
+            {new Date(message.timestamp).toLocaleTimeString([], {
+              hour: '2-digit',
+              minute: '2-digit',
+            })}
+          </p>
+        )}
       </div>
     </div>
   );
