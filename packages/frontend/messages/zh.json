@@ -197,6 +197,27 @@
     "edit": "编辑",
     "delete": "删除"
   },
+  "TodoProgressBar": {
+    "title": "租房进度表",
+    "completed": "已完成",
+    "statuses": {
+      "determineBudget": "确定预算与区域",
+      "findProperties": "寻找房源",
+      "scheduleInspection": "预约看房",
+      "submitApplication": "提交申请",
+      "signContract": "签订合同",
+      "payDeposit": "支付押金与租金",
+      "moveIn": "入住检查 (Condition Report)"
+    },
+    "descriptions": {
+      "findProperties": "正在浏览各大平台房源信息",
+      "scheduleInspection": "联系中介安排实地考察",
+      "submitApplication": "准备材料并填写申请表",
+      "signContract": "仔细阅读条款并签字",
+      "payDeposit": "完成首付款项支付",
+      "moveIn": "领取钥匙并核对房屋状况"
+    }
+  },
   "LanguageSwitcher": {
     "english": "English",
     "chinese": "中文"

@@ -1,4 +1,5 @@
 import BlogPostCard from '@/components/BlogPostCard';
+import TodoProgressBar from '@/components/TodoProgressBar';
 import { getNotionBlogPosts } from '@/lib/notion-blog';
 import { LOCALE } from '@qrent/shared/enum';
 import { Metadata } from 'next';
@@ -20,6 +21,7 @@ export const metadata: Metadata = {
 
 export const revalidate = 600; // Cache for 10 minutes
 
+// 主页面组件（服务器组件）
 export default async function BlogPage({
   params,
 }: {
@@ -29,21 +31,26 @@ export default async function BlogPage({
   const posts = await getNotionBlogPosts(locale);
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-white to-slate-50">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
-        <div className="max-w-3xl mb-12">
-          <h1 className="text-3xl sm:text-4xl font-bold text-slate-900 mb-4">
-            {locale === LOCALE.ZH ? 'Qrent 经验贴' : 'Qrent Blog'}
-          </h1>
-          <p className="text-lg text-slate-600 leading-relaxed">
-            {locale === LOCALE.ZH
-              ? '每一篇经验贴，都是从困惑到安心的故事'
-              : 'Every experience post is a story from confusion to peace of mind'
-            }
-          </p>
+      <div className="min-h-screen bg-gradient-to-b from-white to-slate-50">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
+          <div className="max-w-3xl mb-12">
+            <h1 className="text-3xl sm:text-4xl font-bold text-slate-900 mb-4">
+              {locale === LOCALE.ZH ? 'Qrent 经验贴' : 'Qrent Blog'}
+            </h1>
+            <p className="text-lg text-slate-600 leading-relaxed mb-8">
+              {locale === LOCALE.ZH
+                ? '每一篇经验贴，都是从困惑到安心的故事'
+                : 'Every experience post is a story from confusion to peace of mind'
+              }
+            </p>
+          </div>
+          
+          {/* 引入待办进度条组件 */}
+        <div className="mb-12 max-w-xl">
+          <TodoProgressBar />
         </div>
 
-        {posts.length === 0 ? (
+          {posts.length === 0 ? (
           <div className="text-center py-12">
             <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-8 max-w-md mx-auto">
               <h3 className="text-lg font-semibold text-yellow-800 mb-2">

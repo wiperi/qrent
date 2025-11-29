@@ -197,6 +197,27 @@
     "edit": "Edit",
     "delete": "Delete"
   },
+  "TodoProgressBar": {
+    "title": "Rental Progress",
+    "completed": "Completed",
+    "statuses": {
+      "determineBudget": "Determine Budget & Area",
+      "findProperties": "Find Properties",
+      "scheduleInspection": "Schedule Inspection",
+      "submitApplication": "Submit Application",
+      "signContract": "Sign Contract",
+      "payDeposit": "Pay Deposit & Rent",
+      "moveIn": "Move-in Inspection (Condition Report)"
+    },
+    "descriptions": {
+      "findProperties": "Browsing property listings on various platforms",
+      "scheduleInspection": "Contact agents to arrange site visits",
+      "submitApplication": "Prepare materials and fill out application forms",
+      "signContract": "Carefully read terms and sign",
+      "payDeposit": "Complete down payment",
+      "moveIn": "Collect keys and check property condition"
+    }
+  },
   "LanguageSwitcher": {
     "english": "English",
     "chinese": "中文"
