@@ -1,7 +1,6 @@
 'use client';
 
 import React, { useState } from 'react';
-import styles from './TodoProgressBar.module.css';
 
 interface TodoItem {
   id: string;
@@ -70,28 +69,29 @@ const TodoProgressBar: React.FC<TodoProgressBarProps> = ({ items }) => {
     );
   };
 
-  const getCheckboxClass = (item: TodoItem) => {
-    let className = styles.customCheckbox;
-    if (item.completed) {
-      className += ` ${styles.checked}`;
-    } else if (item.id === '2') {
-      className += ` ${styles.active}`;
-    }
-    return className;
-  };
-
   return (
-    <aside className={styles.guideSidebar}>
-      <div className={styles.sidebarTitle}>租房进度表</div>
-      <div className={styles.timelineList}>
+    <aside className="bg-white p-6 rounded-2xl sticky top-24 border border-gray-200">
+      <div className="text-lg font-bold mb-6 pb-4 border-b border-gray-200 text-gray-900">
+        租房进度表
+      </div>
+      <div className="flex flex-col relative">
+        {/* 垂直时间线 */}
+        <div className="absolute left-3 top-2.5 bottom-2.5 w-0.5 bg-gray-200 z-0"></div>
+        
         {todoItems.map((item) => (
           <div 
             key={item.id} 
-            className={`${styles.timelineItem} ${item.completed ? styles.completed : ''}`}
+            className="flex gap-4 py-3 relative z-1 transition-all duration-800"
           >
-            <div className={styles.checkboxWrapper}>
+            <div className="relative pt-0.5">
               <div 
-                className={getCheckboxClass(item)}
+                className={`w-6 h-6 rounded-md border-2 cursor-pointer flex items-center justify-center ${
+                  item.completed 
+                    ? 'bg-emerald-500 border-emerald-500 text-white' 
+                    : item.id === '2' 
+                      ? 'border-blue-600 shadow-md shadow-blue-100' 
+                      : 'border-gray-300 bg-white hover:border-gray-400'
+                }`}
                 onClick={() => handleCheckboxClick(item.id)}
               >
                 {item.completed && (
@@ -101,9 +101,17 @@ const TodoProgressBar: React.FC<TodoProgressBarProps> = ({ items }) => {
                 )}
               </div>
             </div>
-            <div className={styles.itemContent}>
-              <div className={styles.itemTitle}>{item.title}</div>
-              <div className={styles.itemDesc}>{item.description}</div>
+            <div className="flex-1 cursor-pointer">
+              <div className={`text-sm font-semibold mb-1 ${
+                item.completed 
+                  ? 'text-gray-500 line-through' 
+                  : 'text-gray-900'
+              }`}>
+                {item.title}
+              </div>
+              <div className="text-xs text-gray-500 leading-relaxed">
+                {item.description}
+              </div>
             </div>
           </div>
         ))}
