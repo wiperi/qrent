@@ -1,4 +1,5 @@
 import json
+import asyncio
 from typing import Annotated, Sequence, TypedDict
 from langgraph.graph.message import add_messages
 from langchain_core.messages import (
@@ -16,7 +17,7 @@ class ChatbotState(TypedDict):
 def create_chatbot(model, tools,system_prompt: str,task_name: str):
     model = model.bind_tools(tools)
     tools_by_name = {t.name: t for t in tools}
-    def tool_node(state: ChatbotState):
+    async def tool_node(state: ChatbotState):
         last_msg = state["messages"][-1]
         outputs = []
         for call in last_msg.tool_calls:
@@ -24,14 +25,20 @@ def create_chatbot(model, tools,system_prompt: str,task_name: str):
             args = call["args"]
             try:
                 print(f"[{task_name}] 正在调用工具: {call['name']}...")
-                result = tool.invoke(args)
+                result = await tool.ainvoke(args)
             except Exception as e:
                 result = f"Tool Error: {e}"
-            outputs.append(ToolMessage(content=str(result), name=call["name"], tool_call_id=call["id"]))
+            outputs.append(
+                ToolMessage(
+                    content=str(result),
+                    tool_call_id=call.get("id"),
+                    name=call["name"]
+                )
+            )
         return {"messages": outputs}
-    def call_model(state: ChatbotState, config: RunnableConfig):
+    async def call_model(state: ChatbotState, config: RunnableConfig):
         sys = SystemMessage(content=system_prompt)
-        resp = model.invoke([sys] + state["messages"])
+        resp = await model.ainvoke([sys] + state["messages"])
         return {"messages": [resp]}
     def should_continue(state: ChatbotState):
         last = state["messages"][-1]
@@ -49,7 +56,7 @@ def create_chatbot(model, tools,system_prompt: str,task_name: str):
     graph.add_edge("tool", "agent")
     return graph.compile()
 
-llm = ChatOpenAI(model="gpt-4o-mini", temperature=0.2)
+llm = ChatOpenAI(model="gpt-4o-mini", temperature=0.2).with_config({"async": True})
 TOOLS = [search_qrent_knowledge]
 CONSULTANT_PROMPT = """
 你是专业的租房咨询顾问。你的任务是根据用户的需求，查询知识库并给出专业建议。
@@ -69,25 +76,46 @@ consultant_agent = create_chatbot(
     system_prompt=CONSULTANT_PROMPT, 
     task_name="Consultant"
 )
-def run_chatbot(req: str):
+async def arun_chatbot(req: str):
     final_response = ""
-    for event in consultant_agent.stream(
+    async for event in consultant_agent.astream(
+        {"messages": [HumanMessage(content=req)]},
+        stream_mode="values"
+    ):  
+        msgs = event.get("messages")
+        if not msgs:
+            continue
+        last_message = msgs[-1]
+        if isinstance(last_message, AIMessage) and not getattr(last_message, "tool_calls", None):
+            final_response = last_message.content
+    return final_response
+
+async def run_multiple_requests(requests: list[str]):
+    tasks = [arun_chatbot(req) for req in requests]
+    results = await asyncio.gather(*tasks)
+    return results
+
+async def stream_chatbot(req: str):
+    async for event in consultant_agent.astream(
         {"messages": [HumanMessage(content=req)]},
         stream_mode="values"
     ):
-        last_message = event["messages"][-1]
-        if isinstance(last_message, ToolMessage):
-            final_response += f"Tool result: {last_message.content}\n"
-        elif isinstance(last_message, AIMessage) and not getattr(last_message, "tool_calls", None):
-            final_response = last_message.content
-    return final_response
+        yield event
+
 if __name__ == "__main__":
     try:
         with open("user_test.json", "r", encoding="utf-8") as f:
             user_json_data = json.load(f)
         req_text = parse_user_survey(user_json_data)
     except FileNotFoundError:
-        req_text = "租房前必须支付的初期费用"
+        
+            requests = [
+        "租房前必须支付哪些费用？",
+        "如何提高申请通过率，让房东更愿意选你?",
+        "想提前退租怎么办？会不会被罚钱？"
+    ]
 
-    response = run_chatbot(req_text)
-    print(response)
+    results = asyncio.run(run_multiple_requests(requests))
+    for i, res in enumerate(results):
+        print(f"\n==== RESPONSE {i} ====")
+        print(res)

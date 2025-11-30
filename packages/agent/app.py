@@ -2,7 +2,7 @@ import asyncio
 from fastapi import FastAPI, Request
 from fastapi.responses import StreamingResponse
 from pydantic import BaseModel
-from agent import run_qrent_flow
+from chatbot import stream_chatbot
 
 app = FastAPI()
 
@@ -13,7 +13,7 @@ def sse_format(data: str):
     return f"data: {data}\n\n"
 
 async def qrent_streamer(requirements: str):
-    for event in run_qrent_flow(requirements):
+    for event in stream_chatbot(requirements):
         yield sse_format(str(event))
 
         await asyncio.sleep(0.01)
