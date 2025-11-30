@@ -31,8 +31,8 @@ Settings.embed_model = DashScopeEmbedding(
 # chunk_size: 每块最大 tokens/字符数量
 # chunk_overlap: 块之间的重叠（用于保持语义连续性）
 Settings.text_splitter = SentenceSplitter(
-    chunk_size=512,
-    chunk_overlap=50
+    chunk_size=1024,
+    chunk_overlap=256
 )
 
 # DocMind PDF/Word/Markdown 专用解析器（效果优于普通 parser）
