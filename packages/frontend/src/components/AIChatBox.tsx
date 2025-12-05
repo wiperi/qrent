@@ -1,3 +1,7 @@
+/**
+ * AI 聊天框主组件
+ * 实现可拖拽调整宽度的侧边聊天框，支持桌面端和移动端响应式设计，包含消息展示、输入框和发送功能
+ */
 'use client';
 
 import { useAIChatStore, type Message } from '@/lib/ai-chat-store';

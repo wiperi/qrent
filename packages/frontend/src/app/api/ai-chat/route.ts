@@ -1,3 +1,7 @@
+/**
+ * AI 聊天 API 路由
+ * Next.js API 端点，接收用户消息和历史记录，调用 Google Gemini AI 生成回复，支持多个模型降级重试
+ */
 import { GoogleGenAI, ListModelsResponse, Models } from '@google/genai';
 import { NextRequest, NextResponse } from 'next/server';
 
@@ -32,7 +36,7 @@ export async function POST(request: NextRequest) {
       .join('\n');
 
     // Create the prompt with system context and conversation history
-    const prompt = `You are a helpful AI assistant for QRent, a rental property platform for international students in Australia. Your role is to help students find suitable housing by understanding their needs regarding commute time, budget, and location preferences.
+    const prompt = `You are a helpful AI assistant for QRent, a rental property platform for international students in Australia. Your role is to help students find suitable housing and give them guidence. 
 
 ${conversationHistory ? `Previous conversation:\n${conversationHistory}\n\n` : ''}User: ${message}
 

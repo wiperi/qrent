@@ -1,13 +1,11 @@
+/**
+ * 主内容布局包装器
+ * 当 AI 聊天框打开时自动调整页面布局，桌面端添加右侧边距避免内容被遮挡，移动端无需调整（聊天框为全屏覆盖）
+ */
 'use client';
 
 import { useAIChatStore } from '@/lib/ai-chat-store';
 import { useEffect, useState } from 'react';
-
-/**
- * Main content wrapper that adjusts its layout when AI chat is open
- * On desktop: adds right margin to prevent content from being covered by chat
- * On mobile: no adjustment needed (chat is fullscreen overlay)
- */
 export function MainContentWrapper({ children }: { children: React.ReactNode }) {
   const { isOpen, width } = useAIChatStore();
   const [isMobile, setIsMobile] = useState(false);
