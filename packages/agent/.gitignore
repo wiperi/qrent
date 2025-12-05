@@ -1,0 +1,5 @@
+aivenv/
+venv/
+.env
+__pycache__/
+Qrent_knowledge_base/
