@@ -1,14 +1,6 @@
+import { getNotionBlogSlugs } from '@/lib/notion-blog';
 import { SUPPORTED_LOCALES } from '@qrent/shared/utils/helper';
 import type { MetadataRoute } from 'next';
-
-// Blog posts - you can later fetch these dynamically from your CMS/database
-const blogPosts = [
-  'bills-furniture-worth',
-  'qrent-product-hunt',
-  'rental-inspection-checklist',
-  'sydney-uni-rental-prices',
-  'unsw-rental-analysis',
-];
 
 // Static pages with their priorities and change frequencies
 const staticPages = [
@@ -20,11 +12,20 @@ const staticPages = [
   { path: '/team', priority: 0.5, changeFrequency: 'monthly' as const },
 ];
 
-export default function sitemap(): MetadataRoute.Sitemap {
+export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const baseUrl = 'https://qrent.rent';
   const currentDate = new Date().toISOString();
 
   const sitemapEntries: MetadataRoute.Sitemap = [];
+
+  // Fetch dynamic blog slugs from Notion
+  let blogSlugs: string[] = [];
+  try {
+    blogSlugs = await getNotionBlogSlugs();
+  } catch (error) {
+    console.error('Failed to fetch blog slugs for sitemap:', error);
+    // Continue with static pages even if blog fetch fails
+  }
 
   // Generate entries for each locale
   SUPPORTED_LOCALES.forEach(locale => {
@@ -38,11 +39,11 @@ export default function sitemap(): MetadataRoute.Sitemap {
       });
     });
 
-    // Add blog posts
-    blogPosts.forEach(slug => {
+    // Add dynamic blog posts
+    blogSlugs.forEach(slug => {
       sitemapEntries.push({
         url: `${baseUrl}/${locale}/blog/${slug}`,
-        lastModified: currentDate,
+        lastModified: currentDate, // Ideally this should be the post's last_edited_time, but using current for now is acceptable
         changeFrequency: 'weekly',
         priority: 0.7,
       });

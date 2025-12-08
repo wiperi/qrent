@@ -12,7 +12,7 @@ English | [简体中文](./README_CN.md)
 
 ## About QRent
 
-QRent is an AI-powered rental platform built for international students in Australia. It helps students find housing smarter and faster by analyzing commute time, budget, and area data to recommend the most suitable rentals — all in one place.
+QRent is an AI-powered rental platform built for students in Australia. It helps students find housing smarter and faster by analyzing commute time, budget, and area data to recommend the most suitable rentals — all in one place.
 
 ## Our Growth
 

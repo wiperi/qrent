@@ -1,3 +1,7 @@
+/**
+ * AI 聊天框全局状态管理
+ * 使用 Zustand 管理聊天框的开关状态、宽度、消息列表和加载状态，提供统一的状态管理接口供全局组件访问
+ */
 import { create } from 'zustand';
 
 export interface Message {
@@ -6,6 +10,14 @@ export interface Message {
   content: string;
   timestamp: Date;
 }
+
+const WELCOME_MESSAGE: Message = {
+  id: 'welcome-message',
+  role: 'assistant',
+  content:
+    "🏠 Welcome to QRent! I've studied hundreds of high-quality rental guides and insights from students who've been through the process. The rental process in Australia typically includes: 🔍 searching for properties → 📅 booking viewings → 📄 preparing documents → 🏃 submitting applications on viewing day → 💰 paying deposit → 🔑 moving in. Tell me which stage you're at and what you need, and I'll help you make the right choice and find your dream home!\n\n🏠 欢迎来到QRent！我总结了数百篇高质量的租房攻略和学长学姐们的租房心得。澳洲的租房流程大致如下：🔍 选房 → 📅 预约看房 → 📄 准备文书 → 🏃 看房当天提交申请 → 💰 交押金 → 🔑 准备入住。告诉我你处于哪个环节和你的需求，让我来帮助你做出正确选择，租到你的下一个dream home！",
+  timestamp: new Date('2024-01-01T00:00:00Z'),
+};
 
 interface AIChatState {
   // UI state
@@ -27,10 +39,9 @@ interface AIChatState {
 }
 
 export const useAIChatStore = create<AIChatState>(set => ({
-  // Initial state
   isOpen: false,
-  width: 30, // 30% of screen width
-  messages: [],
+  width: 17, // 17% of screen width
+  messages: [WELCOME_MESSAGE],
   isLoading: false,
 
   // Actions

@@ -13,9 +13,9 @@
     "closeMenu": "Close menu",
     "rentalGuide": "Rental Guide",
     "documentPreparation": "Document Preparation",
-    "rentalBlog": "Rental Blog",
     "favorite": "Favorites",
     "homepage": "Homepage"
+    "rentalBlog": "Guide"
   },
   "SearchBar": {
     "placeholder": "Search by city, address or school...",
@@ -49,7 +49,15 @@
     "apartment": "Apartment",
     "min": "Min",
     "max": "Max",
-    "rating": "Rating"
+    "rating": "Rating",
+    "price": "Price",
+    "bedroomSuffix": "BR",
+    "bathroomSuffix": "BA",
+    "minutes": "min",
+    "ratingSuffix": "",
+    "commute": "Commute",
+    "currentFilters": "Current filters:",
+    "clearAllFilters": "Clear all"
   },
   "Auth": {
     "loginTitle": "Welcome back",
@@ -295,5 +303,12 @@
       "beach": "beach",
       "elegance": "elegance"
     }
+  },
+  "WeChatGroupEntry": {
+    "title": "Rental Community",
+    "description": "Scan to join and get free rental guide",
+    "note": "Note: Please mention your school",
+    "instruction": "Long press to scan and join",
+    "ariaLabel": "Rental Community"
   }
 }

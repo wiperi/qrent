@@ -14,7 +14,7 @@ on:
       - 'pnpm-lock.yaml'
   # Disable PR deployments
   pull_request:
-    branches: []
+    branches: [staging]
 
 # Prevent concurrent deployments to avoid conflicts
 concurrency:

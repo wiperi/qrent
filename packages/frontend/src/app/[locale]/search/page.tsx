@@ -1,6 +1,8 @@
 import FilterModal from '@/components/FilterModal';
 import SearchBar from '@/components/SearchBar';
 import SearchResults from './SearchResults';
+// 横向: 添加
+import CurrentFiltersBar from '@/components/FilterTags';
 
 type SearchParams = {
   q?: string
@@ -16,6 +18,9 @@ export default async function SearchPage({ searchParams }: { searchParams: Promi
       <section className="py-4">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <SearchBar />
+          
+          {/*横向*/}
+          <CurrentFiltersBar />
         </div>
       </section>
 

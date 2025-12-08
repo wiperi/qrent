@@ -20,11 +20,6 @@ export default function Header() {
   const t = useTranslations('Header')
   const locale = useLocale()
 
-  const openDrawer = () => {
-    setIsDrawerOpen(true)
-    document.body.classList.add('overflow-hidden')
-  }
-
   const closeDrawer = () => {
     setIsDrawerOpen(false)
     document.body.classList.remove('overflow-hidden')

@@ -1,6 +1,5 @@
 tt*
 .reports/
-.claude/
 
 # I don't know why these are being ignored
 # *.json

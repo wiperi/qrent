@@ -134,10 +134,15 @@ export default function PropertyGrid() {
 
   const properties = data?.properties || [];
 
+  // 🔥 在前端按评分降序排序(从高到低)
+  const sortedProperties = [...properties].sort((a, b) => {
+    return (b.averageScore || 0) - (a.averageScore || 0);
+  });
+
   return (
     <Section title={sectionTitle}>
       <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-        {properties.map(property => (
+        {sortedProperties.map(property => (
           <PropertyCard
             id={property.id}
             key={property.id}

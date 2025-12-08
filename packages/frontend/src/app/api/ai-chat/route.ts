@@ -1,3 +1,8 @@
+/**
+ * AI 聊天 API 路由
+ * Next.js API 端点，接收用户消息和历史记录，调用 Google Gemini AI 生成回复，支持多个模型降级重试
+ */
+import { GoogleGenAI, ListModelsResponse, Models } from '@google/genai';
 import { NextRequest, NextResponse } from 'next/server';
 
 interface Message {
@@ -8,7 +13,7 @@ interface Message {
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
-    const { message } = body as {
+    const { message, history = [] } = body as {
       message: string;
       history: Message[];
     };
@@ -17,51 +22,55 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Message is required' }, { status: 400 });
     }
 
-    // TODO: Replace this with your actual AI model API call
-    // Example with OpenAI:
-    // const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
-    // const completion = await openai.chat.completions.create({
-    //   model: "gpt-4",
-    //   messages: [
-    //     { role: "system", content: "You are a helpful assistant for a rental property platform." },
-    //     ...history.map(msg => ({ role: msg.role, content: msg.content })),
-    //     { role: "user", content: message }
-    //   ],
-    // });
-    // const aiResponse = completion.choices[0].message.content;
+    if (!process.env.GEMINI_API_KEY) {
+      console.error('GEMINI_API_KEY is not configured');
+      return NextResponse.json({ error: 'AI service is not configured' }, { status: 500 });
+    }
 
-    // For now, using a mock response
-    const aiResponse = await getMockAIResponse(message);
+    // Initialize Gemini AI
+    const genAI = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY });
 
-    return NextResponse.json({ message: aiResponse });
+    // Build conversation history
+    const conversationHistory = history
+      .map(msg => `${msg.role === 'user' ? 'User' : 'Assistant'}: ${msg.content}`)
+      .join('\n');
+
+    // Create the prompt with system context and conversation history
+    const prompt = `You are a helpful AI assistant for QRent, a rental property platform for international students in Australia. Your role is to help students find suitable housing and give them guidence. 
+
+${conversationHistory ? `Previous conversation:\n${conversationHistory}\n\n` : ''}User: ${message}
+
+Please provide a helpful and friendly response:`;
+
+    const models = [
+      'gemini-2.5-flash',
+      'gemini-2.5-flash-lite',
+      'gemini-2.0-flash',
+      'gemini-2.0-flash-lite',
+      'gemini-2.0-flash-001',
+      'gemini-2.0-flash-lite-001',
+      'gemini-2.0-flash-exp',
+      'learnlm-2.0-flash-experimental',
+    ];
+
+    for (const model of models) {
+      try {
+        const result = await genAI.models.generateContent({
+          model: model,
+          contents: prompt,
+        });
+        const aiResponse = result.text;
+        if (aiResponse) {
+          return NextResponse.json({ message: aiResponse });
+        }
+      } catch (error) {
+        console.warn(`Model ${model} failed:`, error);
+        // Try the next model
+      }
+    }
+    throw new Error('All models failed to generate a response');
   } catch (error) {
     console.error('AI Chat Error:', error);
-    return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
+    return NextResponse.json({ error: 'Failed to generate AI response' }, { status: 500 });
   }
-}
-
-// Mock AI response function - replace with actual AI integration
-async function getMockAIResponse(message: string): Promise<string> {
-  // Simulate API delay
-  await new Promise(resolve => setTimeout(resolve, 1000));
-
-  const lowerMessage = message.toLowerCase();
-
-  if (lowerMessage.includes('hello') || lowerMessage.includes('hi')) {
-    return "Hello! I'm here to help you find the perfect rental property. What are you looking for?";
-  }
-
-  if (lowerMessage.includes('rent') || lowerMessage.includes('property')) {
-    return 'I can help you find rental properties. Could you tell me more about your preferences? For example, what area are you interested in, your budget, and any specific requirements?';
-  }
-
-  if (lowerMessage.includes('price') || lowerMessage.includes('budget')) {
-    return "Understanding your budget is important. What's your weekly or monthly rental budget? I can help you find properties within your price range.";
-  }
-
-  if (lowerMessage.includes('location') || lowerMessage.includes('area')) {
-    return 'Location is key! Which suburbs or areas are you interested in? I can help you find properties near universities, public transport, or other amenities.';
-  }
-
-  return "Thank you for your message. I'm an AI assistant here to help you with your rental property search. Could you provide more details about what you're looking for?";
 }
