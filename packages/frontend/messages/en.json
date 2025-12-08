@@ -239,6 +239,8 @@
     "minToUniversity": "min to university",
     "source": "Source",
     "flatmatesWarning": "Friendly reminder: Information on this website varies in quality. Please exercise caution and assess potential risks yourself.",
+    "subscribe": "Add to Favorites",
+    "unsubscribe": "Remove from Favorites",
     "keywords": {
       "bedroom": "bedroom",
       "bedrooms": "bedrooms",
@@ -291,9 +293,7 @@
       "walkable": "walkable",
       "trains": "trains",
       "beach": "beach",
-      "elegance": "elegance",
-      "subscribe": "Add to Favorites",
-      "unsubscribe": "Remove from Favorites"
+      "elegance": "elegance"
     }
   }
 }
