@@ -28,7 +28,7 @@ export class PropertyController {
   }
 
   async fetchProperty(req: Request, res: Response) {
-    let preferences: Preference & { page: number; pageSize: number } = req.body;
+    const preferences: Preference & { page: number; pageSize: number } = req.body;
 
     if (req.user?.userId) {
       preferences.userId = req.user.userId;

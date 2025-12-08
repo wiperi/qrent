@@ -2,7 +2,6 @@ import { LOCALE } from '@qrent/shared/enum';
 import { useLocale, useTranslations } from 'next-intl';
 import { FaBath } from 'react-icons/fa';
 import { IoBed } from 'react-icons/io5';
-import { AiOutlineStar, AiFillStar } from 'react-icons/ai';
 import { useState, useRef, useEffect } from 'react';
 import { useTRPCClient } from '@/lib/trpc';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
