@@ -1,4 +1,4 @@
-'use client';
+"use client";
 
 import React, { useState, useEffect } from 'react';
 
@@ -7,6 +7,7 @@ interface TodoItem {
   title: string;
   description: string;
   completed: boolean;
+  url?: string;
 }
 
 interface TodoProgressBarProps {
@@ -22,42 +23,49 @@ const TodoProgressBar: React.FC<TodoProgressBarProps> = ({ items }) => {
       title: '确定预算与区域',
       description: '已完成',
       completed: false,
+      url: '/budget'
     },
     {
       id: '2',
       title: '寻找房源',
       description: '正在浏览各大平台房源信息',
       completed: false,
+      url: '/search'
     },
     {
       id: '3',
       title: '预约看房',
       description: '联系中介安排实地考察',
       completed: false,
+      url: '/viewing'
     },
     {
       id: '4',
       title: '提交申请',
       description: '准备材料并填写申请表',
       completed: false,
+      url: '/application'
     },
     {
       id: '5',
       title: '签订合同',
       description: '仔细阅读条款并签字',
       completed: false,
+      url: '/contract'
     },
     {
       id: '6',
       title: '支付押金与租金',
       description: '完成首付款项支付',
       completed: false,
+      url: '/payment'
     },
     {
       id: '7',
       title: '入住检查 (Condition Report)',
       description: '领取钥匙并核对房屋状况',
       completed: false,
+      url: '/inspection'
     },
   ];
 
