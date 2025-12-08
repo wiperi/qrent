@@ -11,18 +11,15 @@ export function AIChatBox() {
   const pathname = usePathname();
   const {
     isOpen,
-    width,
     messages,
     isLoading,
     closeChat,
     openChat,
     addMessage,
-    setWidth,
     setLoading,
   } = useAIChatStore();
 
   const [input, setInput] = useState('');
-  const [isResizing, setIsResizing] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const chatBoxRef = useRef<HTMLDivElement>(null);
 
@@ -35,6 +32,36 @@ export function AIChatBox() {
       openChat();
     }
   }, []);
+
+  // Handle click outside to close chat
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (isOpen && chatBoxRef.current && !chatBoxRef.current.contains(event.target as Node)) {
+        // Don't close if clicking on the toggle button
+        const toggleButton = document.querySelector('[aria-label="Open AI Assistant"]');
+        if (toggleButton && toggleButton.contains(event.target as Node)) {
+          return;
+        }
+        closeChat();
+      }
+    };
+
+    const handleEscapeKey = (event: KeyboardEvent) => {
+      if (event.key === 'Escape' && isOpen) {
+        closeChat();
+      }
+    };
+
+    if (isOpen) {
+      document.addEventListener('mousedown', handleClickOutside);
+      document.addEventListener('keydown', handleEscapeKey);
+    }
+
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+      document.removeEventListener('keydown', handleEscapeKey);
+    };
+  }, [isOpen, closeChat]);
 
   // Auto-scroll to bottom when new messages arrive
   useEffect(() => {
@@ -72,36 +99,6 @@ export function AIChatBox() {
     }
   };
 
-  // Handle resize
-  const handleMouseDown = (e: React.MouseEvent) => {
-    e.preventDefault();
-    setIsResizing(true);
-  };
-
-  useEffect(() => {
-    const handleMouseMove = (e: MouseEvent) => {
-      if (!isResizing || !chatBoxRef.current) return;
-
-      const windowWidth = window.innerWidth;
-      const newWidth = ((windowWidth - e.clientX) / windowWidth) * 100;
-      setWidth(newWidth);
-    };
-
-    const handleMouseUp = () => {
-      setIsResizing(false);
-    };
-
-    if (isResizing) {
-      document.addEventListener('mousemove', handleMouseMove);
-      document.addEventListener('mouseup', handleMouseUp);
-    }
-
-    return () => {
-      document.removeEventListener('mousemove', handleMouseMove);
-      document.removeEventListener('mouseup', handleMouseUp);
-    };
-  }, [isResizing, setWidth]);
-
   useEffect(() => {
     if (!isHomePage && isOpen) {
       closeChat();
@@ -112,34 +109,20 @@ export function AIChatBox() {
 
   return (
     <>
-      {/* Mobile overlay */}
-      {isOpen && (
-        <div
-          className="fixed inset-0 z-40 bg-black/50 md:hidden"
-          onClick={closeChat}
-        />
-      )}
-
-      {/* Chat box */}
+      {/* Chat box - independent floating window */}
       <div
         ref={chatBoxRef}
         className={cn(
-          'fixed right-0 top-0 z-50 flex h-full flex-col bg-background shadow-2xl transition-all duration-300 ease-in-out',
-          // Hide when closed
-          !isOpen && 'pointer-events-none',
-          // Mobile: always full width
-          isOpen ? 'w-full md:w-auto' : 'w-0',
+          'fixed z-50 flex flex-col bg-background shadow-2xl transition-all duration-300 ease-in-out',
+          'rounded-2xl border border-border',
+          // Positioning - bottom right corner
+          'bottom-20 right-6',
+          // Size constraints - 20% larger: w-80->w-96, h-96->h-[28rem]
+          'w-96 h-[28rem] max-h-[calc(100vh-120px)]',
+          // Visibility
+          isOpen ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4 pointer-events-none',
         )}
-        style={{
-          // Desktop: use percentage width with minimum
-          width: isOpen ? `max(300px, ${width}%)` : '0',
-        }}
       >
-        {/* Resize handle - desktop only */}
-        <div
-          className="absolute left-0 top-0 hidden h-full w-1 cursor-ew-resize bg-border hover:bg-primary md:block"
-          onMouseDown={handleMouseDown}
-        />
 
         {/* Header */}
         <div className="flex items-center justify-between border-b border-border bg-card p-4">
@@ -267,10 +250,8 @@ export function AIChatToggleButton() {
       size="icon"
       className={cn(
         'fixed z-[70] shadow-lg transition-all hover:scale-110',
-        // Mobile: bottom-right corner
-        'bottom-6 right-6 h-12 w-12',
-        // Desktop: top-right corner
-        'md:bottom-auto md:top-8 md:right-8 md:h-14 md:w-14',
+        // Both mobile and desktop: bottom-right corner
+        'bottom-6 right-6 h-14 w-14',
       )}
       aria-label="Open AI Assistant"
     >
