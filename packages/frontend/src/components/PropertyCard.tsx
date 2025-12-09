@@ -61,7 +61,10 @@ export default function PropertyCard({
     },
     onSuccess: () => {
       setLocalSubscribed(true);
+      // 失效所有相关的房产查询
       queryClient.invalidateQueries({ queryKey: ['properties'] });
+      queryClient.invalidateQueries({ queryKey: ['properties.search'] });
+      queryClient.invalidateQueries({ queryKey: ['properties.subscriptions'] });
     },
     onError: (error: { data?: { code: string } }) => {
       // 如果是409错误（已订阅），静默处理并将状态改为已订阅
@@ -83,7 +86,10 @@ export default function PropertyCard({
     },
     onSuccess: () => {
       setLocalSubscribed(false);
+      // 失效所有相关的房产查询
       queryClient.invalidateQueries({ queryKey: ['properties'] });
+      queryClient.invalidateQueries({ queryKey: ['properties.search'] });
+      queryClient.invalidateQueries({ queryKey: ['properties.subscriptions'] });
     },
     onError: (error: { data?: { code: string } }) => {
       // 如果是404错误（未订阅），静默处理并将状态改为未订阅
@@ -122,8 +128,9 @@ export default function PropertyCard({
 
  
 
-  // 同步外部传入的 subscribed 状态
+  // 同步外部传入的 subscribed 状态 - 修复前进/后退时的状态问题
   useEffect(() => {
+    setLocalSubscribed(subscribed || false);
     setIsFavorited(subscribed);
   }, [subscribed]);
 
