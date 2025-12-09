@@ -1,7 +1,7 @@
 {
   "FavoritePage": {
     "title": "My Favorites",
-    "emptyState": "You haven't saved any properties to your favorites yet. Browse properties and click the star icon to add them here.",
+    "emptyState": "You haven't saved any properties to your favorites yet. Browse properties and click the heart icon to add them here.",
     "errorState": "Failed to load favorites. Please try again later."
   },
   "Header": {

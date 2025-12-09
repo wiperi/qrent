@@ -1,8 +1,10 @@
 'use client';
 
 import { useTRPCClient } from '@/lib/trpc';
-import { useQuery } from '@tanstack/react-query';
+import { useAuth } from '@/hooks/use-auth';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { useTranslations } from 'next-intl';
+import { useEffect } from 'react';
 import PropertyCard from '@/components/PropertyCard';
 import Section from '@/components/Section';
 
@@ -13,12 +15,22 @@ import Section from '@/components/Section';
 export default function FavoritePage() {
   const t = useTranslations('FavoritePage');
   const trpc = useTRPCClient();
+  const queryClient = useQueryClient();
+  const { user, isLoading } = useAuth();
   
   // 获取用户收藏的房产列表
   const { data, isPending, error } = useQuery({
-    queryKey: ['properties.subscriptions'],
-    queryFn: () => trpc.properties.getSubscriptions.query()
+    queryKey: ['properties.subscriptions', user?.id],
+    queryFn: () => trpc.properties.getSubscriptions.query(),
+    enabled: !isLoading,
   });
+
+  // 监听用户认证状态变化，重新获取收藏数据
+  useEffect(() => {
+    if (!isLoading && user?.id) {
+      queryClient.invalidateQueries({ queryKey: ['properties.subscriptions', user.id] });
+    }
+  }, [user?.id, isLoading, queryClient]);
   
   // 加载状态
   if (isPending) {
