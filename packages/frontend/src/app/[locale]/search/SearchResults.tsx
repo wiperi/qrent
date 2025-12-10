@@ -28,25 +28,6 @@ type SearchParams = {
   areas?: string
 }
 
-type Property = {
-  id: number
-  address: string
-  region: string | null
-  price: number
-  bedroomCount?: number
-  bathroomCount?: number
-  propertyType: number
-  description?: string | null
-  commuteTime?: number | null
-  url: string
-  thumbnailUrl: string
-  subscribed: boolean
-  averageScore: number
-  keywords: string
-  availableDate?: string | null
-  publishedAt: string
-}
-
 export default function SearchResults({ searchParams }: { searchParams: SearchParams }) {
   const page = Number(searchParams.page ?? '1') || 1
   const { user, isLoading } = useAuth();
