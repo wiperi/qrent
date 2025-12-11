@@ -310,5 +310,8 @@
     "note": "Note: Please mention your school",
     "instruction": "Long press to scan and join",
     "ariaLabel": "Rental Community"
+  },
+  "HeroSection": {
+    "supportedSchools": "UNSW/USYD/UTS Supported"
   }
 }

@@ -75,7 +75,7 @@ export default function SearchBar() {
           <div className="flex flex-col flex-1">
             <label
               htmlFor="target-school"
-              className="text-xs font-medium text-slate-700 mb-1 h-4 flex items-center"
+              className="text-sm font-medium text-slate-700 mb-1 h-4 flex items-center"
             >
               {t('targetSchool')}
             </label>
@@ -97,7 +97,7 @@ export default function SearchBar() {
           <div className="flex flex-col flex-1">
             <label
               htmlFor="max-price"
-              className="text-xs font-medium text-slate-700 mb-1 h-4 flex items-center"
+              className="text-sm font-medium text-slate-700 mb-1 h-4 flex items-center"
             >
               {t('maxPrice')}
             </label>
@@ -116,7 +116,7 @@ export default function SearchBar() {
           <div className="flex flex-col flex-1">
             <label
               htmlFor="commute-time"
-              className="text-xs font-medium text-slate-700 mb-1 h-4 flex items-center"
+              className="text-sm font-medium text-slate-700 mb-1 h-4 flex items-center"
             >
               {t('maxCommute')}
             </label>
@@ -135,7 +135,7 @@ export default function SearchBar() {
           <div className="flex flex-col flex-1">
             <label
               htmlFor="num-bedrooms"
-              className="text-xs font-medium text-slate-700 mb-1 h-4 flex items-center"
+              className="text-sm font-medium text-slate-700 mb-1 h-4 flex items-center"
             >
               {t('bedrooms')}
             </label>

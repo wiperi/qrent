@@ -310,5 +310,8 @@
     "note": "进群请备注: 学校",
     "instruction": "长按识别二维码加入社群",
     "ariaLabel": "租房社群"
+  },
+  "HeroSection": {
+    "supportedSchools": "已支持 UNSW/USYD/UTS 通勤找房"
   }
 }
