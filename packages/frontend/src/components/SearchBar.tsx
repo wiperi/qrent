@@ -36,7 +36,18 @@ export default function SearchBar() {
     setTargetSchool(searchParams.get('university') || 'UNSW');
     setMaxPrice(searchParams.get('priceMax') || '');
     setCommuteTime(searchParams.get('commuteMax') || '');
-    setNumBedrooms(searchParams.get('bedroomsMax') || '');
+    
+    // 优先读取 bedroomsMin，如果是5及以上则显示为5，否则读取 bedroomsMax
+    const bedroomsMin = searchParams.get('bedroomsMin');
+    const bedroomsMax = searchParams.get('bedroomsMax');
+    
+    if (bedroomsMin === '5' && !bedroomsMax) {
+      setNumBedrooms('5');
+    } else if (bedroomsMax) {
+      setNumBedrooms(bedroomsMax);
+    } else {
+      setNumBedrooms('');
+    }
   }, [searchParams]);
 
   useEffect(() => {
