@@ -14,84 +14,135 @@ interface TodoProgressBarProps {
   items?: TodoItem[];
 }
 
-const STORAGE_KEY = 'todo-progress-bar-items';
+const STORAGE_KEY = 'todo-progress-bar-completed';
+
+// 导出默认待办事项数据结构，供其他组件使用
+export const DEFAULT_TODO_ITEMS: TodoItem[] = [
+  {
+    id: '1',
+    title: '确定预算与区域',
+    description: '确定预算与区域',
+    completed: false,
+    url: '/budget'
+  },
+  {
+    id: '2',
+    title: '寻找房源',
+    description: '浏览各大平台房源信息',
+    completed: false,
+    url: '/search'
+  },
+  {
+    id: '3',
+    title: '预约看房',
+    description: '联系中介安排实地考察',
+    completed: false,
+    url: '/viewing'
+  },
+  {
+    id: '4',
+    title: '提交申请',
+    description: '准备材料并填写申请表',
+    completed: false,
+    url: '/application'
+  },
+  {
+    id: '5',
+    title: '签订合同',
+    description: '仔细阅读条款并签字',
+    completed: false,
+    url: '/contract'
+  },
+  {
+    id: '6',
+    title: '支付押金与租金',
+    description: '完成首付款项支付',
+    completed: false,
+    url: '/payment'
+  },
+  {
+    id: '7',
+    title: '入住检查 (Condition Report)',
+    description: '领取钥匙并核对房屋状况',
+    completed: false,
+    url: '/inspection'
+  },
+];
 
 const TodoProgressBar: React.FC<TodoProgressBarProps> = ({ items }) => {
-  const defaultItems: TodoItem[] = [
-    {
-      id: '1',
-      title: '确定预算与区域',
-      description: '已完成',
-      completed: false,
-      url: '/budget'
-    },
-    {
-      id: '2',
-      title: '寻找房源',
-      description: '正在浏览各大平台房源信息',
-      completed: false,
-      url: '/search'
-    },
-    {
-      id: '3',
-      title: '预约看房',
-      description: '联系中介安排实地考察',
-      completed: false,
-      url: '/viewing'
-    },
-    {
-      id: '4',
-      title: '提交申请',
-      description: '准备材料并填写申请表',
-      completed: false,
-      url: '/application'
-    },
-    {
-      id: '5',
-      title: '签订合同',
-      description: '仔细阅读条款并签字',
-      completed: false,
-      url: '/contract'
-    },
-    {
-      id: '6',
-      title: '支付押金与租金',
-      description: '完成首付款项支付',
-      completed: false,
-      url: '/payment'
-    },
-    {
-      id: '7',
-      title: '入住检查 (Condition Report)',
-      description: '领取钥匙并核对房屋状况',
-      completed: false,
-      url: '/inspection'
-    },
-  ];
 
-  const [todoItems, setTodoItems] = useState<TodoItem[]>(() => {
-    // 从localStorage读取保存的数据
-    if (typeof window !== 'undefined') {
-      const savedItems = localStorage.getItem(STORAGE_KEY);
-      if (savedItems) {
-        try {
-          return JSON.parse(savedItems);
-        } catch (error) {
-          console.error('Failed to parse saved todo items:', error);
-        }
-      }
-    }
-    return items || defaultItems;
-  });
+  const [todoItems, setTodoItems] = useState<TodoItem[]>([]);
+  const [isClient, setIsClient] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
 
   const [isCollapsed, setIsCollapsed] = useState(false);
 
-  // 保存数据到localStorage
-  useEffect(() => {
-    if (typeof window !== 'undefined') {
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(todoItems));
+  // 从localStorage加载完成状态
+  const loadCompletedStates = (): boolean[] => {
+    try {
+      const saved = localStorage.getItem(STORAGE_KEY);
+      if (saved) {
+        const parsed = JSON.parse(saved);
+        if (Array.isArray(parsed) && parsed.every(item => typeof item === 'boolean')) {
+          return parsed;
+        }
+      }
+    } catch (error) {
+      console.error('Failed to load completed states:', error);
     }
-  }, [todoItems]);
+    return [];
+  };
+
+  // 保存完成状态到localStorage
+  const saveCompletedStates = (states: boolean[]) => {
+    try {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(states));
+    } catch (error) {
+      console.error('Failed to save completed states:', error);
+    }
+  };
+
+  // 在客户端挂载后设置isClient为true并加载数据
+  useEffect(() => {
+    setIsClient(true);
+    
+    // 使用默认items作为基础
+    const baseItems = items && items.length > 0 ? items : DEFAULT_TODO_ITEMS;
+    
+    // 从localStorage加载完成状态
+    const completedStates = loadCompletedStates();
+    
+    // 如果localStorage中的状态数组长度与当前items不匹配，说明列表结构发生了变化
+    if (completedStates.length !== baseItems.length) {
+      // 重置localStorage，使用默认的未完成状态
+      const newStates = new Array(baseItems.length).fill(false);
+      saveCompletedStates(newStates);
+      
+      // 应用新的完成状态到items
+      const itemsWithState = baseItems.map((item, index) => ({
+        ...item,
+        completed: newStates[index] || false
+      }));
+      setTodoItems(itemsWithState);
+    } else {
+      // 应用保存的完成状态到items
+      const itemsWithState = baseItems.map((item, index) => ({
+        ...item,
+        completed: completedStates[index] || false
+      }));
+      setTodoItems(itemsWithState);
+    }
+    
+    setIsLoading(false);
+  }, [items]);
+
+  // 保存完成状态到localStorage
+  useEffect(() => {
+    if (isClient && !isLoading && todoItems.length > 0) {
+      const completedStates = todoItems.map(item => item.completed);
+      saveCompletedStates(completedStates);
+    }
+  }, [todoItems, isClient, isLoading]);
 
   const handleCheckboxClick = (id: string) => {
     setTodoItems(prevItems =>
@@ -106,6 +157,11 @@ const TodoProgressBar: React.FC<TodoProgressBarProps> = ({ items }) => {
   };
 
   const firstIncompleteId = getFirstIncompleteItemId();
+
+  // 防止在客户端挂载前渲染，避免hydration错误
+  if (!isClient || isLoading) {
+    return null;
+  }
 
   return (
     <aside className="bg-white rounded-2xl sticky top-24 border border-gray-200">

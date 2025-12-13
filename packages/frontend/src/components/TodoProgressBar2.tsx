@@ -2,6 +2,7 @@
 
 import { useRouter } from 'next/navigation';
 import { useState, useRef, useEffect } from 'react';
+import { DEFAULT_TODO_ITEMS } from './TodoProgressBar';
 interface TimelineStep {
   id: string;
   label: string;
@@ -10,12 +11,39 @@ interface TimelineStep {
   url?: string;
 }
 
-const STORAGE_KEY = 'todo-progress-bar-items';
+const STORAGE_KEY = 'todo-progress-bar-completed';
 
 export default function TodoProgressBar2() {
   const router = useRouter();
   const timelineRef = useRef<HTMLDivElement>(null);
   const [scrollWidth, setScrollWidth] = useState(0);
+  const [completedStates, setCompletedStates] = useState<boolean[]>([]);
+  const [isClient, setIsClient] = useState(false);
+
+  // 从localStorage加载完成状态
+  const loadCompletedStates = (): boolean[] => {
+    try {
+      const saved = localStorage.getItem(STORAGE_KEY);
+      if (saved) {
+        const parsed = JSON.parse(saved);
+        if (Array.isArray(parsed) && parsed.every(item => typeof item === 'boolean')) {
+          return parsed;
+        }
+      }
+    } catch (error) {
+      console.error('Failed to load completed states:', error);
+    }
+    return [];
+  };
+
+  // 保存完成状态到localStorage
+  const saveCompletedStates = (states: boolean[]) => {
+    try {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(states));
+    } catch (error) {
+      console.error('Failed to save completed states:', error);
+    }
+  };
 
   useEffect(() => {
     const updateScrollWidth = () => {
@@ -30,15 +58,32 @@ export default function TodoProgressBar2() {
     return () => window.removeEventListener('resize', updateScrollWidth);
   }, []);
 
-  const steps: TimelineStep[] = [
-    { id: '1', label: '进行中', name: '确定预算与区域', completed: false, url: '/budget' },
-    { id: '2', label: '下一步', name: '寻找房源', completed: false, url: '/search' },
-    { id: '3', label: '待办', name: '预约看房', completed: false, url: '/viewing' },
-    { id: '4', label: '待办', name: '提交申请', completed: false, url: '/application' },
-    { id: '5', label: '待办', name: '签约合同', completed: false, url: '/contract' },
-    { id: '6', label: '待办', name: '支付押金', completed: false, url: '/payment' },
-    { id: '7', label: '待办', name: '入住准备', completed: false, url: '/inspection' },
-  ];
+  // 在客户端挂载后加载完成状态
+  useEffect(() => {
+    setIsClient(true);
+    
+    // 从localStorage加载完成状态
+    const completedStates = loadCompletedStates();
+    
+    // 如果localStorage中的状态数组长度与默认items不匹配，说明列表结构发生了变化
+    if (completedStates.length !== DEFAULT_TODO_ITEMS.length) {
+      // 重置localStorage，使用默认的未完成状态
+      const newStates = new Array(DEFAULT_TODO_ITEMS.length).fill(false);
+      saveCompletedStates(newStates);
+      setCompletedStates(newStates);
+    } else {
+      setCompletedStates(completedStates);
+    }
+  }, []);
+
+  // 使用DEFAULT_TODO_ITEMS并应用完成状态
+  const steps: TimelineStep[] = DEFAULT_TODO_ITEMS.map((item, index) => ({
+    id: item.id,
+    label: completedStates[index] ? '已完成' : index === completedStates.findIndex(state => !state) ? '进行中' : '待办',
+    name: item.title,
+    completed: completedStates[index] || false,
+    url: item.url
+  }));
 
   // 获取当前状态
   const getStepStatus = (step: TimelineStep, index: number) => {
@@ -48,9 +93,9 @@ export default function TodoProgressBar2() {
 
     const firstIncompleteIndex = steps.findIndex(s => !s.completed);
     if (index === firstIncompleteIndex) {
-      return 'active';
+      return 'next';  // 第一个未完成的步骤显示为蓝色空心
     } else if (index === firstIncompleteIndex + 1) {
-      return 'next';
+      return 'future'; // 第二个未完成的步骤显示为灰色
     } else {
       return 'future';
     }
@@ -59,17 +104,19 @@ export default function TodoProgressBar2() {
   // 处理圆圈点击
   const handleStepClick = (step: TimelineStep) => {
     if (step.url) {
-      router.push(step.url);
+    //   router.push(step.url);
+      router.push('/blog');
     }
   };
 
-  // 处理查看详情点击：跳转到第一个未完成步骤的 URL
+  // 处理查看详情点击：跳转到/blog
   const handleViewDetails = (e: React.MouseEvent) => {
     e.preventDefault();
-    const firstIncompleteStep = steps.find(s => !s.completed);
-    if (firstIncompleteStep?.url) {
-      router.push(firstIncompleteStep.url);
-    }
+    // const firstIncompleteStep = steps.find(s => !s.completed);
+    // if (firstIncompleteStep?.url) {
+    //   router.push(firstIncompleteStep.url);
+    // }
+    router.push('/blog');
   };
 
   // 使用React语法简化类名获取
@@ -89,7 +136,7 @@ export default function TodoProgressBar2() {
   };
 
   const StepLabel = ({ status, children }: { status: string; children: React.ReactNode }) => {
-    const baseClasses = 'text-xs font-semibold relative top-[-16px]';
+    const baseClasses = 'text-xs font-semibold relative top-[-16px] md:top-0';
 
     const statusClasses = {
       completed: 'text-green-600',
