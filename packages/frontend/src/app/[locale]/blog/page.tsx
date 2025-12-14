@@ -43,9 +43,9 @@ export default async function BlogPage({ params }: { params: Promise<{ locale: s
                 ? '每一篇经验贴，都是从困惑到安心的故事'
                 : 'Every experience post is a story from confusion to peace of mind'}
             </p>
-            <div className="flex flex-col md:flex-row flex-wrap gap-10 w-full py-6">
-              {/* 引入待办进度条组件 */}
-              <div className="flex-1 min-w-[280px]">
+            <div className="flex flex-col md:flex-row flex-wrap gap-10 py-6">
+              {/* 引入待办进度条组件，这个空div不能删否则会导致折叠时边框高度错误 */}
+              <div>
                 <TodoProgressBar />
               </div>
 

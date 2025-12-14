@@ -132,7 +132,7 @@ export default function SearchBar() {
           </div>
 
           {/* Number of Bedrooms */}
-          <div className="flex flex-col flex-1">
+          <div className="flex flex-col flex-1 min-w-0">
             <label
               htmlFor="num-bedrooms"
               className="text-xs font-medium text-slate-700 mb-1 h-4 flex items-center"

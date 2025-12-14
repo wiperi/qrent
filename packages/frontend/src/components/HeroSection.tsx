@@ -3,16 +3,18 @@
 import { Suspense } from 'react';
 import Image from 'next/image';
 import SearchBar from '@/components/SearchBar';
-import TodoProgressBar2 from './TodoProgressBar2';
+import TodoProgressBar from './TodoProgressBar';
 
 export default function HeroSection() {
   return (
     <section className="relative pb-6">
       <div className="max-w-7xl mx-auto px-5">
         {/* Hero Section Wrapper - 左右布局容器 */}
-        <div className="flex gap-5  flex-col md:flex-row ">
+        <div className="flex gap-5 flex-col md:flex-row items-start">
           {/* Left Sidebar: Timeline */}
-          <TodoProgressBar2 />
+          <div className="w-full md:w-auto">
+            <TodoProgressBar useSticky={false} maxHeight="520px" />
+          </div>
 
           
           {/* Right Content: Hero Image & Search */}

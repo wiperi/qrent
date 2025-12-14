@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 
 interface TodoItem {
   id: string;
@@ -12,6 +12,8 @@ interface TodoItem {
 
 interface TodoProgressBarProps {
   items?: TodoItem[];
+  useSticky?: boolean;
+  maxHeight?: string;
 }
 
 const STORAGE_KEY = 'todo-progress-bar-completed';
@@ -69,13 +71,13 @@ export const DEFAULT_TODO_ITEMS: TodoItem[] = [
   },
 ];
 
-const TodoProgressBar: React.FC<TodoProgressBarProps> = ({ items }) => {
+const TodoProgressBar: React.FC<TodoProgressBarProps> = ({ items, useSticky = true, maxHeight = '1000px' }) => {
 
   const [todoItems, setTodoItems] = useState<TodoItem[]>([]);
   const [isClient, setIsClient] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
-
   const [isCollapsed, setIsCollapsed] = useState(false);
+  const headerRef = useRef<HTMLDivElement>(null);
 
   // 从localStorage加载完成状态
   const loadCompletedStates = (): boolean[] => {
@@ -164,9 +166,13 @@ const TodoProgressBar: React.FC<TodoProgressBarProps> = ({ items }) => {
   }
 
   return (
-    <aside className="bg-white rounded-2xl sticky top-24 border border-gray-200">
+    <aside 
+      className={`bg-white rounded-2xl border border-gray-200 flex flex-col ${useSticky ? 'sticky top-24' : ''}`}
+      style={maxHeight !== 'auto' ? { maxHeight: maxHeight } : {}}
+    >
       {/* 标题栏 - 整个区域可点击触发折叠 */}
       <div
+        ref={headerRef}
         className="flex items-center justify-between cursor-pointer rounded-2xl p-3 hover:bg-gray-50 transition-colors duration-200 select-none"
         onClick={() => setIsCollapsed(!isCollapsed)}
       >
@@ -190,11 +196,9 @@ const TodoProgressBar: React.FC<TodoProgressBarProps> = ({ items }) => {
 
       {/* 内容区域 - 可折叠 */}
       <div
-        className={`transition-all duration-300 overflow-hidden ${
-          isCollapsed ? 'max-h-0' : 'max-h-[1000px]'
-        }`}
+        className={`transition-all duration-300  ${isCollapsed ? 'max-h-0' : 'flex-1'} px-6  overflow-y-auto [&::-webkit-scrollbar]:w-1 [&::-webkit-scrollbar-thumb]:bg-gray-300 [&::-webkit-scrollbar-thumb]:rounded-full`}
       >
-        <div className="p-6 pt-4">
+      
           <div className="flex flex-col relative">
             {/* 垂直时间线 */}
             <div className="absolute left-3 top-2.5 bottom-2.5 w-0.5 bg-gray-200 z-0"></div>
@@ -238,7 +242,7 @@ const TodoProgressBar: React.FC<TodoProgressBarProps> = ({ items }) => {
                 </div>
               </div>
             ))}
-          </div>
+          
         </div>
       </div>
     </aside>
