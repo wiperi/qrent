@@ -10,6 +10,7 @@ type PropertyWithRegion = Omit<Property, 'regionId'> & {
   regionId?: number | undefined;
   region: string | null;
   commuteTime: number | null;
+  subscribed: boolean;
 };
 
 type TopRegion = {
@@ -48,6 +49,7 @@ class PropertyService {
         regionId: undefined,
         region: p.region?.name || null,
         commuteTime: null,
+        subscribed: true,
       })) || []
     );
   }
@@ -238,11 +240,31 @@ class PropertyService {
               },
             });
 
+            // Check if property is subscribed by the user
+            let subscribed = false;
+            if (preferences.userId) {
+              const userProperty = await prisma.user.findFirst({
+                where: {
+                  id: preferences.userId,
+                  properties: {
+                    some: {
+                      id: p.id,
+                    },
+                  },
+                },
+                select: {
+                  id: true,
+                },
+              });
+              subscribed = !!userProperty;
+            }
+
             return {
               ...p,
               regionId: undefined,
               region: p.region?.name || null,
               commuteTime,
+              subscribed,
             };
           })
         );

@@ -5,14 +5,15 @@
 <a href="https://www.qrent.rent"><img alt="Website" src="https://img.shields.io/badge/website-qrent.rent-blue?style=for-the-badge"></a>
 <a href="https://github.com/wiperi/qrent/blob/main/LICENSE"><img alt="License" src="https://img.shields.io/badge/license-NCL%201.0-orange?style=for-the-badge"></a>
 <a href="https://github.com/wiperi/qrent/issues"><img alt="Issues" src="https://img.shields.io/github/issues/wiperi/qrent?style=for-the-badge"></a>
-
+<br>
+<a href="https://deepwiki.com/wiperi/qrent"><img src="https://deepwiki.com/badge.svg" alt="Ask DeepWiki"></a>
 </div>
 
 English | [简体中文](./README_CN.md)
 
 ## About QRent
 
-QRent is an AI-powered rental platform built for international students in Australia. It helps students find housing smarter and faster by analyzing commute time, budget, and area data to recommend the most suitable rentals — all in one place.
+QRent is an AI-powered rental platform built for students in Australia. It helps students find housing smarter and faster by analyzing commute time, budget, and area data to recommend the most suitable rentals — all in one place.
 
 ## Our Growth
 

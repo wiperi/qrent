@@ -11,8 +11,9 @@
 # Specific owners for packages (more specific rules are placed after the default)
 /packages/backend/ @wiperi
 /packages/shared/ @wiperi
-/packages/frontend/ @wiperi
+/packages/frontend/ @CHELSEADOPAMIN
 /.github/ @wiperi
 /packages/scraper/ @zach-moon
+/packages/agent/ @dulala12
 
 # End of CODEOWNERS

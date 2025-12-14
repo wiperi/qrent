@@ -1,3 +1,7 @@
+/**
+ * AI 聊天框全局状态管理
+ * 使用 Zustand 管理聊天框的开关状态、宽度、消息列表和加载状态，提供统一的状态管理接口供全局组件访问
+ */
 import { create } from 'zustand';
 
 export interface Message {
