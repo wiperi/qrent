@@ -2,7 +2,14 @@
   "FavoritePage": {
     "title": "我的收藏",
     "emptyState": "您还没有保存任何房产到收藏夹。浏览房产并点击爱心图标将它们添加到这里。",
-    "errorState": "加载收藏列表失败，请稍后重试。"
+    "errorState": "加载收藏列表失败，请稍后重试。",
+    "unauthorizedError": "请先登录以查看收藏列表",
+    "loginRequired": "需要登录",
+    "forbiddenError": "您没有权限访问此页面",
+    "notFoundError": "收藏列表不存在",
+    "networkError": "网络连接失败，请检查网络连接",
+    "serverError": "服务器错误，请稍后重试",
+    "goToLogin": "前往登录"
   },
   "Header": {
     "login": "登录",

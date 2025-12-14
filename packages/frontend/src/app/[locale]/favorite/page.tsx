@@ -2,6 +2,7 @@
 
 import { useTRPCClient } from '@/lib/trpc';
 import { useAuth } from '@/hooks/use-auth';
+import { showLoginModal } from '@/lib/auth-events';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { useTranslations } from 'next-intl';
 import { useEffect } from 'react';
@@ -57,13 +58,96 @@ export default function FavoritePage() {
     );
   }
   
-  // 错误状态
+  // TRPC错误类型定义
+  interface TRPCErrorShape {
+    shape?: {
+      message?: string;
+      data: {
+        code: string;
+        httpStatus: number;
+        stack?: string;
+        path?: string;
+      };
+    };
+  }
+
+  // 错误状态处理
   if (error) {
+    let errorMessage = t('errorState');
+    let errorTitle = t('title');
+    let errorType: 'info' | 'warning' | 'error' = 'error';
+    
+    // 检查具体的错误类型
+    if (error && typeof error === 'object') {
+      const errorData = error as TRPCErrorShape;
+      
+      // 获取TRPC错误信息
+      const shape = errorData.shape;
+      const data = shape?.data;
+      
+      // 处理401未登录错误
+      if (data?.code === 'UNAUTHORIZED' || data?.httpStatus === 401) {
+        errorMessage = t('unauthorizedError') || '请先登录以查看收藏列表';
+        errorTitle = t('loginRequired') || '需要登录';
+        errorType = 'info';
+      }
+      // 处理403权限错误
+      else if (data?.code === 'FORBIDDEN' || data?.httpStatus === 403) {
+        errorMessage = t('forbiddenError') || '您没有权限访问此页面';
+        errorType = 'warning';
+      }
+      // 处理404找不到资源
+      else if (data?.httpStatus === 404) {
+        errorMessage = t('notFoundError') || '收藏列表不存在';
+        errorType = 'info';
+      }
+      // 处理网络错误
+      else if ( data?.httpStatus === 0) {
+        errorMessage = t('networkError') || '网络连接失败，请检查网络连接';
+        errorType = 'warning';
+      }
+      // 处理服务器错误
+      else if (data?.httpStatus === 500) {
+        errorMessage = t('serverError') || '服务器错误，请稍后重试';
+        errorType = 'error';
+      }
+      // 显示具体的错误信息（调试用）
+      else if (shape?.message) {
+        errorMessage = `${t('errorState')} ${shape.message}`;
+      }
+    }
+    
+    // 根据错误类型设置样式
+    const errorStyles = {
+      info: 'bg-blue-50 border-blue-200 text-blue-600',
+      warning: 'bg-yellow-50 border-yellow-200 text-yellow-600',
+      error: 'bg-red-50 border-red-200 text-red-600'
+    };
+    
     return (
       <div className="container mx-auto px-4 py-8">
-        <h1 className="text-3xl font-bold mb-6">{t('title')}</h1>
-        <div className="bg-red-50 border border-red-200 rounded-lg p-6">
-          <p className="text-red-600">{t('errorState')}</p>
+        <h1 className="text-3xl font-bold mb-6">{errorTitle}</h1>
+        <div className={`border rounded-lg p-6 ${errorStyles[errorType]}`}>
+          <p className="font-medium mb-2">{errorMessage}</p>
+          {error && typeof error === 'object' && (error as TRPCErrorShape).shape?.data?.httpStatus && (
+            <p className="text-sm opacity-75">
+              error code: {(error as TRPCErrorShape).shape?.data?.httpStatus}
+            </p>
+          )}
+          {errorType === 'info' && error && typeof error === 'object' && (error as TRPCErrorShape).shape?.data?.code === 'UNAUTHORIZED' && (
+            <div className="mt-4">
+              <button 
+                onClick={() => {
+                  console.log('Login button clicked, opening global auth modal');
+                  showLoginModal();
+                }}
+                className="inline-block bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 transition-colors cursor-pointer"
+                type="button"
+              >
+                {t('goToLogin') || '前往登录'}
+              </button>
+            </div>
+          )}
         </div>
       </div>
     );
@@ -105,6 +189,7 @@ export default function FavoritePage() {
           <p className="text-gray-600">{t('emptyState')}</p>
         </div>
       )}
+      
     </div>
   );
 }
