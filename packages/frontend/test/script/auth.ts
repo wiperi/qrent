@@ -1,6 +1,10 @@
 /*
-  Minimal test script to call backend tRPC auth.login.
+  Minimal test script to call backend tRPC auth.googleOAuthLogin.
   Usage: pnpm --filter frontend run test:trpc
+
+  NOTE: Traditional auth (register/login) has been removed.
+  Only Google OAuth is supported now.
+  To use this script, set GOOGLE_ID_TOKEN environment variable.
 */
 import { createTRPCProxyClient, httpBatchLink } from '@trpc/client';
 import type { AppRouter } from '@qrent/backend/trpc';
@@ -18,21 +22,20 @@ const client = createTRPCProxyClient<AppRouter>({
     }),
   ],
 });
+
 async function main() {
   try {
-    // const registerResult = await client.auth.register.mutate({
-    //   email: 'hellofo23ijfo3ij@rpc.com',
-    //   password: 'woefjoj23ofjo23jo',
-    //   name: 'Hello',
-    //   gender: 1,
-    // })
-    // console.log('Register OK:', registerResult);
+    const idToken = process.env.GOOGLE_ID_TOKEN;
+    if (!idToken) {
+      console.error('GOOGLE_ID_TOKEN environment variable is required');
+      process.exitCode = 1;
+      return;
+    }
 
-    const result = await client.auth.login.mutate({
-      email: 'hellofo23ijfo3ij001@rpc.com',
-      password: 'woefjoj23ofjo23jo',
+    const result = await client.auth.googleOAuthLogin.mutate({
+      idToken,
     });
-    console.log('Login OK:', result);
+    console.log('Google OAuth Login OK:', result);
   } catch (err) {
     console.error('Login failed:', err);
     process.exitCode = 1;
