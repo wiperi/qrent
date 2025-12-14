@@ -116,9 +116,9 @@ export function AIChatBox() {
           'fixed z-50 flex flex-col bg-background shadow-2xl transition-all duration-300 ease-in-out',
           'rounded-2xl border border-border',
           // Positioning - bottom right corner
-          'bottom-20 right-6',
+          'bottom-0 right-0 sm:bottom-6 sm:right-6',
           // Size constraints - 20% larger: w-80->w-96, h-96->h-[28rem]
-          'w-96 h-[28rem] max-h-[calc(100vh-120px)]',
+          'max-w-96 h-[28rem] max-h-[calc(100vh-120px)]',
           // Visibility
           isOpen ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4 pointer-events-none',
         )}
