@@ -7,10 +7,7 @@ import { userService } from './UserService';
 import { oauthService } from './OAuthService';
 
 class AuthService {
-  async changeAuthProfile(
-    userId: number,
-    newData: Pick<User, 'phone' | 'email'>
-  ) {
+  async changeAuthProfile(userId: number, newData: Pick<User, 'phone' | 'email'>) {
     const user = await prisma.user.findUnique({
       where: { id: userId },
     });

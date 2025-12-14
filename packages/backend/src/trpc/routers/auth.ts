@@ -27,10 +27,7 @@ export const authRouter = t.router({
       if (input.phone !== undefined) updateData.phone = input.phone;
       if (input.email !== undefined) updateData.email = input.email;
 
-      const profile = await authService.changeAuthProfile(
-        ctx.userId!,
-        updateData as any
-      );
+      const profile = await authService.changeAuthProfile(ctx.userId!, updateData as any);
       return profile;
     }),
 
