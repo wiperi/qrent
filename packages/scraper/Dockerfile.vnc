@@ -1,22 +1,22 @@
-# QRent Scraper Docker Image
-# 使用 Xvfb 虚拟显示器运行非 headless 浏览器，绕过 Kasada 保护
+# QRent Scraper Docker Image with VNC
+# 支持通过浏览器查看容器内的桌面，用于手动完成验证
 FROM mcr.microsoft.com/playwright/python:v1.40.0-jammy
 
-# 设置工作目录
 WORKDIR /app
 
-# 设置环境变量
 ENV PYTHONUNBUFFERED=1
 ENV PYTHONDONTWRITEBYTECODE=1
 ENV PLAYWRIGHT_BROWSERS_PATH=/ms-playwright
-# 虚拟显示器
 ENV DISPLAY=:99
 
-# 安装 Xvfb (虚拟显示器)
+# 安装 Xvfb + x11vnc + noVNC
 USER root
 RUN apt-get update && apt-get install -y \
     xvfb \
-    x11-utils \
+    x11vnc \
+    novnc \
+    websockify \
+    fluxbox \
     && rm -rf /var/lib/apt/lists/*
 
 # 复制依赖文件
@@ -30,20 +30,19 @@ RUN pip install --no-cache-dir --upgrade pip && \
 COPY src/ ./src/
 COPY main.py .
 COPY run_scraper.py .
-COPY entrypoint.sh .
+COPY entrypoint-vnc.sh .
 
 # 创建必要目录
 RUN mkdir -p /app/logs /app/output /app/domain_profile /app/rea_profile
 
 # 设置权限
-RUN chmod +x /app/entrypoint.sh && \
+RUN chmod +x /app/entrypoint-vnc.sh && \
     chown -R pwuser:pwuser /app
 
-# 使用 Playwright 自带的用户
 USER pwuser
 
-# 入口点 - 启动 Xvfb 然后运行爬虫
-ENTRYPOINT ["/app/entrypoint.sh"]
+EXPOSE 6080
 
-# 默认命令
-CMD ["python", "main.py", "run", "--universities", "UNSW", "USYD", "--no-database"]
+ENTRYPOINT ["/app/entrypoint-vnc.sh"]
+CMD ["python", "run_scraper.py", "--scrapers", "realestate", "--universities", "UNSW", "--no-database", "--no-scoring", "--no-commute"]
+

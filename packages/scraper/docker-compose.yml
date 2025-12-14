@@ -5,82 +5,60 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
-    restart: unless-stopped
     container_name: qrent-scraper
-    environment:
-      - PYTHONUNBUFFERED=1
-      - DISPLAY=:99
-      # Database configuration
-      - DB_HOST=${DB_HOST:-host.docker.internal}
-      - DB_USER=${DB_USER}
-      - DB_PASSWORD=${DB_PASSWORD}
-      - DB_DATABASE=${DB_DATABASE}
-      - DB_PORT=${DB_PORT:-3306}
-      # API Keys
-      - GOOGLE_MAPS_API_KEY=${GOOGLE_MAPS_API_KEY}
-      - PROPERTY_RATING_API_KEY=${PROPERTY_RATING_API_KEY}
-      # Auto-delete configuration
-      - AUTO_DELETE_DELISTED=${AUTO_DELETE_DELISTED:-true}
-    volumes:
-      - scraper_logs:/app/scraper/logs
-      - scraper_data:/app/scraper/data
-      - ./backup:/app/scraper/backup  # Local backup directory
-    # Running mode options:
-    # - run: Execute immediately once
-    # - cron-only: Start scheduled tasks only (daily at 1:00 AM)
-    # - test: Test mode
-    command: ["/usr/local/bin/docker-entrypoint.sh", "cron-only"]
     
-    # Resource limits
+    # 内存限制
     deploy:
       resources:
         limits:
-          memory: 2G
-          cpus: '1.0'
+          memory: 3G
         reservations:
           memory: 1G
-          cpus: '0.5'
     
-    # Health check
-    healthcheck:
-      test: ["CMD", "python", "-c", "import requests; print('OK')"]
-      interval: 30s
-      timeout: 10s
-      retries: 3
-      start_period: 40s
+    # 环境变量
+    environment:
+      - PYTHONUNBUFFERED=1
+      - DISPLAY=:99
+      # 数据库配置 (可选)
+      - DB_HOST=${DB_HOST:-localhost}
+      - DB_USER=${DB_USER:-root}
+      - DB_PASSWORD=${DB_PASSWORD:-}
+      - DB_DATABASE=${DB_DATABASE:-qrent}
+      # API Keys (可选)
+      - DASHSCOPE_API_KEY=${DASHSCOPE_API_KEY:-}
+      - GOOGLE_MAPS_API_KEY=${GOOGLE_MAPS_API_KEY:-}
+      # 输出目录
+      - OUTPUT_DIR=/app/output
+    
+    # 挂载目录
+    volumes:
+      # 输出文件
+      - ./output:/app/output
+      # 日志
+      - ./logs:/app/logs
+      # 浏览器配置 (直接使用本地 profile)
+      - ./domain_profile:/app/domain_profile
+      - ./rea_profile:/app/rea_profile
+      # 环境变量文件
+      - ./.env:/app/.env:ro
+    
+    # 网络
+    networks:
+      - qrent-network
+    
+    # 重启策略
+    restart: "no"
+    
+    # 共享内存 (Playwright/Xvfb 需要)
+    shm_size: '2gb'
+    
+    # 安全设置 (Xvfb 需要)
+    security_opt:
+      - seccomp:unconfined
+    
+    # 允许 X11
+    privileged: false
 
-  # Optional: Local MySQL database (if you don't want to depend on external database)
-  # Uncomment the following section to enable local database
-  # db:
-  #   image: mysql:8.0
-  #   container_name: qrent-scraper-db
-  #   restart: unless-stopped
-  #   environment:
-  #     - MYSQL_ROOT_PASSWORD=${DB_ROOT_PASSWORD}
-  #     - MYSQL_DATABASE=${DB_DATABASE}
-  #     - MYSQL_USER=${DB_USER}
-  #     - MYSQL_PASSWORD=${DB_PASSWORD}
-  #   ports:
-  #     - '${DB_PORT:-3306}:3306'
-  #   volumes:
-  #     - db_data:/var/lib/mysql
-  #     - ./init-db:/docker-entrypoint-initdb.d
-  #   healthcheck:
-  #     test: ["CMD-SHELL", "mysqladmin ping -h localhost -u root -p$MYSQL_ROOT_PASSWORD"]
-  #     interval: 5s
-  #     timeout: 5s
-  #     retries: 20
-  #     start_period: 10s
-
-volumes:
-  scraper_logs:
-    driver: local
-  scraper_data:
-    driver: local
-  # db_data:  # If enabling local database, uncomment this
-  #   driver: local
-
-# Network configuration (if need to connect to external services)
 networks:
-  default:
-    name: qrent-scraper-network
+  qrent-network:
+    driver: bridge
