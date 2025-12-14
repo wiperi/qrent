@@ -262,8 +262,6 @@ export function AIChatToggleButton() {
         'bottom-6 right-6 h-12 w-12',
         // Desktop: top-right corner
         'md:bottom-auto md:top-24 md:right-8 md:h-14 md:w-14',
-        // Both mobile and desktop: bottom-right corner
-        'bottom-6 right-6 h-14 w-14',
       )}
       aria-label="Open AI Assistant"
     >

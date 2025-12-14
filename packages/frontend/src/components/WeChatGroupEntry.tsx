@@ -25,7 +25,7 @@ export function WeChatGroupEntry() {
       className={cn(
         'fixed z-[70] transition-all',
         // Mobile: 在AI按钮上方
-        'bottom-[88px] right-6',
+        'bottom-[96px] right-6',
         // Desktop: 在AI按钮下方
         'md:bottom-auto md:top-42 md:right-8',
       )}
@@ -51,14 +51,14 @@ export function WeChatGroupEntry() {
       {isHovered && (
         <div
           className={cn(
-            'absolute right-[60px] top-0 md:right-[70px]',
-            'min-w-[280px] rounded-lg bg-white p-4 shadow-2xl',
+            'absolute right-[60px] bottom-0 md:top-[-6px] md:right-[70px]',
+            'h-[450px] min-w-[280px] rounded-lg bg-white p-4 shadow-2xl',
             'border-2 border-green-600',
             'animate-in fade-in slide-in-from-right-5 duration-200'
           )}
         >
           {/* 箭头 */}
-          <div className="absolute -right-2 top-6 h-4 w-4 rotate-45 border-r-2 border-t-2 border-green-600 bg-white" />
+          <div className="absolute -right-2 bottom-4 md:top-6 h-4 w-4 rotate-45 border-r-2 border-t-2 border-green-600 bg-white" />
           
           {/* 标题 */}
           <div className="mb-3 text-center">
