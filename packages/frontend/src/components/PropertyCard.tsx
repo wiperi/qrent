@@ -1,6 +1,6 @@
 import { LOCALE } from '@qrent/shared/enum';
 import { useLocale, useTranslations } from 'next-intl';
-import { FaBath } from 'react-icons/fa';
+import { FaBath, FaStar, FaRegStar } from 'react-icons/fa';
 import { IoBed } from 'react-icons/io5';
 import { useState, useRef, useEffect } from 'react';
 import { useTRPCClient } from '@/lib/trpc';
@@ -43,9 +43,7 @@ export default function PropertyCard({
   subscribed,
   propertyId,
 }: PropertyCardProps) {
-  const [isFavorited, setIsFavorited] = useState(subscribed);
   const [addressFontSize, setAddressFontSize] = useState(18);
-  const [visibleKeywordCount, setVisibleKeywordCount] = useState(0);
   const addressRef = useRef<HTMLHeadingElement>(null);
   const keywordContainerRef = useRef<HTMLDivElement>(null);
   const t = useTranslations('PropertyCard');
@@ -123,15 +121,9 @@ export default function PropertyCard({
   // 判断是否是 flatmates 房源
   const isFlatmates = url.toLowerCase().includes('flatmates');
 
-  // 获取 tRPC client
-  const trpcClient = useTRPCClient();
-
- 
-
   // 同步外部传入的 subscribed 状态 - 修复前进/后退时的状态问题
   useEffect(() => {
     setLocalSubscribed(subscribed || false);
-    setIsFavorited(subscribed);
   }, [subscribed]);
 
   // 自动调整地址字体大小
@@ -195,40 +187,6 @@ export default function PropertyCard({
     const calculateVisibleKeywords = () => {
       const container = keywordContainerRef.current;
       if (!container) return;
-
-      // 最大允许高度（约4行，每行约28-30px，留一点余量）
-      const maxHeight = 115;
-      
-      // 临时创建一个测试容器来测量高度
-      const testContainer = container.cloneNode(false) as HTMLElement;
-      testContainer.style.position = 'absolute';
-      testContainer.style.visibility = 'hidden';
-      testContainer.style.width = container.offsetWidth + 'px';
-      container.parentElement?.appendChild(testContainer);
-
-      let visibleCount = 0;
-      
-      // 逐个添加标签并测量高度
-      for (let i = 0; i < keywordList.length; i++) {
-        const span = document.createElement('span');
-        span.className = 'px-2 py-1 bg-blue-100 text-blue-800 text-xs rounded-full whitespace-nowrap flex-shrink-0';
-        span.textContent = keywordList[i];
-        testContainer.appendChild(span);
-        
-        // 检查添加这个标签后的高度
-        if (testContainer.offsetHeight <= maxHeight) {
-          visibleCount = i + 1;
-        } else {
-          // 如果超过了，就不再添加
-          break;
-        }
-      }
-      
-      // 清理测试容器
-      testContainer.remove();
-      
-      // 设置可见的标签数量
-      setVisibleKeywordCount(visibleCount);
     };
 
     // 使用 setTimeout 确保 DOM 已完全渲染
@@ -236,7 +194,7 @@ export default function PropertyCard({
 
     // 监听窗口大小变化
     window.addEventListener('resize', calculateVisibleKeywords);
-    
+
     return () => {
       clearTimeout(timer);
       window.removeEventListener('resize', calculateVisibleKeywords);
@@ -261,8 +219,6 @@ export default function PropertyCard({
       return 'Unknown';
     }
   };
-
-  const websiteName = getWebsiteName(url);
 
   const getScoreColor = (score: number): string => {
     if (score >= 18.3) return 'bg-orange-600 text-white';
@@ -323,7 +279,6 @@ export default function PropertyCard({
     return publishedDate.toLocaleDateString(locale === LOCALE.ZH ? 'zh-CN' : 'en-US', options);
   };
 
-
   const content = (
     <>
       {/* Property Image with overlay info */}
@@ -340,7 +295,7 @@ export default function PropertyCard({
           {/* Dark gradient overlay at bottom */}
           <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent" />
 
-          {/* Top right: Score badge and Favorite button */}
+          {/* Top right: Score badge and Subscribe button */}
           <div className="absolute top-3 right-3 z-10 flex items-center gap-2">
             {/* Score badge */}
             <div
@@ -348,59 +303,27 @@ export default function PropertyCard({
             >
               <span>{averageScore.toFixed(1)}</span>
             </div>
-<button
-            onClick={handleSubscribeToggle}
-            disabled={isSubscribing || !propertyId}
-            className={`rounded-full p-1.5 shadow-md hover:scale-110 transition-transform ${
-        localSubscribed
-          ? 'bg-orange-500 text-white'
-          : 'bg-white text-orange-500 hover:bg-orange-50'
-      } ${isSubscribing ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'}`}
-            title={localSubscribed ? t('unsubscribe') : t('subscribe')}
-          >
-            {localSubscribed ? (
-              <svg
-                className="w-4 h-4 text-white"
-                fill="currentColor" 
-                viewBox="0 0 24 24"
-                stroke="none" 
-              >
-                <path d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
-              </svg>
-            ) : (
-              <svg
-                className="w-4 h-4 text-orange-600"
-                fill="none"
-                viewBox="0 0 24 24"
-                stroke="currentColor"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"
-                />
-              </svg>
-            )}
-          </button>
-            {/* Favorite button - 在收藏数据加载时禁用 */}
-            {/* <button
-              onClick={handleFavoriteClick}
-              disabled={isButtonDisabled}
-              className={`w-9 h-9 bg-white rounded-full transition-colors flex items-center justify-center shadow-md ${
-                isButtonDisabled ? 'opacity-50 cursor-not-allowed' : 'hover:bg-gray-100'
-              }`}
-              aria-label={isFavorited ? 'Remove from favorites' : 'Add to favorites'}
+            <button
+              onClick={handleSubscribeToggle}
+              disabled={isSubscribing || !propertyId}
+              className={`flex items-center justify-center rounded-full p-1.5 shadow-md hover:scale-130 transition-all duration-300 ease-in-out
+                   bg-white text-orange-400 hover:bg-orange-50 hover:shadow-lg hover:rotate-5
+                  ${isSubscribing ? 'animate-pulse opacity-50 cursor-not-allowed' : 'cursor-pointer'}`}
+              title={localSubscribed ? t('unsubscribe') : t('subscribe')}
             >
-              {isFavorited ? (
-                <AiFillStar className="w-5 h-5 text-orange-500" />
+              {localSubscribed ? (
+                <FaStar
+                  className={`w-5 h-5 transition-all duration-1200 ease-in-out transform
+                    ${isSubscribing ? 'animate-pulse' : ''}`}
+                />
               ) : (
-                <AiOutlineStar className="w-5 h-5 text-orange-500" />
+                <FaRegStar
+                  className={`w-5 h-5 transition-all duration-1200 ease-in-out transform
+                    ${isSubscribing ? 'animate-pulse' : ''}`}
+                />
               )}
-            </button> */}
+            </button>
           </div>
-         
-          
 
           {/* Bottom left: Property info overlay on image */}
           <div className="absolute bottom-0 left-0 right-0 p-4 z-10">
@@ -484,11 +407,11 @@ export default function PropertyCard({
           <div className="mt-2 text-xs text-gray-500 leading-relaxed">{t('flatmatesWarning')}</div>
         ) : (
           keywordList.length > 0 && (
-            <div 
+            <div
               ref={keywordContainerRef}
-              className="mt-2 flex flex-wrap gap-1.5 content-start overflow-hidden"
+              className="flex flex-wrap gap-1.5 content-start overflow-hidden"
             >
-              {keywordList.slice(0, visibleKeywordCount || keywordList.length).map((keyword, index) => (
+              {keywordList.slice(0, keywordList.length).map((keyword, index) => (
                 <span
                   key={index}
                   className="px-2 py-1 bg-blue-100 text-blue-800 text-xs rounded-full whitespace-nowrap flex-shrink-0"

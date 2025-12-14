@@ -1,7 +1,7 @@
 {
   "FavoritePage": {
     "title": "我的收藏",
-    "emptyState": "您还没有保存任何房产到收藏夹。浏览房产并点击爱心图标将它们添加到这里。",
+    "emptyState": "您还没有保存任何房产到收藏夹。浏览房产并点击五角星图标将它们添加到这里。",
     "errorState": "加载收藏列表失败，请稍后重试。",
     "unauthorizedError": "请先登录以查看收藏列表",
     "loginRequired": "需要登录",
