@@ -2,11 +2,12 @@
 
 import PropertyCard from '@/components/PropertyCard';
 import { useTRPCClient } from '@/lib/trpc';
-import { useQuery } from '@tanstack/react-query';
+import { useAuth } from '@/hooks/use-auth';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { useLocale, useTranslations } from 'next-intl';
 import Link from 'next/link';
 import { useSearchParams } from 'next/navigation';
-import { useMemo } from 'react';
+import { useMemo, useEffect } from 'react';
 import { HiSearch } from 'react-icons/hi';
 
 type SearchParams = {
@@ -29,6 +30,8 @@ type SearchParams = {
 
 export default function SearchResults({ searchParams }: { searchParams: SearchParams }) {
   const page = Number(searchParams.page ?? '1') || 1
+  const { user, isLoading } = useAuth();
+  const queryClient = useQueryClient();
 
   // Build search parameters from URL - aligned with backend preferenceSchema
   const searchFilters = useMemo(() => {
@@ -68,9 +71,18 @@ export default function SearchResults({ searchParams }: { searchParams: SearchPa
   const trpc = useTRPCClient()
 
   const { data, isPending, error } = useQuery({
-    queryKey: ['properties.search', searchFilters],
-    queryFn: () => trpc.properties.search.query(searchFilters)
+    queryKey: ['properties.search', searchFilters, user?.id],
+    queryFn: () => trpc.properties.search.query(searchFilters),
+    enabled: !isLoading, // 只在认证状态确定后才启用查询
+   
   })
+
+  // 当用户登录状态变化时，重新获取房产数据
+  useEffect(() => {
+    if (!isLoading) {
+      queryClient.invalidateQueries({ queryKey: ['properties.search', searchFilters] });
+    }
+  }, [user?.id, searchFilters, queryClient, isLoading]);
 
   // Deprecated: use subscriptions field from PropertyCard directly
   // // 获取用户收藏列表
@@ -137,13 +149,13 @@ export default function SearchResults({ searchParams }: { searchParams: SearchPa
                     propertyType={property.propertyType}
                     commuteTime={property.commuteTime ?? undefined}
                     url={property.url}
+                    thumbnailUrl={property.thumbnailUrl}
+                    subscribed={property.subscribed}
                     averageScore={property.averageScore}
                     keywords={property.keywords}
                     availableDate={property.availableDate}
                     publishedAt={property.publishedAt}
-                    thumbnailUrl={property.thumbnailUrl}
-                    isSubscribed={false}
-                    subscriptionsLoading={false}
+                    propertyId={property.id as number}
                   />
                 ))}
               </div>

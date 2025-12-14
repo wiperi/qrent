@@ -127,3 +127,33 @@
     @apply bg-background text-foreground;
   }
 }
+
+@keyframes rainbow-shift {
+  0% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+  100% {
+    background-position: 0% 50%;
+  }
+}
+
+.bg-rainbow-gradient {
+  background: linear-gradient(
+    135deg,
+    #ef4444,    /* red */
+    #f59e0b,    /* orange */
+    #eab308,    /* yellow */
+    #22c55e,    /* green */
+    #3b82f6,    /* blue */
+    #8b5cf6,    /* indigo */
+    #a855f7,    /* purple */
+    #ef4444,    /* back to red for seamless loop */
+    #f59e0b,    /* orange */
+    #eab308     /* yellow */
+  );
+  background-size: 300% 300%;
+  animation: rainbow-shift 4s ease infinite;
+}

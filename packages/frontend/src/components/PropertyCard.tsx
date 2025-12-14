@@ -2,7 +2,6 @@ import { LOCALE } from '@qrent/shared/enum';
 import { useLocale, useTranslations } from 'next-intl';
 import { FaBath } from 'react-icons/fa';
 import { IoBed } from 'react-icons/io5';
-import { AiOutlineStar, AiFillStar } from 'react-icons/ai';
 import { useState, useRef, useEffect } from 'react';
 import { useTRPCClient } from '@/lib/trpc';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
@@ -23,12 +22,11 @@ interface PropertyCardProps {
   availableDate?: string | null;
   publishedAt: string;
   thumbnailUrl: string;
-  isSubscribed: boolean;
-  subscriptionsLoading: boolean;
+  subscribed?: boolean;
+  propertyId?: number;
 }
 
 export default function PropertyCard({
-  id,
   address,
   region,
   price,
@@ -42,10 +40,10 @@ export default function PropertyCard({
   availableDate,
   publishedAt,
   thumbnailUrl,
-  isSubscribed,
-  subscriptionsLoading = false,
+  subscribed,
+  propertyId,
 }: PropertyCardProps) {
-  const [isFavorited, setIsFavorited] = useState(isSubscribed);
+  const [isFavorited, setIsFavorited] = useState(subscribed);
   const [addressFontSize, setAddressFontSize] = useState(18);
   const [visibleKeywordCount, setVisibleKeywordCount] = useState(0);
   const addressRef = useRef<HTMLHeadingElement>(null);
@@ -53,6 +51,73 @@ export default function PropertyCard({
   const t = useTranslations('PropertyCard');
   const locale = useLocale();
   const propertyTypeName = propertyType === 1 ? t('house') : t('apartment');
+  const trpc = useTRPCClient();
+  const [isSubscribing, setIsSubscribing] = useState(false);
+  const [localSubscribed, setLocalSubscribed] = useState(subscribed || false);
+
+  const subscribeMutation = useMutation({
+    mutationFn: async (propertyId: number) => {
+      return await trpc.properties.subscribe.mutate({ propertyId });
+    },
+    onSuccess: () => {
+      setLocalSubscribed(true);
+      // 失效所有相关的房产查询
+      queryClient.invalidateQueries({ queryKey: ['properties'] });
+      queryClient.invalidateQueries({ queryKey: ['properties.search'] });
+      queryClient.invalidateQueries({ queryKey: ['properties.subscriptions'] });
+    },
+    onError: (error: { data?: { code: string } }) => {
+      // 如果是409错误（已订阅），静默处理并将状态改为已订阅
+      if (error?.data?.code === 'CONFLICT') {
+        // 静默处理，不显示错误，但更新本地状态
+        setLocalSubscribed(true);
+      } else {
+        console.error('Failed to subscribe:', error);
+      }
+    },
+    onSettled: () => {
+      setIsSubscribing(false);
+    },
+  });
+
+  const unsubscribeMutation = useMutation({
+    mutationFn: async (propertyId: number) => {
+      return await trpc.properties.unsubscribe.mutate({ propertyId });
+    },
+    onSuccess: () => {
+      setLocalSubscribed(false);
+      // 失效所有相关的房产查询
+      queryClient.invalidateQueries({ queryKey: ['properties'] });
+      queryClient.invalidateQueries({ queryKey: ['properties.search'] });
+      queryClient.invalidateQueries({ queryKey: ['properties.subscriptions'] });
+    },
+    onError: (error: { data?: { code: string } }) => {
+      // 如果是404错误（未订阅），静默处理并将状态改为未订阅
+      if (error?.data?.code === 'NOT_FOUND') {
+        // 静默处理，不显示错误，但更新本地状态
+        setLocalSubscribed(false);
+      } else {
+        console.error('Failed to unsubscribe:', error);
+      }
+    },
+    onSettled: () => {
+      setIsSubscribing(false);
+    },
+  });
+
+  const handleSubscribeToggle = async (e: React.MouseEvent) => {
+    e.stopPropagation();
+    e.preventDefault();
+    if (!propertyId || isSubscribing) return;
+
+    setIsSubscribing(true);
+
+    if (localSubscribed) {
+      unsubscribeMutation.mutate(propertyId);
+    } else {
+      subscribeMutation.mutate(propertyId);
+    }
+  };
   const queryClient = useQueryClient();
 
   // 判断是否是 flatmates 房源
@@ -61,53 +126,13 @@ export default function PropertyCard({
   // 获取 tRPC client
   const trpcClient = useTRPCClient();
 
-  // 订阅/收藏 mutation
-  const subscribeMutation = useMutation({
-    mutationFn: async () => {
-      if (!id) throw new Error('Property ID is required');
-      return await trpcClient.properties.subscribe.mutate({ propertyId: id! });
-    },
-    onSuccess: () => {
-      // 刷新收藏列表
-      queryClient.invalidateQueries({ queryKey: ['properties.getSubscriptions'] });
-    },
-    onError: (error: unknown) => {
-      const errorMessage = error instanceof Error ? error.message : '';
+ 
 
-      // 如果是"已经收藏过"的错误，不回滚 UI
-      if (errorMessage.toLowerCase().includes('already subscribed')) {
-        queryClient.invalidateQueries({ queryKey: ['properties.getSubscriptions'] });
-        return;
-      }
-
-      // 其他错误：回滚 UI 并提示
-      setIsFavorited(false);
-      alert('添加收藏失败，请重试');
-    },
-  });
-
-  // 取消订阅 mutation
-  const unsubscribeMutation = useMutation({
-    mutationFn: async () => {
-      if (!id) throw new Error('Property ID is required');
-      return await trpcClient.properties.unsubscribe.mutate({ propertyId: id! });
-    },
-    onSuccess: () => {
-      // 刷新收藏列表
-      queryClient.invalidateQueries({ queryKey: ['properties.getSubscriptions'] });
-    },
-    onError: () => {
-      // 回滚 UI 并提示
-      setIsFavorited(true);
-      alert('取消收藏失败，请重试');
-      queryClient.invalidateQueries({ queryKey: ['properties.getSubscriptions'] });
-    },
-  });
-
-  // 同步外部传入的 isSubscribed 状态
+  // 同步外部传入的 subscribed 状态 - 修复前进/后退时的状态问题
   useEffect(() => {
-    setIsFavorited(isSubscribed);
-  }, [isSubscribed]);
+    setLocalSubscribed(subscribed || false);
+    setIsFavorited(subscribed);
+  }, [subscribed]);
 
   // 自动调整地址字体大小
   useEffect(() => {
@@ -298,35 +323,6 @@ export default function PropertyCard({
     return publishedDate.toLocaleDateString(locale === LOCALE.ZH ? 'zh-CN' : 'en-US', options);
   };
 
-  const handleFavoriteClick = async (e: React.MouseEvent) => {
-    e.preventDefault();
-    e.stopPropagation();
-
-    // 检查用户是否登录
-    const token = typeof window !== 'undefined' ? localStorage.getItem('auth-token') : null;
-    if (!token) {
-      alert('请登录后再收藏');
-      return;
-    }
-
-    // 乐观更新 UI
-    const newFavoriteState = !isFavorited;
-    setIsFavorited(newFavoriteState);
-
-    try {
-      if (newFavoriteState) {
-        await subscribeMutation.mutateAsync();
-      } else {
-        await unsubscribeMutation.mutateAsync();
-      }
-    } catch (error) {
-      // 错误已经在 mutation 的 onError 中处理了
-    }
-  };
-
-  // 按钮禁用条件：正在加载收藏列表，或正在执行收藏/取消收藏操作
-  const isButtonDisabled =
-    subscriptionsLoading || subscribeMutation.isPending || unsubscribeMutation.isPending;
 
   const content = (
     <>
@@ -352,7 +348,41 @@ export default function PropertyCard({
             >
               <span>{averageScore.toFixed(1)}</span>
             </div>
-
+<button
+            onClick={handleSubscribeToggle}
+            disabled={isSubscribing || !propertyId}
+            className={`rounded-full p-1.5 shadow-md hover:scale-110 transition-transform ${
+        localSubscribed
+          ? 'bg-orange-500 text-white'
+          : 'bg-white text-orange-500 hover:bg-orange-50'
+      } ${isSubscribing ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'}`}
+            title={localSubscribed ? t('unsubscribe') : t('subscribe')}
+          >
+            {localSubscribed ? (
+              <svg
+                className="w-4 h-4 text-white"
+                fill="currentColor" 
+                viewBox="0 0 24 24"
+                stroke="none" 
+              >
+                <path d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
+              </svg>
+            ) : (
+              <svg
+                className="w-4 h-4 text-orange-600"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"
+                />
+              </svg>
+            )}
+          </button>
             {/* Favorite button - 在收藏数据加载时禁用 */}
             {/* <button
               onClick={handleFavoriteClick}
@@ -369,6 +399,8 @@ export default function PropertyCard({
               )}
             </button> */}
           </div>
+         
+          
 
           {/* Bottom left: Property info overlay on image */}
           <div className="absolute bottom-0 left-0 right-0 p-4 z-10">

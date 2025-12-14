@@ -8,7 +8,8 @@ import { useAIChatStore, type Message } from '@/lib/ai-chat-store';
 import { cn } from '@/lib/utils';
 import { usePathname } from 'next/navigation';
 import { useEffect, useRef, useState } from 'react';
-import { FiChevronsRight, FiMessageSquare, FiSend, FiSidebar } from 'react-icons/fi';
+import { FiChevronsRight, FiMessageSquare, FiSend } from 'react-icons/fi';
+import { RiRobot2Line } from 'react-icons/ri';
 import { Button } from './ui/button';
 
 export function AIChatBox() {
@@ -271,14 +272,17 @@ export function AIChatToggleButton() {
       size="icon"
       className={cn(
         'fixed z-[70] shadow-lg transition-all hover:scale-110',
+        'rounded-full bg-rainbow-gradient',
+        'hover:shadow-2xl',
+        'border-2 border-white/30',
         // Mobile: bottom-right corner
         'bottom-6 right-6 h-12 w-12',
         // Desktop: top-right corner
-        'md:bottom-auto md:top-8 md:right-8 md:h-14 md:w-14',
+        'md:bottom-auto md:top-24 md:right-8 md:h-14 md:w-14',
       )}
       aria-label="Open AI Assistant"
     >
-      <FiSidebar className="h-6 w-6" />
+      <RiRobot2Line className="h-6 w-6 text-white" />
     </Button>
   );
 }

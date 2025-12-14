@@ -2,18 +2,23 @@
 
 import { usePathname } from 'next/navigation';
 import { useState } from 'react';
-import { FiUsers } from 'react-icons/fi';
+import { useTranslations } from 'next-intl';
+import { RiWechatFill } from 'react-icons/ri';
 import { cn } from '@/lib/utils';
+import { useAIChatStore } from '@/lib/ai-chat-store';
 import { Button } from './ui/button';
 
 export function WeChatGroupEntry() {
   const pathname = usePathname();
   const [isHovered, setIsHovered] = useState(false);
+  const { isOpen: isAIChatOpen } = useAIChatStore();
+  const t = useTranslations('WeChatGroupEntry');
 
   // 只在首页显示
   const isHomePage = pathname === '/' || /^\/[a-z]{2}$/.test(pathname);
 
-  if (!isHomePage) return null;
+  // 当AI聊天框打开时隐藏
+  if (!isHomePage || isAIChatOpen) return null;
 
   return (
     <div
@@ -22,7 +27,7 @@ export function WeChatGroupEntry() {
         // Mobile: 在AI按钮上方
         'bottom-[88px] right-6',
         // Desktop: 在AI按钮下方
-        'md:bottom-auto md:top-[120px] md:right-8',
+        'md:bottom-auto md:top-42 md:right-8',
       )}
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
@@ -34,11 +39,12 @@ export function WeChatGroupEntry() {
         className={cn(
           'shadow-lg transition-all hover:scale-110',
           'h-12 w-12 md:h-14 md:w-14',
-          'bg-green-600 hover:bg-green-700 text-white'
+          'rounded-full bg-green-600 hover:bg-green-700 text-white',
+          'border-2 border-white/30'
         )}
-        aria-label="租房社群"
+        aria-label={t('ariaLabel')}
       >
-        <FiUsers className="h-6 w-6" />
+        <RiWechatFill className="h-7 w-7" />
       </Button>
 
       {/* 悬停显示的二维码卡片 */}
@@ -56,9 +62,11 @@ export function WeChatGroupEntry() {
           
           {/* 标题 */}
           <div className="mb-3 text-center">
-            <h3 className="text-lg font-bold text-gray-800">租房社群</h3>
+            <h3 className="text-lg font-bold text-gray-800">
+              {t('title')}
+            </h3>
             <p className="mt-1 text-sm text-gray-600">
-              扫码进群即可免费领取全流程租房手册
+              {t('description')}
             </p>
           </div>
 
@@ -66,19 +74,19 @@ export function WeChatGroupEntry() {
           <div className="flex justify-center">
             <img
               src="/wechat-qrcode.png"
-              alt="微信群二维码"
+              alt={t('ariaLabel')}
               className="h-48 w-48 rounded-lg border-2 border-gray-200"
             />
           </div>
 
           {/* 备注提示 */}
           <p className="mt-2 text-center text-xs text-red-600 font-medium">
-            进群请备注: 学校
+            {t('note')}
           </p>
 
           {/* 提示文字 */}
           <p className="mt-1 text-center text-xs text-gray-500">
-            长按识别二维码加入社群
+            {t('instruction')}
           </p>
         </div>
       )}

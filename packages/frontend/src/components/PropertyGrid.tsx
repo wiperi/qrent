@@ -2,9 +2,10 @@
 
 import { useTRPCClient } from '@/lib/trpc';
 import { SCHOOL } from '@qrent/shared/enum';
-import { useQuery } from '@tanstack/react-query';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { useTranslations } from 'next-intl';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import { useAuth } from '@/hooks/use-auth';
 import PropertyCard from './PropertyCard';
 import Section from './Section';
 
@@ -12,10 +13,12 @@ export default function PropertyGrid() {
   const t = useTranslations('PropertyGrid');
   const [selectedUniversity, setSelectedUniversity] = useState(SCHOOL.UNSW);
   const trpc = useTRPCClient();
+  const queryClient = useQueryClient();
+  const { user, isLoading } = useAuth();
 
   // 获取房产列表
   const { data, isPending, error } = useQuery({
-    queryKey: ['properties.search', selectedUniversity],
+    queryKey: ['properties.search', selectedUniversity, user?.id],
     queryFn: () =>
       trpc.properties.search.query({
         targetSchool: selectedUniversity,
@@ -30,6 +33,8 @@ export default function PropertyGrid() {
           },
         ],
       }),
+    enabled: !isLoading, // 只在认证状态确定后才启用查询
+    
   });
 
   // @Deprecated: 后端应该直接返回房源状态
@@ -149,13 +154,13 @@ export default function PropertyGrid() {
             propertyType={property.propertyType}
             commuteTime={property.commuteTime ?? undefined}
             url={property.url}
+            thumbnailUrl={property.thumbnailUrl}
+            subscribed={property.subscribed}
             averageScore={property.averageScore}
             keywords={property.keywords}
             availableDate={property.availableDate}
             publishedAt={property.publishedAt}
-            thumbnailUrl={property.thumbnailUrl}
-            isSubscribed={false}
-            subscriptionsLoading={false}
+            propertyId={property.id as number}
           />
         ))}
       </div>

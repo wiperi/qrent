@@ -1,4 +1,9 @@
 {
+  "FavoritePage": {
+    "title": "My Favorites",
+    "emptyState": "You haven't saved any properties to your favorites yet. Browse properties and click the heart icon to add them here.",
+    "errorState": "Failed to load favorites. Please try again later."
+  },
   "Header": {
     "login": "Log in",
     "signup": "Sign up",
@@ -8,6 +13,8 @@
     "closeMenu": "Close menu",
     "rentalGuide": "Rental Guide",
     "documentPreparation": "Document Preparation",
+    "favorite": "Favorites",
+    "homepage": "Homepage",
     "rentalBlog": "Guide"
   },
   "SearchBar": {
@@ -240,6 +247,8 @@
     "minToUniversity": "min to university",
     "source": "Source",
     "flatmatesWarning": "Friendly reminder: Information on this website varies in quality. Please exercise caution and assess potential risks yourself.",
+    "subscribe": "Add to Favorites",
+    "unsubscribe": "Remove from Favorites",
     "keywords": {
       "bedroom": "bedroom",
       "bedrooms": "bedrooms",
@@ -294,5 +303,12 @@
       "beach": "beach",
       "elegance": "elegance"
     }
+  },
+  "WeChatGroupEntry": {
+    "title": "Rental Community",
+    "description": "Scan to join and get free rental guide",
+    "note": "Note: Please mention your school",
+    "instruction": "Long press to scan and join",
+    "ariaLabel": "Rental Community"
   }
 }

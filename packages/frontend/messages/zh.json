@@ -1,4 +1,9 @@
 {
+  "FavoritePage": {
+    "title": "我的收藏",
+    "emptyState": "您还没有保存任何房产到收藏夹。浏览房产并点击爱心图标将它们添加到这里。",
+    "errorState": "加载收藏列表失败，请稍后重试。"
+  },
   "Header": {
     "login": "登录",
     "signup": "注册",
@@ -8,7 +13,9 @@
     "closeMenu": "关闭菜单",
     "rentalGuide": "租房指南",
     "documentPreparation": "文件准备",
-    "rentalBlog": "攻略"
+    "rentalBlog": "租房攻略",
+    "favorite": "我的收藏",
+    "homepage": "首页"
   },
   "SearchBar": {
     "placeholder": "按城市、地址或学校搜索...",
@@ -240,6 +247,8 @@
     "minToUniversity": "分钟到学校",
     "source": "来源网站",
     "flatmatesWarning": "温馨提示：该网站信息鱼龙混杂，潜在风险需自行判断，请谨慎选择。",
+    "subscribe": "加入收藏",
+    "unsubscribe": "取消收藏",
     "keywords": {
       "bedroom": "卧室",
       "bedrooms": "卧室",
@@ -294,5 +303,12 @@
       "beach": "海滩",
       "elegance": "优雅"
     }
+  },
+  "WeChatGroupEntry": {
+    "title": "租房社群",
+    "description": "扫码进群即可免费领取全流程租房手册",
+    "note": "进群请备注: 学校",
+    "instruction": "长按识别二维码加入社群",
+    "ariaLabel": "租房社群"
   }
 }
