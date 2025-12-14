@@ -37,3 +37,6 @@ yarn-error.log*
 # Specific files to ignore
 CHANGELOG.md
 LICENSE
+
+# RAG / LlamaIndex generated files
+packages/agent/knowledge/
