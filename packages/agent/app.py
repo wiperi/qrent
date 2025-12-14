@@ -2,7 +2,7 @@
 import uvicorn
 from fastapi import FastAPI
 from pydantic import BaseModel
-<<<<<<< HEAD
+
 from langchain_core.messages import HumanMessage
 from src.agent.graph import graph, State 
 
