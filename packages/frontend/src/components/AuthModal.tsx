@@ -1,24 +1,14 @@
 'use client';
 
-import { useEffect, useState } from 'react';
 import { HiX } from 'react-icons/hi';
 import LoginForm from './LoginForm';
-import SignupForm from './SignupForm';
 
 interface AuthModalProps {
   isOpen: boolean;
   onClose: () => void;
-  initialMode?: 'login' | 'signup';
 }
 
-export default function AuthModal({ isOpen, onClose, initialMode = 'login' }: AuthModalProps) {
-  const [mode, setMode] = useState<'login' | 'signup'>(initialMode);
-
-  // Update mode when initialMode changes
-  useEffect(() => {
-    setMode(initialMode);
-  }, [initialMode]);
-
+export default function AuthModal({ isOpen, onClose }: AuthModalProps) {
   if (!isOpen) return null;
 
   const handleSuccess = () => {
@@ -44,17 +34,7 @@ export default function AuthModal({ isOpen, onClose, initialMode = 'login' }: Au
 
           {/* Content */}
           <div className="p-6">
-            {mode === 'login' ? (
-              <LoginForm
-                onSuccess={handleSuccess}
-                onSwitchToSignup={() => setMode('signup')}
-              />
-            ) : (
-              <SignupForm
-                onSuccess={handleSuccess}
-                onSwitchToLogin={() => setMode('login')}
-              />
-            )}
+            <LoginForm onSuccess={handleSuccess} />
           </div>
         </div>
       </div>

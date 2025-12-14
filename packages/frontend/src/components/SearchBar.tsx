@@ -36,7 +36,7 @@ export default function SearchBar() {
     setTargetSchool(searchParams.get('university') || 'UNSW');
     setMaxPrice(searchParams.get('priceMax') || '');
     setCommuteTime(searchParams.get('commuteMax') || '');
-    setNumBedrooms(searchParams.get('bedroomsMax') || '');
+    setNumBedrooms(searchParams.get('bedroomsMin') || '');
   }, [searchParams]);
 
   useEffect(() => {
@@ -44,11 +44,8 @@ export default function SearchBar() {
     if (heading) heading.focus();
   }, [searchParams]);
 
-  const onSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    const params = new URLSearchParams(searchParams.toString());
-
-    // Set first-level filter parameters
+  // Helper function to update URL params with current filter values
+  const updateParamsWithFilters = (params: URLSearchParams) => {
     const setOrDelete = (key: string, val: string) => {
       if (val && val.trim() !== '') params.set(key, val);
       else params.delete(key);
@@ -58,11 +55,14 @@ export default function SearchBar() {
     setOrDelete('priceMax', maxPrice);
     setOrDelete('commuteMax', commuteTime);
     setOrDelete('bedroomsMin', numBedrooms);
+    setOrDelete('bedroomsMax', numBedrooms && parseInt(numBedrooms) < 5 ? numBedrooms : '');
+  };
 
-    if (parseInt(numBedrooms) < 5) {
-      setOrDelete('bedroomsMax', numBedrooms);
-    }
+  const onSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    const params = new URLSearchParams(searchParams.toString());
 
+    updateParamsWithFilters(params);
     params.set('page', '1');
     router.push(`/${locale}/search?${params.toString()}`);
   };
@@ -159,20 +159,7 @@ export default function SearchBar() {
             onClick={() => {
               const params = new URLSearchParams(searchParams.toString());
 
-              // Set first-level filter values before opening modal
-              const setOrDelete = (key: string, val: string) => {
-                if (val && val.trim() !== '') params.set(key, val);
-                else params.delete(key);
-              };
-
-              setOrDelete('university', targetSchool);
-              setOrDelete('priceMax', maxPrice);
-              setOrDelete('commuteMax', commuteTime);
-              setOrDelete('bedroomsMin', numBedrooms);
-
-              if (parseInt(numBedrooms) < 5) {
-                setOrDelete('bedroomsMax', numBedrooms);
-              }
+              updateParamsWithFilters(params);
 
               if (pathname === `/${locale}/search`) {
                 params.set('filters', 'open');

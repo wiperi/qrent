@@ -12,7 +12,6 @@ import LanguageSwitcher from './LanguageSwitcher'
 export default function Header() {
   const [isDrawerOpen, setIsDrawerOpen] = useState(false)
   const [authModalOpen, setAuthModalOpen] = useState(false)
-  const [authMode, setAuthMode] = useState<'login' | 'signup'>('login')
   const [userMenuOpen, setUserMenuOpen] = useState(false)
   const userMenuRef = useRef<HTMLDivElement>(null)
 
@@ -30,8 +29,7 @@ export default function Header() {
     document.body.classList.toggle('overflow-hidden')
   }
 
-  const openAuthModal = (mode: 'login' | 'signup') => {
-    setAuthMode(mode)
+  const openAuthModal = () => {
     setAuthModalOpen(true)
   }
 
@@ -95,13 +93,13 @@ export default function Header() {
                 {!user ? (
                   <>
                     <button
-                      onClick={() => openAuthModal('login')}
+                      onClick={openAuthModal}
                       className="px-3 py-2 text-sm font-medium text-slate-700 hover:text-blue-600 transition-colors"
                     >
                       {t('login')}
                     </button>
                     <button
-                      onClick={() => openAuthModal('signup')}
+                      onClick={openAuthModal}
                       className="px-3 py-2 text-sm font-semibold text-white bg-blue-600 hover:bg-blue-700 rounded-md transition-colors"
                     >
                       {t('signup')}
@@ -191,13 +189,13 @@ export default function Header() {
               {!user ? (
                 <>
                   <button
-                    onClick={() => { openAuthModal('login'); closeDrawer(); }}
+                    onClick={() => { openAuthModal(); closeDrawer(); }}
                     className="block w-full text-left rounded-md px-3 py-2 text-slate-700 hover:bg-slate-100 hover:text-blue-600"
                   >
                     {t('login')}
                   </button>
                   <button
-                    onClick={() => { openAuthModal('signup'); closeDrawer(); }}
+                    onClick={() => { openAuthModal(); closeDrawer(); }}
                     className="block w-full text-left rounded-md px-3 py-2 text-white bg-blue-600 hover:bg-blue-700"
                   >
                     {t('signup')}
@@ -226,7 +224,6 @@ export default function Header() {
       <AuthModal
         isOpen={authModalOpen}
         onClose={() => setAuthModalOpen(false)}
-        initialMode={authMode}
       />
     </>
   )

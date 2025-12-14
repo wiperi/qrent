@@ -11,16 +11,21 @@ datasource db {
 model User {
   id               Int               @id @default(autoincrement()) @db.UnsignedInt
   email            String            @unique @db.VarChar(50)
-  password         String            @db.VarChar(200)
+  password         String?           @db.VarChar(200)
   name             String            @default("User") @db.VarChar(50)
   gender           Int?              @db.UnsignedTinyInt
   phone            String?           @unique @db.Char(11)
   emailVerified    Boolean           @default(false) @map("email_verified")
+  authProvider     String?           @default("email") @map("auth_provider") @db.VarChar(20)
+  oauthProviderId  String?           @unique @map("oauth_provider_id") @db.VarChar(255)
+  avatarUrl        String?           @map("avatar_url") @db.VarChar(500)
   emailPreferences EmailPreference[]
   preferences      Preference[]
   userSessions     UserSession[]
   properties       Property[]        @relation("PropertyToUser")
 
+  @@index([authProvider])
+  @@index([oauthProviderId])
   @@map("users")
 }
 
