@@ -3,67 +3,13 @@ import HttpError from '@/error/HttpError';
 import { generateToken } from '@/utils/helper';
 import redis from '@/utils/redisClient';
 import { emailService } from '@/services/EmailService';
-import { hashPassword, comparePassword } from '@/utils/bcrypt';
 import { userService } from './UserService';
 import { oauthService } from './OAuthService';
 
 class AuthService {
-  async register(userData: User): Promise<string> {
-    if (await prisma.user.findUnique({ where: { email: userData.email } })) {
-      throw new HttpError(400, 'Email already exists');
-    }
-
-    const user = await prisma.user.create({
-      data: {
-        ...userData,
-        password: await hashPassword(userData.password),
-        authProvider: 'email',
-      },
-    });
-
-    // Generate JWT token
-    const token = generateToken(user.id);
-
-    await this.createUserSession(user.id, token);
-
-    return token;
-  }
-
-  async login(userData: Pick<User, 'email' | 'password'>): Promise<string> {
-    const user = await prisma.user.findUnique({
-      where: { email: userData.email },
-    });
-
-    if (!user) {
-      throw new HttpError(400, 'Email not found');
-    }
-
-    // OAuth 用户不允许使用密码登录
-    if (user.authProvider && user.authProvider !== 'email') {
-      throw new HttpError(400, `Please login with ${user.authProvider}`);
-    }
-
-    if (!user.password) {
-      throw new HttpError(400, 'Password login not available for this account');
-    }
-
-    const isPasswordValid = await comparePassword(userData.password, user.password);
-    if (!isPasswordValid) {
-      throw new HttpError(400, 'Invalid password');
-    }
-
-    // Generate JWT token
-    const token = generateToken(user.id);
-
-    await this.createUserSession(user.id, token);
-
-    return token;
-  }
-
   async changeAuthProfile(
     userId: number,
-    oldPassword: string,
-    newData: Pick<User, 'password' | 'phone' | 'email'>
+    newData: Pick<User, 'phone' | 'email'>
   ) {
     const user = await prisma.user.findUnique({
       where: { id: userId },
@@ -71,15 +17,6 @@ class AuthService {
 
     if (!user) {
       throw new HttpError(400, 'User not found');
-    }
-
-    const isOldPasswordValid = await comparePassword(oldPassword, user.password);
-    if (!isOldPasswordValid) {
-      throw new HttpError(400, 'Invalid old password');
-    }
-
-    if (newData.password && (await comparePassword(newData.password, user.password))) {
-      throw new HttpError(400, 'New password cannot be the same as the old password');
     }
 
     if (newData.email && (await prisma.user.findUnique({ where: { email: newData.email } }))) {
@@ -93,7 +30,6 @@ class AuthService {
     await prisma.user.update({
       where: { id: userId },
       data: {
-        password: newData.password ? await hashPassword(newData.password) : user.password,
         phone: newData.phone ?? user.phone,
         email: newData.email ?? user.email,
         emailVerified: newData.email === user.email ? user.emailVerified : false,
