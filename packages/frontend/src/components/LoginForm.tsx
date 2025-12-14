@@ -3,6 +3,7 @@
 import { useAuth } from '@/hooks/use-auth';
 import { useTranslations } from 'next-intl';
 import { useState } from 'react';
+import GoogleLoginButton from './GoogleLoginButton';
 
 interface LoginFormProps {
   onSuccess?: () => void;
@@ -39,6 +40,24 @@ export default function LoginForm({ onSuccess, onSwitchToSignup }: LoginFormProp
         <h2 className="text-2xl font-bold text-center text-gray-900 mb-6">
           {t('loginTitle')}
         </h2>
+
+        {/* Google 登录按钮 */}
+        <div className="mb-4">
+          <GoogleLoginButton
+            onSuccess={onSuccess}
+            onError={(err) => setError(err)}
+          />
+        </div>
+
+        {/* 分隔线 */}
+        <div className="relative my-6">
+          <div className="absolute inset-0 flex items-center">
+            <div className="w-full border-t border-gray-300"></div>
+          </div>
+          <div className="relative flex justify-center text-sm">
+            <span className="px-2 bg-white text-gray-500">或使用邮箱登录</span>
+          </div>
+        </div>
 
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>

@@ -11,6 +11,7 @@ import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { HiEye, HiEyeOff } from 'react-icons/hi';
 import { z } from 'zod';
+import GoogleLoginButton from './GoogleLoginButton';
 
 type FormData = {
   name?: string;
@@ -70,9 +71,27 @@ export default function SignupForm({ onSuccess, onSwitchToLogin }: SignupFormPro
           <CardTitle className="text-2xl font-bold text-center">{t('signupTitle')}</CardTitle>
         </CardHeader>
 
+        {/* Google 登录按钮 */}
+        <CardContent className="pb-0">
+          <GoogleLoginButton
+            onSuccess={onSuccess}
+            onError={(err) => form.setError("root", { type: "manual", message: err })}
+          />
+
+          {/* 分隔线 */}
+          <div className="relative my-6">
+            <div className="absolute inset-0 flex items-center">
+              <div className="w-full border-t border-gray-300"></div>
+            </div>
+            <div className="relative flex justify-center text-sm">
+              <span className="px-2 bg-white text-gray-500">或使用邮箱注册</span>
+            </div>
+          </div>
+        </CardContent>
+
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
-            <CardContent className="space-y-4">
+            <CardContent className="space-y-4 pt-0">
               <FormField
                 control={form.control}
                 name="name"

@@ -5,6 +5,7 @@ import redis from '@/utils/redisClient';
 import { emailService } from '@/services/EmailService';
 import { hashPassword, comparePassword } from '@/utils/bcrypt';
 import { userService } from './UserService';
+import { oauthService } from './OAuthService';
 
 class AuthService {
   async register(userData: User): Promise<string> {
@@ -16,19 +17,14 @@ class AuthService {
       data: {
         ...userData,
         password: await hashPassword(userData.password),
+        authProvider: 'email',
       },
     });
 
     // Generate JWT token
     const token = generateToken(user.id);
 
-    await prisma.userSession.create({
-      data: {
-        userId: user.id,
-        token,
-        expiresAt: new Date(Date.now() + 90 * 24 * 60 * 60 * 1000),
-      },
-    });
+    await this.createUserSession(user.id, token);
 
     return token;
   }
@@ -42,6 +38,15 @@ class AuthService {
       throw new HttpError(400, 'Email not found');
     }
 
+    // OAuth 用户不允许使用密码登录
+    if (user.authProvider && user.authProvider !== 'email') {
+      throw new HttpError(400, `Please login with ${user.authProvider}`);
+    }
+
+    if (!user.password) {
+      throw new HttpError(400, 'Password login not available for this account');
+    }
+
     const isPasswordValid = await comparePassword(userData.password, user.password);
     if (!isPasswordValid) {
       throw new HttpError(400, 'Invalid password');
@@ -50,13 +55,7 @@ class AuthService {
     // Generate JWT token
     const token = generateToken(user.id);
 
-    await prisma.userSession.create({
-      data: {
-        userId: user.id,
-        token,
-        expiresAt: new Date(Date.now() + 90 * 24 * 60 * 60 * 1000),
-      },
-    });
+    await this.createUserSession(user.id, token);
 
     return token;
   }
@@ -145,6 +144,86 @@ class AuthService {
     await prisma.user.update({
       where: { id: user.id },
       data: { emailVerified: true },
+    });
+  }
+
+  /**
+   * Google OAuth 登录/注册
+   * 逻辑：
+   * 1. 验证 Google ID token
+   * 2. 检查是否已有该 Google 账号（通过 oauthProviderId）
+   * 3. 如果存在，直接登录
+   * 4. 如果不存在，检查邮箱是否已注册
+   *    - 如果邮箱已存在：绑定 Google 到现有账号（账号合并）
+   *    - 如果邮箱不存在：创建新账号
+   */
+  async googleOAuthLogin(idToken: string): Promise<string> {
+    // 1. 验证 Google token，获取 sub 和 email
+    const googleUser = await oauthService.verifyGoogleToken(idToken);
+
+    // 2. 查找是否已有该 Google 账号
+    let user = await prisma.user.findUnique({
+      where: { oauthProviderId: googleUser.sub },
+    });
+
+    if (user) {
+      // 已有 Google 账号，直接登录
+      const token = generateToken(user.id);
+      await this.createUserSession(user.id, token);
+      return token;
+    }
+
+    // 3. 检查邮箱是否已注册（账号合并逻辑）
+    user = await prisma.user.findUnique({
+      where: { email: googleUser.email },
+    });
+
+    if (user) {
+      // 邮箱已存在，绑定 Google 到现有账号
+      user = await prisma.user.update({
+        where: { id: user.id },
+        data: {
+          authProvider: 'google',
+          oauthProviderId: googleUser.sub,
+          emailVerified: true,
+          avatarUrl: googleUser.picture,
+          name: googleUser.name || user.name,
+        },
+      });
+
+      const token = generateToken(user.id);
+      await this.createUserSession(user.id, token);
+      return token;
+    }
+
+    // 4. 创建新账号
+    user = await prisma.user.create({
+      data: {
+        email: googleUser.email,
+        password: null,
+        name: googleUser.name || 'User',
+        authProvider: 'google',
+        oauthProviderId: googleUser.sub,
+        emailVerified: true,
+        avatarUrl: googleUser.picture,
+      },
+    });
+
+    const token = generateToken(user.id);
+    await this.createUserSession(user.id, token);
+    return token;
+  }
+
+  /**
+   * 创建用户会话（私有方法）
+   */
+  private async createUserSession(userId: number, token: string): Promise<void> {
+    await prisma.userSession.create({
+      data: {
+        userId,
+        token,
+        expiresAt: new Date(Date.now() + 90 * 24 * 60 * 60 * 1000),
+      },
     });
   }
 }

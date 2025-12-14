@@ -74,6 +74,13 @@ export const authRouter = t.router({
       await authService.verifyEmail(input.email, input.code);
       return { ok: true };
     }),
+
+  googleOAuthLogin: publicProcedure
+    .input(z.object({ idToken: z.string().min(1) }))
+    .mutation(async ({ input }) => {
+      const token = await authService.googleOAuthLogin(input.idToken);
+      return { token };
+    }),
 });
 
 export type AuthRouter = typeof authRouter;

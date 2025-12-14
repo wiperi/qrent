@@ -1,4 +1,5 @@
 import { AuthProvider } from '@/lib/auth-context';
+import { OAuthProvider } from '@/lib/oauth-provider';
 import AppTRPCProvider from '@/lib/trpc-provider';
 import type { Metadata } from 'next';
 import Script from 'next/script';
@@ -45,11 +46,13 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       </head>
       <body className="bg-white text-slate-800 antialiased">
         <AppTRPCProvider>
-          <AuthProvider>
-            <MainContentWrapper>{children}</MainContentWrapper>
-            <AIChatToggleButton />
-            <AIChatBox />
-          </AuthProvider>
+          <OAuthProvider>
+            <AuthProvider>
+              <MainContentWrapper>{children}</MainContentWrapper>
+              <AIChatToggleButton />
+              <AIChatBox />
+            </AuthProvider>
+          </OAuthProvider>
         </AppTRPCProvider>
         <Analytics />
       </body>

@@ -18,6 +18,7 @@ interface AuthContextType {
   token: string | null;
   isLoading: boolean;
   login: (email: string, password: string) => Promise<void>;
+  googleLogin: (idToken: string) => Promise<void>;
   register: (email: string, password: string, name?: string) => Promise<void>;
   logout: () => void;
   refreshUser: () => void;
@@ -32,6 +33,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   const loginMutation = useMutation(
     trpc.auth.login.mutationOptions()
+  );
+  const googleLoginMutation = useMutation(
+    trpc.auth.googleOAuthLogin.mutationOptions()
   );
   const registerMutation = useMutation(
     trpc.auth.register.mutationOptions()
@@ -63,6 +67,11 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     setToken(result.token);
   };
 
+  const googleLogin = async (idToken: string) => {
+    const result = await googleLoginMutation.mutateAsync({ idToken });
+    setToken(result.token);
+  };
+
   const register = async (email: string, password: string, name?: string) => {
     const result = await registerMutation.mutateAsync({ email, password, name });
     setToken(result.token);
@@ -83,6 +92,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     token,
     isLoading: isLoading || userQuery.isLoading,
     login,
+    googleLogin,
     register,
     logout,
     refreshUser,
