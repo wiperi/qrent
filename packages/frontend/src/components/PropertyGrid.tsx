@@ -2,19 +2,23 @@
 
 import { useTRPCClient } from '@/lib/trpc';
 import { SCHOOL } from '@qrent/shared/enum';
-import { useQuery } from '@tanstack/react-query';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { useTranslations } from 'next-intl';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import { useAuth } from '@/hooks/use-auth';
 import PropertyCard from './PropertyCard';
 import Section from './Section';
-
 
 export default function PropertyGrid() {
   const t = useTranslations('PropertyGrid');
   const [selectedUniversity, setSelectedUniversity] = useState(SCHOOL.UNSW);
   const trpc = useTRPCClient();
+  const queryClient = useQueryClient();
+  const { user, isLoading } = useAuth();
+
+  // 获取房产列表
   const { data, isPending, error } = useQuery({
-    queryKey: ['properties.search', selectedUniversity],
+    queryKey: ['properties.search', selectedUniversity, user?.id],
     queryFn: () =>
       trpc.properties.search.query({
         targetSchool: selectedUniversity,
@@ -22,14 +26,36 @@ export default function PropertyGrid() {
         page: 1,
         orderBy: [
           {
-            availableDate: 'desc' as const,
+            publishedAt: 'desc' as const,
           },
           {
             averageScore: 'desc' as const,
           },
         ],
       }),
+    enabled: !isLoading, // 只在认证状态确定后才启用查询
+    
   });
+
+  // @Deprecated: 后端应该直接返回房源状态
+  // // 获取用户收藏列表
+  // const { data: subscriptions, isLoading: subscriptionsLoading } = useQuery({
+  //   queryKey: ['properties.getSubscriptions'],
+  //   queryFn: () => trpc.properties.getSubscriptions.query(),
+  //   enabled: typeof window !== 'undefined' && !!localStorage.getItem('auth-token'),
+  //   // initialData: getCachedSubscriptions(), // 注释掉：localStorage缓存会造成多端不一致
+  // });
+
+  // // 创建收藏 ID 的 Set 用于快速查找
+  // const subscribedPropertyIds = new Set(subscriptions?.map((sub: Subscription) => sub.id) || []);
+
+  // 当 subscriptions 更新时，保存到 localStorage
+  // 注释掉：localStorage缓存会造成多端不一致
+  // useEffect(() => {
+  //   if (typeof window !== 'undefined' && subscriptions && subscriptions.length >= 0) {
+  //     localStorage.setItem(SUBSCRIPTIONS_CACHE_KEY, JSON.stringify(subscriptions));
+  //   }
+  // }, [subscriptions]);
 
   const getUniversityColors = (school: string, isSelected: boolean) => {
     const colors = {
@@ -53,17 +79,18 @@ export default function PropertyGrid() {
   };
 
   const sectionTitle = (
-    <div className="flex items-center gap-3">
-      <span>{t('dailyNewHouses')}</span>
-      <div className="flex rounded-lg border border-slate-200 bg-slate-50">
+    <div className="flex flex-wrap justify-center items-center gap-3">
+      <span className="flex-shrink-0">{t('dailyNewHouses')}</span>
+      <div className="flex flex-wrap rounded-lg border border-slate-200 bg-slate-50">
         {Object.values(SCHOOL).map(school => (
           <button
             key={school}
             onClick={() => setSelectedUniversity(school)}
-            className={`px-3 py-2 transition-colors rounded-md ${selectedUniversity === school
-              ? `${getUniversityColors(school, true)} shadow-sm`
-              : getUniversityColors(school, false)
-              }`}
+            className={`px-3 py-2 transition-colors rounded-md ${
+              selectedUniversity === school
+                ? `${getUniversityColors(school, true)} shadow-sm`
+                : getUniversityColors(school, false)
+            }`}
           >
             {school}
           </button>
@@ -107,23 +134,33 @@ export default function PropertyGrid() {
 
   const properties = data?.properties || [];
 
+  // 🔥 在前端按评分降序排序(从高到低)
+  const sortedProperties = [...properties].sort((a, b) => {
+    return (b.averageScore || 0) - (a.averageScore || 0);
+  });
+
   return (
     <Section title={sectionTitle}>
       <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-        {properties.map((property) => (
+        {sortedProperties.map(property => (
           <PropertyCard
-            key={property.id as string | number}
-            address={property.address as string}
-            region={(property.region as string) || ''}
-            price={property.price as number}
-            bedroomCount={property.bedroomCount as number}
-            bathroomCount={property.bathroomCount as number}
-            propertyType={property.propertyType as number}
-            commuteTime={(property.commuteTime as number) ?? undefined}
-            url={property.url as string}
-            averageScore={property.averageScore as number}
-            keywords={property.keywords as string}
-            availableDate={property.availableDate as string}
+            id={property.id}
+            key={property.id}
+            address={property.address}
+            region={property.region || ''}
+            price={property.price}
+            bedroomCount={property.bedroomCount}
+            bathroomCount={property.bathroomCount}
+            propertyType={property.propertyType}
+            commuteTime={property.commuteTime ?? undefined}
+            url={property.url}
+            thumbnailUrl={property.thumbnailUrl}
+            subscribed={property.subscribed}
+            averageScore={property.averageScore}
+            keywords={property.keywords}
+            availableDate={property.availableDate}
+            publishedAt={property.publishedAt}
+            propertyId={property.id as number}
           />
         ))}
       </div>

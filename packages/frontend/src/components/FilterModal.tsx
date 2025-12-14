@@ -185,7 +185,7 @@ export default function FilterModal() {
         role="dialog"
         aria-modal="true"
         aria-labelledby="filter-modal-title"
-        className="absolute inset-x-0 top-0 mx-auto mt-28 w-[min(900px,92vw)] overflow-hidden rounded-2xl bg-white shadow-2xl"
+        className="absolute inset-x-0 top-0 mx-auto mt-20 w-[min(900px,92vw)] overflow-auto rounded-2xl bg-white shadow-2xl"
       >
         {/* Header */}
         <div className="flex items-center justify-between border-b px-5 py-3">
@@ -201,7 +201,7 @@ export default function FilterModal() {
         </div>
 
         {/* Content */}
-        <div className="max-h-[70vh] overflow-y-auto px-5 py-4 space-y-6">
+        <div className="h-[calc(100vh-280px)] overflow-y-auto px-5 py-4 space-y-6">
           {/* University (single-select) */}
           {/* <section>
             <h3 className="text-sm font-medium text-slate-800 mb-3">University</h3>
@@ -281,9 +281,9 @@ export default function FilterModal() {
                 type="number"
                 min="0"
                 placeholder={t('min')}
-                className="rounded-xl border border-slate-200 px-3 py-2"
+                className="rounded-xl border border-slate-200 text-sm text-slate-700 placeholder-slate-400 px-3 py-2"
               />
-              <input value={bathroomsMax} onChange={e => setBathroomsMax(e.target.value)} type="number" placeholder={t('max')} className="rounded-xl border border-slate-200 px-3 py-2" />
+              <input value={bathroomsMax} onChange={e => setBathroomsMax(e.target.value)} type="number" placeholder={t('max')} className="rounded-xl border border-slate-200 text-sm text-slate-700 placeholder-slate-400 px-3 py-2" />
             </div>
           </section>
 
@@ -294,7 +294,7 @@ export default function FilterModal() {
               value={moveInDate}
               onChange={e => setMoveInDate(e.target.value)}
               type="date"
-              className="w-full rounded-xl border border-slate-200 px-3 py-2"
+              className="w-full rounded-xl border border-slate-200 text-sm text-slate-700 placeholder-slate-400 px-3 py-2"
             />
           </section>
 

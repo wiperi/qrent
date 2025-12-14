@@ -1,4 +1,9 @@
 {
+  "FavoritePage": {
+    "title": "My Favorites",
+    "emptyState": "You haven't saved any properties to your favorites yet. Browse properties and click the heart icon to add them here.",
+    "errorState": "Failed to load favorites. Please try again later."
+  },
   "Header": {
     "login": "Log in",
     "signup": "Sign up",
@@ -8,7 +13,9 @@
     "closeMenu": "Close menu",
     "rentalGuide": "Rental Guide",
     "documentPreparation": "Document Preparation",
-    "rentalBlog": "Rental Blog"
+    "favorite": "Favorites",
+    "homepage": "Homepage",
+    "rentalBlog": "Guide"
   },
   "SearchBar": {
     "placeholder": "Search by city, address or school...",
@@ -26,13 +33,6 @@
     "fourBedrooms": "4 bedrooms",
     "fivePlusBedrooms": "5+ bedrooms"
   },
-  "PropertyCard": {
-    "bedrooms": "bedrooms",
-    "bathrooms": "bathrooms",
-    "parking": "parking",
-    "availableFrom": "Available from",
-    "viewDetails": "View Details"
-  },
   "FilterModal": {
     "title": "Filters",
     "priceRange": "Price Range",
@@ -49,7 +49,15 @@
     "apartment": "Apartment",
     "min": "Min",
     "max": "Max",
-    "rating": "Rating"
+    "rating": "Rating",
+    "price": "Price",
+    "bedroomSuffix": "BR",
+    "bathroomSuffix": "BA",
+    "minutes": "min",
+    "ratingSuffix": "",
+    "commute": "Commute",
+    "currentFilters": "Current filters:",
+    "clearAllFilters": "Clear all"
   },
   "Auth": {
     "loginTitle": "Welcome back",
@@ -235,7 +243,12 @@
     "availableNow": "Available now",
     "availableInDays": "Available in {days} day{plural}",
     "available": "Available",
+    "published": "Published on",
     "minToUniversity": "min to university",
+    "source": "Source",
+    "flatmatesWarning": "Friendly reminder: Information on this website varies in quality. Please exercise caution and assess potential risks yourself.",
+    "subscribe": "Add to Favorites",
+    "unsubscribe": "Remove from Favorites",
     "keywords": {
       "bedroom": "bedroom",
       "bedrooms": "bedrooms",
@@ -290,5 +303,12 @@
       "beach": "beach",
       "elegance": "elegance"
     }
+  },
+  "WeChatGroupEntry": {
+    "title": "Rental Community",
+    "description": "Scan to join and get free rental guide",
+    "note": "Note: Please mention your school",
+    "instruction": "Long press to scan and join",
+    "ariaLabel": "Rental Community"
   }
 }

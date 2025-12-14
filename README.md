@@ -1,135 +1,205 @@
-Qrent
+<div align="center">
+  <img alt="QRent logo" src="./packages/frontend/public/qrent-logo.svg" height="128">
+  <h1>QRent</h1>
 
-Website: www.qrent.rent
+<a href="https://www.qrent.rent"><img alt="Website" src="https://img.shields.io/badge/website-qrent.rent-blue?style=for-the-badge"></a>
+<a href="https://github.com/wiperi/qrent/blob/main/LICENSE"><img alt="License" src="https://img.shields.io/badge/license-NCL%201.0-orange?style=for-the-badge"></a>
+<a href="https://github.com/wiperi/qrent/issues"><img alt="Issues" src="https://img.shields.io/github/issues/wiperi/qrent?style=for-the-badge"></a>
+<br>
+<a href="https://deepwiki.com/wiperi/qrent"><img src="https://deepwiki.com/badge.svg" alt="Ask DeepWiki"></a>
+</div>
 
-Qrent is an AI-powered rental platform built for international students in Australia.
-It helps students find housing smarter and faster by analyzing commute time, budget, and area data to recommend the most suitable rentals — all in one place.
+English | [简体中文](./README_CN.md)
 
-🌟 Key Features
+## About QRent
 
-AI-Based Recommendations: Personalized rental suggestions based on commute, budget, and lifestyle.
+QRent is an AI-powered rental platform built for students in Australia. It helps students find housing smarter and faster by analyzing commute time, budget, and area data to recommend the most suitable rentals — all in one place.
 
-Smart Filters: Instantly narrow down listings with intelligent search and filter options.
+## Our Growth
 
-All-in-One Experience: Compare, shortlist, and book — without switching platforms.
+This year, we achieved **4.2K active users** and over **10K page views**. During peak rental season, our DAU reached **200+** and MAU reached **1,500+**.
 
-Local Insights: Understand each suburb’s pros and cons with data-driven summaries.
+<div align="center">
+<img src="./doc/dau-google-analytics.png" alt="Daily Active Users" width="800">
 
-🚀 Mission
+<img src="./doc/mau-cloud-flare.png" alt="Monthly Active Users" width="800">
+</div>
 
-To make renting in Australia simple, transparent, and data-driven — empowering international students to find a real home faster.
+## Key Features
 
-——————————————————————————————————————————————————————————————————————————————————————————————————————————————————————————————————
-# QRent Backend Setup Guide
+- **AI-Driven Recommendation System**: From an international student's perspective, we score and recommend properties based on commute time, budget, lifestyle, and rental success rate. Next, we'll focus on building an agentic-assisted rental experience to minimize housing difficulties caused by information asymmetry.
 
-## Overview
-QRent is a rental property management system with a Node.js backend.
+- **Tailored Experience**: We specialize in providing customized information services for international students in Australia, ensuring every user finds the most suitable accommodation. We will continue to expand our service offerings with the goal of providing end-to-end solutions.
 
-## Prerequisites
-- Node.js (v16+)
-- Docker and Docker Compose
-- pnpm
+- **Smart Filtering**: Through intelligent search and filtering options, users can quickly narrow down property listings based on their school location and find the most suitable options.
 
-## Installation
+- **All-in-One Experience**: We aggregate quality rental listings from across the web, allowing users to compare, filter, and book on a single platform without switching between multiple websites. We will continue to expand property sources to enhance user experience.
 
-### Clone the Repository
-```bash
-git clone https://github.com/yourusername/qrent.git
-cd qrent
+## Getting Started
+
+### Prerequisites
+
+Before you begin, ensure you have the following installed:
+- **Node.js** 20 or higher
+- **pnpm** 8 or higher
+- **Docker** (optional, for running backend dependent services)
+
+You have two main options for development based on your needs.
+
+### Option 1: Frontend Development Only
+
+This option uses the production backend API, perfect for frontend-only development.
+
+1. **Configure environment**:
+   Create a `.env` file in the project root and fill in. So frontend will use the online backend API.:
+   ```bash
+   NEXT_PUBLIC_BACKEND_URL=https://api.qrent.rent
+   ```
+
+2. **Install dependencies**:
+   ```bash
+   pnpm install
+   ```
+
+3. **Build the frontend**:
+   ```bash
+   pnpm --filter packages/frontend build # same effect as cd packages/frontend && pnpm build
+   ```
+
+   > This will first generate Prisma client code, build the backend project, then build the frontend to obtain the tRPC type information.
+
+4. **Run the development server**:
+   ```bash
+   pnpm --filter packages/frontend dev
+   ```
+
+### Option 2: Full Stack Development
+
+This option runs both frontend and backend locally.
+
+1. **Configure environment**:
+   Create a `.env` file in the project root and configure backend-related fields. See `.env.example` for reference:
+   ```bash
+   cp .env.example .env
+   ```
+
+   Edit the `.env` file and fill in database, backend and redis related fields at minimum.
+
+2. **Start backend services**:
+
+   **With Docker**:
+   ```bash
+   docker compose up -d db redis
+   ```
+
+   > Start all services except the backend service itself, those are backend dependent services.
+
+   **Without Docker**:
+   Manually install and start all services defined in `docker-compose.yml` except the backend service, then configure their connection details in `.env`.
+
+3. **Install dependencies**:
+   ```bash
+   pnpm install
+   ```
+
+4. **Generate Prisma client**:
+   ```bash
+   pnpm --filter packages/shared db:generate # Generate Prisma client code and type definitions
+   pnpm --filter packages/shared db:push # Synchronize schema to database
+   ```
+
+5. **Run the backend**:
+   ```bash
+   pnpm --filter packages/backend dev
+   ```
+
+   If successful, you should see:
+   ```
+   > @qrent/backend@1.0.0 dev /home/wiperi/qrent/packages/backend
+   > NODE_ENV=development ts-node-dev -r tsconfig-paths/register -T src/server.ts
+
+   [INFO] 00:19:50 ts-node-dev ver. 2.0.0 (using ts-node ver. 10.9.2, typescript ver. 5.8.2)
+   🔄 Loading: /home/wiperi/qrent/.env
+   ⚡️ Server started on port 3201 at 0.0.0.0
+   You have 0 users in your database
+   You have 0 properties in your database
+   ```
+
+6. **Run the frontend** (in a new terminal):
+   ```bash
+   pnpm --filter packages/frontend dev
+   ```
+
+Check out terminal outputs for port numbers of both backend and frontend.
+
+## Documentation
+
+- **[API Documentation](https://0gqqgjlydk.apifox.cn)** - Backend API reference (REST Version, Same effect as tRPC)
+
+## Community
+
+We welcome contributions and discussions from the community!
+
+- **Report Issues**: Found a bug? [Open an issue](https://github.com/wiperi/qrent/issues)
+- **Discussions**: Have questions or ideas? Start a [discussion](https://github.com/wiperi/qrent/discussions)
+- **Email**: For partnership or general inquiries, contact us at this [email](mailto:solidtreepassing@gmail.com)
+
+## Contributing
+
+Contributions to QRent are welcome! We follow the [Conventional Commits](https://www.conventionalcommits.org/) specification for commit messages.
+
+### Commit Message Format
+
+Each commit message consists of a **type**, **scope** (optional), and **subject**:
+
+```
+<type>(<scope>): <subject>
+
+Examples:
+feat(frontend): add property comparison feature
+fix(backend): resolve JWT token expiration issue
+docs: update README with new setup instructions
+chore(deps): update dependencies
 ```
 
-### Environment Setup
+### Common Types:
+- `feat`: A new feature
+- `fix`: A bug fix
+- `docs`: Documentation changes
+- `style`: Code style changes (formatting, semicolons, etc.)
+- `refactor`: Code refactoring
+- `test`: Adding or updating tests
+- `chore`: Maintenance tasks, dependency updates
 
-1. Create your environment configuration:
-   - Locate the `.env.example` file in the project root
-   - Make a copy and rename it to `.env`
-   - Update the following values according to your setup:
-     - `DATABASE_URL`: Your MySQL connection string
-     - `JWT_SECRET`: A secure random string for authentication
-     - `PORT`: The port for the backend server (default: 3200)
+### Good First Issues
 
-### Development with Docker
+New to the project? Check out issues labeled [`good first issue`](https://github.com/wiperi/qrent/labels/good%20first%20issue) - these are great starting points for newcomers to get familiar with the codebase.
 
-1. **Setup Docker Environment**:
-   - Install [Docker Desktop](https://www.docker.com/products/docker-desktop/) for your operating system
-   - Install the Docker extension for VSCode for better container management
-   - Ensure Docker Compose is installed (comes with Docker Desktop)
+Before contributing, please:
+1. Fork the repository
+2. Create a feature branch (`git checkout -b feat/amazing-feature`)
+3. Commit your changes following the commit message format
+4. Push to your branch (`git push origin feat/amazing-feature`)
+5. Open a Pull Request
 
-2. **Configure for Development Mode**:
-   - Edit the `startup.sh` file in the project root
-   - Replace the last line:
-     ```sh
-     # Change this line:
-     exec pnpm --filter @qrent/backend start
-     
-     # To this for development mode with hot reloading:
-     exec pnpm --filter @qrent/backend dev
-     ```
+## Tech Stack
 
-3. **Start the Development Environment**:
-   - In the project root directory, run:
-     ```sh
-     docker compose up
-     ```
-   - Alternatively, open the docker-compose.yml file in VSCode and click the "Run" button
-   - The first build may take several minutes as it installs dependencies
+- **Frontend**: Next.js 15, React 19, Tailwind CSS v4, tRPC
+- **Backend**: Node.js, Express, tRPC, Prisma ORM
+- **Database**: MySQL 8.0
+- **Cache**: Redis
+- **Scraper**: Python with Playwright
+- **Monorepo**: pnpm workspaces
 
-4. **Monitor the Application**:
-   - View logs in real-time with:
-     ```sh
-     docker logs -f qrent-backend
-     ```
-   - The backend will be available at http://localhost:3200
+## License
 
-5. **Development Workflow**:
-   - Any changes to your code will automatically trigger a restart of the server
-   - The container mounts your local files, so changes are reflected immediately
-   - API endpoints can be tested while the container is running
+This project is licensed under the **Non-Commercial License (NCL 1.0)**.
 
-### Local Development (Without Docker)
+You may use, copy, modify, and distribute the code for non-commercial purposes. Any commercial use requires a separate commercial license from the maintainers. See [LICENSE](./LICENSE) for details.
 
-1. **Database Setup**:
-   - Install MySQL 8.0+ locally or run it in a Docker container:
-     ```sh
-     docker run --name mysql -e MYSQL_ROOT_PASSWORD=password -e MYSQL_DATABASE=qrent -p 3306:3306 -d mysql:8
-     ```
 
-2. **Install Dependencies**:
-   - Navigate to the project root:
-     ```sh
-     cd qrent
-     ```
-   - Install all workspace packages:
-     ```sh
-     pnpm install
-     ```
-   - When prompted, allow post-install scripts to run
+---
 
-3. **Database Initialization**:
-   - Generate Prisma client:
-     ```sh
-     cd packages/shared
-     pnpm db:generate
-     ```
-   - Apply database schema:
-     ```sh
-     pnpm db:push
-     ```
-
-4. **Start the Development Server**:
-   - From the project root:
-     ```sh
-     pnpm --filter @qrent/backend dev
-     ```
-   - The server will start on http://localhost:3200
-
-## Commit Message Guidelines
-
-We follow the [Conventional Commits](https://www.conventionalcommits.org/) specification for our commit messages. This leads to more readable messages that are easy to follow when looking through the project history.
-
-### Format
-
-Each commit message consists of a **header**, a **body**, and a **footer**:
-
-    
-
+<div align="center">
+Made with ❤️ for international students in Australia
+</div>

@@ -1,13 +1,13 @@
-
 'use client';
 
 import PropertyCard from '@/components/PropertyCard';
 import { useTRPCClient } from '@/lib/trpc';
-import { useQuery } from '@tanstack/react-query';
+import { useAuth } from '@/hooks/use-auth';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { useLocale, useTranslations } from 'next-intl';
 import Link from 'next/link';
 import { useSearchParams } from 'next/navigation';
-import { useMemo } from 'react';
+import { useMemo, useEffect } from 'react';
 import { HiSearch } from 'react-icons/hi';
 
 type SearchParams = {
@@ -28,24 +28,10 @@ type SearchParams = {
   areas?: string
 }
 
-type Property = {
-  id: number
-  address: string
-  region: string | null
-  price: number
-  bedroomCount?: number
-  bathroomCount?: number
-  propertyType: number
-  description?: string | null
-  commuteTime?: number | null
-  url: string
-  averageScore: number
-  keywords: string
-  availableDate?: string | null
-}
-
 export default function SearchResults({ searchParams }: { searchParams: SearchParams }) {
   const page = Number(searchParams.page ?? '1') || 1
+  const { user, isLoading } = useAuth();
+  const queryClient = useQueryClient();
 
   // Build search parameters from URL - aligned with backend preferenceSchema
   const searchFilters = useMemo(() => {
@@ -85,11 +71,33 @@ export default function SearchResults({ searchParams }: { searchParams: SearchPa
   const trpc = useTRPCClient()
 
   const { data, isPending, error } = useQuery({
-    queryKey: ['properties.search', searchFilters],
-    queryFn: () => trpc.properties.search.query(searchFilters)
+    queryKey: ['properties.search', searchFilters, user?.id],
+    queryFn: () => trpc.properties.search.query(searchFilters),
+    enabled: !isLoading, // 只在认证状态确定后才启用查询
+   
   })
 
-  const properties: Property[] = data?.properties || []
+  // 当用户登录状态变化时，重新获取房产数据
+  useEffect(() => {
+    if (!isLoading) {
+      queryClient.invalidateQueries({ queryKey: ['properties.search', searchFilters] });
+    }
+  }, [user?.id, searchFilters, queryClient, isLoading]);
+
+  // Deprecated: use subscriptions field from PropertyCard directly
+  // // 获取用户收藏列表
+  // const { data: subscriptions, isLoading: subscriptionsLoading } = useQuery({
+  //   queryKey: ['properties.getSubscriptions'],
+  //   queryFn: () => trpc.properties.getSubscriptions.query(),
+  //   enabled: typeof window !== 'undefined' && !!localStorage.getItem('auth-token'),
+  // })
+
+  // // 创建收藏 ID 的 Set 用于快速查找
+  // const subscribedPropertyIds = new Set(
+  //   subscriptions?.map((sub: { id: number }) => sub.id) || []
+  // )
+
+  const properties = data?.properties || []
   const searchSummary = {
     totalCount: data?.totalCount || 0,
     filteredCount: data?.filteredCount || 0,
@@ -119,7 +127,6 @@ export default function SearchResults({ searchParams }: { searchParams: SearchPa
               <Pagination current={page} totalPages={totalPages} />
             </div>
 
-            {/* 注意：如果 useQuery 不支持 suspense 这里写 Suspense 会报错，可以直接移除 Suspense 包裹 */}
             {isPending ? (
               <ResultsSkeleton />
             ) : error ? (
@@ -133,6 +140,7 @@ export default function SearchResults({ searchParams }: { searchParams: SearchPa
                 {properties.map(property => (
                   <PropertyCard
                     key={property.id}
+                    id={property.id}
                     address={property.address}
                     region={property.region || ''}
                     price={property.price}
@@ -141,9 +149,13 @@ export default function SearchResults({ searchParams }: { searchParams: SearchPa
                     propertyType={property.propertyType}
                     commuteTime={property.commuteTime ?? undefined}
                     url={property.url}
+                    thumbnailUrl={property.thumbnailUrl}
+                    subscribed={property.subscribed}
                     averageScore={property.averageScore}
                     keywords={property.keywords}
                     availableDate={property.availableDate}
+                    publishedAt={property.publishedAt}
+                    propertyId={property.id as number}
                   />
                 ))}
               </div>
@@ -298,6 +310,7 @@ function ResultsSkeleton() {
     <div className="mt-6 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
       {Array.from({ length: 6 }).map((_, i) => (
         <div key={i} className="animate-pulse overflow-hidden rounded-2xl border border-slate-200 bg-white">
+          <div className="h-48 bg-slate-200" />
           <div className="p-4 space-y-3">
             <div className="h-4 bg-slate-200 rounded w-2/3" />
             <div className="h-3 bg-slate-200 rounded w-1/2" />

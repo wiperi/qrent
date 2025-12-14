@@ -20,14 +20,14 @@ export default function Header() {
   const t = useTranslations('Header')
   const locale = useLocale()
 
-  const openDrawer = () => {
-    setIsDrawerOpen(true)
-    document.body.classList.add('overflow-hidden')
-  }
-
   const closeDrawer = () => {
     setIsDrawerOpen(false)
     document.body.classList.remove('overflow-hidden')
+  }
+
+  const toggleDrawer = () => {
+    setIsDrawerOpen(!isDrawerOpen)
+    document.body.classList.toggle('overflow-hidden')
   }
 
   const openAuthModal = (mode: 'login' | 'signup') => {
@@ -77,6 +77,9 @@ export default function Header() {
                 </Link>
                 <Link href={`/${locale}/blog`} className="hidden md:block text-slate-700 hover:text-blue-600 transition-colors font-bold">
                   {t('rentalBlog')}
+                </Link>
+                <Link href={`/${locale}/favorite`} className="hidden md:block text-slate-700 hover:text-blue-600 transition-colors font-bold">
+                  {t('favorite')}
                 </Link>
               </div>
 
@@ -138,13 +141,16 @@ export default function Header() {
               </div>
 
               {/* Mobile hamburger */}
-              <button
-                onClick={openDrawer}
-                className="md:hidden inline-flex h-10 w-10 items-center justify-center text-slate-700 hover:text-blue-600 focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-600"
-                aria-label={t('openMenu')}
-              >
-                <HiMenu className="h-5 w-5" />
-              </button>
+              <div className="flex items-center md:hidden">
+                <LanguageSwitcher />
+                <button
+                  onClick={toggleDrawer}
+                  className="md:hidden inline-flex h-10 w-10 items-center justify-center text-slate-700 hover:text-blue-600 focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-600"
+                  aria-label={t('openMenu')}
+                >
+                  <HiMenu className="h-5 w-5" />
+                </button>
+              </div>
             </div>
           </div>
         </div>
@@ -176,9 +182,11 @@ export default function Header() {
               </button>
             </div>
             <nav className="px-4 py-4 space-y-1" aria-label="Mobile">
-              <a href="#guide" className="block rounded-md px-3 py-2 text-slate-700 hover:bg-slate-100 hover:text-blue-600">{t('rentalGuide')}</a>
-              <a href="#docs" className="block rounded-md px-3 py-2 text-slate-700 hover:bg-slate-100 hover:text-blue-600">{t('documentPreparation')}</a>
+              {/* <a href="#guide" className="block rounded-md px-3 py-2 text-slate-700 hover:bg-slate-100 hover:text-blue-600">{t('rentalGuide')}</a> */}
+              {/* <a href="#docs" className="block rounded-md px-3 py-2 text-slate-700 hover:bg-slate-100 hover:text-blue-600">{t('documentPreparation')}</a> */}
+              <Link href={`/${locale}`} onClick={closeDrawer} className="block rounded-md px-3 py-2 text-slate-700 hover:bg-slate-100 hover:text-blue-600">{t('homepage')}</Link>
               <Link href={`/${locale}/blog`} onClick={closeDrawer} className="block rounded-md px-3 py-2 text-slate-700 hover:bg-slate-100 hover:text-blue-600">{t('rentalBlog')}</Link>
+              <Link href={`/${locale}/favorite`} onClick={closeDrawer} className="block rounded-md px-3 py-2 text-slate-700 hover:bg-slate-100 hover:text-blue-600">{t('favorite')}</Link>
               <div className="my-3 h-px bg-slate-200"></div>
               {!user ? (
                 <>
