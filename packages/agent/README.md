@@ -14,18 +14,46 @@ It supports **retrieval-augmented generation (RAG)** over a rental knowledge bas
 
 ## Project Structure
 ```text
+## Project Structure
+
+```text
 agent/
-│── src/            # Core agent logic
-│── tools/          # Agent tools (RAG, generation, APIs)
-│── knowledge/      # Knowledge base for RAG
-│── config/         # Configuration files
-│── docs/           # Documentation
-│── tests/          # Tests
-│── app.py          # Application entrypoint
-│── langgraph.json  # LangGraph configuration
-│── Dockerfile
-│── requirements.txt
-└── README.md
+├── __pycache__/                  # Python bytecode cache
+├── .github/                      # GitHub workflows and configurations
+├── .langgraph_api/               # LangGraph API-related configuration
+├── aivenv/                       # Local Python virtual environment (not committed)
+├── config/                       # Global configuration modules
+│   ├── __pycache__/
+│   ├── __init__.py
+│   ├── config.py                 # Centralized configuration (models, keys, params)
+│   └── path.py                   # Path and directory management
+├── docs/                         # Documentation and knowledge source files
+├── knowledge/                    # Persisted RAG knowledge base (vector stores)
+├── src/
+│   └── agent/                    # Core agent implementation (LangGraph logic)
+├── static/                       # Static assets
+├── tests/                        # Test suite
+│   ├── integration_tests/        # Integration-level tests
+│   ├── unit_tests/               # Unit tests
+│   └── conftest.py               # Pytest global fixtures
+├── tools/                        # Agent tool implementations
+│   ├── __pycache__/
+│   ├── __init__.py
+│   ├── build_knowledge_base.py   # Knowledge base construction script
+│   ├── coverletter_tool.py       # Rental cover letter generation tool
+│   └── rag_tool.py               # RAG retrieval tool
+├── __init__.py                   # Package initializer
+├── .env.example                  # Environment variable template
+├── app.py                        # Application entrypoint (FastAPI / Agent server)
+├── Dockerfile                    # Docker image build definition
+├── langgraph.json                # LangGraph workflow configuration
+├── LICENSE                       # License information
+├── Makefile                      # Common development commands
+├── pyproject.toml                # Python project metadata and tooling config
+├── README.md                     # Project documentation
+├── requirements.txt              # Python dependencies
+└── uv.lock                       # Dependency lock file
+
 ```
 
 ## Environment Variables
