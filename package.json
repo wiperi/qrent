@@ -7,6 +7,7 @@
     "test:backend": "pnpm --filter backend test",
     "dev:frontend": "pnpm --filter frontend dev",
     "build": "pnpm -r build",
+    "build:frontend": "pnpm run style:write && pnpm --filter frontend build",
     "dev": "pnpm -r dev",
     "test": "pnpm -r test",
     "style": "prettier --check \"**/*.{ts,json}\"",
