@@ -1,0 +1,9 @@
+services:
+  api:
+    build: .
+    env_file: .env
+    environment:
+      AGENT_HOST: ${AGENT_HOST:-0.0.0.0}
+      AGENT_PORT: ${AGENT_PORT:-8000}
+    ports:
+      - "${AGENT_PORT:-8000}:${AGENT_PORT:-8000}"

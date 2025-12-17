@@ -4,16 +4,20 @@ from fastapi import FastAPI
 from pydantic import BaseModel
 from fastapi.responses import StreamingResponse
 from langchain_core.messages import HumanMessage
-from src.agent.graph import graph, State 
+from src.agent.graph import graph, State
+import os
 
 app = FastAPI()
+
+HOST = os.getenv("AGENT_HOST", "0.0.0.0")
+PORT = int(os.getenv("AGENT_PORT", "8000"))
 
 class ChatPayload(BaseModel):
     messages: list[dict]
 
-@app.get("/")
-async def root():
-    return {"status": "ok", "msg": "Qrent AI Agent is running on port 8000"}
+@app.get("/health")
+async def health():
+    return {"status": "ok", "msg": f"Qrent AI Agent is running on {HOST}:{PORT}"}
 
 @app.post("/invoke")
 async def invoke_graph(payload: ChatPayload):
@@ -54,4 +58,4 @@ async def stream_graph(payload: ChatPayload):
 
 
 if __name__ == "__main__":
-    uvicorn.run("app:app", host="0.0.0.0", port=8000)
+    uvicorn.run("app:app", host=HOST, port=PORT)
