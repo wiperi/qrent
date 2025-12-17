@@ -2,7 +2,7 @@
 import uvicorn
 from fastapi import FastAPI
 from pydantic import BaseModel
-
+from fastapi.responses import StreamingResponse
 from langchain_core.messages import HumanMessage
 from src.agent.graph import graph, State 
 
@@ -54,4 +54,4 @@ async def stream_graph(payload: ChatPayload):
 
 
 if __name__ == "__main__":
-    uvicorn.run("app:app", host="127.0.0.1", port=8000)
+    uvicorn.run("app:app", host="0.0.0.0", port=8000)
