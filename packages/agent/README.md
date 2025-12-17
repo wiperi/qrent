@@ -15,17 +15,17 @@ It supports **retrieval-augmented generation (RAG)** over a rental knowledge bas
 ## Project Structure
 ```text
 agent/
-©¦©¤©¤ src/            # Core agent logic
-©¦©¤©¤ tools/          # Agent tools (RAG, generation, APIs)
-©¦©¤©¤ knowledge/      # Knowledge base for RAG
-©¦©¤©¤ config/         # Configuration files
-©¦©¤©¤ docs/           # Documentation
-©¦©¤©¤ tests/          # Tests
-©¦©¤©¤ app.py          # Application entrypoint
-©¦©¤©¤ langgraph.json  # LangGraph configuration
-©¦©¤©¤ Dockerfile
-©¦©¤©¤ requirements.txt
-©¸©¤©¤ README.md
+â”‚â”€â”€ src/            # Core agent logic
+â”‚â”€â”€ tools/          # Agent tools (RAG, generation, APIs)
+â”‚â”€â”€ knowledge/      # Knowledge base for RAG
+â”‚â”€â”€ config/         # Configuration files
+â”‚â”€â”€ docs/           # Documentation
+â”‚â”€â”€ tests/          # Tests
+â”‚â”€â”€ app.py          # Application entrypoint
+â”‚â”€â”€ langgraph.json  # LangGraph configuration
+â”‚â”€â”€ Dockerfile
+â”‚â”€â”€ requirements.txt
+â””â”€â”€ README.md
 ```
 
 ## Environment Variables
@@ -46,7 +46,7 @@ LANGSMITH_API_KEY=your_langsmith_api_key
   Enables LangSmith tracing for agent execution.
 - **LANGSMITH_API_KEY** *(optional)*  
   Required when LangSmith tracing is enabled.
-> ?? Do not commit the `.env` file to the repository.  
+> âš ï¸ Do not commit the `.env` file to the repository.  
 > Make sure `.env` is listed in `.gitignore`.
 
 ## Setup
