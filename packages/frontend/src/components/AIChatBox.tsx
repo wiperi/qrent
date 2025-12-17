@@ -38,15 +38,21 @@ export function AIChatBox() {
     }
   }, []);
 
-  // Handle click outside to close chat
+  // Auto-scroll to bottom when new messages arrive
+  useEffect(() => {
+    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+  }, [messages]);
+
+  // Handle close chatbox events
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
+      // Close chatbox when clicking outside of it
       if (isOpen && chatBoxRef.current && !chatBoxRef.current.contains(event.target as Node)) {
         // Don't close if clicking on the toggle button
-        const toggleButton = document.querySelector('[aria-label="Open AI Assistant"]');
-        if (toggleButton && toggleButton.contains(event.target as Node)) {
-          return;
-        }
+        // const toggleButton = document.querySelector('[aria-label="Open AI Assistant"]');
+        // if (toggleButton && toggleButton.contains(event.target as Node)) {
+        //   return;
+        // }
         closeChat();
       }
     };
@@ -58,20 +64,33 @@ export function AIChatBox() {
     };
 
     if (isOpen) {
-      document.addEventListener('mousedown', handleClickOutside);
+      document.addEventListener('click', handleClickOutside);
       document.addEventListener('keydown', handleEscapeKey);
     }
 
     return () => {
-      document.removeEventListener('mousedown', handleClickOutside);
+      document.removeEventListener('click', handleClickOutside);
       document.removeEventListener('keydown', handleEscapeKey);
     };
   }, [isOpen, closeChat]);
 
-  // Auto-scroll to bottom when new messages arrive
+  // Prevent internal clicks from closing chat (except for close button)
   useEffect(() => {
-    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
-  }, [messages]);
+    const chatElement = chatBoxRef.current;
+    if (!chatElement || !isOpen) return;
+
+    const handleInternalClick = (e: MouseEvent) => {
+      // Don't stop propagation if clicking on the close button or its children
+      const target = e.target as HTMLElement;
+      const closeButton = target.closest('button[title="Collapse chat"]');
+      if (closeButton) return;
+      
+      e.stopPropagation();
+    };
+    
+    chatElement.addEventListener('click', handleInternalClick, true);
+    return () => chatElement.removeEventListener('click', handleInternalClick, true);
+  }, [isOpen]);
 
   // Handle send message
   const handleSend = async () => {
@@ -119,13 +138,13 @@ export function AIChatBox() {
         ref={chatBoxRef}
         className={cn(
           'fixed z-50 flex flex-col bg-background shadow-2xl transition-all duration-300 ease-in-out',
-          'rounded-2xl border border-border',
+          'rounded-2xl border border-border overflow-hidden',
           // Positioning - bottom right corner
-          'bottom-0 right-0 sm:bottom-6 sm:right-6',
+          'bottom-0 right-0 md:bottom-auto md:right-7 md:top-22',
           // Size constraints - 20% larger: w-80->w-96, h-96->h-[28rem]
-          'max-w-96 h-[28rem] max-h-[calc(100vh-120px)]',
+          'max-w-96 h-[calc(98vh-5rem)] ',
           // Visibility
-          isOpen ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4 pointer-events-none',
+          isOpen ? 'opacity-100 translate-y-0' : 'opacity-0 translate-x-4 pointer-events-none',
         )}
       >
 
