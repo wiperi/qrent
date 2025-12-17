@@ -120,6 +120,7 @@ const TodoProgressBar: React.FC<TodoProgressBarProps> = ({
   const [isClient, setIsClient] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   const [isCollapsed, setIsCollapsed] = useState(false);
+  const [isMediumScreenOrLarger, setIsMediumScreenOrLarger] = useState(false);
   const headerRef = useRef<HTMLDivElement>(null);
 
   // 从localStorage加载完成状态
@@ -184,6 +185,22 @@ const TodoProgressBar: React.FC<TodoProgressBarProps> = ({
     setIsLoading(false);
   }, [items, locale]);
 
+  // 检测屏幕尺寸变化
+  useEffect(() => {
+    const checkScreenSize = () => {
+      const isMediumOrLarger = window.matchMedia('(min-width: 960px)').matches;
+      setIsMediumScreenOrLarger(isMediumOrLarger);
+      if (isMediumOrLarger) {
+        setIsCollapsed(false);
+      }
+    };
+
+    checkScreenSize();
+    window.addEventListener('resize', checkScreenSize);
+    
+    return () => window.removeEventListener('resize', checkScreenSize);
+  }, []);
+
   // 保存完成状态到localStorage
   useEffect(() => {
     if (isClient && !isLoading && todoItems.length > 0) {
@@ -221,25 +238,29 @@ const TodoProgressBar: React.FC<TodoProgressBarProps> = ({
       {/* 标题栏 - 整个区域可点击触发折叠 */}
       <div
         ref={headerRef}
-        className="flex items-center justify-between cursor-pointer rounded-2xl p-3 hover:bg-gray-50 transition-colors duration-200 select-none"
-        onClick={() => setIsCollapsed(!isCollapsed)}
+        className={`flex items-center justify-between rounded-2xl p-3 transition-colors duration-200 select-none ${
+          isMediumScreenOrLarger ? '' : 'cursor-pointer hover:bg-gray-50'
+        }`}
+        onClick={() => !isMediumScreenOrLarger && setIsCollapsed(!isCollapsed)}
       >
         <div className="text-base font-bold text-gray-900 select-text">{headerText}</div>
-        <div className="p-1 rounded-md hover:bg-gray-200 transition-colors duration-200">
-          <svg
-            width="18"
-            height="18"
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            strokeWidth="2"
-            className={`transform transition-transform duration-200 ${
-              isCollapsed ? 'rotate-180' : ''
-            }`}
-          >
-            <polyline points="6 9 12 15 18 9"></polyline>
-          </svg>
-        </div>
+        {!isMediumScreenOrLarger && (
+          <div className="p-1 rounded-md hover:bg-gray-200 transition-colors duration-200">
+            <svg
+              width="18"
+              height="18"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2"
+              className={`transform transition-transform duration-200 ${
+                isCollapsed ? 'rotate-180' : ''
+              }`}
+            >
+              <polyline points="6 9 12 15 18 9"></polyline>
+            </svg>
+          </div>
+        )}
       </div>
 
       {/* 内容区域 - 可折叠 */}
