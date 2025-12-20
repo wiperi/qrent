@@ -1,9 +1,9 @@
+/**
+ * 主内容布局包装器
+ * 当 AI 聊天框打开时自动调整页面布局，桌面端添加右侧边距避免内容被遮挡，移动端无需调整（聊天框为全屏覆盖）
+ */
 'use client';
 
-/**
- * Main content wrapper - simplified version that no longer needs to adjust for AI chat
- * The AI chat is now an independent floating window that doesn't affect the main layout
- */
 export function MainContentWrapper({ children }: { children: React.ReactNode }) {
   return (
     <div>
