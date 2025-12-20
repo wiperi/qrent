@@ -1,8 +1,15 @@
 {
   "FavoritePage": {
     "title": "我的收藏",
-    "emptyState": "您还没有保存任何房产到收藏夹。浏览房产并点击爱心图标将它们添加到这里。",
-    "errorState": "加载收藏列表失败，请稍后重试。"
+    "emptyState": "您还没有保存任何房产到收藏夹。浏览房产并点击五角星图标将它们添加到这里。",
+    "errorState": "加载收藏列表失败，请稍后重试。",
+    "unauthorizedError": "请先登录以查看收藏列表",
+    "loginRequired": "需要登录",
+    "forbiddenError": "您没有权限访问此页面",
+    "notFoundError": "收藏列表不存在",
+    "networkError": "网络连接失败，请检查网络连接",
+    "serverError": "服务器错误，请稍后重试",
+    "goToLogin": "前往登录"
   },
   "Header": {
     "login": "登录",
@@ -203,6 +210,27 @@
     "save": "保存",
     "edit": "编辑",
     "delete": "删除"
+  },
+  "TodoProgressBar": {
+    "title": "租房进度表",
+    "completed": "已完成",
+    "statuses": {
+      "determineBudget": "确定预算与区域",
+      "findProperties": "寻找房源",
+      "scheduleInspection": "预约看房",
+      "submitApplication": "提交申请",
+      "signContract": "签订合同",
+      "payDeposit": "支付押金与租金",
+      "moveIn": "入住检查 (Condition Report)"
+    },
+    "descriptions": {
+      "findProperties": "正在浏览各大平台房源信息",
+      "scheduleInspection": "联系中介安排实地考察",
+      "submitApplication": "准备材料并填写申请表",
+      "signContract": "仔细阅读条款并签字",
+      "payDeposit": "完成首付款项支付",
+      "moveIn": "领取钥匙并核对房屋状况"
+    }
   },
   "LanguageSwitcher": {
     "english": "English",

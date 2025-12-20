@@ -70,7 +70,7 @@ export default function SearchBar() {
   return (
     <form onSubmit={onSubmit} className="w-full">
       <div className="rounded-2xl bg-white shadow-card ring-1 ring-slate-200 p-4 md:p-5">
-        <div className="flex flex-col gap-3 lg:flex-row lg:items-end lg:gap-4">
+        <div className="flex flex-col gap-3 md:flex-row md:items-end md:gap-4">
           {/* Target School */}
           <div className="flex flex-col flex-1">
             <label
@@ -94,7 +94,7 @@ export default function SearchBar() {
           </div>
 
           {/* Max Price */}
-          <div className="flex flex-col flex-1">
+          <div className="flex flex-col flex-1 min-w-0">
             <label
               htmlFor="max-price"
               className="text-xs font-medium text-slate-700 mb-1 h-4 flex items-center"
@@ -108,12 +108,12 @@ export default function SearchBar() {
               value={maxPrice}
               onChange={e => setMaxPrice(e.target.value)}
               placeholder={t('anyPlaceholder')}
-              className="rounded-lg border border-slate-200 px-3 py-2 text-sm text-slate-700 placeholder-slate-400 focus:border-blue-500 focus:ring-1 focus:ring-blue-500 focus:outline-none h-9"
+              className="rounded-lg border border-slate-200 px-3 py-2 text-sm text-slate-700 placeholder-slate-400 focus:border-blue-500 focus:ring-1 focus:ring-blue-500 focus:outline-none h-9 w-full"
             />
           </div>
 
           {/* Commute Time */}
-          <div className="flex flex-col flex-1">
+          <div className="flex flex-col flex-1 min-w-0">
             <label
               htmlFor="commute-time"
               className="text-xs font-medium text-slate-700 mb-1 h-4 flex items-center"
@@ -127,12 +127,12 @@ export default function SearchBar() {
               value={commuteTime}
               onChange={e => setCommuteTime(e.target.value)}
               placeholder={t('anyPlaceholder')}
-              className="rounded-lg border border-slate-200 px-3 py-2 text-sm text-slate-700 placeholder-slate-400 focus:border-blue-500 focus:ring-1 focus:ring-blue-500 focus:outline-none h-9"
+              className="rounded-lg border border-slate-200 px-3 py-2 text-sm text-slate-700 placeholder-slate-400 focus:border-blue-500 focus:ring-1 focus:ring-blue-500 focus:outline-none h-9 w-full"
             />
           </div>
 
           {/* Number of Bedrooms */}
-          <div className="flex flex-col flex-1">
+          <div className="flex flex-col flex-1 min-w-0">
             <label
               htmlFor="num-bedrooms"
               className="text-xs font-medium text-slate-700 mb-1 h-4 flex items-center"
