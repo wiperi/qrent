@@ -3,7 +3,6 @@ import AppTRPCProvider from '@/lib/trpc-provider';
 import type { Metadata } from 'next';
 import Script from 'next/script';
 import './globals.css';
-import { AIChatBox, AIChatToggleButton } from '@/components/AIChatBox';
 import { MainContentWrapper } from '@/components/MainContentWrapper';
 import { Analytics } from '@vercel/analytics/next';
 
@@ -47,8 +46,6 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <AppTRPCProvider>
           <AuthProvider>
             <MainContentWrapper>{children}</MainContentWrapper>
-            <AIChatToggleButton />
-            <AIChatBox />
           </AuthProvider>
         </AppTRPCProvider>
         <Analytics />
