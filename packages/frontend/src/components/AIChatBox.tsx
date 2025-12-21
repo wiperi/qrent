@@ -2,15 +2,19 @@
  * AI 聊天框主组件
  * 实现可拖拽调整宽度的侧边聊天框，支持桌面端和移动端响应式设计，包含消息展示、输入框和发送功能
  */
-'use client';
+"use client";
 
-import { useAIChatStore, type Message } from '@/lib/ai-chat-store';
-import { cn } from '@/lib/utils';
-import { usePathname } from 'next/navigation';
-import { useEffect, useRef, useState } from 'react';
-import { FiChevronsRight, FiMessageSquare, FiSend } from 'react-icons/fi';
-import { RiRobot2Line } from 'react-icons/ri';
-import { Button } from './ui/button';
+import { useAIChatStore, type Message } from "@/lib/ai-chat-store";
+import { cn } from "@/lib/utils";
+import { usePathname } from "next/navigation";
+import { useEffect, useRef, useState } from "react";
+import ReactMarkdown from "react-markdown";
+import remarkGfm from "remark-gfm";
+import { FiChevronsRight, FiFileText, FiMessageSquare, FiSend } from "react-icons/fi";
+import { RiRobot2Line } from "react-icons/ri";
+import { Button } from "./ui/button";
+import { CoverLetterForm } from "./CoverLetterForm";
+import { generateCoverLetterPrompt, type CoverLetterData } from "@/lib/templates";
 
 export function AIChatBox() {
   const pathname = usePathname();
@@ -24,12 +28,14 @@ export function AIChatBox() {
     setLoading,
   } = useAIChatStore();
 
-  const [input, setInput] = useState('');
+  const [input, setInput] = useState("");
+  const [isResizing, setIsResizing] = useState(false);
+  const [showCoverLetterForm, setShowCoverLetterForm] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const chatBoxRef = useRef<HTMLDivElement>(null);
 
   // Check if we are on the home page (root or localized root)
-  const isHomePage = pathname === '/' || /^\/[a-z]{2}$/.test(pathname);
+  const isHomePage = pathname === "/" || /^\/[a-z]{2}$/.test(pathname);
 
   // Auto-open on desktop, keep closed on mobile (client-side only to avoid hydration issues)
   useEffect(() => {
@@ -43,85 +49,71 @@ export function AIChatBox() {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [messages]);
 
-  // Handle close chatbox events
-  useEffect(() => {
-    const handleClickOutside = (event: MouseEvent) => {
-      // Close chatbox when clicking outside of it
-      if (isOpen && chatBoxRef.current && !chatBoxRef.current.contains(event.target as Node)) {
-        // Don't close if clicking on the toggle button
-        // const toggleButton = document.querySelector('[aria-label="Open AI Assistant"]');
-        // if (toggleButton && toggleButton.contains(event.target as Node)) {
-        //   return;
-        // }
-        closeChat();
-      }
-    };
+  // Handle send message (supports custom prompt from cover letter form)
+  const handleSend = async (contentOverride?: string) => {
+    const userMessage = (contentOverride ?? input).trim();
+    if (!userMessage || isLoading) return;
 
-    const handleEscapeKey = (event: KeyboardEvent) => {
-      if (event.key === 'Escape' && isOpen) {
-        closeChat();
-      }
-    };
-
-    if (isOpen) {
-      document.addEventListener('click', handleClickOutside);
-      document.addEventListener('keydown', handleEscapeKey);
-    }
-
-    return () => {
-      document.removeEventListener('click', handleClickOutside);
-      document.removeEventListener('keydown', handleEscapeKey);
-    };
-  }, [isOpen, closeChat]);
-
-  // Prevent internal clicks from closing chat (except for close button)
-  useEffect(() => {
-    const chatElement = chatBoxRef.current;
-    if (!chatElement || !isOpen) return;
-
-    const handleInternalClick = (e: MouseEvent) => {
-      // Don't stop propagation if clicking on the close button or its children
-      const target = e.target as HTMLElement;
-      const closeButton = target.closest('button[title="Collapse chat"]');
-      if (closeButton) return;
-      
-      e.stopPropagation();
-    };
-    
-    chatElement.addEventListener('click', handleInternalClick, true);
-    return () => chatElement.removeEventListener('click', handleInternalClick, true);
-  }, [isOpen]);
-
-  // Handle send message
-  const handleSend = async () => {
-    if (!input.trim() || isLoading) return;
-
-    const userMessage = input.trim();
-    setInput('');
-    addMessage({ role: 'user', content: userMessage });
+    setInput("");
+    addMessage({ role: "user", content: userMessage });
     setLoading(true);
 
     try {
-      const response = await fetch('/api/ai-chat', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+      const response = await fetch("/api/ai-chat", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ message: userMessage, history: messages }),
       });
 
-      if (!response.ok) throw new Error('Failed to get response');
+      if (!response.ok) throw new Error("Failed to get response");
 
       const data = await response.json();
-      addMessage({ role: 'assistant', content: data.message });
+      addMessage({ role: "assistant", content: data.message });
     } catch (error) {
-      console.error('Error sending message:', error);
+      console.error("Error sending message:", error);
       addMessage({
-        role: 'assistant',
-        content: 'Sorry, I encountered an error. Please try again.',
+        role: "assistant",
+        content: "Sorry, I encountered an error. Please try again.",
       });
     } finally {
       setLoading(false);
     }
   };
+
+  const handleCoverLetterSubmit = (data: CoverLetterData) => {
+    const prompt = generateCoverLetterPrompt(data);
+    handleSend(prompt);
+  };
+
+  // Handle resize
+  const handleMouseDown = (e: React.MouseEvent) => {
+    e.preventDefault();
+    setIsResizing(true);
+  };
+
+  useEffect(() => {
+    const handleMouseMove = (e: MouseEvent) => {
+      if (!isResizing || !chatBoxRef.current) return;
+
+      const windowWidth = window.innerWidth;
+      const newWidth = ((windowWidth - e.clientX) / windowWidth) * 100;
+      setWidth(newWidth);
+    };
+
+    const handleMouseUp = () => {
+      setIsResizing(false);
+    };
+
+    if (isResizing) {
+      document.addEventListener('mousemove', handleMouseMove);
+      document.addEventListener('mouseup', handleMouseUp);
+    }
+
+    return () => {
+      document.removeEventListener('mousemove', handleMouseMove);
+      document.removeEventListener('mouseup', handleMouseUp);
+    };
+  }, [isResizing, setWidth]);
 
   useEffect(() => {
     if (!isHomePage && isOpen) {
@@ -133,7 +125,21 @@ export function AIChatBox() {
 
   return (
     <>
-      {/* Chat box - independent floating window */}
+      <CoverLetterForm
+        isOpen={showCoverLetterForm}
+        onClose={() => setShowCoverLetterForm(false)}
+        onSubmit={handleCoverLetterSubmit}
+      />
+
+      {/* Mobile overlay */}
+      {isOpen && (
+        <div
+          className="fixed inset-0 z-40 bg-black/50 md:hidden"
+          onClick={closeChat}
+        />
+      )}
+
+      {/* Chat box */}
       <div
         ref={chatBoxRef}
         className={cn(
@@ -196,6 +202,18 @@ export function AIChatBox() {
 
         {/* Input */}
         <div className="border-t border-border bg-card p-4">
+          <div className="flex flex-wrap items-center gap-2 pb-2">
+            <Button
+              variant="outline"
+              size="sm"
+              className="h-8 gap-2 text-xs"
+              onClick={() => setShowCoverLetterForm(true)}
+              title="填表生成 Cover Letter"
+            >
+              <FiFileText className="h-4 w-4" />
+              📝 生成 Cover Letter
+            </Button>
+          </div>
           <form
             onSubmit={(e) => {
               e.preventDefault();
@@ -245,7 +263,16 @@ function MessageBubble({ message }: { message: Message }) {
             : 'bg-muted text-foreground',
         )}
       >
-        <p className="whitespace-pre-wrap break-words">{message.content}</p>
+        <div
+          className={cn(
+            "prose prose-sm max-w-none break-words dark:prose-invert",
+            isUser ? "prose-p:text-primary-foreground" : "text-foreground",
+          )}
+        >
+          <ReactMarkdown remarkPlugins={[remarkGfm]}>
+            {message.content}
+          </ReactMarkdown>
+        </div>
         {isMounted && (
           <p className="mt-1 text-xs opacity-70">
             {new Date(message.timestamp).toLocaleTimeString([], {
