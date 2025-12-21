@@ -29,7 +29,6 @@ export function AIChatBox() {
   } = useAIChatStore();
 
   const [input, setInput] = useState("");
-  const [isResizing, setIsResizing] = useState(false);
   const [showCoverLetterForm, setShowCoverLetterForm] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const chatBoxRef = useRef<HTMLDivElement>(null);
@@ -84,36 +83,6 @@ export function AIChatBox() {
     const prompt = generateCoverLetterPrompt(data);
     handleSend(prompt);
   };
-
-  // Handle resize
-  const handleMouseDown = (e: React.MouseEvent) => {
-    e.preventDefault();
-    setIsResizing(true);
-  };
-
-  useEffect(() => {
-    const handleMouseMove = (e: MouseEvent) => {
-      if (!isResizing || !chatBoxRef.current) return;
-
-      const windowWidth = window.innerWidth;
-      const newWidth = ((windowWidth - e.clientX) / windowWidth) * 100;
-      setWidth(newWidth);
-    };
-
-    const handleMouseUp = () => {
-      setIsResizing(false);
-    };
-
-    if (isResizing) {
-      document.addEventListener('mousemove', handleMouseMove);
-      document.addEventListener('mouseup', handleMouseUp);
-    }
-
-    return () => {
-      document.removeEventListener('mousemove', handleMouseMove);
-      document.removeEventListener('mouseup', handleMouseUp);
-    };
-  }, [isResizing, setWidth]);
 
   useEffect(() => {
     if (!isHomePage && isOpen) {
