@@ -1,0 +1,43 @@
+# Environment variables (contains sensitive API keys and database credentials)
+.env
+
+# Python cache
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.Python
+
+# Virtual environment
+venv/
+env/
+ENV/
+
+# Logs
+*.log
+logs/
+rea_scraper.log
+
+# Data files
+*.csv
+*.xml
+*.json
+*.sql
+data/
+
+# Backup files
+backup/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Docker
+docker-compose.override.yml
