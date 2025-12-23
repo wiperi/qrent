@@ -234,7 +234,6 @@ class CommuteService:
         
         logger.info(f"开始计算 {len(to_process)} 个房产到 {university} 的通勤时间")
         
-        destination = SCHOOL_COORDINATES.get(university)
         successful = 0
         failed = 0
         
