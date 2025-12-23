@@ -246,7 +246,9 @@ class BrowserManager:
         try:
             if self.browser_type == BrowserType.PLAYWRIGHT:
                 page = self.get_driver()
-                page.goto(url, timeout=60000)
+                # RealEstate.com.au 等站点可能持续加载资源导致 "load" 事件迟迟不触发，
+                # 使用 domcontentloaded 可显著降低 page.goto 超时概率。
+                page.goto(url, timeout=60000, wait_until="domcontentloaded")
                 page.wait_for_timeout(int(wait_time * 1000))
             else:
                 driver = self.get_driver()

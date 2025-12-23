@@ -78,8 +78,13 @@ class ScoringService:
     
     def __init__(self, config: Optional[ScoringConfig] = None):
         self.config = config or settings.scoring
-        if self.config.api_key:
-            dashscope.api_key = self.config.api_key
+        api_key = (
+            self.config.api_key
+            or getattr(settings, "env_property_rating_api_key", None)
+            or getattr(settings, "env_dashscope_api_key", None)
+        )
+        if api_key:
+            dashscope.api_key = api_key
     
     def _call_model(
         self, 
@@ -197,7 +202,7 @@ class ScoringService:
         
         return ""
     
-    def process_property(self, prop: PropertyData) -> PropertyData:
+    def process_property(self, prop: PropertyData, force_update: bool = False) -> PropertyData:
         """
         处理单个房产的评分和关键词
         
@@ -210,17 +215,17 @@ class ScoringService:
         description = prop.description_en or ""
         
         # 评分
-        if not prop.average_score or prop.average_score == 0:
+        if force_update or not prop.average_score or prop.average_score == 0:
             avg_score, scores = self.score_property(description)
             prop.average_score = avg_score
             prop.scores = scores
         
         # 英文关键词
-        if not prop.keywords:
+        if force_update or not prop.keywords:
             prop.keywords = self.extract_keywords_en(description)
         
         # 中文关键词/描述
-        if not prop.description_cn:
+        if force_update or not prop.description_cn:
             prop.description_cn = self.extract_keywords_cn(description)
         
         return prop
@@ -228,7 +233,9 @@ class ScoringService:
     def process_properties(
         self, 
         properties: List[PropertyData],
-        skip_existing: bool = True
+        skip_existing: bool = True,
+        force_update: bool = False,
+        limit: Optional[int] = None,
     ) -> List[PropertyData]:
         """
         批量处理房产评分
@@ -240,12 +247,22 @@ class ScoringService:
         Returns:
             处理后的房产列表
         """
-        to_process = []
+        to_process: List[PropertyData] = []
         for prop in properties:
-            if skip_existing and prop.average_score and prop.average_score > 0:
+            if not prop.description_en:
                 continue
-            if prop.description_en:
-                to_process.append(prop)
+
+            # skip_existing 的语义：只有在“评分 + 关键词(英文/中文) 都已经有值”时才跳过
+            has_score = prop.average_score is not None and prop.average_score > 0
+            has_keywords = bool(prop.keywords and str(prop.keywords).strip())
+            has_cn = bool(prop.description_cn and str(prop.description_cn).strip())
+
+            if (not force_update) and skip_existing and has_score and has_keywords and has_cn:
+                continue
+
+            to_process.append(prop)
+            if limit is not None and len(to_process) >= limit:
+                break
         
         if not to_process:
             logger.info("没有需要评分的房产")
@@ -255,7 +272,7 @@ class ScoringService:
         
         with ThreadPoolExecutor(max_workers=self.config.max_workers) as executor:
             futures = {
-                executor.submit(self.process_property, prop): prop 
+                executor.submit(self.process_property, prop, force_update): prop 
                 for prop in to_process
             }
             
@@ -266,4 +283,3 @@ class ScoringService:
                     logger.error(f"处理失败: {e}")
         
         return properties
-

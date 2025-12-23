@@ -1,13 +1,13 @@
 """
-爬虫配置文件
-统一管理所有配置项
+Scraper Configuration
+Centralized configuration management
 """
 import os
 from dataclasses import dataclass, field
 from typing import Dict, List, Optional
 from dotenv import load_dotenv
 
-# 加载环境变量
+# Load environment variables
 env_paths = ['.env', '../.env', '../../.env', '/app/.env']
 for env_path in env_paths:
     if os.path.exists(env_path):
@@ -19,7 +19,7 @@ else:
 
 @dataclass
 class DatabaseConfig:
-    """数据库配置"""
+    """Database configuration"""
     host: str = field(default_factory=lambda: os.getenv("DB_HOST", "localhost"))
     user: str = field(default_factory=lambda: os.getenv("DB_USER", "root"))
     password: str = field(default_factory=lambda: os.getenv("DB_PASSWORD", ""))
@@ -31,7 +31,7 @@ class DatabaseConfig:
 
 @dataclass
 class SeleniumConfig:
-    """Selenium 浏览器配置"""
+    """Selenium browser configuration"""
     headless: bool = True
     disable_gpu: bool = True
     window_size: str = "1920x1080"
@@ -47,18 +47,18 @@ class SeleniumConfig:
 
 @dataclass 
 class ScraperConfig:
-    """爬虫通用配置"""
-    max_pages: int = 50
-    page_delay: float = 3.0  # 翻页等待时间
-    request_delay: float = 1.0  # 请求间隔
+    """General scraper configuration"""
+    max_pages: int = 7  # Scrape first 7 pages per area only
+    page_delay: float = 5.0  # Page navigation delay
+    request_delay: float = 3.0  # Request interval (seconds)
     retry_count: int = 3
-    retry_delay: float = 5.0
+    retry_delay: float = 10.0
 
 
 @dataclass
 class ScoringConfig:
-    """评分服务配置"""
-    api_key: str = field(default_factory=lambda: os.getenv("PROPERTY_RATING_API_KEY", ""))
+    """Scoring service configuration"""
+    api_key: str = field(default_factory=lambda: os.getenv("PROPERTY_RATING_API_KEY") or os.getenv("DASHSCOPE_API_KEY", ""))
     model_name: str = "qwen-plus-1220"
     num_calls: int = 2
     scores_per_call: int = 4
@@ -69,27 +69,27 @@ class ScoringConfig:
 
 @dataclass
 class CommuteConfig:
-    """通勤时间计算配置"""
+    """Commute time calculation configuration"""
     api_key: str = field(default_factory=lambda: os.getenv("GOOGLE_MAPS_API_KEY", ""))
     max_workers: int = 5
     request_delay: float = 1.1
 
 
-# 学校坐标配置
+# School coordinates configuration
 SCHOOL_COORDINATES: Dict[str, str] = {
     'UNSW': "University of New South Wales, Kensington NSW 2052, Australia",
     'USYD': "University of Sydney, Camperdown NSW 2006, Australia",
     'UTS': "University of Technology Sydney, Ultimo NSW 2007, Australia"
 }
 
-# 学校名称映射
+# School name mapping
 SCHOOL_NAME_MAPPING: Dict[str, str] = {
     'UNSW': 'University of New South Wales',
     'USYD': 'University of Sydney',
     'UTS': 'University of Technology Sydney'
 }
 
-# 目标区域配置
+# Target areas configuration
 TARGET_AREAS: Dict[str, List[str]] = {
     'UNSW': [
         "newtown-nsw-2042",
@@ -129,7 +129,7 @@ TARGET_AREAS: Dict[str, List[str]] = {
     ]
 }
 
-# 房产类型映射
+# Property type mapping
 PROPERTY_TYPE_MAPPING: Dict[str, int] = {
     'house': 1,
     'apartment': 2,
@@ -147,21 +147,20 @@ PROPERTY_TYPE_MAPPING: Dict[str, int] = {
 
 @dataclass
 class Settings:
-    """全局配置"""
+    """Global settings"""
     database: DatabaseConfig = field(default_factory=DatabaseConfig)
     selenium: SeleniumConfig = field(default_factory=SeleniumConfig)
     scraper: ScraperConfig = field(default_factory=ScraperConfig)
     scoring: ScoringConfig = field(default_factory=ScoringConfig)
     commute: CommuteConfig = field(default_factory=CommuteConfig)
     
-    # 数据输出目录
+    # Data output directory
     output_dir: str = "."
     
-    # 日志配置
+    # Logging configuration
     log_level: str = "INFO"
     log_file: str = "scraper.log"
 
 
-# 全局配置实例
+# Global settings instance
 settings = Settings()
-

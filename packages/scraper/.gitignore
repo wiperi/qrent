@@ -17,6 +17,8 @@ ENV/
 *.log
 logs/
 rea_scraper.log
+*.gz
+*.bak
 
 # Data files
 *.csv
@@ -51,6 +53,21 @@ browser_profiles/
 browser_profile/
 rea_browser_profile/
 *_profile/
+profile*/
+*profile*/
+*Profile*/
+*PROFILE*/
+testprofile*/
+test_profile*/
+profile_usyd/
+profile_unsw/
+profile_uts/
+playwright/.cache/
+playwright/.local-browsers/
+.cache/
+tmp/
+*.sqlite
+*.db
 
 # Debug/test files
 *.html
@@ -59,3 +76,4 @@ rea_browser_profile/
 
 # Output
 output/
+packages/scraper/output/

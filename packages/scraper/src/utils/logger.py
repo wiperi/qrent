@@ -1,5 +1,6 @@
 """
 日志配置
+实时控制台输出 + 文件记录
 """
 import logging
 import sys
@@ -7,6 +8,16 @@ from pathlib import Path
 from typing import Optional
 
 from ..config import settings
+
+# 确保 stdout 实时刷新
+sys.stdout.reconfigure(line_buffering=True) if hasattr(sys.stdout, 'reconfigure') else None
+
+
+class FlushStreamHandler(logging.StreamHandler):
+    """每条日志后立即刷新的处理器"""
+    def emit(self, record):
+        super().emit(record)
+        self.flush()
 
 
 def setup_logger(
@@ -32,14 +43,14 @@ def setup_logger(
     # 清除已有的处理器
     logger.handlers.clear()
     
-    # 日志格式
+    # 日志格式 - 更清晰的格式
     formatter = logging.Formatter(
-        '%(asctime)s - %(name)s - %(levelname)s - %(message)s',
-        datefmt='%Y-%m-%d %H:%M:%S'
+        '[%(asctime)s] %(levelname)s - %(message)s',
+        datefmt='%H:%M:%S'
     )
     
-    # 控制台处理器
-    console_handler = logging.StreamHandler(sys.stdout)
+    # 控制台处理器 - 使用实时刷新
+    console_handler = FlushStreamHandler(sys.stdout)
     console_handler.setFormatter(formatter)
     logger.addHandler(console_handler)
     

@@ -1,6 +1,6 @@
 """
-房产数据模型
-统一的数据结构定义
+Property data model
+Unified data structure definitions
 """
 from dataclasses import dataclass, field, asdict
 from datetime import datetime
@@ -9,10 +9,10 @@ from enum import Enum
 
 
 class PropertySource(Enum):
-    """房源来源"""
+    """Property source"""
     DOMAIN = "domain"
     REALESTATE = "realestate"
-    # 未来可扩展
+    # Future extensions
     # RENT_COM_AU = "rent.com.au"
     # FLATMATES = "flatmates"
 
@@ -20,69 +20,69 @@ class PropertySource(Enum):
 @dataclass
 class PropertyData:
     """
-    房产数据模型
-    统一的数据结构，所有爬虫都应该输出这种格式
+    Property data model
+    Unified data structure that all scrapers should output
     """
-    # 基础信息
-    house_id: str  # 房源唯一标识
-    source: PropertySource  # 数据来源
+    # Basic information
+    house_id: str  # Unique property identifier
+    source: PropertySource  # Data source
     
-    # 价格信息
+    # Price information
     price_per_week: int = 0
     
-    # 地址信息
+    # Address information
     address_line1: str = ""
     address_line2: str = ""
     suburb: str = ""
     state: str = "NSW"
     postcode: str = ""
     
-    # 房产特征
+    # Property features
     bedroom_count: int = 0
     bathroom_count: int = 0
     parking_count: int = 0
     property_type: int = 1  # 1=house, 2=apartment, 3=studio, etc.
-    property_type_raw: str = ""  # 原始房产类型字符串
+    property_type_raw: str = ""  # Raw property type string
     
-    # 详细信息
+    # Detailed information
     description_en: Optional[str] = None
     description_cn: Optional[str] = None
     keywords: Optional[str] = None
     
-    # 图片和链接
+    # Images and links
     url: str = ""
     thumbnail_url: Optional[str] = None
     
-    # 日期信息
+    # Date information
     available_date: Optional[datetime] = None
     published_at: Optional[datetime] = None
     scraped_at: datetime = field(default_factory=datetime.now)
     
-    # 评分
+    # Scoring
     average_score: Optional[float] = None
     scores: List[float] = field(default_factory=list)
     
-    # 通勤时间 (分钟)
+    # Commute time (minutes)
     commute_times: Dict[str, Optional[int]] = field(default_factory=dict)
     
     def to_dict(self) -> Dict[str, Any]:
-        """转换为字典"""
+        """Convert to dictionary"""
         data = asdict(self)
         data['source'] = self.source.value
         return data
     
     def get_combined_address(self) -> str:
-        """获取组合地址（用于构建 URL）"""
+        """Get combined address (for building URL)"""
         return f"{self.address_line1}-{self.address_line2}-{self.house_id}"
     
     def get_full_address(self) -> str:
-        """获取完整地址"""
+        """Get full address"""
         parts = [self.address_line1, self.address_line2]
         return ", ".join(p for p in parts if p)
     
     @classmethod
     def from_dict(cls, data: Dict[str, Any]) -> 'PropertyData':
-        """从字典创建"""
+        """Create from dictionary"""
         if 'source' in data and isinstance(data['source'], str):
             data['source'] = PropertySource(data['source'])
         return cls(**data)
@@ -91,8 +91,8 @@ class PropertyData:
 @dataclass
 class ScrapeResult:
     """
-    爬取结果
-    用于封装单次爬取的结果和状态
+    Scrape result
+    Used to encapsulate results and status of a single scrape operation
     """
     success: bool
     properties: List[PropertyData] = field(default_factory=list)
