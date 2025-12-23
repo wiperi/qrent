@@ -1,8 +1,15 @@
 {
   "FavoritePage": {
     "title": "My Favorites",
-    "emptyState": "You haven't saved any properties to your favorites yet. Browse properties and click the heart icon to add them here.",
-    "errorState": "Failed to load favorites. Please try again later."
+    "emptyState": "You haven't saved any properties to your favorites yet. Browse properties and click the star icon to add them here.",
+    "errorState": "Failed to load favorites. Please try again later.",
+    "unauthorizedError": "Please log in to view your favorites",
+    "loginRequired": "Login Required",
+    "forbiddenError": "You don't have permission to access this page",
+    "notFoundError": "Favorites list not found",
+    "networkError": "Network connection failed. Please check your connection",
+    "serverError": "Server error. Please try again later",
+    "goToLogin": "Go to Login"
   },
   "Header": {
     "login": "Log in",
@@ -203,6 +210,27 @@
     "save": "Save",
     "edit": "Edit",
     "delete": "Delete"
+  },
+  "TodoProgressBar": {
+    "title": "Rental Progress",
+    "completed": "Completed",
+    "statuses": {
+      "determineBudget": "Determine Budget & Area",
+      "findProperties": "Find Properties",
+      "scheduleInspection": "Schedule Inspection",
+      "submitApplication": "Submit Application",
+      "signContract": "Sign Contract",
+      "payDeposit": "Pay Deposit & Rent",
+      "moveIn": "Move-in Inspection (Condition Report)"
+    },
+    "descriptions": {
+      "findProperties": "Browsing property listings on various platforms",
+      "scheduleInspection": "Contact agents to arrange site visits",
+      "submitApplication": "Prepare materials and fill out application forms",
+      "signContract": "Carefully read terms and sign",
+      "payDeposit": "Complete down payment",
+      "moveIn": "Collect keys and check property condition"
+    }
   },
   "LanguageSwitcher": {
     "english": "English",

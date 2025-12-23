@@ -16,18 +16,15 @@ export function AIChatBox() {
   const pathname = usePathname();
   const {
     isOpen,
-    width,
     messages,
     isLoading,
     closeChat,
     openChat,
     addMessage,
-    setWidth,
     setLoading,
   } = useAIChatStore();
 
   const [input, setInput] = useState('');
-  const [isResizing, setIsResizing] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const chatBoxRef = useRef<HTMLDivElement>(null);
 
@@ -45,6 +42,55 @@ export function AIChatBox() {
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [messages]);
+
+  // Handle close chatbox events
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      // Close chatbox when clicking outside of it
+      if (isOpen && chatBoxRef.current && !chatBoxRef.current.contains(event.target as Node)) {
+        // Don't close if clicking on the toggle button
+        // const toggleButton = document.querySelector('[aria-label="Open AI Assistant"]');
+        // if (toggleButton && toggleButton.contains(event.target as Node)) {
+        //   return;
+        // }
+        closeChat();
+      }
+    };
+
+    const handleEscapeKey = (event: KeyboardEvent) => {
+      if (event.key === 'Escape' && isOpen) {
+        closeChat();
+      }
+    };
+
+    if (isOpen) {
+      document.addEventListener('click', handleClickOutside);
+      document.addEventListener('keydown', handleEscapeKey);
+    }
+
+    return () => {
+      document.removeEventListener('click', handleClickOutside);
+      document.removeEventListener('keydown', handleEscapeKey);
+    };
+  }, [isOpen, closeChat]);
+
+  // Prevent internal clicks from closing chat (except for close button)
+  useEffect(() => {
+    const chatElement = chatBoxRef.current;
+    if (!chatElement || !isOpen) return;
+
+    const handleInternalClick = (e: MouseEvent) => {
+      // Don't stop propagation if clicking on the close button or its children
+      const target = e.target as HTMLElement;
+      const closeButton = target.closest('button[title="Collapse chat"]');
+      if (closeButton) return;
+      
+      e.stopPropagation();
+    };
+    
+    chatElement.addEventListener('click', handleInternalClick, true);
+    return () => chatElement.removeEventListener('click', handleInternalClick, true);
+  }, [isOpen]);
 
   // Handle send message
   const handleSend = async () => {
@@ -77,36 +123,6 @@ export function AIChatBox() {
     }
   };
 
-  // Handle resize
-  const handleMouseDown = (e: React.MouseEvent) => {
-    e.preventDefault();
-    setIsResizing(true);
-  };
-
-  useEffect(() => {
-    const handleMouseMove = (e: MouseEvent) => {
-      if (!isResizing || !chatBoxRef.current) return;
-
-      const windowWidth = window.innerWidth;
-      const newWidth = ((windowWidth - e.clientX) / windowWidth) * 100;
-      setWidth(newWidth);
-    };
-
-    const handleMouseUp = () => {
-      setIsResizing(false);
-    };
-
-    if (isResizing) {
-      document.addEventListener('mousemove', handleMouseMove);
-      document.addEventListener('mouseup', handleMouseUp);
-    }
-
-    return () => {
-      document.removeEventListener('mousemove', handleMouseMove);
-      document.removeEventListener('mouseup', handleMouseUp);
-    };
-  }, [isResizing, setWidth]);
-
   useEffect(() => {
     if (!isHomePage && isOpen) {
       closeChat();
@@ -117,34 +133,20 @@ export function AIChatBox() {
 
   return (
     <>
-      {/* Mobile overlay */}
-      {isOpen && (
-        <div
-          className="fixed inset-0 z-40 bg-black/50 md:hidden"
-          onClick={closeChat}
-        />
-      )}
-
-      {/* Chat box */}
+      {/* Chat box - independent floating window */}
       <div
         ref={chatBoxRef}
         className={cn(
-          'fixed right-0 top-0 z-50 flex h-full flex-col bg-background shadow-2xl transition-all duration-300 ease-in-out',
-          // Hide when closed
-          !isOpen && 'pointer-events-none',
-          // Mobile: always full width
-          isOpen ? 'w-full md:w-auto' : 'w-0',
+          'fixed z-50 flex flex-col bg-background shadow-2xl transition-all duration-300 ease-in-out',
+          'rounded-2xl border border-border overflow-hidden',
+          // Positioning - bottom right corner
+          'bottom-0 right-0 md:bottom-auto md:right-7 md:top-22',
+          // Size constraints - 20% larger: w-80->w-96, h-96->h-[28rem]
+          'max-w-96 h-[calc(98vh-5rem)] ',
+          // Visibility
+          isOpen ? 'opacity-100 translate-y-0' : 'opacity-0 translate-x-4 pointer-events-none',
         )}
-        style={{
-          // Desktop: use percentage width with minimum
-          width: isOpen ? `max(300px, ${width}%)` : '0',
-        }}
       >
-        {/* Resize handle - desktop only */}
-        <div
-          className="absolute left-0 top-0 hidden h-full w-1 cursor-ew-resize bg-border hover:bg-primary md:block"
-          onMouseDown={handleMouseDown}
-        />
 
         {/* Header */}
         <div className="flex items-center justify-between border-b border-border bg-card p-4">

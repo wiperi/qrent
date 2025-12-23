@@ -25,6 +25,10 @@ const nextConfig: NextConfig = {
     remotePatterns: [
       {
         protocol: 'https',
+        hostname: '**',
+      },
+      {
+        protocol: 'https',
         hostname: 'api.dicebear.com',
       },
       {
@@ -42,6 +46,10 @@ const nextConfig: NextConfig = {
       {
         protocol: 'https',
         hostname: 'www.notion.so',
+      },
+      {
+        protocol: 'https',
+        hostname: '**.reastatic.net',
       },
     ],
     dangerouslyAllowSVG: true,

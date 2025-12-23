@@ -22,7 +22,6 @@ const WELCOME_MESSAGE: Message = {
 interface AIChatState {
   // UI state
   isOpen: boolean;
-  width: number; // Width in percentage (30 by default)
 
   // Chat state
   messages: Message[];
@@ -32,7 +31,6 @@ interface AIChatState {
   openChat: () => void;
   closeChat: () => void;
   toggleChat: () => void;
-  setWidth: (width: number) => void;
   addMessage: (message: Omit<Message, 'id' | 'timestamp'>) => void;
   clearMessages: () => void;
   setLoading: (isLoading: boolean) => void;
@@ -40,7 +38,6 @@ interface AIChatState {
 
 export const useAIChatStore = create<AIChatState>(set => ({
   isOpen: false,
-  width: 17, // 17% of screen width
   messages: [WELCOME_MESSAGE],
   isLoading: false,
 
@@ -48,7 +45,6 @@ export const useAIChatStore = create<AIChatState>(set => ({
   openChat: () => set({ isOpen: true }),
   closeChat: () => set({ isOpen: false }),
   toggleChat: () => set(state => ({ isOpen: !state.isOpen })),
-  setWidth: (width: number) => set({ width: Math.min(Math.max(width, 20), 60) }), // Clamp between 20-60%
   addMessage: message =>
     set(state => ({
       messages: [
