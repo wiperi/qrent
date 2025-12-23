@@ -192,8 +192,8 @@ class RealEstateScraper(BaseScraper):
                             self.browser.scroll_page(200)
                             self.browser.wait(1.0)
                         html = self.browser.get_page_source()
-                    except Exception:
-                        pass
+                    except Exception as e:
+                        logger.warning(f"Kasada 保护重试时滚动或获取页面内容失败: {e}")
                     
                     if len(html) < 10000:
                         logger.error("页面未能加载，可能需要手动验证")
