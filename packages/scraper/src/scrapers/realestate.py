@@ -249,8 +249,8 @@ class RealEstateScraper(BaseScraper):
             if self.browser:
                 try:
                     self.browser.close()
-                except:
-                    pass
+                except Exception as e:
+                    logger.debug("关闭浏览器时出错（已忽略）：%s", e)
                 self.browser = None
         
         logger.info(f"\n所有区域爬取完成，共 {len(all_properties)} 个房源")
