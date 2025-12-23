@@ -351,8 +351,8 @@ class RealEstateScraper(BaseScraper):
         # 实时输出每条列表级房源信息，便于监控
         try:
             logger.info(f"找到房源: id={prop.house_id} price={prop.price_per_week} beds={prop.bedroom_count} url={prop.url}")
-        except Exception:
-            pass
+        except Exception as e:
+            logger.debug("Failed to log property info for id=%s: %s", getattr(prop, "house_id", "unknown"), e)
 
         return prop
     
