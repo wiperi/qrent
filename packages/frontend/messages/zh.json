@@ -277,6 +277,9 @@
     "flatmatesWarning": "温馨提示：该网站信息鱼龙混杂，潜在风险需自行判断，请谨慎选择。",
     "subscribe": "加入收藏",
     "unsubscribe": "取消收藏",
+    "subscriptionTimeoutError": "收藏操作超时，请稍后重试",
+    "subscriptionError": "收藏操作失败，请稍后重试",
+    "error": "错误",
     "keywords": {
       "bedroom": "卧室",
       "bedrooms": "卧室",
