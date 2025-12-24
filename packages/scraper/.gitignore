@@ -17,6 +17,8 @@ ENV/
 *.log
 logs/
 rea_scraper.log
+*.gz
+*.bak
 
 # Data files
 *.csv
@@ -41,3 +43,37 @@ Thumbs.db
 
 # Docker
 docker-compose.override.yml
+
+# Browser profiles (Playwright/Selenium cache, cookies, sessions)
+rea_profile/
+domain_profile/
+docker_rea_profile/
+docker_domain_profile/
+browser_profiles/
+browser_profile/
+rea_browser_profile/
+*_profile/
+profile*/
+*profile*/
+*Profile*/
+*PROFILE*/
+testprofile*/
+test_profile*/
+profile_usyd/
+profile_unsw/
+profile_uts/
+playwright/.cache/
+playwright/.local-browsers/
+.cache/
+tmp/
+*.sqlite
+*.db
+
+# Debug/test files
+*.html
+*.png
+!README*.png
+
+# Output
+output/
+packages/scraper/output/

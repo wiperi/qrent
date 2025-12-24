@@ -1,10 +1,29 @@
+# Web Scraping
 beautifulsoup4==4.12.2
-pandas==2.1.4
 selenium==4.15.2
-mysql-connector-python==8.2.0
-tqdm==4.66.1
 requests==2.31.0
-python-dotenv==1.0.0
-dashscope==1.17.0
-googlemaps==4.10.0
+playwright==1.40.0
+
+# Anti-detection
+undetected-chromedriver==3.5.4
+playwright-stealth==1.0.6
+
+# Data Processing
+pandas==2.1.4
 numpy==1.24.4
+
+# Database
+mysql-connector-python==8.2.0
+
+# AI/ML Services
+dashscope==1.17.0
+
+# Google Maps API
+googlemaps==4.10.0
+
+# Utilities
+python-dotenv==1.0.0
+tqdm==4.66.1
+
+# Type hints (Python 3.8+)
+typing-extensions>=4.0.0

@@ -5,7 +5,8 @@
 <a href="https://www.qrent.rent"><img alt="Website" src="https://img.shields.io/badge/website-qrent.rent-blue?style=for-the-badge"></a>
 <a href="https://github.com/wiperi/qrent/blob/main/LICENSE"><img alt="License" src="https://img.shields.io/badge/license-NCL%201.0-orange?style=for-the-badge"></a>
 <a href="https://github.com/wiperi/qrent/issues"><img alt="Issues" src="https://img.shields.io/github/issues/wiperi/qrent?style=for-the-badge"></a>
-
+<br>
+<a href="https://deepwiki.com/wiperi/qrent"><img src="https://deepwiki.com/badge.svg" alt="Ask DeepWiki"></a>
 </div>
 
 English | [简体中文](./README_CN.md)

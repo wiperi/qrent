@@ -1,6 +1,7 @@
 'use client'
 
 import { useAuth } from '@/hooks/use-auth'
+import { useAuthModalEvents } from '@/lib/auth-events'
 import { useLocale, useTranslations } from 'next-intl'
 import Image from 'next/image'
 import Link from 'next/link'
@@ -19,6 +20,12 @@ export default function Header() {
   const { user, logout } = useAuth()
   const t = useTranslations('Header')
   const locale = useLocale()
+
+  // 监听全局认证事件
+  useAuthModalEvents((modalType) => {
+    setAuthMode(modalType)
+    setAuthModalOpen(true)
+  })
 
   const closeDrawer = () => {
     setIsDrawerOpen(false)

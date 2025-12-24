@@ -1,0 +1,41 @@
+# Git
+.git
+.gitignore
+
+# Python
+__pycache__
+*.pyc
+*.pyo
+*.pyd
+.Python
+venv
+env
+.venv
+
+# IDE
+.idea
+.vscode
+*.swp
+*.swo
+
+# 测试文件
+test_*.py
+tests/
+
+# 输出文件
+*.csv
+output/
+logs/
+
+# 浏览器配置
+domain_profile/
+rea_profile/
+browser_profiles/
+
+# 其他
+*.md
+*.txt
+!requirements.txt
+.env
+.env.*
+

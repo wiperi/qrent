@@ -1,153 +1,403 @@
-# QRent Scraper - Independent Deployment
+# QRent Property Scraper
 
-🚀 **Independent** Australian property data scraping and processing service, specifically designed for rental information around Sydney universities (UNSW, USYD, UTS).
+A production-ready, modular property scraping framework for Australian rental market, specifically designed for university student accommodation near UNSW, USYD, and UTS.
 
-## ✨ Features
+## 🌟 Features
 
-- 🏠 Scrape property basic information from Domain.com.au
-- 🧹 Intelligent data cleaning and standardization
-- 📍 Google Maps API for commute time calculation
-- 🤖 AI-driven property scoring and keyword extraction
-- 🗄️ Incremental database updates with delisted property removal
-- 🔄 **Smart data synchronization** - removes properties no longer available
-- 🐳 **Completely independent Docker deployment**
-- ⏰ Scheduled task support (runs daily at 1:00 AM)
-- 🔒 Fully isolated from main application
+### Core Capabilities
+- **Multi-Platform Scraping**: Supports RealEstate.com.au and Domain.com.au
+- **Anti-Bot Protection**: Playwright persistent browser profiles with automatic reset mechanism
+- **Historical Data Reuse**: Intelligent caching system to avoid redundant API calls
+- **AI-Powered Scoring**: Property quality assessment using DashScope (Qwen) API
+- **Commute Time Calculation**: Google Maps API integration for transit time estimates
+- **Database Integration**: MySQL storage with intelligent update/delete logic
+- **Modular Architecture**: Clean separation of scrapers, services, models, and utilities
 
-## 🚦 Quick Start
+### Advanced Features
+- **Smart Region Matching**: Fuzzy address parsing for flexible location handling
+- **Profile Reset Strategy**: Bypasses IP blocking by resetting browser profile every 30 properties
+- **Concurrent Processing**: Multi-threaded scoring and commute calculation
+- **Real-time Logging**: Live progress monitoring with automatic flush
+- **CSV Export**: Structured data output with date-stamped filenames
+- **Error Recovery**: Comprehensive retry mechanisms and error handling
 
-### 1. Initialize Environment
+## � Project Structure
+
+```
+src/
+├── config/
+│   ├── __init__.py
+│   └── settings.py          # Centralized configuration management
+├── models/
+│   ├── __init__.py
+│   └── property.py          # Property data model & enums
+├── scrapers/
+│   ├── __init__.py
+│   ├── base.py              # Base scraper abstract class
+│   ├── domain.py            # Domain.com.au scraper
+│   └── realestate.py        # RealEstate.com.au scraper (Playwright)
+├── services/
+│   ├── __init__.py
+│   ├── commute.py           # Google Maps commute time service
+│   ├── scoring.py           # AI property scoring service
+│   ├── database.py          # Database connection service
+│   └── database_importer.py # CSV to MySQL import logic
+├── utils/
+│   ├── __init__.py
+│   ├── browser.py           # Browser manager (Selenium/Playwright)
+│   ├── helpers.py           # Utility functions
+│   └── logger.py            # Logging configuration
+└── pipeline.py              # Main orchestration pipeline
+```
+
+## � Quick Start
+
+### Prerequisites
+
+- Python 3.8+
+- MySQL 5.7+ or 8.0+
+- Google Maps API key (for commute calculation)
+- DashScope API key (for property scoring)
+
+### Installation
+
 ```bash
+# Clone the repository
 cd packages/scraper
-./deploy.sh init
+
+# Install dependencies
+pip install -r requirements.txt
+
+# Install Playwright browsers
+playwright install chromium
 ```
 
-### 2. Configure Environment Variables
-```bash
-# Edit configuration file
-nano .env
+### Configuration
 
-# Required configuration:
-# - Database connection information
-# - Google Maps API key
-# - DashScope API key
-```
+Create a `.env` file in the project root:
 
-### 3. Build and Start
-```bash
-# Build image
-./deploy.sh build
-
-# Start service
-./deploy.sh start
-
-# Check status
-./deploy.sh status
-```
-
-## 📋 Management Commands
-
-```bash
-./deploy.sh init        # Initialize environment
-./deploy.sh build       # Build Docker image
-./deploy.sh start       # Start service
-./deploy.sh stop        # Stop service
-./deploy.sh restart     # Restart service
-./deploy.sh status      # Show status
-./deploy.sh logs        # Show real-time logs
-./deploy.sh run         # Execute scraper immediately
-./deploy.sh shell       # Enter container command line
-./deploy.sh test        # Test mode
-./deploy.sh backup      # Backup data
-./deploy.sh cleanup     # Clean all resources
-./deploy.sh help        # Show help
-```
-
-## 🔧 Configuration Options
-
-### Environment Variables Configuration
-Configure the following variables in the `.env` file:
-
-```bash
+```env
 # Database Configuration
-DB_HOST=your_database_host
-DB_USER=property_user
-DB_PASSWORD=your_secure_password
-DB_DATABASE=qrent_db
+DB_HOST=localhost
+DB_USER=your_username
+DB_PASSWORD=your_password
+DB_DATABASE=qrent
 DB_PORT=3306
 
 # API Keys
 GOOGLE_MAPS_API_KEY=your_google_maps_api_key
-PROPERTY_RATING_API_KEY=your_dashscope_api_key
+DASHSCOPE_API_KEY=your_dashscope_api_key
+PROPERTY_RATING_API_KEY=your_dashscope_api_key  # Alternative key name
 
-# Data Synchronization
-AUTO_DELETE_DELISTED=false  # Set to 'true' to auto-remove delisted properties
+# Output Directory
+OUTPUT_DIR=./output
 ```
 
-### Running Mode Configuration
-Modify the `command` parameter in `docker-compose.yml`:
+### Basic Usage
 
-- `["cron-only"]` - Scheduled task mode (recommended for production)
-- `["run"]` - Immediate execution mode
-- `["test"]` - Test mode
+```python
+from src.pipeline import ScraperPipeline
 
-## 📁 Project Structure
+# Initialize pipeline with all features enabled
+pipeline = ScraperPipeline(
+    scraper_types=['realestate'],  # or ['domain'] or both
+    enable_scoring=True,
+    enable_commute=True,
+    enable_database=True,
+    output_dir='./output'
+)
 
-```
-packages/scraper/
-├── deploy.sh                    # 🎯 Independent deployment management script
-├── docker-compose.yml           # 🐳 Independent Docker configuration
-├── Dockerfile                   # 📦 Docker image build file
-├── .env.example                 # ⚙️ Environment variables template
-├── property.py                  # Main program
-├── scraper.py                   # Basic data scraping
-├── target_areas.py              # Target area configuration
-├── data_cleaner.py              # Data cleaning
-├── scraper_detailed.py          # Detailed information scraping
-├── commute_time.py              # Commute time calculation
-├── point.py                     # AI scoring and keyword extraction
-├── csv_cleaner_and_importer.py  # Database import
-├── requirements.txt             # Python dependencies
-├── docker-entrypoint.sh         # Docker entry script
-├── backup/                      # 🗂️ Backup directory
-├── logs/                        # 📋 Log directory
-└── README.md                    # 📖 This documentation
+# Run complete pipeline for UNSW
+properties = pipeline.run(
+    university='UNSW',
+    scrape_details=True,
+    skip_existing=True
+)
+
+print(f"Scraped {len(properties)} properties")
 ```
 
-## 🔄 Data Processing Workflow
+### Command Line Usage
 
-```
-Domain.com.au Property Data
-         ↓
-1. Basic Data Scraping (UNSW + USYD)
-         ↓
-2. Data Cleaning and Standardization
-         ↓
-3. Detailed Information Supplementation (description, available date)
-         ↓
-4. Commute Time Calculation (to universities)
-         ↓
-5. AI Scoring and Keyword Extraction
-         ↓
-6. UTS Data Generation (copy USYD data)
-         ↓
-7. UTS Commute Time Recalculation
-         ↓
-8. Database Synchronization (remove delisted properties) 🆕
-         ↓
-9. Database Import (three universities separately)
-         ↓
-10. Cleanup Temporary Files
+```bash
+# Run full pipeline for UNSW
+python -m src.pipeline UNSW
+
+# Generate UTS data from USYD (with commute time reuse)
+python generate_uts_csv.py
+
+# Process USYD details only (list already exists)
+python process_usyd_only.py
+
+# Clean CSV (remove properties without description)
+python clean_csv.py output/UNSW_rentdata_251222.csv
+
+# Import to database
+python csv_cleaner_and_importer.py process output/UNSW_rentdata_251222.csv
 ```
 
-## 🎯 Target Areas
+## 🏗️ Architecture
 
-### UNSW Surrounding Areas (10 postcodes)
-newtown, eastgardens, pagewood, maroubra, kensington, kingsford, randwick, mascot, rosebery, zetland
+### Pipeline Workflow
 
-### USYD Surrounding Areas (10 postcodes)
-sydney-city, wolli-creek, hurstville, burwood, newtown, glebe, waterloo, chippendale, ultimo, haymarket
+```
+1. List Scraping
+   ↓
+2. Historical Data Loading (7-day cache)
+   ↓
+3. Detail Scraping (with profile reset every 30 properties)
+   ↓
+4. AI Scoring (DashScope API, 0-20 scale)
+   ↓
+5. Commute Time Calculation (Google Maps Transit API)
+   ↓
+6. Database Import (with outdated RealEstate property deletion)
+   ↓
+7. CSV Export
+```
 
+### Key Components
+
+#### 1. ScraperPipeline (`pipeline.py`)
+- **Purpose**: Orchestrates the complete scraping workflow
+- **Key Methods**:
+  - `_load_history_csv()`: Loads last 7 days' CSV for data reuse
+  - `_apply_history_data()`: Applies cached details/scores/commute times
+  - `run()`: Main execution flow for a university
+  - **UTS Generation** (lines 641-710): Copies USYD data with UTS-specific commute
+
+#### 2. RealEstateScraper (`scrapers/realestate.py`)
+- **Purpose**: RealEstate.com.au scraping with Kasada bypass
+- **Anti-Bot Strategy**:
+  - Playwright persistent browser (`rea_profile/`)
+  - Profile reset every 30 properties via `_reset_profile()`
+  - Random delays (1-2 seconds) between requests
+  - Page scrolling simulation
+- **Key Methods**:
+  - `scrape_listings()`: Scrapes property list pages
+  - `scrape_property_details()`: Scrapes individual property details
+
+#### 3. ScoringService (`services/scoring.py`)
+- **Purpose**: AI-powered property quality assessment
+- **Scoring Dimensions**:
+  1. House Quality (0-10)
+  2. Living Experience (0-10)
+  3. Internal Facilities (0-10)
+  - **Total Score** = (Sum of 3 dimensions) / 30 × 20
+- **API**: DashScope `qwen-plus-1220` model
+- **Strategy**: Multiple calls for consistency, average results
+
+#### 4. CommuteService (`services/commute.py`)
+- **Purpose**: Calculate public transit commute times
+- **API**: Google Maps Directions API
+- **Parameters**: 
+  - Mode: Transit
+  - Departure: Next day 8:30 AM
+  - Alternatives: False (fastest route only)
+- **Smart Reuse**: Checks `commute_times` dict before API call
+
+#### 5. DatabaseImporter (`services/database_importer.py`)
+
+
+## 🔧 Configuration
+
+### ScraperConfig
+
+```python
+max_pages: int = 7          # Pages to scrape per area
+page_delay: float = 5.0     # Delay between pages
+request_delay: float = 3.0  # Delay between requests
+retry_count: int = 3
+retry_delay: float = 10.0
+```
+
+### Target Areas
+
+Configurable target suburbs for each university in `config/settings.py`:
+
+```python
+TARGET_AREAS = {
+    'UNSW': [
+        "kensington-nsw-2033",
+        "kingsford-nsw-2032",
+        "randwick-nsw-2031",
+        # ... 7 more areas
+    ],
+    'USYD': [...],
+    'UTS': [...]
+}
+```
+
+## 🛡️ Anti-Bot Strategies
+
+### 1. Browser Profile Management
+- **Persistent Profile**: Saves cookies, localStorage, session data
+- **Automatic Reset**: Deletes profile every 30 properties
+- **Directory**: `rea_profile/` (can be customized)
+
+### 2. Request Patterns
+- **Random Delays**: 1-2 seconds between requests
+- **Page Scrolling**: Simulates human behavior
+- **Wait Times**: Explicit waits for elements
+
+### 3. Detection Avoidance
+- Non-headless mode by default (uses Xvfb on servers)
+- User-agent rotation (optional)
+- Request header customization
+
+## 📈 Performance Optimization
+
+### Historical Data Reuse
+
+The pipeline caches data from the last 7 days to minimize redundant operations:
+
+```python
+# Reuse statistics from a typical USYD run:
+Details:  823 properties (no need to re-scrape)
+Scores:   823 properties (no AI API calls)
+Commute:  varies by university (no Google Maps API calls)
+```
+
+### Concurrent Processing
+
+```python
+# Scoring: 2 workers (configurable)
+scoring_service = ScoringService(
+    max_workers=2
+)
+
+# Commute: 5 workers (configurable)
+commute_service = CommuteService(
+    max_workers=5,
+    request_delay=1.1  # Rate limiting
+)
+```
+
+## 📦 CSV Output Format
+
+Generated files: `{UNIVERSITY}_rentdata_YYMMDD.csv`
+
+```csv
+houseId,bedrooms,bathrooms,parking,propertyType,pricePerWeek,address_line1,address_line2,suburb,state,postcode,url,thumbnail_url,description_en,keywords,average_score,commuteTime_UNSW,commuteTime_USYD,commuteTime_UTS,available_date,source
+```
+
+## 🗄️ Database Schema
+
+### Key Tables
+
+- `property`: Main property data
+- `property_school`: Many-to-many relationship (property ↔ school)
+- `property_images`: Property image gallery
+- `regions`: Suburb/postcode lookup table
+- `schools`: University information
+
+## 🔍 Troubleshooting
+
+### IP Blocking Issues
+
+If you encounter "Access Denied" or Kasada challenges:
+
+```python
+# Increase profile reset frequency
+scraper._reset_profile()  # Manual reset
+```
+
+### Historical Data Not Loading
+
+Check the output directory for CSV files:
+
+```bash
+ls -lt output/UNSW_rentdata_*.csv
+```
+
+Ensure files are within 7 days and don't contain `_list_` in filename.
+
+### Database Import Errors
+
+**Region Mismatch**: The fuzzy matching should handle most cases, but if you see warnings about unmatched regions, new records will be created with `state=NSW` and `postcode=0`. Review and update manually if needed.
+
+## 🚀 Deployment
+
+### Docker Deployment
+
+```bash
+# Build image
+docker build -t qrent-scraper -f Dockerfile .
+
+# Run scraper
+docker run --env-file .env qrent-scraper python src/pipeline.py UNSW
+```
+
+### Scheduled Runs (Cron)
+
+```cron
+# Daily scraping at 2 AM
+0 2 * * * cd /path/to/scraper && python src/pipeline.py UNSW >> logs/unsw.log 2>&1
+0 3 * * * cd /path/to/scraper && python src/pipeline.py USYD >> logs/usyd.log 2>&1
+0 4 * * * cd /path/to/scraper && python src/pipeline.py UTS >> logs/uts.log 2>&1
+```
+
+## 📝 Development
+
+### Adding a New Scraper
+
+```python
+from src.scrapers.base import BaseScraper
+from src.models import PropertyData, PropertySource
+
+class NewSiteScraper(BaseScraper):
+    SOURCE = PropertySource.NEW_SITE
+    BASE_URL = "https://newsite.com.au"
+    
+    def scrape_listings(self, area: str) -> List[PropertyData]:
+        # Implement listing scraping
+        pass
+    
+    def scrape_property_details(self, properties: List[PropertyData]) -> None:
+        # Implement detail scraping
+        pass
+
+# Register in pipeline.py
+SCRAPERS = {
+    'domain': DomainScraper,
+    'realestate': RealEstateScraper,
+    'newsite': NewSiteScraper,  # Add here
+}
+```
+
+### Running Tests
+
+```bash
+# Run unit tests
+pytest tests/
+
+# Run with coverage
+pytest --cov=src tests/
+```
+
+## 🤝 Contributing
+
+1. Fork the repository
+2. Create a feature branch (`git checkout -b feature/amazing-feature`)
+3. Commit your changes (`git commit -m 'Add amazing feature'`)
+4. Push to the branch (`git push origin feature/amazing-feature`)
+5. Open a Pull Request
+
+## 📄 License
+
+This project is proprietary software for QRent internal use only.
+
+## 📧 Contact
+
+For questions or issues, please contact the development team.
+
+## 🙏 Acknowledgments
+
+---
+
+**Last Updated**: December 2025  
+**Version**: 2.0.0  
+**Status**: Production Ready ✅
 ### UTS Surrounding Areas (10 postcodes)
 sydney-city, ultimo, haymarket, pyrmont, chippendale, surry-hills, redfern, waterloo, glebe, newtown
 
