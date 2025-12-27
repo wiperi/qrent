@@ -1,6 +1,6 @@
 import os
-from tools.rag_tool import search_qrent_knowledge
-from tools.coverletter_tool import generate_rental_cover_letter
+from src.tools.rag_tool import search_qrent_knowledge
+from src.tools.cover_letter import generate_rental_cover_letter
 
 # 统一注册所有工具
 ALL_TOOLS = [

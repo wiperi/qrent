@@ -7,7 +7,7 @@ from llama_index.core.settings import Settings
 from llama_index.embeddings.dashscope import DashScopeEmbedding
 from llama_index.readers.dashscope.base import DashScopeParse
 from llama_index.readers.dashscope.utils import ResultType
-from config.path import PATHS
+from src.config.path import PATHS
 
 # ================================================================
 # 1. 加载环境变量（用于读取百炼 API Key）

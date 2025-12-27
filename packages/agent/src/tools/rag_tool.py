@@ -5,7 +5,7 @@ from llama_index.core import StorageContext, load_index_from_storage
 from llama_index.core.settings import Settings
 from llama_index.embeddings.dashscope import DashScopeEmbedding
 from langchain_core.tools import tool
-from config.path import PATHS
+from src.config.path import PATHS
 
 dotenv.load_dotenv()
 

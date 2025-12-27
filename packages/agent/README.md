@@ -16,9 +16,7 @@ It supports **retrieval-augmented generation (RAG)** over a rental knowledge bas
 ```text
 agent/
 │── src/            # Core agent logic
-│── tools/          # Agent tools (RAG, generation, APIs)
 │── knowledge/      # Knowledge base for RAG
-│── config/         # Configuration files
 │── docs/           # Documentation
 │── tests/          # Tests
 │── app.py          # Application entrypoint
