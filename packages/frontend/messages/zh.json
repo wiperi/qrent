@@ -312,6 +312,12 @@
     "ariaLabel": "租房社群"
   },
   "HeroSection": {
-    "supportedSchools": "已支持 UNSW/USYD/UTS 通勤找房"
+    "supportedPrefix": "已支持",
+    "supportedSuffix": "通勤找房",
+    "schools": {
+      "UNSW": "UNSW",
+      "USYD": "USYD", 
+      "UTS": "UTS"
+    }
   }
 }

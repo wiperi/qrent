@@ -312,6 +312,12 @@
     "ariaLabel": "Rental Community"
   },
   "HeroSection": {
-    "supportedSchools": "UNSW/USYD/UTS Supported"
+    "supportedPrefix": "",
+    "supportedSuffix": "Commute Housing Now Supported",
+    "schools": {
+      "UNSW": "UNSW",
+      "USYD": "USYD",
+      "UTS": "UTS"
+    }
   }
 }

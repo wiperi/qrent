@@ -3,6 +3,7 @@
 import { Suspense } from 'react'
 import Image from 'next/image'
 import SearchBar from '@/components/SearchBar'
+import SchoolRotate from '@/components/SchoolRotate'
 import { useTranslations } from 'next-intl'
 
 
@@ -21,10 +22,9 @@ export default function HeroSection() {
             className="object-cover"
             sizes="(max-width: 1280px) 100vw, 1280px"
           />
-          
-        <h2 className="absolute top-[30%] left-1/2 -translate-x-1/2 text-xl sm:text-2xl md:text-3xl font-semibold text-white text-center drop-shadow-lg"> 
-          {t('supportedSchools')}
-        </h2>
+          <h2 className="absolute top-[30%] left-1/2 -translate-x-1/2 text-xl sm:text-2xl md:text-3xl font-semibold text-white text-center drop-shadow-lg whitespace-nowrap"> 
+            {t('supportedPrefix')} <SchoolRotate /> {t('supportedSuffix')}
+          </h2>
 
           {/* Search bar overlay */}
           <div className="absolute inset-0 flex items-center justify-center px-4">
