@@ -1,0 +1,7 @@
+# Web Scraping
+requests==2.31.0
+
+# Database
+mysql-connector-python==8.2.0
+
+flask
