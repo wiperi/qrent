@@ -59,6 +59,7 @@ export const Thread: FC = () => {
 
         <ThreadPrimitive.ViewportFooter className="aui-thread-viewport-footer sticky bottom-0 mx-auto mt-auto flex w-full max-w-(--thread-max-width) flex-col gap-4 overflow-visible rounded-t-3xl bg-background pb-4 md:pb-6">
           <ThreadScrollToBottom />
+          <ThreadSuggestionsBar />
           <Composer />
         </ThreadPrimitive.ViewportFooter>
       </ThreadPrimitive.Viewport>
@@ -93,6 +94,13 @@ const ThreadWelcome: FC = () => {
           </p>
         </div>
       </div>
+    </div>
+  );
+};
+
+const ThreadSuggestionsBar: FC = () => {
+  return (
+    <div className="aui-thread-suggestions-bar mx-auto w-full max-w-(--thread-max-width) px-2">
       <ThreadSuggestions />
     </div>
   );
@@ -105,9 +113,10 @@ const SUGGESTIONS = [
     prompt: "请帮我生成一封英文的租房 Cover Letter，突出按时交租、安静干净、无宠物、无烟。",
   },
   {
-    title: "Explain React hooks",
-    label: "like useState and useEffect",
-    prompt: "Explain React hooks like useState and useEffect",
+    title: "生成 Parent Letter",
+    label: "一键生成父母担保函",
+    prompt:
+      "请帮我生成一封正式的父母担保函 (Parent Letter/Guardian Letter) 用于澳洲租房申请。请告诉我你需要哪些信息（如担保人姓名、资助金额承诺等），然后帮我起草这封信。",
   },
 ] as const;
 

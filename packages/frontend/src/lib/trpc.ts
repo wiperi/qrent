@@ -16,8 +16,8 @@ export function makeQueryClient() {
         retry: (failureCount, error: unknown) => {
           // Don't retry on auth errors
           if (error && typeof error === 'object' && 'data' in error) {
-            const errorData = error.data as { code?: string };
-            if (errorData.code === 'UNAUTHORIZED') {
+            const errorData = (error as { data?: { code?: string } }).data;
+            if (errorData?.code === 'UNAUTHORIZED') {
               return false;
             }
           }
