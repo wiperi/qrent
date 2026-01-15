@@ -16,27 +16,27 @@
     {
       "id": "Client_001",
       "name": "佛系妖精",
-      "webhook_url": "https://qyapi.weixin.qq.com/cgi-bin/webhook/send?key=27791a95-e674-4d9c-86be-00e79c2d01be",
-      "min_price": 720,
-      "max_price": 850,
+      "webhookUrl": "https://qyapi.weixin.qq.com/cgi-bin/webhook/send?key=27791a95-e674-4d9c-86be-00e79c2d01be",
+      "minPrice": 720,
+      "maxPrice": 850,
       "regions": [
         "zetland",
         "waterloo",
         "wolli creek"
       ],
-      "room_types": [
+      "roomTypes": [
         {
           "bedrooms": 1,
           "bathrooms": 1
         }
       ],
-      "min_available_date": "2026-01-25",
-      "min_rating": 4,
-      "target_schools": ["UNSW"],
-      "min_commute_time": 20,
-      "max_commute_time": 30,
-      "max_available_date": null,
-      "default_limit": 20
+      "minAvailableDate": "2026-01-25",
+      "minRating": 4,
+      "targetSchools": ["UNSW"],
+      "minCommuteTime": 20,
+      "maxCommuteTime": 30,
+      "maxAvailableDate": null,
+      "defaultLimit": 20
     }
   ]
 }

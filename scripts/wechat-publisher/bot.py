@@ -12,7 +12,8 @@ from typing import Any, Dict, List, Optional, Tuple
 # ================= 配置与常量 =================
 
 APP_TITLE = "每日客户房源推荐"
-DEDUP_FILE = "sent_records.json"
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+DEDUP_FILE = os.path.join(BASE_DIR, "sent_records.json")
 
 
 # ================= 1. 基础工具函数 (复用 app.py) =================
@@ -34,7 +35,6 @@ def load_settings(settings_file: str) -> Dict[str, Any]:
     
 
 def get_db_config(settings: Dict[str, Any]) -> Dict[str, Any]:
-    # 允许用环境变量覆盖，方便部署
     db = dict(settings.get("db", {}))
     db["host"] = os.getenv("DB_HOST", db.get("host"))
     db["port"] = int(os.getenv("DB_PORT", db.get("port", 3306)))
@@ -58,14 +58,13 @@ def get_qwen_config(settings: Dict[str, Any]) -> Dict[str, Any]:
 
 def build_client_query(
     customer: Dict[str, Any],
-    today_only: bool = False,           # [新增] 默认值
-    lookback_days: int = 0,             # [新增] 默认值
-    min_available_date: Optional[date] = None, # [新增]
-    max_available_date: Optional[date] = None, # [新增]
+    today_only: bool = False,  
+    lookback_days: int = 0,
+    min_available_date: Optional[date] = None,
+    max_available_date: Optional[date] = None,
     limit: int = 10
 ) -> Tuple[str, Tuple[Any, ...]]:
     
-    # 1. 基础字段
     select_fields = [
         "p.id", "p.url", "p.address", "r.name AS region_name",
         "p.bedroom_count", "p.bathroom_count", "p.price", 
@@ -79,9 +78,8 @@ def build_client_query(
     params: List[Any] = []
     group_by_clause = "" 
 
-    # --- 学校与通勤逻辑 ---
-    target_schools = customer.get("target_schools") or []
-    max_commute = customer.get("max_commute_time")
+    target_schools = customer.get("targetSchools") or []
+    max_commute = customer.get("maxCommuteTime")
 
     if target_schools:
         join_clause.append("JOIN property_school ps ON p.id = ps.property_id")
@@ -101,19 +99,15 @@ def build_client_query(
     else:
         extra_select.append("NULL as commute_time")
 
-    # --- 时间限制逻辑 (使用传入的参数) ---
     if today_only:
         where_clause.append("p.published_at >= CURDATE()")
     else:
-        # 如果不是仅今日，则看回溯天数
-        # 如果参数 lookback_days > 0，就加上限制；否则(0)就是查全量
         if lookback_days > 0:
             where_clause.append("p.published_at >= DATE_SUB(CURDATE(), INTERVAL %s DAY)")
             params.append(int(lookback_days))
 
-    # --- 基础筛选逻辑 ---
     where_clause.append("p.price BETWEEN %s AND %s")
-    params.extend([int(customer.get("min_price", 0)), int(customer.get("max_price", 999999))])
+    params.extend([int(customer.get("minPrice", 0)), int(customer.get("maxPrice", 999999))])
 
     regions = customer.get("regions") or []
     if regions:
@@ -127,7 +121,7 @@ def build_client_query(
                 params.append(f"%{v}%")
         where_clause.append("(" + " OR ".join(region_clauses) + ")")
 
-    room_types = customer.get("room_types") or []
+    room_types = customer.get("roomTypes") or []
     if room_types:
         rt_clauses = []
         for rt in room_types:
@@ -135,7 +129,6 @@ def build_client_query(
             params.extend([int(rt.get("bedrooms", 0)), int(rt.get("bathrooms", 0))])
         where_clause.append("(" + " OR ".join(rt_clauses) + ")")
 
-    # 使用传入的 min_available_date 参数，而不是只从 customer 取
     if min_available_date:
         where_clause.append("p.available_date >= %s")
         params.append(min_available_date)
@@ -144,11 +137,10 @@ def build_client_query(
         where_clause.append("p.available_date <= %s")
         params.append(max_available_date)
 
-    if customer.get("min_score"):
+    if customer.get("minScore"):
         where_clause.append("p.average_score >= %s")
-        params.append(float(customer.get("min_score")))
+        params.append(float(customer.get("minScore")))
 
-    # 组装 SQL
     final_select = ", ".join(select_fields + extra_select)
     sql = f"""
         SELECT {final_select}
@@ -166,18 +158,14 @@ def build_client_query(
 def fetch_properties(settings, customer):
     db_config = get_db_config(settings)
     
-    # === [修改点] 补全参数 ===
-    # 策略：作为机器人，我们这里手动指定这些参数
-    # 为了测试能查出数据，建议先设为 "查历史30天"
-    
-    limit = customer.get("default_limit", 10)
-    min_av = _parse_date(customer.get("min_available_date"))
-    max_av = _parse_date(customer.get("max_available_date"))
+    limit = customer.get("defaultLimit", 10)
+    min_av = _parse_date(customer.get("minAvailableDate"))
+    max_av = _parse_date(customer.get("maxAvailableDate"))
     
     sql, params = build_client_query(
         customer=customer,
-        today_only=False,      # <--- 建议先设为 False 以便测试能查到数据
-        lookback_days=30,      # <--- 追溯过去 30 天发布的房源
+        today_only=False,
+        lookback_days=30,
         min_available_date=min_av,
         max_available_date=max_av,
         limit=limit
@@ -229,9 +217,9 @@ def validate_customer(c: Dict[str, Any]) -> Tuple[bool, str]:
             return False, f"缺少字段：{k}"
     if not isinstance(c["regions"], list) or not c["regions"]:
         return False, "regions 必须是非空数组"
-    if not isinstance(c["room_types"], list) or not c["room_types"]:
+    if not isinstance(c["roomTypes"], list) or not c["room_types"]:
         return False, "room_types 必须是非空数组"
-    url = c.get("webhook_url", "")
+    url = c.get("webhookUrl", "")
     if not isinstance(url, str) or not url.startswith("http"):
         return False, "webhook_url 格式错误，必须以 http 开头"
     return True, ""
@@ -295,7 +283,6 @@ def load_sent_records():
 
 
 def save_sent_records(records):
-    # 只保留最近 1000 条
     with open(DEDUP_FILE, "w") as f:
         json.dump(records[-1000:], f)
 
@@ -312,12 +299,10 @@ def send_wechat_webhook(webhook_url, customer_name, props, settings):
     for i, p in enumerate(props):
         ai_text = make_summary(settings, p)
         
-        # 1. 处理通勤时间显示
         commute_info = ""
         if p.get('commute_time'):
             commute_info = f"🚶{p['commute_time']} mins\n"
             
-        # 2. 构建符合文档的格式
         lines.append(
             f"**[{i + 1}. {p['address']}]({p['url']})**\n" 
             f"💰 <font color='warning'>${int(p['price'])}/wk</font> | "
@@ -339,7 +324,7 @@ def send_wechat_webhook(webhook_url, customer_name, props, settings):
 
 
 
-# ================= 5. Main 函数 (程序入口) =================
+# ================= 5. Main 函数 ======================
 
 def main():
     print("="*50)
@@ -351,20 +336,19 @@ def main():
 
     settings_file = sys.argv[1]
     
-    # 1. 加载配置
+    # 加载配置
     try:
         settings = load_settings(settings_file)
     except Exception as e:
         print(f"[FATAL] 配置文件加载失败: {e}")
         return
 
-    # 2. 加载去重记录
+    # 加载去重记录
     sent_ids = load_sent_records()
-    # 转成字符串集合方便比对
     sent_ids_set = set(str(x) for x in sent_ids)
     new_sent_ids = list(sent_ids)
 
-    # 3. 遍历客户列表
+    # 遍历客户列表
     customers = settings.get("customers", [])
     if not customers:
         print("[WARN] customers.json 中没有客户配置")
@@ -372,22 +356,22 @@ def main():
 
     for customer in customers:
         name = customer.get("name", "Unknown")
-        webhook = customer.get("webhook_url")
+        webhook = customer.get("webhookUrl")
         
         print(f"\n正在处理客户: {name} ...")
         
-        # 3.1 检查 Webhook (如果没配 Webhook，查了也发不出去，直接跳过)
+        # 检查 Webhook
         if not webhook:
             print("   -> ⚠️ 跳过：未配置 webhook_url")
             continue
 
-        # 3.2 查房源
+        # 查房源
         props = fetch_properties(settings, customer)
         if not props:
             print("   -> 未查到符合条件的房源")
             continue
             
-        # 3.3 去重 (过滤掉发过的 ID)
+        # 去重
         fresh_props = []
         for p in props:
             p_id_str = str(p['id'])
@@ -396,11 +380,9 @@ def main():
         
         print(f"   -> 查到 {len(props)} 条，去重后剩余 {len(fresh_props)} 条新房源")
 
-        # 3.4 推送与记录
+        # 推送与记录
         if fresh_props:
             send_wechat_webhook(webhook, name, fresh_props, settings)
-            
-            # 将新发送的 ID 加入记录
             for p in fresh_props:
                 p_id_str = str(p['id'])
                 if p_id_str not in sent_ids_set:
