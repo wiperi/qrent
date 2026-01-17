@@ -1,0 +1,57 @@
+{
+  "database": {
+    "host": "139.180.164.78",
+    "port": 3306,
+    "database": "qrent",
+    "user": "root",
+    "password": "chb089y1jxcfu902h43jcv014",
+    "connection_timeout": 10
+  },
+  "settings": {
+    "max_items": 10,
+    "sort_by": "published_at",
+    "enable_dedup": true,
+    "dedup_file": "sent_records.json"
+  },
+  "qwen": {
+    "api_key": "sk-2090e6c4c0c942338336111cb3a13e59",
+    "api_url": "https://dashscope.aliyuncs.com/api/v1/services/aigc/text-generation/generation",
+    "model": "qwen-max"
+  },
+  "tasks": [
+    {
+      "name": "student_group_01",
+      "webhook_url": "https://qyapi.weixin.qq.com/cgi-bin/webhook/send?key=27791a95-e674-4d9c-86be-00e79c2d01be",
+      "preferences": {
+        "min_price": 300,
+        "max_price": 10000,
+        "regions": ["zetland", "waterloo", "wolli creek"],
+        "room_types": {"bedrooms": 1,"bathrooms": 1},
+        "target_schools": ["UNSW"],
+        "min_commute_time": 20,
+        "max_commute_time": 30,
+        "min_rating": 14.0,
+        "min_available_date": "2026-01-25",
+        "max_available_date": null,
+        "default_limit": 20
+      }
+    },
+    {
+      "name": "family_client_02",
+      "webhook_url": "https://qyapi.weixin.qq.com/cgi-bin/webhook/send?key=27791a95-e674-4d9c-86be-00e79c2d01be",
+      "preferences": {
+        "min_price": 100,
+        "max_price": 1500,
+        "regions": ["zetland", "waterloo", "wolli creek"],
+        "room_types": {"bedrooms": 2,"bathrooms": 1},
+        "target_schools": ["UNSW"],
+        "min_commute_time": 20,
+        "max_commute_time": 20,
+        "min_rating": 16.5,
+        "min_available_date": "2026-01-25",
+        "max_available_date": null,
+        "default_limit": 20
+      }
+    }
+  ]
+}
