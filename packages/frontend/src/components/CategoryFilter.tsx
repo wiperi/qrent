@@ -16,7 +16,8 @@ export default function CategoryFilter({ categories, locale }: CategoryFilterPro
       // 选择"全部"时清空其他选择
       setSelectedCategories([]);
     } else {
-      toggleCategory(category);
+      // 单选逻辑：如果已选中则取消选择，否则替换为当前选择
+      setSelectedCategories(selectedCategories.includes(category) ? [] : [category]);
     }
   };
 
@@ -60,14 +61,14 @@ export default function CategoryFilter({ categories, locale }: CategoryFilterPro
       </div>
 
       {/* 已选择的分类显示 */}
-      {selectedCategories.length > 0 && (
+      {/* {selectedCategories.length > 0 && (
         <div className="mt-3 text-sm text-gray-600">
           {locale === LOCALE.ZH ? '已选择: ' : 'Selected: '}
           <span className="font-medium">
             {selectedCategories.join(', ')}
           </span>
         </div>
-      )}
+      )} */}
     </div>
   );
 }

@@ -277,6 +277,9 @@
     "flatmatesWarning": "Friendly reminder: Information on this website varies in quality. Please exercise caution and assess potential risks yourself.",
     "subscribe": "Add to Favorites",
     "unsubscribe": "Remove from Favorites",
+    "subscriptionTimeoutError": "Operation timed out. Please try again later.",
+    "subscriptionError": "Operation failed. Please try again later.",
+    "error": "Error",
     "keywords": {
       "bedroom": "bedroom",
       "bedrooms": "bedrooms",
