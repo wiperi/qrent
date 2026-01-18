@@ -9,15 +9,9 @@ export default function HeroSection() {
   return (
     <section className="relative pb-6">
       <div className="max-w-7xl mx-auto px-5">
-        {/* Hero Section Wrapper - 左右布局容器 */}
-        <div className="flex gap-5 flex-col md:flex-row items-start">
-          {/* Left Sidebar: Timeline */}
-          <div className="w-full md:w-auto">
-            <TodoProgressBar useSticky={false} maxHeight="520px" />
-          </div>
-
-          
-          {/* Right Content: Hero Image & Search */}
+        {/* Hero Section Wrapper - 上下布局容器 */}
+        <div className="flex flex-col gap-5">
+          {/* Top: Hero Image & Search */}
           <div className="relative h-[520px] w-full overflow-hidden rounded-2xl">
             <Image
               src="/banner.jpg"
@@ -40,6 +34,11 @@ export default function HeroSection() {
                 </Suspense>
               </div>
             </div>
+          </div>
+
+          {/* Bottom: Rental Progress Bar */}
+          <div className="w-full">
+            <TodoProgressBar useSticky={false} maxHeight="auto" />
           </div>
         </div>
       </div>

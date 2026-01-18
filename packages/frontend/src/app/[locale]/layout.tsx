@@ -1,6 +1,7 @@
 import Footer from '@/components/Footer';
 import Header from '@/components/Header';
 import LocaleUpdater from '@/components/LocaleUpdater';
+import NotificationBar from '@/components/NotificationBar';
 import { AIChatBox, AIChatToggleButton } from '@/components/AIChatBox';
 import { WeChatGroupEntry } from '@/components/WeChatGroupEntry';
 import { locales } from '@/i18n';
@@ -37,13 +38,14 @@ export default async function LocaleLayout({
     <NextIntlClientProvider messages={messages}>
       <LocaleUpdater />
       <Header />
+      <NotificationBar />
       <AppTRPCProvider>
         <AuthProvider>
           {children}
         </AuthProvider>
       </AppTRPCProvider>
       <Footer />
-      
+
       {/* AI 聊天框和租房社群入口 */}
       <AIChatBox />
       <AIChatToggleButton />

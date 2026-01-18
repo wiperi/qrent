@@ -341,5 +341,10 @@
     "note": "Note: Please mention your school",
     "instruction": "Long press to scan and join",
     "ariaLabel": "Rental Community"
+  },
+  "NotificationBar": {
+    "message1": "🎉 Now supports finding properties based on school location and commute time",
+    "message2": "💝 Join WeChat group for exclusive house-hunting service: multiple staff serving you, full-service management - just tell us your needs",
+    "message3": "⭐ Dynamic scoring based on your school and preferences"
   }
 }
