@@ -343,5 +343,14 @@
     "message1": "🎉 现已支持基于学校位置和通勤时间找房",
     "message2": "💝 加入微信群获得专属带找房服务，多对1服务，全流程托管，您提需求，我们帮您安排一切",
     "message3": "⭐ 根据你的学校和需求，动态显示评分"
+  },
+  "HeroSection": {
+    "supportedPrefix": "已支持",
+    "supportedSuffix": "通勤找房",
+    "schools": {
+      "UNSW": "UNSW",
+      "USYD": "USYD",
+      "UTS": "UTS"
+    }
   }
 }

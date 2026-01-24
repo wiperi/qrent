@@ -157,3 +157,26 @@
   background-size: 300% 300%;
   animation: rainbow-shift 4s ease infinite;
 }
+
+@keyframes school-fade {
+  0% {
+    opacity: 0;
+    transform: translateY(-100%);
+  }
+  10%, 23% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+  33% {
+    opacity: 0;
+    transform: translateY(100%);
+  }
+  34%, 100% {
+    opacity: 0;
+    transform: translateY(-100%);
+  }
+}
+
+.animate-school-fade {
+  animation: school-fade 6s ease-in-out infinite;
+}

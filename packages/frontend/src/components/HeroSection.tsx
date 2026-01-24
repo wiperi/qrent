@@ -4,8 +4,12 @@ import { Suspense } from 'react';
 import Image from 'next/image';
 import SearchBar from '@/components/SearchBar';
 import TodoProgressBar from './TodoProgressBar';
+import SchoolRotate from '@/components/SchoolRotate'
+import { useTranslations } from 'next-intl'
 
 export default function HeroSection() {
+  const t = useTranslations('HeroSection')
+
   return (
     <section className="relative pb-6">
       <div className="max-w-7xl mx-auto px-5">
@@ -33,6 +37,9 @@ export default function HeroSection() {
                   <SearchBar />
                 </Suspense>
               </div>
+              <h2 className="absolute top-[30%] left-1/2 -translate-x-1/2 text-xl sm:text-2xl md:text-3xl font-semibold text-white text-center drop-shadow-lg whitespace-nowrap"> 
+                {t('supportedPrefix')} <SchoolRotate /> {t('supportedSuffix')}
+              </h2>
             </div>
           </div>
 

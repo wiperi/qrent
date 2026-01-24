@@ -343,5 +343,14 @@
     "message1": "🎉 Now supports finding properties based on school location and commute time",
     "message2": "💝 Join WeChat group for exclusive house-hunting service: multiple staff serving you, full-service management - just tell us your needs",
     "message3": "⭐ Dynamic scoring based on your school and preferences"
+  },
+   "HeroSection": {
+    "supportedPrefix": "",
+    "supportedSuffix": "Commute Housing Now Supported",
+    "schools": {
+      "UNSW": "UNSW",
+      "USYD": "USYD",
+      "UTS": "UTS"
+    }
   }
 }
