@@ -4,7 +4,8 @@ import { FaBath, FaStar, FaRegStar } from 'react-icons/fa';
 import { IoBed } from 'react-icons/io5';
 import { useState, useRef, useEffect } from 'react';
 import { useTRPCClient } from '@/lib/trpc';
-import { useMutation, useQueryClient } from '@tanstack/react-query';
+import { useQueryClient } from '@tanstack/react-query';
+import { useToast } from '@/hooks/use-toast';
 import Image from 'next/image';
 
 interface PropertyCardProps {
@@ -50,70 +51,51 @@ export default function PropertyCard({
   const locale = useLocale();
   const propertyTypeName = propertyType === 1 ? t('house') : t('apartment');
   const trpc = useTRPCClient();
-  const [isSubscribing, setIsSubscribing] = useState(false);
   const [localSubscribed, setLocalSubscribed] = useState(subscribed || false);
-
-  const subscribeMutation = useMutation({
-    mutationFn: async (propertyId: number) => {
-      return await trpc.properties.subscribe.mutate({ propertyId });
-    },
-    onSuccess: () => {
-      setLocalSubscribed(true);
-      // 失效所有相关的房产查询
-      queryClient.invalidateQueries({ queryKey: ['properties'] });
-      queryClient.invalidateQueries({ queryKey: ['properties.search'] });
-      queryClient.invalidateQueries({ queryKey: ['properties.subscriptions'] });
-    },
-    onError: (error: { data?: { code: string } }) => {
-      // 如果是409错误（已订阅），静默处理并将状态改为已订阅
-      if (error?.data?.code === 'CONFLICT') {
-        // 静默处理，不显示错误，但更新本地状态
-        setLocalSubscribed(true);
-      } else {
-        console.error('Failed to subscribe:', error);
-      }
-    },
-    onSettled: () => {
-      setIsSubscribing(false);
-    },
-  });
-
-  const unsubscribeMutation = useMutation({
-    mutationFn: async (propertyId: number) => {
-      return await trpc.properties.unsubscribe.mutate({ propertyId });
-    },
-    onSuccess: () => {
-      setLocalSubscribed(false);
-      // 失效所有相关的房产查询
-      queryClient.invalidateQueries({ queryKey: ['properties'] });
-      queryClient.invalidateQueries({ queryKey: ['properties.search'] });
-      queryClient.invalidateQueries({ queryKey: ['properties.subscriptions'] });
-    },
-    onError: (error: { data?: { code: string } }) => {
-      // 如果是404错误（未订阅），静默处理并将状态改为未订阅
-      if (error?.data?.code === 'NOT_FOUND') {
-        // 静默处理，不显示错误，但更新本地状态
-        setLocalSubscribed(false);
-      } else {
-        console.error('Failed to unsubscribe:', error);
-      }
-    },
-    onSettled: () => {
-      setIsSubscribing(false);
-    },
-  });
+  const { toast } = useToast();
 
   const handleSubscribeToggle = async (e: React.MouseEvent) => {
     e.stopPropagation();
     e.preventDefault();
-    if (!propertyId || isSubscribing) return;
+    if (!propertyId) return;
 
-    setIsSubscribing(true);
+    // Immediately toggle local state for UI feedback
+    const newSubscribedState = !localSubscribed;
+    setLocalSubscribed(newSubscribedState);
 
-    if (localSubscribed) {
-      unsubscribeMutation.mutate(propertyId);
-    } else {
-      subscribeMutation.mutate(propertyId);
+    // Create AbortController for proper request cancellation
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 10000);
+
+    try {
+      // Make API call with abort signal
+      await (newSubscribedState 
+        ? trpc.properties.subscribe.mutate({ propertyId }, { signal: controller.signal })
+        : trpc.properties.unsubscribe.mutate({ propertyId }, { signal: controller.signal })
+      );
+      
+      // Clear timeout on success
+      clearTimeout(timeoutId);
+
+      // Success - invalidate queries to sync with server
+      queryClient.invalidateQueries({ queryKey: ['properties'] });
+      queryClient.invalidateQueries({ queryKey: ['properties.search'] });
+      queryClient.invalidateQueries({ queryKey: ['properties.subscriptions'] });
+    } catch (error) {
+      // Error handling - rollback state and show message
+      setLocalSubscribed(!newSubscribedState);
+      
+      // Show error message using toast
+      const errorMessage = error instanceof Error && (error.name === 'AbortError' || error.message.includes('aborted'))
+        ? t('subscriptionTimeoutError')
+        : t('subscriptionError');
+      
+      toast({
+        title: t('error'),
+        description: errorMessage,
+        variant: 'destructive',
+        duration: 2000,
+      });
     }
   };
   const queryClient = useQueryClient();
@@ -305,25 +287,20 @@ export default function PropertyCard({
             </div>
             <button
               onClick={handleSubscribeToggle}
-              disabled={isSubscribing || !propertyId}
-              className={`flex items-center justify-center rounded-full p-1.5 shadow-md hover:scale-130 transition-all duration-300 ease-in-out
-                   bg-white text-orange-400 hover:bg-orange-50 hover:shadow-lg hover:rotate-5
-                  ${isSubscribing ? 'animate-pulse opacity-50 cursor-not-allowed' : 'cursor-pointer'}`}
+              disabled={!propertyId}
+              className="flex items-center justify-center rounded-full p-1.5 shadow-md hover:scale-130 transition-all duration-300 ease-in-out
+                   bg-white text-orange-400 hover:bg-orange-50 hover:shadow-lg hover:rotate-5 cursor-pointer"
               title={localSubscribed ? t('unsubscribe') : t('subscribe')}
             >
               {localSubscribed ? (
-                <FaStar
-                  className={`w-5 h-5 transition-all duration-1200 ease-in-out transform
-                    ${isSubscribing ? 'animate-pulse' : ''}`}
-                />
+                <FaStar className="w-5 h-5 transition-all duration-1200 ease-in-out transform" />
               ) : (
-                <FaRegStar
-                  className={`w-5 h-5 transition-all duration-1200 ease-in-out transform
-                    ${isSubscribing ? 'animate-pulse' : ''}`}
-                />
+                <FaRegStar className="w-5 h-5 transition-all duration-1200 ease-in-out transform" />
               )}
             </button>
           </div>
+         
+          
 
           {/* Bottom left: Property info overlay on image */}
           <div className="absolute bottom-0 left-0 right-0 p-4 z-10">

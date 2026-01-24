@@ -5,6 +5,7 @@ import Script from 'next/script';
 import './globals.css';
 import { AIChatBox, AIChatToggleButton } from '@/components/AIChatBox';
 import { MainContentWrapper } from '@/components/MainContentWrapper';
+import { Toaster } from '@/components/ui/toaster';
 import { Analytics } from '@vercel/analytics/next';
 
 export const metadata: Metadata = {
@@ -49,6 +50,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
             <MainContentWrapper>{children}</MainContentWrapper>
             <AIChatToggleButton />
             <AIChatBox />
+            <Toaster />
           </AuthProvider>
         </AppTRPCProvider>
         <Analytics />
