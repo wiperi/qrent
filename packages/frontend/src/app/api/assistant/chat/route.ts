@@ -1,6 +1,11 @@
+/**
+ * Next.js API route that proxies chat payloads to the Agent streaming endpoint.
+ *
+ * Browser -> `/api/assistant/chat` -> `process.env.AGENT_URL` (defaults to `http://127.0.0.1:8000/stream`)
+ */
 import { NextRequest } from 'next/server';
 
-const BACKEND_URL = 'http://45.32.212.237:8000/stream';
+const BACKEND_URL = process.env.AGENT_URL || 'http://127.0.0.1:8000/stream';
 
 type ChatMessage = {
   role: 'user' | 'assistant';

@@ -1,3 +1,7 @@
+/**
+ * Root layout configuration
+ * Sets global metadata/scripts and wraps shared providers
+ */
 import { AuthProvider } from '@/lib/auth-context';
 import AppTRPCProvider from '@/lib/trpc-provider';
 import type { Metadata } from 'next';

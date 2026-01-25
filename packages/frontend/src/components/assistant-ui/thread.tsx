@@ -1,3 +1,4 @@
+// Assistant 聊天线程 UI：消息列表、输入框、建议卡片与消息操作栏等。
 "use client";
 
 import {
@@ -33,17 +34,36 @@ import {
 } from "lucide-react";
 import type { FC } from "react";
 
-export const Thread: FC = () => {
+type ThreadVariant = "sidebar" | "floating";
+
+type ThreadProps = {
+  variant?: ThreadVariant;
+};
+
+export const Thread: FC<ThreadProps> = ({ variant = "sidebar" }) => {
+  const maxWidth = variant === "floating" ? "36rem" : "44rem";
+  const viewportPadding = variant === "floating" ? "px-3 pt-3" : "px-4 pt-4";
+  const footerClassName =
+    variant === "floating"
+      ? "aui-thread-viewport-footer sticky bottom-0 mx-auto mt-auto flex w-full max-w-(--thread-max-width) flex-col gap-3 overflow-visible border-t border-border/70 bg-background/95 px-2 pb-3 pt-2 shadow-[0_-12px_32px_-24px_rgba(0,0,0,0.45)]"
+      : "aui-thread-viewport-footer sticky bottom-0 mx-auto mt-auto flex w-full max-w-(--thread-max-width) flex-col gap-4 overflow-visible rounded-t-3xl bg-background pb-4 md:pb-6";
+
   return (
     <ThreadPrimitive.Root
-      className="aui-root aui-thread-root @container flex h-full flex-col bg-background"
+      className={cn(
+        "aui-root aui-thread-root @container flex h-full flex-col bg-background",
+        variant === "floating" && "bg-background/95",
+      )}
       style={{
-        ["--thread-max-width" as string]: "44rem",
+        ["--thread-max-width" as string]: maxWidth,
       }}
     >
       <ThreadPrimitive.Viewport
         turnAnchor="top"
-        className="aui-thread-viewport relative flex flex-1 flex-col overflow-x-auto overflow-y-scroll scroll-smooth px-4 pt-4"
+        className={cn(
+          "aui-thread-viewport relative flex flex-1 flex-col overflow-x-auto overflow-y-scroll scroll-smooth",
+          viewportPadding,
+        )}
       >
         <AssistantIf condition={({ thread }) => thread.isEmpty}>
           <ThreadWelcome />
@@ -57,7 +77,7 @@ export const Thread: FC = () => {
           }}
         />
 
-        <ThreadPrimitive.ViewportFooter className="aui-thread-viewport-footer sticky bottom-0 mx-auto mt-auto flex w-full max-w-(--thread-max-width) flex-col gap-4 overflow-visible rounded-t-3xl bg-background pb-4 md:pb-6">
+        <ThreadPrimitive.ViewportFooter className={footerClassName}>
           <ThreadScrollToBottom />
           <ThreadSuggestionsBar />
           <Composer />

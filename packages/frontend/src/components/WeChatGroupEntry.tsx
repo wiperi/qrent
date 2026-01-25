@@ -1,3 +1,4 @@
+// 微信群入口浮窗按钮：仅首页显示，悬停展示二维码；当 AI 浮窗打开时自动隐藏。
 'use client';
 
 import { usePathname } from 'next/navigation';
@@ -5,20 +6,20 @@ import { useState } from 'react';
 import { useTranslations } from 'next-intl';
 import { RiWechatFill } from 'react-icons/ri';
 import { cn } from '@/lib/utils';
-import { useAIChatStore } from '@/lib/ai-chat-store';
+import { useFloatingAssistantStore } from '@/lib/floating-assistant-store';
 import { Button } from './ui/button';
 
 export function WeChatGroupEntry() {
   const pathname = usePathname();
   const [isHovered, setIsHovered] = useState(false);
-  const { isOpen: isAIChatOpen } = useAIChatStore();
+  const { isOpen: isAssistantOpen } = useFloatingAssistantStore();
   const t = useTranslations('WeChatGroupEntry');
 
   // 只在首页显示
   const isHomePage = pathname === '/' || /^\/[a-z]{2}$/.test(pathname);
 
   // 当AI聊天框打开时隐藏
-  if (!isHomePage || isAIChatOpen) return null;
+  if (!isHomePage || isAssistantOpen) return null;
 
   return (
     <div
