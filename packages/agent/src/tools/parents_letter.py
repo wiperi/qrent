@@ -1,9 +1,3 @@
-"""LangChain tool: generate a Parent/Guardian support letter for rentals.
-
-Generates a landlord-friendly parent financial support / guarantee letter in
-English or Chinese (Australia rental context).
-"""
-
 from __future__ import annotations
 
 from datetime import datetime
@@ -41,33 +35,82 @@ def generate_parent_letter(**kwargs) -> str:
     salutation_en_default = "To Whom It May Concern,"
     salutation_zh_default = "致相关负责人："
 
-    title = (data.title or (title_zh_default if data.language == "zh" else title_en_default)).strip()
-    salutation = (data.salutation or (salutation_zh_default if data.language == "zh" else salutation_en_default)).strip()
+    title = (
+        data.title or (title_zh_default if data.language == "zh" else title_en_default)
+    ).strip()
+    salutation = (
+        data.salutation
+        or (salutation_zh_default if data.language == "zh" else salutation_en_default)
+    ).strip()
 
     # support lines
-    rent_line_en = f"Rent: {data.support.rent_support}" if data.support.rent_support else f"Rent: AUD {data.weekly_rent} per week"
-    living_line_en = f"Living expenses: {data.support.living_support}" if data.support.living_support else "Living expenses: AUD [amount] per month"
+    rent_line_en = (
+        f"Rent: {data.support.rent_support}"
+        if data.support.rent_support
+        else f"Rent: AUD {data.weekly_rent} per week"
+    )
+    living_line_en = (
+        f"Living expenses: {data.support.living_support}"
+        if data.support.living_support
+        else "Living expenses: AUD [amount] per month"
+    )
 
-    rent_line_zh = f"房租：{data.support.rent_support}" if data.support.rent_support else f"房租：每周 AUD {data.weekly_rent}"
-    living_line_zh = f"生活费：{data.support.living_support}" if data.support.living_support else "生活费：每月 AUD [金额]"
+    rent_line_zh = (
+        f"房租：{data.support.rent_support}"
+        if data.support.rent_support
+        else f"房租：每周 AUD {data.weekly_rent}"
+    )
+    living_line_zh = (
+        f"生活费：{data.support.living_support}"
+        if data.support.living_support
+        else "生活费：每月 AUD [金额]"
+    )
 
     # bond / prepay
     if data.language == "en":
-        bond_en = "including the rental bond (bond)" if data.support.cover_bond else "excluding the rental bond (bond)"
+        bond_en = (
+            "including the rental bond (bond)"
+            if data.support.cover_bond
+            else "excluding the rental bond (bond)"
+        )
         prepay_en = (
             " If required, I am also willing to prepay rent for several months to further demonstrate my commitment."
             if data.support.prepay_option
             else ""
         )
-        support_scope_en = "full financial support" if data.support.support_type == "full" else "partial financial support"
+        support_scope_en = (
+            "full financial support"
+            if data.support.support_type == "full"
+            else "partial financial support"
+        )
 
-        applicant_id = f" ({data.applicant_identity})" if data.applicant_identity else ""
-        parent_loc = f" I am currently based in {data.parent_location}." if data.parent_location else ""
-        move_in = f" with a preferred move-in date of {data.move_in_date}" if data.move_in_date else ""
+        applicant_id = (
+            f" ({data.applicant_identity})" if data.applicant_identity else ""
+        )
+        parent_loc = (
+            f" I am currently based in {data.parent_location}."
+            if data.parent_location
+            else ""
+        )
+        move_in = (
+            f" with a preferred move-in date of {data.move_in_date}"
+            if data.move_in_date
+            else ""
+        )
 
-        funds_source = (data.support.funds_source or "my stable personal income and long-term savings").strip()
-        proof_docs = (data.support.proof_documents or "bank statements, proof of income, and/or asset documentation").strip()
-        notes = f"\n\nAdditional note: {data.statement_notes.strip()}" if data.statement_notes else ""
+        funds_source = (
+            data.support.funds_source
+            or "my stable personal income and long-term savings"
+        ).strip()
+        proof_docs = (
+            data.support.proof_documents
+            or "bank statements, proof of income, and/or asset documentation"
+        ).strip()
+        notes = (
+            f"\n\nAdditional note: {data.statement_notes.strip()}"
+            if data.statement_notes
+            else ""
+        )
 
         letter = f"""
 {title}
@@ -99,17 +142,35 @@ Date: {date_str}
         return letter
 
     # Chinese
-    bond_zh = "包括租赁押金（bond）在内" if data.support.cover_bond else "不含租赁押金（bond）"
-    prepay_zh = "如有需要，本人亦愿意预付数月租金，以进一步体现我的支持意愿与经济稳定性。" if data.support.prepay_option else ""
+    bond_zh = (
+        "包括租赁押金（bond）在内"
+        if data.support.cover_bond
+        else "不含租赁押金（bond）"
+    )
+    prepay_zh = (
+        "如有需要，本人亦愿意预付数月租金，以进一步体现我的支持意愿与经济稳定性。"
+        if data.support.prepay_option
+        else ""
+    )
     support_scope_zh = "全额" if data.support.support_type == "full" else "部分"
 
-    applicant_id_zh = f"（{data.applicant_identity}）" if data.applicant_identity else ""
-    parent_loc_zh = f"我目前居住在 {data.parent_location}。" if data.parent_location else ""
+    applicant_id_zh = (
+        f"（{data.applicant_identity}）" if data.applicant_identity else ""
+    )
+    parent_loc_zh = (
+        f"我目前居住在 {data.parent_location}。" if data.parent_location else ""
+    )
     move_in_zh = f"，预计入住日期为 {data.move_in_date}" if data.move_in_date else ""
 
-    funds_source_zh = (data.support.funds_source or "本人稳定收入及长期储蓄/资产").strip()
-    proof_docs_zh = (data.support.proof_documents or "银行流水、收入证明及/或资产证明等").strip()
-    notes_zh = f"\n\n补充说明：{data.statement_notes.strip()}" if data.statement_notes else ""
+    funds_source_zh = (
+        data.support.funds_source or "本人稳定收入及长期储蓄/资产"
+    ).strip()
+    proof_docs_zh = (
+        data.support.proof_documents or "银行流水、收入证明及/或资产证明等"
+    ).strip()
+    notes_zh = (
+        f"\n\n补充说明：{data.statement_notes.strip()}" if data.statement_notes else ""
+    )
 
     letter_zh = f"""
 {title}

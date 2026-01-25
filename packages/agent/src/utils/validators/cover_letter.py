@@ -135,17 +135,13 @@ def _business_rules(a: dict) -> List[str]:
         errs.append("lease_term 不能为空（例如：12 months）。")
 
     # weekly_rent must be valid and positive
-    wr = a.get("weekly_rent")
+# weekly_rent: required but no numeric validation
+    fin = a.get("financials") or {}
+    wr = fin.get("weekly_rent")
+
     if _is_blank(wr):
-        errs.append("weekly_rent 不能为空（例如：750）。")
-    else:
-        try:
-            if not isinstance(wr, int):
-                raise ValueError
-            if wr <= 0:
-                errs.append("weekly_rent 必须为正整数。")
-        except Exception:
-            errs.append("weekly_rent 格式不正确，请填写整数（例如：750）。")
+        errs.append("weekly_rent 不能为空（例如：520 / AUD 520 / 520 per week）。")
+
 
     # enum sanity checks (extra)
     ut = a.get("user_type")

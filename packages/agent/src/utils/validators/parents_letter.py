@@ -3,9 +3,6 @@ Business-level validation for parent letter generation.
 
 This module enforces hard constraints BEFORE calling the tool
 `generate_parent_letter`.
-
-It is used by the agent graph to fail fast with user-friendly, copyable
-templates instead of letting tool execution crash on bad inputs.
 """
 
 from __future__ import annotations
@@ -145,13 +142,19 @@ def _business_rules(a: dict) -> List[str]:
     # recommendation: partial support should include at least one amount
     if st == "partial":
         if _is_blank(sup.get("rent_support")) and _is_blank(sup.get("living_support")):
-            errs.append("当 support_type=partial 时，建议至少填写 rent_support 或 living_support（金额），以增强可信度。")
+            errs.append(
+                "当 support_type=partial 时，建议至少填写 rent_support 或 living_support（金额），以增强可信度。"
+            )
 
     # tips (non-blocking)
     if _is_blank(sup.get("proof_documents")):
-        errs.append("提示：建议填写 support.proof_documents（银行流水/收入证明/资产证明等）。")
+        errs.append(
+            "提示：建议填写 support.proof_documents（银行流水/收入证明/资产证明等）。"
+        )
     if _is_blank(sup.get("funds_source")):
-        errs.append("提示：建议填写 support.funds_source（资金来源，如收入/储蓄/资产）。")
+        errs.append(
+            "提示：建议填写 support.funds_source（资金来源，如收入/储蓄/资产）。"
+        )
 
     return errs
 
@@ -171,12 +174,24 @@ def validate_parent_letter_args(args: dict) -> Tuple[bool, str, dict]:
     rule_errors = _business_rules(filled_args)
 
     # split hard errors vs tips/recommendations
-    hard_errors = [e for e in rule_errors if not e.startswith("提示：") and not e.startswith("当 support_type=partial")]
-    tips = [e for e in rule_errors if e.startswith("提示：") or e.startswith("当 support_type=partial")]
+    hard_errors = [
+        e
+        for e in rule_errors
+        if not e.startswith("提示：") and not e.startswith("当 support_type=partial")
+    ]
+    tips = [
+        e
+        for e in rule_errors
+        if e.startswith("提示：") or e.startswith("当 support_type=partial")
+    ]
 
     if hard_errors:
         msg = "❗ 当前信息不足或不符合要求，暂时无法生成父母资金支持/担保信（Parent Letter）。\n\n"
-        msg += "请修正/补充以下内容：\n" + "\n".join(f"- {e}" for e in hard_errors) + "\n\n"
+        msg += (
+            "请修正/补充以下内容：\n"
+            + "\n".join(f"- {e}" for e in hard_errors)
+            + "\n\n"
+        )
         msg += "你可以直接复制并填写以下模板（未填的可选项会自动补默认值）：\n\n"
         msg += (
             "language: en  # 或 zh\n"
@@ -233,9 +248,11 @@ def validate_parent_letter_args(args: dict) -> Tuple[bool, str, dict]:
         if missing_fields:
             msg += "缺少字段：\n" + "\n".join(f"- {f}" for f in missing_fields) + "\n\n"
         if enum_errors:
-            msg += "枚举/取值可能不正确（例如 language / support.support_type）：\n" + "\n".join(
-                f"- {f}" for f in enum_errors
-            ) + "\n\n"
+            msg += (
+                "枚举/取值可能不正确（例如 language / support.support_type）：\n"
+                + "\n".join(f"- {f}" for f in enum_errors)
+                + "\n\n"
+            )
 
         msg += "建议按上面的模板检查并补齐后再试。"
         return False, msg, filled_args

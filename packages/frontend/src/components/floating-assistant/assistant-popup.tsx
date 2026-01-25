@@ -16,6 +16,9 @@ type AssistantPopupProps = {
 };
 
 const MIN_MARGIN = 12;
+// Keep the popup above the floating launcher button (h-14 w-14, md:bottom-8).
+// This prevents the launcher's ❌ button from covering the chat composer send button.
+const BOTTOM_SAFE_AREA = 96;
 
 export const AssistantPopup: FC<AssistantPopupProps> = ({
   isOpen,
@@ -37,12 +40,26 @@ export const AssistantPopup: FC<AssistantPopupProps> = ({
   }, []);
 
   useLayoutEffect(() => {
-    if (!isOpen || isMobile || position || typeof window === "undefined") return;
-    const width = contentRef.current?.offsetWidth ?? 420;
-    const height = contentRef.current?.offsetHeight ?? 640;
-    const nextX = Math.max(MIN_MARGIN, window.innerWidth - width - 24);
-    const nextY = Math.max(MIN_MARGIN, window.innerHeight - height - 24);
-    setPosition({ x: nextX, y: nextY });
+    if (!isOpen || isMobile || typeof window === "undefined") return;
+
+    // First open: place near bottom-right but keep enough space for the launcher button.
+    if (!position) {
+      const width = contentRef.current?.offsetWidth ?? 420;
+      const height = contentRef.current?.offsetHeight ?? 640;
+      const nextX = Math.max(MIN_MARGIN, window.innerWidth - width - 24);
+      const nextY = Math.max(
+        MIN_MARGIN,
+        window.innerHeight - height - BOTTOM_SAFE_AREA,
+      );
+      setPosition({ x: nextX, y: nextY });
+      return;
+    }
+
+    // If the popup was previously dragged too low, clamp it into the safe area.
+    const clamped = clampPosition(position.x, position.y);
+    if (clamped.x !== position.x || clamped.y !== position.y) {
+      setPosition(clamped);
+    }
   }, [isOpen, isMobile, position, setPosition]);
 
   const clampPosition = (nextX: number, nextY: number) => {
@@ -51,7 +68,7 @@ export const AssistantPopup: FC<AssistantPopupProps> = ({
     const width = rect?.width ?? 420;
     const height = rect?.height ?? 640;
     const maxX = Math.max(MIN_MARGIN, window.innerWidth - width - MIN_MARGIN);
-    const maxY = Math.max(MIN_MARGIN, window.innerHeight - height - MIN_MARGIN);
+    const maxY = Math.max(MIN_MARGIN, window.innerHeight - height - BOTTOM_SAFE_AREA);
 
     return {
       x: Math.min(Math.max(MIN_MARGIN, nextX), maxX),
@@ -108,7 +125,7 @@ export const AssistantPopup: FC<AssistantPopupProps> = ({
               "data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=open]:fade-in-0 data-[state=closed]:fade-out-0 data-[state=open]:slide-in-from-bottom-5 data-[state=closed]:slide-out-to-bottom-5",
               "md:h-[640px] md:w-[420px] md:max-w-none md:rounded-2xl",
               "max-md:inset-3 max-md:rounded-2xl",
-              !isMobile && !position && "md:bottom-8 md:right-8",
+              !isMobile && !position && "md:bottom-24 md:right-8",
               isDragging && "cursor-grabbing",
               !isDragging && !isMobile && "cursor-default",
             )}
