@@ -162,10 +162,10 @@ jobs:
         run: pnpm --filter shared db:generate
 
       - name: Type check backend
-        run: pnpm --filter backend tsc --noEmit
+        run: pnpm --filter backend build
 
       - name: Type check frontend
-        run: pnpm --filter frontend tsc --noEmit
+        run: pnpm --filter frontend exec tsc --noEmit
 
   # Final check - all tests passed
   ci-success:
