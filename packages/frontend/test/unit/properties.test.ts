@@ -27,7 +27,7 @@ describe('Properties Router - Client-Side tRPC', () => {
         pageSize: 10,
       };
 
-      const result = await client.properties.search.mutate(searchParams);
+      const result = await client.properties.search.query(searchParams);
 
       expect(result).toBeDefined();
       expect(result).toHaveProperty('properties');
@@ -45,7 +45,7 @@ describe('Properties Router - Client-Side tRPC', () => {
         pageSize: 10,
       };
 
-      const result = await client.properties.search.mutate(searchParams);
+      const result = await client.properties.search.query(searchParams);
 
       expect(result).toBeDefined();
       expect(result).toHaveProperty('properties');
@@ -64,7 +64,7 @@ describe('Properties Router - Client-Side tRPC', () => {
         pageSize: 5,
       };
 
-      const result = await client.properties.search.mutate(searchParams);
+      const result = await client.properties.search.query(searchParams);
 
       expect(result).toBeDefined();
       expect(result).toHaveProperty('properties');
@@ -80,7 +80,7 @@ describe('Properties Router - Client-Side tRPC', () => {
         pageSize: 10,
       };
 
-      const result = await client.properties.search.mutate(searchParams);
+      const result = await client.properties.search.query(searchParams);
 
       expect(result).toBeDefined();
       expect(result).toHaveProperty('properties');
@@ -97,7 +97,7 @@ describe('Properties Router - Client-Side tRPC', () => {
         pageSize: 10,
       };
 
-      const result = await client.properties.search.mutate(searchParams);
+      const result = await client.properties.search.query(searchParams);
 
       expect(result).toBeDefined();
     });
@@ -111,7 +111,7 @@ describe('Properties Router - Client-Side tRPC', () => {
         pageSize: 5,
       };
 
-      const result = await client.properties.search.mutate(searchParams);
+      const result = await client.properties.search.query(searchParams);
 
       expect(result).toBeDefined();
     });
@@ -126,7 +126,7 @@ describe('Properties Router - Client-Side tRPC', () => {
       };
 
       // Depending on implementation, this might throw or return empty results
-      await expect(client.properties.search.mutate(searchParams)).rejects.toThrow();
+      await expect(client.properties.search.query(searchParams)).rejects.toThrow();
     });
 
     it('should fail with negative price values', async () => {
@@ -139,7 +139,7 @@ describe('Properties Router - Client-Side tRPC', () => {
         pageSize: 10,
       };
 
-      await expect(client.properties.search.mutate(searchParams)).rejects.toThrow();
+      await expect(client.properties.search.query(searchParams)).rejects.toThrow();
     });
   });
 
