@@ -28,7 +28,7 @@ describe('Users Router - Client-Side tRPC', () => {
       expect(result).toHaveProperty('id');
       expect(result).toHaveProperty('email');
       expect(result).toHaveProperty('name');
-      expect(result.email).toBe(userData.email);
+      expect(result!.email).toBe(userData.email);
     });
 
     it('should fail without authentication via HTTP', async () => {
@@ -62,8 +62,8 @@ describe('Users Router - Client-Side tRPC', () => {
       const result = await authenticatedClient.users.updateProfile.mutate(updateData);
 
       expect(result).toBeDefined();
-      expect(result.name).toBe(updateData.name);
-      expect(result.gender).toBe(updateData.gender);
+      expect(result!.name).toBe(updateData.name);
+      expect(result!.gender).toBe(updateData.gender);
     });
 
     it('should fail without authentication via HTTP', async () => {
@@ -74,8 +74,12 @@ describe('Users Router - Client-Side tRPC', () => {
     });
 
     it('should fail with invalid name length', async () => {
-      const testUser = await createTestUser();
-      const caller = createAuthenticatedCaller(testUser.id);
+      const client = createUnauthenticatedClient();
+      const userData = generateTestUser();
+
+      const registerResult = await client.auth.register.mutate(userData);
+      const authToken = registerResult.token;
+      const authenticatedClient = createAuthenticatedClient(authToken);
 
       const updateData = {
         name: '', // Empty name
@@ -83,12 +87,16 @@ describe('Users Router - Client-Side tRPC', () => {
         emailPreferences: [],
       };
 
-      await expect(caller.users.updateProfile(updateData)).rejects.toThrow();
+      await expect(authenticatedClient.users.updateProfile.mutate(updateData)).rejects.toThrow();
     });
 
     it('should fail with name too long', async () => {
-      const testUser = await createTestUser();
-      const caller = createAuthenticatedCaller(testUser.id);
+      const client = createUnauthenticatedClient();
+      const userData = generateTestUser();
+
+      const registerResult = await client.auth.register.mutate(userData);
+      const authToken = registerResult.token;
+      const authenticatedClient = createAuthenticatedClient(authToken);
 
       const updateData = {
         name: 'a'.repeat(51), // Too long name (max 50 chars)
@@ -96,12 +104,16 @@ describe('Users Router - Client-Side tRPC', () => {
         emailPreferences: [],
       };
 
-      await expect(caller.users.updateProfile(updateData)).rejects.toThrow();
+      await expect(authenticatedClient.users.updateProfile.mutate(updateData)).rejects.toThrow();
     });
 
     it('should fail with invalid gender value', async () => {
-      const testUser = await createTestUser();
-      const caller = createAuthenticatedCaller(testUser.id);
+      const client = createUnauthenticatedClient();
+      const userData = generateTestUser();
+
+      const registerResult = await client.auth.register.mutate(userData);
+      const authToken = registerResult.token;
+      const authenticatedClient = createAuthenticatedClient(authToken);
 
       const updateData = {
         name: 'Valid Name',
@@ -109,25 +121,29 @@ describe('Users Router - Client-Side tRPC', () => {
         emailPreferences: [],
       };
 
-      await expect(caller.users.updateProfile(updateData)).rejects.toThrow();
+      await expect(authenticatedClient.users.updateProfile.mutate(updateData)).rejects.toThrow();
     });
 
     it('should update email preferences correctly', async () => {
-      const testUser = await createTestUser();
-      const caller = createAuthenticatedCaller(testUser.id);
+      const client = createUnauthenticatedClient();
+      const userData = generateTestUser();
+
+      const registerResult = await client.auth.register.mutate(userData);
+      const authToken = registerResult.token;
+      const authenticatedClient = createAuthenticatedClient(authToken);
 
       const updateData = {
         name: 'Test User',
         gender: 1,
         emailPreferences: [
           {
-            userId: testUser.id,
+            userId: 1, // Will be ignored by backend, uses token userId
             type: 1, // DailyPropertyRecommendation
           },
         ],
       };
 
-      const result = await caller.users.updateProfile(updateData);
+      const result = await authenticatedClient.users.updateProfile.mutate(updateData);
 
       expect(result).toBeDefined();
     });
