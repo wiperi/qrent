@@ -154,6 +154,14 @@ export default function PropertyCard({
     return capitalizeEnglishWords(formatted);
   };
 
+  const generateImageAlt = (address: string, propertyTypeName: string, bedroomCount?: number) => {
+    const baseAlt = `${propertyTypeName} for rent at ${formatAddress(address)}`;
+    if (bedroomCount) {
+      return `${bedroomCount}-bedroom ${baseAlt}`;
+    }
+    return baseAlt;
+  };
+
   const keywordList = keywords.trim()
     ? keywords
         .split(',')
@@ -268,7 +276,7 @@ export default function PropertyCard({
         <div className="relative w-full h-64 overflow-hidden">
           <Image
             src={thumbnailUrl}
-            alt={formatAddress(address)}
+            alt={generateImageAlt(address, propertyTypeName, bedroomCount)}
             fill
             className="object-cover"
             sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"

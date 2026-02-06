@@ -1,6 +1,6 @@
 import { AuthProvider } from '@/lib/auth-context';
 import AppTRPCProvider from '@/lib/trpc-provider';
-import type { Metadata } from 'next';
+import type { Metadata, Viewport } from 'next';
 import Script from 'next/script';
 import './globals.css';
 import { AIChatBox, AIChatToggleButton } from '@/components/AIChatBox';
@@ -8,13 +8,17 @@ import { MainContentWrapper } from '@/components/MainContentWrapper';
 import { Toaster } from '@/components/ui/toaster';
 import { Analytics } from '@vercel/analytics/next';
 
+export const viewport: Viewport = {
+  width: 'device-width',
+  initialScale: 1,
+  themeColor: '#ffffff',
+};
+
 export const metadata: Metadata = {
   title: 'Qrent - Your Perfect Home Awaits',
   description:
     'Discover exceptional rental properties with ease. Your dream home is just a search away.',
   keywords: 'rental properties, real estate, apartments, houses, rent, leasing, property search',
-  viewport: 'width=device-width, initial-scale=1',
-  themeColor: '#ffffff',
   appleWebApp: {
     capable: true,
     statusBarStyle: 'black-translucent',
