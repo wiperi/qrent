@@ -12,6 +12,39 @@ export const metadata: Metadata = {
   title: 'Qrent - Your Perfect Home Awaits',
   description:
     'Discover exceptional rental properties with ease. Your dream home is just a search away.',
+  keywords: 'rental properties, real estate, apartments, houses, rent, leasing, property search',
+  viewport: 'width=device-width, initial-scale=1',
+  themeColor: '#ffffff',
+  appleWebApp: {
+    capable: true,
+    statusBarStyle: 'black-translucent',
+    title: 'QRent',
+  },
+  openGraph: {
+    title: 'Qrent - Your Perfect Home Awaits',
+    description: 'Discover exceptional rental properties with ease. Your dream home is just a search away.',
+    url: 'https://qrent.rent',
+    siteName: 'QRent',
+    images: [
+      {
+        url: 'https://qrent.rent/qrent.jpg',
+        width: 1200,
+        height: 630,
+        alt: 'QRent - Rental Properties',
+      },
+    ],
+    locale: 'en_US',
+    type: 'website',
+  },
+  twitter: {
+    title: 'Qrent - Your Perfect Home Awaits',
+    description: 'Discover exceptional rental properties with ease. Your dream home is just a search away.',
+    card: 'summary_large_image',
+    images: ['https://qrent.rent/qrent.jpg'],
+  },
+  alternates: {
+    canonical: 'https://qrent.rent',
+  },
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
@@ -19,17 +52,23 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
     <html lang="en" suppressHydrationWarning>
       <head>
         <meta name="baidu-site-verification" content="codeva-nsbHswsQeF"/>
+        {/* Hreflang tags for multilingual SEO */}
+        <link rel="alternate" href="https://qrent.rent/en" hrefLang="en" />
+        <link rel="alternate" href="https://qrent.rent/zh" hrefLang="zh" />
+        <link rel="alternate" href="https://qrent.rent" hrefLang="x-default" />
         <Script
           strategy="afterInteractive"
           src={`https://www.googletagmanager.com/gtag/js?id=G-LVXN1Q8W0X`}
         />
         <Script id="google-analytics" strategy="afterInteractive">
-          {`
+          {
+            `
             window.dataLayer = window.dataLayer || [];
             function gtag(){dataLayer.push(arguments);}
             gtag('js', new Date());
             gtag('config', 'G-LVXN1Q8W0X');
-          `}
+          `
+          }
         </Script>
         <Script
           id="clarity-analytics"
@@ -42,6 +81,34 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
                   y=l.getElementsByTagName(r)[0];y.parentNode.insertBefore(t,y);
               })(window, document, "clarity", "script", "r5zysdcmja");
             `,
+          }}
+        />
+        {/* Schema.org Structured Data */}
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{
+            __html: JSON.stringify({
+              '@context': 'https://schema.org',
+              '@type': 'Website',
+              name: 'QRent',
+              url: 'https://qrent.rent',
+              description: 'Discover exceptional rental properties with ease. Your dream home is just a search away.',
+              publisher: {
+                '@type': 'Organization',
+                name: 'QRent',
+                logo: {
+                  '@type': 'ImageObject',
+                  url: 'https://qrent.rent/qrent-logo.svg',
+                  width: 300,
+                  height: 60,
+                },
+              },
+              potentialAction: {
+                '@type': 'SearchAction',
+                target: 'https://qrent.rent/{locale}/search?q={search_term_string}',
+                'query-input': 'required name=search_term_string',
+              },
+            }),
           }}
         />
       </head>
