@@ -11,63 +11,89 @@ type SearchParams = {
   page?: string
 }
 
+/**
+ * 生成搜索页面的 SEO 元数据
+ * 
+ * @param params 路由参数，包含当前语言环境
+ * @param searchParams 搜索参数，包含查询词等
+ * @returns 生成的 SEO 元数据
+ */
 export async function generateMetadata({ params, searchParams }: {
-  params: { locale: string };
+  params: Promise<{ locale: string }>;
   searchParams: Promise<SearchParams>;
 }): Promise<Metadata> {
-  const t = await getTranslations({ locale: params.locale });
+  const { locale } = await params
+  const t = await getTranslations({ locale });
   const searchParamsObj = await searchParams;
   const query = searchParamsObj.q;
   
-  if (query) {
+  // 生成更智能的搜索元数据
+  const generateSearchMeta = () => {
+    if (query) {
+      // 基于搜索查询生成长尾关键词友好的标题
+      const searchTerms = query.toLowerCase().split(' ');
+      const isLocationSearch = searchTerms.some(term => 
+        ['sydney', 'melbourne', 'brisbane', 'perth', 'adelaide', 'canberra', 'darwin', 'hobart', '悉尼', '墨尔本', '布里斯班', '珀斯', '阿德莱德'].includes(term)
+      );
+      const isPropertyTypeSearch = searchTerms.some(term =>
+        ['apartment', 'house', 'unit', 'studio', 'room', 'flat', '公寓', '别墅', '单间', '房子'].includes(term)
+      );
+      
+      let titleKey: string;
+      let descriptionKey: string;
+      
+      if (isLocationSearch && isPropertyTypeSearch) {
+        titleKey = 'search.titleLocationType';
+        descriptionKey = 'search.descriptionLocationType';
+      } else if (isLocationSearch) {
+        titleKey = 'search.titleLocation';
+        descriptionKey = 'search.descriptionLocation';
+      } else {
+        titleKey = 'search.titleWithQuery';
+        descriptionKey = 'search.descriptionWithQuery';
+      }
+      
+      return {
+        title: t(titleKey, { query }),
+        description: t(descriptionKey, { query })
+      };
+    }
+    
+    // 默认搜索页面元数据
     return {
-      title: t('search.titleWithQuery', { 
-        query, 
-        default: `Search results for "${query}" - QRent` 
-      }),
-      description: t('search.descriptionWithQuery', {
-        query,
-        default: `Find rental properties matching "${query}" on QRent. Your perfect home awaits.`
-      }),
-      openGraph: {
-        title: t('search.titleWithQuery', { 
-          query, 
-          default: `Search results for "${query}" - QRent` 
-        }),
-        description: t('search.descriptionWithQuery', {
-          query,
-          default: `Find rental properties matching "${query}" on QRent. Your perfect home awaits.`
-        }),
-      },
-      twitter: {
-        title: t('search.titleWithQuery', { 
-          query, 
-          default: `Search results for "${query}" - QRent` 
-        }),
-        description: t('search.descriptionWithQuery', {
-          query,
-          default: `Find rental properties matching "${query}" on QRent. Your perfect home awaits.`
-        }),
-      },
+      title: t('search.title'),
+      description: t('search.description')
     };
-  }
+  };
+  
+  const metaContent = generateSearchMeta();
+  
+  // 构建基础URL和查询参数
+  const baseUrl = 'https://qrent.rent';
+  const searchQuery = query ? `?q=${encodeURIComponent(query)}` : '';
+  const currentUrl = `${baseUrl}/${locale}/search${searchQuery}`;
   
   return {
-    title: t('search.title', { default: 'Property Search - QRent' }),
-    description: t('search.description', {
-      default: 'Search for rental properties by location, price, and amenities. Find your perfect home today.'
-    }),
+    title: metaContent.title,
+    description: metaContent.description,
     openGraph: {
-      title: t('search.title', { default: 'Property Search - QRent' }),
-      description: t('search.description', {
-        default: 'Search for rental properties by location, price, and amenities. Find your perfect home today.'
-      }),
+      title: metaContent.title,
+      description: metaContent.description,
+      type: 'website',
+      siteName: 'QRent',
     },
     twitter: {
-      title: t('search.title', { default: 'Property Search - QRent' }),
-      description: t('search.description', {
-        default: 'Search for rental properties by location, price, and amenities. Find your perfect home today.'
-      }),
+      title: metaContent.title,
+      description: metaContent.description,
+      card: 'summary_large_image',
+    },
+    alternates: {
+      canonical: currentUrl,
+      languages: {
+        'en': `${baseUrl}/en/search${searchQuery}`,
+        'zh': `${baseUrl}/zh/search${searchQuery}`,
+        'x-default': `${baseUrl}/search${searchQuery}`,
+      },
     },
   };
 }

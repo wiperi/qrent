@@ -52,5 +52,5 @@ bcrypt 6.0.0
 使用 lucide-react 和react-icons图标库，不要使用path硬编码图标。
 
 ## 运行和提交代码
-每次任务完成后不需要启动调试或预览，我会检查。你确实要检查，用 pnpm run dev:frontend 来运行前端，pnpm run dev:backend 运行后端。分两个终端来运行。
-在commit之前，用 pnpm run build:frontend 来检查语法并确保编译通过。
+每次任务完成后不需要构建、启动调试或预览，我会检查。如果你要检查，用 pnpm run dev:frontend 来运行前端，pnpm run dev:backend 运行后端。分两个终端来运行。
+只有我要求你编译时才用 pnpm run build:frontend 来检查语法并确保编译通过。

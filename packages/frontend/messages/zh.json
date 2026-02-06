@@ -232,6 +232,24 @@
       "moveIn": "领取钥匙并核对房屋状况"
     }
   },
+  "home": {
+    "title": "Qrent - 您的理想之家正在等待",
+    "description": "轻松发现优质住房。您的梦想之家只需一次搜索即可找到。",
+    "ogTitle": "Qrent - 您的理想之家正在等待",
+    "ogDescription": "轻松发现优质住房。您的梦想之家只需一次搜索即可找到。",
+    "twitterTitle": "Qrent - 您的理想之家正在等待",
+    "twitterDescription": "轻松发现优质住房。您的梦想之家只需一次搜索即可找到。"
+  },
+  "search": {
+    "title": "房源搜索 - Qrent",
+    "description": "按位置、价格和设施搜索租房信息。今天找到您的理想之家。",
+    "titleWithQuery": "\"{query}\"的搜索结果 - Qrent",
+    "descriptionWithQuery": "在Qrent上查找与\"{query}\"匹配的租房信息。您的理想之家正在等待。",
+    "titleLocation": "{query} 租房信息 & 公寓 | Qrent",
+    "descriptionLocation": "发现{query}的租房信息。比较价格，查看照片，用Qrent找到您的理想之家。",
+    "titleLocationType": "{query} - 租房信息 & 公寓 | Qrent",
+    "descriptionLocationType": "找到最好的{query}出租房源。浏览照片、价格和设施。通过Qrent直接联系房东。"
+  },
   "LanguageSwitcher": {
     "english": "English",
     "chinese": "中文"
