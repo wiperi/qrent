@@ -48,7 +48,7 @@ describe('User Workflows Integration - Client-Side tRPC', () => {
 
       const updateResult = await authenticatedClient.users.updateProfile.mutate(profileUpdate);
       expect(updateResult).toBeDefined();
-      expect(updateResult.name).toBe(profileUpdate.name);
+      expect(updateResult!.name).toBe(profileUpdate.name);
     });
 
     it('should handle registration → password change workflow via HTTP', async () => {
@@ -90,7 +90,7 @@ describe('User Workflows Integration - Client-Side tRPC', () => {
 
       // Step 2: Search properties (public endpoint)
       const searchParams = generatePropertySearch();
-      const searchResult = await client.properties.search.mutate(searchParams);
+      const searchResult = await client.properties.search.query(searchParams);
       expect(searchResult).toBeDefined();
       expect(searchResult).toHaveProperty('properties');
 
@@ -173,7 +173,7 @@ describe('User Workflows Integration - Client-Side tRPC', () => {
       expect(preferences).toBeDefined();
 
       // Search properties with specific criteria (can use unauthenticated client for search)
-      const searchResult = await client.properties.search.mutate({
+      const searchResult = await client.properties.search.query({
         targetSchool: 'UNSW',
         minPrice: 400,
         maxPrice: 800,
