@@ -1,3 +1,11 @@
+/**
+ * Next.js config for the frontend app.
+ *
+ * Responsibilities:
+ * - Load environment variables for local/dev builds
+ * - Apply next-intl plugin wiring
+ * - Configure Turbopack root + remote image patterns
+ */
 import { config as dotenvConfig } from 'dotenv';
 import type { NextConfig } from 'next';
 import createNextIntlPlugin from 'next-intl/plugin';
@@ -21,6 +29,12 @@ if (process.env.NODE_ENV === 'development') {
 const withNextIntl = createNextIntlPlugin('./src/i18n.ts');
 
 const nextConfig: NextConfig = {
+  // Fix incorrect workspace root inference when multiple lockfiles exist on the machine.
+  turbopack: {
+    // In a pnpm workspace the real `node_modules` usually lives at the repo root,
+    // so Turbopack must be allowed to read outside `packages/frontend`.
+    root: join(__dirname, '../..'),
+  },
   images: {
     remotePatterns: [
       {

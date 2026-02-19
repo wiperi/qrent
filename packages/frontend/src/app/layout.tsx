@@ -1,9 +1,12 @@
+/**
+ * Root layout configuration
+ * Sets global metadata/scripts and wraps shared providers
+ */
 import { AuthProvider } from '@/lib/auth-context';
 import AppTRPCProvider from '@/lib/trpc-provider';
 import type { Metadata, Viewport } from 'next';
 import Script from 'next/script';
 import './globals.css';
-import { AIChatBox, AIChatToggleButton } from '@/components/AIChatBox';
 import { MainContentWrapper } from '@/components/MainContentWrapper';
 import { Toaster } from '@/components/ui/toaster';
 import { Analytics } from '@vercel/analytics/next';
@@ -121,8 +124,6 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <AppTRPCProvider>
           <AuthProvider>
             <MainContentWrapper>{children}</MainContentWrapper>
-            <AIChatToggleButton />
-            <AIChatBox />
             <Toaster />
           </AuthProvider>
         </AppTRPCProvider>
