@@ -11,10 +11,9 @@ export default function HeroSection() {
 
   return (
     <section className="relative pb-6">
-      {/* H1 标题 - 对屏幕阅读器可见，SEO 优化 */}
       <h1 className="sr-only">{t('title')}</h1>
       <div className="max-w-7xl mx-auto px-5">
-        {/* Hero Section Wrapper - 上下布局容器 */}
+        {/* Hero Section Wrapper */}
         <div className="flex flex-col gap-5">
           {/* Top: Hero Image & Search */}
           <div className="relative h-[520px] w-full overflow-hidden rounded-2xl">
