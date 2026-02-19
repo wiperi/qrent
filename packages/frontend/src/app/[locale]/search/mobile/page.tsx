@@ -1,7 +1,6 @@
 import FilterModal from '@/components/FilterModal';
 import SearchBar from '@/components/SearchBar';
-import SearchResults from './SearchResults';
-// 横向: 添加
+import SearchResults from '../SearchResults';
 import CurrentFiltersBar from '@/components/FilterTags';
 import type { Metadata } from 'next';
 import { getTranslations } from 'next-intl/server';
@@ -12,7 +11,7 @@ type SearchParams = {
 }
 
 /**
- * 生成搜索页面的 SEO 元数据
+ * 生成移动端搜索页面的 SEO 元数据
  * 
  * @param params 路由参数，包含当前语言环境
  * @param searchParams 搜索参数，包含查询词等
@@ -71,7 +70,7 @@ export async function generateMetadata({ params, searchParams }: {
   // 构建基础URL和查询参数
   const baseUrl = 'https://qrent.rent';
   const searchQuery = query ? `?q=${encodeURIComponent(query)}` : '';
-  const currentUrl = `${baseUrl}/${locale}/search${searchQuery}`;
+  const currentUrl = `${baseUrl}/${locale}/search/mobile${searchQuery}`;
   
   return {
     title: metaContent.title,
@@ -90,31 +89,38 @@ export async function generateMetadata({ params, searchParams }: {
     alternates: {
       canonical: currentUrl,
       languages: {
-        'en': `${baseUrl}/en/search${searchQuery}`,
-        'zh': `${baseUrl}/zh/search${searchQuery}`,
-        'x-default': `${baseUrl}/search${searchQuery}`,
+        'en': `${baseUrl}/en/search/mobile${searchQuery}`,
+        'zh': `${baseUrl}/zh/search/mobile${searchQuery}`,
+        'x-default': `${baseUrl}/search/mobile${searchQuery}`,
       },
     },
   };
 }
 
-export default async function SearchPage({ searchParams }: { searchParams: Promise<SearchParams> }) {
+export default async function MobileSearchPage({ searchParams }: { searchParams: Promise<SearchParams> }) {
   const params = await searchParams;
 
   return (
-    <main>
-      {/* Head bar already provided by Header. Below it, the search bar aligned to container width */}
-      <section className="py-4">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <main className="min-h-screen bg-gray-50">
+      {/* Mobile-specific search bar */}
+      <section className="py-3 bg-white shadow-sm sticky top-0 z-10">
+        <div className="mx-auto px-4">
           <SearchBar />
-          
-          {/*横向*/}
+        </div>
+      </section>
+
+      {/* Mobile-specific filters bar */}
+      <section className="py-2 bg-white border-b border-gray-200">
+        <div className="mx-auto px-4">
           <CurrentFiltersBar />
         </div>
       </section>
 
-      {/* Results area */}
-      <SearchResults searchParams={params} />
+      {/* Results area - mobile optimized */}
+      <section className="py-2">
+        <SearchResults searchParams={params} />
+      </section>
+      
       <FilterModal />
     </main>
   )

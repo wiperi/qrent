@@ -232,6 +232,24 @@
       "moveIn": "Collect keys and check property condition"
     }
   },
+  "home": {
+    "title": "Qrent - Your Perfect Home Awaits",
+    "description": "Discover exceptional rental properties with ease. Your dream home is just a search away.",
+    "ogTitle": "Qrent - Your Perfect Home Awaits",
+    "ogDescription": "Discover exceptional rental properties with ease. Your dream home is just a search away.",
+    "twitterTitle": "Qrent - Your Perfect Home Awaits",
+    "twitterDescription": "Discover exceptional rental properties with ease. Your dream home is just a search away."
+  },
+  "search": {
+    "title": "Property Search - QRent",
+    "description": "Search for rental properties by location, price, and amenities. Find your perfect home today.",
+    "titleWithQuery": "Search results for \"{query}\" - QRent",
+    "descriptionWithQuery": "Find rental properties matching \"{query}\" on QRent. Your perfect home awaits.",
+    "titleLocation": "{query} Rental Properties & Apartments | QRent",
+    "descriptionLocation": "Discover rental properties in {query}. Compare prices, view photos, and find your perfect home with QRent.",
+    "titleLocationType": "{query} - Rental Properties & Apartments | QRent",
+    "descriptionLocationType": "Find the best {query} rentals. Browse photos, prices, and amenities. Contact landlords directly through QRent."
+  },
   "LanguageSwitcher": {
     "english": "English",
     "chinese": "中文"
