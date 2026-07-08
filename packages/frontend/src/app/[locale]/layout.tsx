@@ -3,7 +3,7 @@ import Header from '@/components/Header';
 import LocaleUpdater from '@/components/LocaleUpdater';
 import NotificationBar from '@/components/NotificationBar';
 import { AIChatBox, AIChatToggleButton } from '@/components/AIChatBox';
-import { WeChatGroupEntry } from '@/components/WeChatGroupEntry';
+// import { WeChatGroupEntry } from '@/components/WeChatGroupEntry';
 import { locales } from '@/i18n';
 import { AuthProvider } from '@/lib/auth-context';
 import AppTRPCProvider from '@/lib/trpc-provider';
@@ -49,7 +49,7 @@ export default async function LocaleLayout({
       {/* AI 聊天框和租房社群入口 */}
       <AIChatBox />
       <AIChatToggleButton />
-      <WeChatGroupEntry />
+      {/* <WeChatGroupEntry /> */}
     </NextIntlClientProvider>
   );
 }
