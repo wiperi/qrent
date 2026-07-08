@@ -9,7 +9,7 @@ import { cn } from '@/lib/utils';
 import { usePathname } from 'next/navigation';
 import { useEffect, useRef, useState } from 'react';
 import { FiChevronsRight, FiMessageSquare, FiSend } from 'react-icons/fi';
-import { RiRobot2Line } from 'react-icons/ri';
+// import { RiRobot2Line } from 'react-icons/ri';
 import { Button } from './ui/button';
 
 export function AIChatBox() {
@@ -19,7 +19,6 @@ export function AIChatBox() {
     messages,
     isLoading,
     closeChat,
-    openChat,
     addMessage,
     setLoading,
   } = useAIChatStore();
@@ -30,13 +29,6 @@ export function AIChatBox() {
 
   // Check if we are on the home page (root or localized root)
   const isHomePage = pathname === '/' || /^\/[a-z]{2}$/.test(pathname);
-
-  // Auto-open on desktop, keep closed on mobile (client-side only to avoid hydration issues)
-  useEffect(() => {
-    if (isHomePage && !isOpen && window.innerWidth >= 768) {
-      openChat();
-    }
-  }, []);
 
   // Auto-scroll to bottom when new messages arrive
   useEffect(() => {
@@ -261,13 +253,17 @@ function MessageBubble({ message }: { message: Message }) {
 
 export function AIChatToggleButton() {
   const pathname = usePathname();
-  const { isOpen, openChat } = useAIChatStore();
+  const { isOpen } = useAIChatStore();
+  // const { isOpen, openChat } = useAIChatStore();
 
   // Check if we are on the home page (root or localized root)
   const isHomePage = pathname === '/' || /^\/[a-z]{2}$/.test(pathname);
 
   if (isOpen || !isHomePage) return null;
 
+  return null;
+
+  /*
   return (
     <Button
       onClick={openChat}
@@ -287,4 +283,5 @@ export function AIChatToggleButton() {
       <RiRobot2Line className="h-6 w-6 text-white" />
     </Button>
   );
+  */
 }
