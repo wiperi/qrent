@@ -46,12 +46,17 @@ jobs:
           with tempfile.TemporaryDirectory(prefix='qrent-probe-') as directory:
               folder=pathlib.Path(directory)
               known=folder/'known_hosts'
-              known.write_text(os.environ['QRENT_SSH_KNOWN_HOSTS']+'\n'); known.chmod(0o600)
+              pins=[]
+              for line in os.environ['QRENT_SSH_KNOWN_HOSTS'].splitlines():
+                  fields=line.split()
+                  if fields and not line.startswith('#'):
+                      pins.append(' '.join(['qrent-recovery-pin']+fields[1:3]))
+              known.write_text('\n'.join(pins)+'\n'); known.chmod(0o600)
               ask=folder/'askpass'
               ask.write_text('#!/usr/bin/env python3\nimport os\nprint(os.environ["QRENT_SSH_PASSWORD"])\n')
               ask.chmod(0o700)
               env=dict(os.environ, SSH_ASKPASS=str(ask), SSH_ASKPASS_REQUIRE='force', DISPLAY='qrent-recovery')
-              command=['ssh','-T','-o','StrictHostKeyChecking=yes','-o',f'UserKnownHostsFile={known}',
+              command=['ssh','-T','-o','StrictHostKeyChecking=yes','-o','HostKeyAlias=qrent-recovery-pin','-o',f'UserKnownHostsFile={known}',
                   '-o','GlobalKnownHostsFile=/dev/null','-o','IdentityAgent=none','-o','PubkeyAuthentication=no',
                   '-o','PreferredAuthentications=password,keyboard-interactive','-o','NumberOfPasswordPrompts=1',
                   '-o','ConnectTimeout=10','-o','ServerAliveInterval=10','-o','ServerAliveCountMax=2',
