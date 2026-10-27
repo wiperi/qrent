@@ -42,11 +42,13 @@ class BrowserManager:
         self, 
         config: Optional[SeleniumConfig] = None,
         browser_type: BrowserType = BrowserType.CHROME,
-        profile_dir: Optional[str] = None
+        profile_dir: Optional[str] = None,
+        source: str = "realestate"
     ):
         self.config = config or settings.selenium
         self.browser_type = browser_type
         self.profile_dir = profile_dir
+        self.source = source
         self.driver = None
         self._temp_dir: Optional[str] = None
         # Playwright 相关
@@ -146,8 +148,7 @@ class BrowserManager:
             # 如果明确设置 HEADLESS=true 则使用 headless 模式
             use_headless = os.environ.get('HEADLESS', str(self.config.headless)).lower() == 'true'
 
-            source = 'domain' if 'domain' in profile_path.lower() else 'realestate'
-            self.proxy_pool = ProxyPool(source)
+            self.proxy_pool = ProxyPool(self.source)
             proxy = self.proxy_pool.config()
             extra = {}
             executable = os.getenv('CHROMIUM_EXECUTABLE_PATH')

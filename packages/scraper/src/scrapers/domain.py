@@ -81,6 +81,7 @@ class DomainScraper(BaseScraper):
             # 使用 Playwright
             self.browser = BrowserManager(
                 browser_type=BrowserType.PLAYWRIGHT,
+                source="domain",
                 profile_dir=self.profile_dir
             )
             self.browser.create_driver()
@@ -190,10 +191,10 @@ class DomainScraper(BaseScraper):
         
         # 地址
         address1_elem = listing.find('span', {'data-testid': 'address-line1'})
-        address_line1 = clean_address(address1_elem.text if address1_elem else "")
+        address_line1 = " ".join(address1_elem.get_text(" ", strip=True).split()).strip(" ,") if address1_elem else ""
         
         address2_elem = listing.find('span', {'data-testid': 'address-line2'})
-        address_line2_raw = address2_elem.text.strip() if address2_elem else ""
+        address_line2_raw = address2_elem.get_text(" ", strip=True) if address2_elem else ""
         address_line2 = address_line2_raw.lower().replace(' ', '-')
         
         # 解析区域信息
@@ -220,11 +221,20 @@ class DomainScraper(BaseScraper):
         
         # 获取详情页 URL
         url = ""
-        link = listing.find('a', href=lambda h: h and '/rent/' in str(h) or h and '-' in str(h) and str(h).endswith('/'))
+        link = listing.find('a', href=lambda h: bool(h and house_id and
+            re.search(r'-' + re.escape(house_id) + r'(?:[/?#]|$)', str(h))))
         if link:
             href = link.get('href', '')
             if href:
                 url = f"{self.BASE_URL}{href}" if href.startswith('/') else href
+
+        # Current cards put the suburb in address-line2 and state/postcode in the canonical URL.
+        location = re.search(r'-(nsw|vic|qld|sa|wa|tas|nt|act)-(\d{4})-\d+(?:[/?#]|$)', url, re.I)
+        if location:
+            state, postcode = location.group(1).upper(), location.group(2)
+            suburb = suburb or address_line2_raw.strip().lower()
+        if suburb and postcode:
+            address_line2 = f"{suburb.replace(' ', '-')}-{state.lower()}-{postcode}"
         
         # 缩略图
         thumbnail_url = None
@@ -234,7 +244,7 @@ class DomainScraper(BaseScraper):
             if src and is_valid_image_url(src):
                 thumbnail_url = src
         
-        if not house_id or not address_line1:
+        if not house_id or not address_line1 or not url:
             return None
         
         return PropertyData(
@@ -297,6 +307,7 @@ class DomainScraper(BaseScraper):
             if not self.browser:
                 self.browser = BrowserManager(
                     browser_type=BrowserType.PLAYWRIGHT,
+                    source="domain",
                     profile_dir=self.profile_dir
                 )
                 self.browser.create_driver()

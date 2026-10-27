@@ -10,6 +10,7 @@ RealEstate.com.au 爬虫
 1. 爬取列表页 -> 爬取详情页 -> 计算通勤时间 -> AI 评分/关键词
 """
 import re
+import json
 import os
 import logging
 import time
@@ -118,6 +119,7 @@ class RealEstateScraper(BaseScraper):
         if not self.browser:
             self.browser = BrowserManager(
                 browser_type=BrowserType.PLAYWRIGHT,
+                source="realestate",
                 profile_dir=self.profile_dir
             )
             self.browser.create_driver()
@@ -194,7 +196,6 @@ class RealEstateScraper(BaseScraper):
                 page_properties = self.parse_listing_page(html)
 
                 for prop in page_properties:
-                    prop.postcode = prop.postcode or self._extract_postcode(area) or ""
                     if prop.suburb and prop.postcode:
                         prop.address_line2 = f"{prop.suburb.lower().replace(' ', '-')}-{prop.state.lower()}-{prop.postcode}"
                 
@@ -224,6 +225,32 @@ class RealEstateScraper(BaseScraper):
         
         return properties
     
+    def _complete_locations(self, properties, soup):
+        """Use listing metadata for postcodes; search bounds may include nearby suburbs."""
+        locations = {}
+        for script in soup.find_all('script', type='application/ld+json'):
+            try:
+                data = json.loads(script.string or script.get_text())
+            except (ValueError, TypeError):
+                continue
+            items = data if isinstance(data, list) else data.get('@graph', [data]) if isinstance(data, dict) else []
+            for item in items:
+                if not isinstance(item, dict):
+                    continue
+                location = item.get('location') or {}
+                address = item.get('address') or (location.get('address') if isinstance(location, dict) else {})
+                match = re.search(r'-(\d+)(?:[/?#]|$)', str(item.get('url', '')))
+                if match and isinstance(address, dict) and re.fullmatch(r'\d{4}', str(address.get('postalCode', ''))):
+                    locations[match.group(1)] = address
+        for prop in properties:
+            address = locations.get(prop.house_id)
+            if address:
+                prop.postcode = str(address['postalCode'])
+                prop.suburb = address.get('addressLocality') or prop.suburb
+                prop.state = address.get('addressRegion') or prop.state
+            if prop.suburb and prop.postcode:
+                prop.address_line2 = f"{prop.suburb.lower().replace(' ', '-')}-{prop.state.lower()}-{prop.postcode}"
+
     def scrape_areas(self, areas: List[str]) -> List[PropertyData]:
         """爬取多个区域"""
         all_properties = []
@@ -275,6 +302,7 @@ class RealEstateScraper(BaseScraper):
             except Exception as e:
                 logger.debug(f"解析房源失败: {e}")
         
+        self._complete_locations(properties, soup)
         return properties
     
     def _find_listings(self, soup: BeautifulSoup) -> List:

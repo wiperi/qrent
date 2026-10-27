@@ -6,6 +6,7 @@ import json
 import logging
 import os
 import re
+import shutil
 import sys
 import uuid
 from datetime import datetime
@@ -15,16 +16,16 @@ from urllib.parse import quote, urlsplit
 import requests
 
 from src.config import ScraperConfig, TARGET_AREAS, settings
-from src.models import PropertySource
 from src.scrapers import DomainScraper, RealEstateScraper
-from src.services.incremental import reuse_details
+from src.services.incremental import complete_postcodes, reuse_details
 from src.services.sqlite_store import SQLiteStore
 from src.utils.network import ProxyPool, TrafficBudget, set_run_budget
 
 logger = logging.getLogger(__name__)
 FACTORIES = {"domain": DomainScraper, "realestate": RealEstateScraper}
 CITY_AREAS = {
-    "sydney": list(dict.fromkeys(area for areas in TARGET_AREAS.values() for area in areas)),
+    "sydney": list(dict.fromkeys("sydney-nsw-2000" if area == "sydney-city-nsw" else area
+                                 for areas in TARGET_AREAS.values() for area in areas)),
     "melbourne": ["melbourne-vic-3000", "carlton-vic-3053", "parkville-vic-3052",
                   "north-melbourne-vic-3051", "southbank-vic-3006", "docklands-vic-3008",
                   "brunswick-vic-3056", "richmond-vic-3121", "clayton-vic-3168"],
@@ -46,6 +47,7 @@ def build_parser():
     parser.add_argument("--pages", type=positive, default=1)
     parser.add_argument("--limit", type=positive, default=2000, help="Maximum unique listings per source and area")
     parser.add_argument("--detail-limit", type=positive, default=50, help="Maximum detail downloads per run")
+    parser.add_argument("--details-per-area", type=positive, default=10, help="Maximum detail downloads in one area")
     parser.add_argument("--no-details", action="store_true")
     parser.add_argument("--full-details", action="store_true", help="Disable detail reuse")
     parser.add_argument("--score", action="store_true", help="Score up to score-limit new descriptions")
@@ -56,6 +58,7 @@ def build_parser():
     parser.add_argument("--max-requests", type=positive, default=int(os.getenv("SCRAPER_MAX_REQUESTS", "1000")))
     parser.add_argument("--proxy-bytes", type=positive, default=int(os.getenv("SCRAPER_MAX_PROXY_BYTES", "30000000")))
     parser.add_argument("--skip-proxy-check", action="store_true", help="Use only with a previously verified AU session")
+    parser.add_argument("--keep-profiles", action="store_true", help="Retain temporary browser profiles for diagnosis")
     return parser
 
 
@@ -98,15 +101,14 @@ def capture(args, factories=None):
     set_run_budget(budget)
     os.environ["PROXY_SESSION"] = uuid.uuid4().hex[:12]
     result = {"run": tag, "status": "failed", "exit_code": 1, "listings": 0, "reused": 0,
-              "detail_requests": 0, "details_failed": 0, "areas": [], "errors": [], "scored": 0}
+              "detail_requests": 0, "details_failed": 0, "areas": [], "errors": [], "scored": 0,
+              "postcodes_completed": 0}
     areas = args.areas or list(dict.fromkeys(area for city in args.cities for area in CITY_AREAS[city]))
     if any(not re.fullmatch(r"[a-z0-9]+(?:-[a-z0-9]+)*", area) for area in areas):
         result["errors"].append({"stage": "configuration", "error": "Invalid area slug"})
         return result
     store = None
     try:
-        if not args.skip_proxy_check:
-            result["exit"] = verify_au_proxy(args.scrapers[0], budget)
         store = SQLiteStore(args.db)
         references = [] if args.full_details else store.recent()
         collected = {}
@@ -119,6 +121,14 @@ def capture(args, factories=None):
         # Domain has the first opportunity to provide complete data.
         sources = sorted(dict.fromkeys(args.scrapers), key=lambda source: source != "domain")
         for source in sources:
+            if source == "realestate" and not args.skip_proxy_check:
+                try:
+                    result["exit"] = verify_au_proxy(source, budget)
+                except Exception as exc:
+                    result["errors"].append({"source": source, "stage": "proxy_check",
+                                             "error": type(exc).__name__})
+                    logger.error("AU proxy unavailable; Real Estate skipped: %s", type(exc).__name__)
+                    continue
             for area in areas:
                 if budget.exhausted:
                     result["errors"].append({"source": source, "area": area, "error": "Budget reached"})
@@ -139,20 +149,29 @@ def capture(args, factories=None):
                         props = list({prop.house_id: prop for prop in props}.values())[:args.limit]
                         props = [prop for prop in props if (source, prop.house_id) not in collected]
                         if not args.full_details:
+                            result["postcodes_completed"] += complete_postcodes(props, references)
                             item["reused"] = reuse_details(props, references, allow_same_source=True)
                             result["reused"] += item["reused"]
-                        remaining = max(0, args.detail_limit - result["detail_requests"])
+                        remaining = min(args.details_per_area, max(0, args.detail_limit - result["detail_requests"]))
                         details = [prop for prop in props if not prop.description_en][:remaining]
                         if not args.no_details and details:
                             result["detail_requests"] += len(details)
                             scraper.scrape_property_details(details, skip_existing=True)
-                            result["details_failed"] += sum(not prop.description_en for prop in details)
+                            failed = sum(not prop.description_en for prop in details)
+                            result["details_failed"] += failed
+                            if failed:
+                                result["errors"].append({"source": source, "area": area,
+                                                         "stage": "details", "failed": failed})
                         if scoring:
                             to_score = [prop for prop in props if prop.description_en and not prop.average_score]
                             to_score = to_score[:max(0, args.score_limit - result["scored"])]
                             if to_score:
                                 scoring.process_properties(to_score)
-                                result["scored"] += sum(bool(prop.scores) for prop in to_score)
+                                scored = sum(bool(prop.scores) for prop in to_score)
+                                result["scored"] += scored
+                                if scored < len(to_score):
+                                    result["errors"].append({"source": source, "area": area,
+                                        "stage": "scoring", "failed": len(to_score) - scored})
                         item.update(store.save(props))
                         item["count"] = len(props)
                         for prop in props:
@@ -169,6 +188,9 @@ def capture(args, factories=None):
                         if getattr(scraper, "browser", None):
                             scraper.browser.close()
                             scraper.browser = None
+                        if not args.keep_profiles:
+                            shutil.rmtree(args.output / "profiles" / f"{source}-{os.environ['PROXY_SESSION']}",
+                                          ignore_errors=True)
                 result["areas"].append(item)
         result["listings"] = len(collected)
         if not result["errors"] and collected:

@@ -23,7 +23,7 @@ class ProxyPool:
         self.username = os.getenv("PROXY_USERNAME", "")
         self.password = os.getenv("PROXY_PASSWORD", "")
         self.country = os.getenv("PROXY_COUNTRY", "AU").upper()
-        self.sources = os.getenv("PROXY_SOURCES", "realestate,domain").split(",")
+        self.sources = os.getenv("PROXY_SOURCES", "realestate").split(",")
         if self.server:
             parsed = urlsplit(self.server)
             if parsed.scheme not in ("http", "https", "socks5") or not parsed.hostname:

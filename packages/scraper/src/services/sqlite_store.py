@@ -54,6 +54,16 @@ class SQLiteStore:
                 values = [data[name].isoformat() if isinstance(data[name], datetime) else data[name]
                           for name in FIELDS]
                 self.connection.execute(sql, values + [datetime.now().isoformat()])
+                previous = self.connection.execute(
+                    "SELECT payload FROM property_enrichment WHERE house_id=? AND source=?",
+                    (prop.house_id, prop.source.value)).fetchone()
+                if previous:
+                    old = json.loads(previous[0])
+                    for name in ("description_en", "description_cn", "keywords", "thumbnail_url",
+                                 "available_date", "average_score", "scores"):
+                        if not data.get(name) and old.get(name):
+                            data[name] = old[name]
+                    data["commute_times"] = {**old.get("commute_times", {}), **data.get("commute_times", {})}
                 self.connection.execute("INSERT OR REPLACE INTO property_enrichment VALUES (?,?,?)",
                                         (prop.house_id, prop.source.value, json.dumps(data, default=str)))
                 stats["updated" if existing else "inserted"] += 1

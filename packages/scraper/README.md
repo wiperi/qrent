@@ -15,24 +15,29 @@ python3.11 -m venv .venv
 chmod 600 .env
 BROWSER_ENGINE=camoufox .venv/bin/python recovery_runner.py \
   --areas newtown-nsw-2042 melbourne-vic-3000 \
-  --scrapers realestate --pages 1 --detail-limit 2 --retries 1
+  --scrapers domain realestate --pages 1 --detail-limit 4 --details-per-area 1 --retries 1
 ```
 
 - `--cities sydney melbourne` 展开为配置的大学周边区域，不代表整个都市区全量覆盖。
-- 同时选择 `--scrapers domain realestate` 时先运行 Domain，再按完整地址（含房号、州、邮编）、价格、卧室数复用完整详情；可用 `--full-details` 强制重新读取。
+- Domain 默认直连，`PROXY_SOURCES=realestate` 只让 Real Estate 使用 AU 代理；仅采 Domain 时不做收费代理检查。
+- AU 代理故障或额度耗尽时保留 Domain 的直连结果，Real Estate 单独记为失败，整个任务返回部分完成。
+- 同时选择 `--scrapers domain realestate` 时先运行 Domain，再按完整地址（含房号、州、邮编）、价格、卧室数复用最近 7 天内完整详情；可用 `--full-details` 强制重新读取。
+- 详情总量由 `--detail-limit` 限制，单区由 `--details-per-area` 限制；超出明确限额的详情留待后续采集。列表仍保留两个站点各自的 ID 和链接。
 - 每次运行默认最多 1000 个网络请求和约 30 MB 已记录代理传输，图片、视频、字体不下载，公共 CDN 资源走无认证直连。供应商用量与应用计数可能因协议开销不同。
-- 按运行生成 CSV 和 `*_result.json`；`success` 退出 0，空结果或失败退出非零。原计划任务需使用 `set -o pipefail` 保留退出码。
+- 按运行生成 CSV 和 `*_result.json`；`success` 退出 0，空结果、详情失败或部分扫描退出非零。临时浏览器配置运行后自动清理；诊断时可用 `--keep-profiles` 保留。
 - 千问模型通过 `QWEN_MODEL` 配置，默认 `qwen-plus`；支持 `DASHSCOPE_API_KEY`、`PROPERTY_RATING_API_KEY`、`QWEN_API_KEY`。评分通过 `--score --score-limit 5` 显式启用。
-- 截至本次试验，Camoufox + FlashProxy AU 已取得 Real Estate 两地各 25 条列表及 2 个详情；Domain 仍受站点保护阻拦，不能据此承诺可无人值守采集。
+- 腾讯云真实验收：Domain 直连两地各 20 条，Real Estate + FlashProxy AU 两地各 25 条，共 90 条写入原数据库；4 条详情和 1 条千问评分成功，退出 0。完整证据及部署状态见 [恢复报告](../../docs/reports/2026-10-27-scraper-recovery.md)。
+
+服务器启动模板是 `ops/run_recovery.sh`：带独占锁、2 小时超时、每次约 30 MB 代理传输上限及正确退出码。原目录的每日 02:00 cron 可继续调用 `/root/qrent-scraper/run_scraper.sh`。`ops/backup_sqlite.py` 使用 SQLite 在线备份接口，能包含 WAL 中已经提交的记录。
 
 验证采集模块：`python -m unittest discover -s tests -v`。
-代理会话设计参考取回的 Qrent 服务器 LycheeIP/gost 代码，当前连接来自 FlashProxy Residential Lite；不在仓库中保存密钥。
+代理会话设计参考取回的 Qrent 服务器 LycheeIP/gost 代码，当前连接来自 FlashProxy Residential Lite；千问配置私下复用本机 `pdftomd` 项目的 DashScope 密钥。不在仓库中保存凭据。
 
 ## 🌟 Features
 
 ### Core Capabilities
 - **Multi-Platform Scraping**: Supports RealEstate.com.au and Domain.com.au
-- **Anti-Bot Protection**: Playwright persistent browser profiles with automatic reset mechanism
+- **Browser Sessions**: Persistent profiles within a capture, with explicit reset configuration
 - **Historical Data Reuse**: Intelligent caching system to avoid redundant API calls
 - **AI-Powered Scoring**: Property quality assessment using DashScope (Qwen) API
 - **Commute Time Calculation**: Google Maps API integration for transit time estimates
@@ -41,7 +46,7 @@ BROWSER_ENGINE=camoufox .venv/bin/python recovery_runner.py \
 
 ### Advanced Features
 - **Smart Region Matching**: Fuzzy address parsing for flexible location handling
-- **Profile Reset Strategy**: Bypasses IP blocking by resetting browser profile every 30 properties
+- **Session Management**: Browser restart after 30 detail pages, with cookies preserved by default
 - **Concurrent Processing**: Multi-threaded scoring and commute calculation
 - **Real-time Logging**: Live progress monitoring with automatic flush
 - **CSV Export**: Structured data output with date-stamped filenames
@@ -171,7 +176,7 @@ python csv_cleaner_and_importer.py process output/UNSW_rentdata_251222.csv
    ↓
 2. Historical Data Loading (7-day cache)
    ↓
-3. Detail Scraping (with profile reset every 30 properties)
+3. Detail Scraping (browser restart after 30 properties; explicit profile reset only)
    ↓
 4. AI Scoring (DashScope API, 0-20 scale)
    ↓
