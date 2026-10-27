@@ -31,6 +31,24 @@ class NetworkTests(unittest.TestCase):
         self.assertEqual(resource_route("https://www.realestate.com.au/rent/", "document"), "proxy")
         self.assertEqual(resource_route("https://www.realestate.com.au.evil.test/x", "script"), "direct")
 
+    def test_same_origin_scripts_are_direct_but_documents_and_validation_stay_proxied(self):
+        from src.utils.network import resource_route
+        for path in ("/static/js/app.js", "/challenge/session/ips.js"):
+            self.assertEqual(resource_route("https://www.realestate.com.au" + path, "script"), "direct")
+        self.assertEqual(resource_route("https://www.realestate.com.au/app.css", "stylesheet"), "direct")
+        self.assertEqual(resource_route("https://www.realestate.com.au/rent/in-2042/list-1", "document"), "proxy")
+        self.assertEqual(resource_route("https://www.realestate.com.au/challenge/tl", "xhr"), "proxy")
+        self.assertEqual(resource_route("https://www.realestate.com.au/challenge/r", "fetch"), "proxy")
+        self.assertEqual(resource_route("https://csp.sec-team.realestate.com.au/report", "fetch"), "direct")
+
+    def test_domain_hosts_stay_direct_when_only_realestate_is_enabled(self):
+        from src.utils.network import resource_route, ProxyPool
+        with patch.dict(os.environ, {"PROXY_SOURCES": "realestate",
+                                    "PROXY_TARGET_HOSTS": "realestate.com.au,domain.com.au"}, clear=True):
+            self.assertEqual(resource_route("https://www.domain.com.au/rent/", "document"), "direct")
+            self.assertEqual(resource_route("https://www.realestate.com.au/rent/", "document"), "proxy")
+            self.assertIsNone(ProxyPool("domain").config())
+
     def test_static_direct_request_drops_sensitive_headers(self):
         from src.utils.network import direct_headers
         headers = direct_headers({"Cookie": "session=private", "Authorization": "Bearer private",

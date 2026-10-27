@@ -24,6 +24,8 @@ BROWSER_ENGINE=camoufox .venv/bin/python recovery_runner.py \
 - 同时选择 `--scrapers domain realestate` 时先运行 Domain，再按完整地址（含房号、州、邮编）、价格、卧室数复用最近 7 天内完整详情；可用 `--full-details` 强制重新读取。
 - 详情总量由 `--detail-limit` 限制，单区由 `--details-per-area` 限制；超出明确限额的详情留待后续采集。列表仍保留两个站点各自的 ID 和链接。
 - 每次运行默认最多 1000 个网络请求和约 30 MB 已记录代理传输，图片、视频、字体不下载，公共 CDN 资源走无认证直连。供应商用量与应用计数可能因协议开销不同。
+- 站内 JavaScript（含应用包及验证 SDK）也走无认证普通网络，AU 会话只用于页面和验证/数据交互；最新节流规则的服务器部署状态见恢复报告。
+- 浏览器的 loopback HTTP/CONNECT 出口把后台更新、过滤规则和视频组件连接也分到普通网络；`proxy_wire_bytes`、`direct_wire_bytes`、`wire_hosts` 包含这些连接的传输记录。页面拦截统计不等于供应商扣量，配额同时检查页面与中继两项代理计数。
 - 按运行生成 CSV 和 `*_result.json`；`success` 退出 0，空结果、详情失败或部分扫描退出非零。临时浏览器配置运行后自动清理；诊断时可用 `--keep-profiles` 保留。
 - 千问模型通过 `QWEN_MODEL` 配置，默认 `qwen-plus`；支持 `DASHSCOPE_API_KEY`、`PROPERTY_RATING_API_KEY`、`QWEN_API_KEY`。评分通过 `--score --score-limit 5` 显式启用。
 - 腾讯云真实验收：Domain 直连两地各 20 条，Real Estate + FlashProxy AU 两地各 25 条，共 90 条写入原数据库；4 条详情和 1 条千问评分成功，退出 0。完整证据及部署状态见 [恢复报告](../../docs/reports/2026-10-27-scraper-recovery.md)。

@@ -11,7 +11,6 @@ import sys
 import uuid
 from datetime import datetime
 from pathlib import Path
-from urllib.parse import quote, urlsplit
 
 import requests
 
@@ -20,6 +19,7 @@ from src.scrapers import DomainScraper, RealEstateScraper
 from src.services.incremental import complete_postcodes, reuse_details
 from src.services.sqlite_store import SQLiteStore
 from src.utils.network import ProxyPool, TrafficBudget, set_run_budget
+from src.utils.egress import EgressProxy
 
 logger = logging.getLogger(__name__)
 FACTORIES = {"domain": DomainScraper, "realestate": RealEstateScraper}
@@ -66,12 +66,8 @@ def verify_au_proxy(source, budget):
     proxy = ProxyPool(source).config()
     if not proxy:
         raise RuntimeError("An Australian proxy is required; configure PROXY_SERVER/USERNAME/PASSWORD")
-    parsed = urlsplit(proxy["server"])
-    credentials = ""
-    if proxy.get("username"):
-        credentials = quote(proxy["username"], safe="") + ":" + quote(proxy["password"], safe="") + "@"
-    url = f"{parsed.scheme}://{credentials}{parsed.netloc}"
-    with requests.Session() as session:
+    with EgressProxy(proxy, budget) as egress, requests.Session() as session:
+        url = egress.browser_config()["server"]
         session.trust_env = False
         budget.reserve("proxy")
         response = session.get("https://ipinfo.io/json", proxies={"http": url, "https": url}, timeout=20)

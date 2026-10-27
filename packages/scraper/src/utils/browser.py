@@ -20,7 +20,8 @@ from selenium.webdriver.common.by import By
 from selenium.common.exceptions import TimeoutException, WebDriverException
 
 from ..config import settings, SeleniumConfig
-from .network import NetworkPolicy, ProxyPool
+from .network import NetworkPolicy, ProxyPool, get_run_budget
+from .egress import EgressProxy
 
 logger = logging.getLogger(__name__)
 
@@ -58,6 +59,7 @@ class BrowserManager:
         self.network_policy = None
         self._camoufox_manager = None
         self._navigation_status = None
+        self.egress_proxy = None
     
     def create_driver(self):
         """创建并配置浏览器"""
@@ -150,6 +152,9 @@ class BrowserManager:
 
             self.proxy_pool = ProxyPool(self.source)
             proxy = self.proxy_pool.config()
+            if proxy:
+                self.egress_proxy = EgressProxy(proxy, get_run_budget()).__enter__()
+                proxy = self.egress_proxy.browser_config()
             extra = {}
             executable = os.getenv('CHROMIUM_EXECUTABLE_PATH')
             if executable:
@@ -204,10 +209,10 @@ class BrowserManager:
             logger.info(f"Playwright browser created with profile: {profile_path}")
             return self._playwright_page
             
-        except ImportError:
-            logger.error("Playwright not installed. Install with: pip install playwright && playwright install chromium")
-            raise
         except Exception as e:
+            if self.egress_proxy:
+                self.egress_proxy.close()
+                self.egress_proxy = None
             logger.error("Failed to create Playwright browser: %s", type(e).__name__)
             raise
     
@@ -261,8 +266,16 @@ class BrowserManager:
                     self.network_policy.close()
                     self.network_policy = None
                 if self._camoufox_manager:
-                    self._camoufox_manager.__exit__(None, None, None)
-                    self._camoufox_manager = None
+                    try:
+                        self._camoufox_manager.__exit__(None, None, None)
+                    finally:
+                        self._camoufox_manager = None
+                        if self.egress_proxy:
+                            self.egress_proxy.close()
+                            self.egress_proxy = None
+                elif self.egress_proxy:
+                    self.egress_proxy.close()
+                    self.egress_proxy = None
                 self._playwright_page = None
                 self._playwright_context = None
                 self._playwright = None
