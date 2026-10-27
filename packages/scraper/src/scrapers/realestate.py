@@ -79,8 +79,8 @@ class RealEstateScraper(BaseScraper):
                 pass
             self.browser = None
         
-        # 删除 profile 目录
-        if os.path.exists(self.profile_dir):
+        # Preserve cookies and cache by default; reset only when explicitly requested.
+        if os.getenv('RESET_PROFILE_ON_START', '').lower() == 'true' and os.path.exists(self.profile_dir):
             try:
                 shutil.rmtree(self.profile_dir)
                 logger.info(f"Profile 已重置: {self.profile_dir}")
@@ -132,6 +132,7 @@ class RealEstateScraper(BaseScraper):
         
         properties = []
         url = self.get_search_url(area)
+        self.last_run_error = None
         logger.info(f"RealEstate 爬取: {url}")
         
         try:
@@ -149,18 +150,7 @@ class RealEstateScraper(BaseScraper):
                 
                 # 导航到页面 - 检查是否成功
                 if not self.browser.navigate(page_url, wait_time=10.0):
-                    consecutive_failures += 1
-                    logger.warning(f"导航失败，连续失败 {consecutive_failures} 次")
-                    
-                    if consecutive_failures >= 3:
-                        logger.error("连续失败 3 次，可能被封禁，停止该区域爬取")
-                        break
-                    
-                    # 等待一段时间再继续
-                    logger.info("等待 30 秒后继续...")
-                    time.sleep(30)
-                    page += 1
-                    continue
+                    raise RuntimeError("RealEstate navigation failed or was blocked")
                 
                 # 重置失败计数
                 consecutive_failures = 0
@@ -202,6 +192,11 @@ class RealEstateScraper(BaseScraper):
                 
                 # 解析页面
                 page_properties = self.parse_listing_page(html)
+
+                for prop in page_properties:
+                    prop.postcode = prop.postcode or self._extract_postcode(area) or ""
+                    if prop.suburb and prop.postcode:
+                        prop.address_line2 = f"{prop.suburb.lower().replace(' ', '-')}-{prop.state.lower()}-{prop.postcode}"
                 
                 if not page_properties:
                     logger.info(f"第 {page} 页没有找到房源，停止")
@@ -221,6 +216,7 @@ class RealEstateScraper(BaseScraper):
                 time.sleep(delay)
             
         except Exception as e:
+            self.last_run_error = type(e).__name__
             logger.error(f"RealEstate 爬取失败: {e}")
             import traceback
             traceback.print_exc()
@@ -430,6 +426,9 @@ class RealEstateScraper(BaseScraper):
         
         if href:
             detail_url = f"{self.BASE_URL}{href}" if href.startswith('/') else href
+            state_match = re.search(r'-(NSW|VIC|QLD|SA|WA|TAS|NT|ACT)-', href, re.I)
+            if state_match:
+                state = state_match.group(1).upper()
             
             # 从 URL 提取邮编
             # 格式: /property-unit-nsw-kensington-442963084
@@ -872,11 +871,11 @@ class CommuteCalculator:
 class AIScorer:
     """AI 评分和关键词提取"""
     
-    def __init__(self, api_key: str, model_name: str = "qwen-plus-1220"):
+    def __init__(self, api_key: str, model_name: str = None):
         import dashscope
         self.dashscope = dashscope
         self.api_key = api_key
-        self.model_name = model_name
+        self.model_name = model_name or os.getenv('QWEN_MODEL', 'qwen-plus')
     
     def _build_user_prompt(self, description: str) -> str:
         return (

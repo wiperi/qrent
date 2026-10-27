@@ -73,7 +73,7 @@ SCHOOL_COORDINATES = {
 # Property scoring configuration
 NUM_CALLS = 2         # Number of API calls
 SCORES_PER_CALL = 4   # 4 score groups per call
-MODEL_NAME = "qwen-plus-1220"
+MODEL_NAME = os.getenv("QWEN_MODEL", "qwen-plus")
 
 SYSTEM_PROMPT = """你是一位专业的房屋居住质量评估员，需要对房屋进行"分项打分"和"总评分"，标准如下：
 1. 房屋质量 (0~10 分)：

@@ -20,6 +20,7 @@ from selenium.webdriver.common.by import By
 from selenium.common.exceptions import TimeoutException, WebDriverException
 
 from ..config import settings, SeleniumConfig
+from .network import NetworkPolicy, ProxyPool
 
 logger = logging.getLogger(__name__)
 
@@ -52,6 +53,9 @@ class BrowserManager:
         self._playwright = None
         self._playwright_context = None
         self._playwright_page = None
+        self.network_policy = None
+        self._camoufox_manager = None
+        self._navigation_status = None
     
     def create_driver(self):
         """创建并配置浏览器"""
@@ -138,30 +142,63 @@ class BrowserManager:
             
             os.makedirs(profile_path, exist_ok=True)
             
-            self._playwright = sync_playwright().start()
-            
             # 默认使用非 headless 模式 (通过 Xvfb 虚拟显示器在服务器上运行)
             # 如果明确设置 HEADLESS=true 则使用 headless 模式
-            use_headless = os.environ.get('HEADLESS', '').lower() == 'true'
+            use_headless = os.environ.get('HEADLESS', str(self.config.headless)).lower() == 'true'
+
+            source = 'domain' if 'domain' in profile_path.lower() else 'realestate'
+            self.proxy_pool = ProxyPool(source)
+            proxy = self.proxy_pool.config()
+            extra = {}
+            executable = os.getenv('CHROMIUM_EXECUTABLE_PATH')
+            if executable:
+                extra['executable_path'] = executable
+            elif os.getenv('CHROMIUM_CHANNEL'):
+                extra['channel'] = os.environ['CHROMIUM_CHANNEL']
+            if proxy:
+                extra['proxy'] = proxy
             
-            self._playwright_context = self._playwright.chromium.launch_persistent_context(
-                profile_path,
-                headless=use_headless,
-                viewport={'width': 1920, 'height': 1080},
-                locale='en-AU',
-                args=[
-                    '--disable-blink-features=AutomationControlled',
-                    '--no-sandbox',
-                    '--disable-setuid-sandbox',
-                    '--disable-dev-shm-usage',
-                ],
-            )
+            if os.getenv('BROWSER_ENGINE', 'chromium').lower() == 'camoufox':
+                from camoufox.sync_api import Camoufox
+                self._camoufox_manager = Camoufox(
+                    persistent_context=True, user_data_dir=profile_path,
+                    headless=use_headless, proxy=proxy,
+                    geoip=bool(proxy), enable_cache=True,
+                    locale='en-AU', service_workers='block')
+                self._playwright_context = self._camoufox_manager.__enter__()
+            else:
+                self._playwright = sync_playwright().start()
+                self._playwright_context = self._playwright.chromium.launch_persistent_context(
+                    profile_path,
+                    headless=use_headless,
+                    viewport={'width': 1920, 'height': 1080},
+                    locale='en-AU',
+                    service_workers='block',
+                    args=[
+                        '--disable-blink-features=AutomationControlled',
+                        '--no-sandbox',
+                        '--disable-setuid-sandbox',
+                        '--disable-dev-shm-usage',
+                    ],
+                    **extra,
+                )
+
+            self.network_policy = NetworkPolicy(proxied=bool(proxy))
+            self._playwright_context.route('**/*', self.network_policy.route)
+            self._playwright_context.on('requestfinished', self.network_policy.finished)
+            self._playwright_context.on('requestfailed', self.network_policy.failed)
             
             # 获取或创建页面
             if self._playwright_context.pages:
                 self._playwright_page = self._playwright_context.pages[0]
             else:
                 self._playwright_page = self._playwright_context.new_page()
+
+            def record_navigation(response):
+                if (response.request.is_navigation_request()
+                        and response.frame == self._playwright_page.main_frame):
+                    self._navigation_status = response.status
+            self._playwright_page.on('response', record_navigation)
             
             logger.info(f"Playwright browser created with profile: {profile_path}")
             return self._playwright_page
@@ -170,7 +207,7 @@ class BrowserManager:
             logger.error("Playwright not installed. Install with: pip install playwright && playwright install chromium")
             raise
         except Exception as e:
-            logger.error(f"Failed to create Playwright browser: {e}")
+            logger.error("Failed to create Playwright browser: %s", type(e).__name__)
             raise
     
     def get_driver(self):
@@ -219,6 +256,12 @@ class BrowserManager:
             except Exception as e:
                 logger.warning(f"Error closing Playwright: {e}")
             finally:
+                if self.network_policy:
+                    self.network_policy.close()
+                    self.network_policy = None
+                if self._camoufox_manager:
+                    self._camoufox_manager.__exit__(None, None, None)
+                    self._camoufox_manager = None
                 self._playwright_page = None
                 self._playwright_context = None
                 self._playwright = None
@@ -246,10 +289,20 @@ class BrowserManager:
         try:
             if self.browser_type == BrowserType.PLAYWRIGHT:
                 page = self.get_driver()
+                self._navigation_status = None
                 # RealEstate.com.au 等站点可能持续加载资源导致 "load" 事件迟迟不触发，
                 # 使用 domcontentloaded 可显著降低 page.goto 超时概率。
-                page.goto(url, timeout=60000, wait_until="domcontentloaded")
+                response = page.goto(url, timeout=60000, wait_until="domcontentloaded")
                 page.wait_for_timeout(int(wait_time * 1000))
+                status = self._navigation_status or (response.status if response is not None else 0)
+                if status >= 400:
+                    logger.error("HTTP %s loading %s", status, url)
+                    return False
+                # Automatic site redirects may begin after the initial document was ready.
+                page.wait_for_load_state('domcontentloaded', timeout=45000)
+                if self.network_policy and self.network_policy.budget.exhausted:
+                    logger.error("Network budget reached")
+                    return False
             else:
                 driver = self.get_driver()
                 driver.get(url)

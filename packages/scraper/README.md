@@ -2,6 +2,32 @@
 
 A production-ready, modular property scraping framework for Australian rental market, specifically designed for university student accommodation near UNSW, USYD, and UTS.
 
+## 2026-10-27 恢复运行入口
+
+腾讯云现有独立部署位于 `/root/qrent-scraper`，使用 SQLite；它与根目录 Docker Compose 的 MySQL 后端是两条数据路径。
+新的 `recovery_runner.py` 可写入原 SQLite 表，按来源区分 ID，失败或部分扫描不会下架存量房源。
+
+```bash
+python3.11 -m venv .venv
+.venv/bin/pip install -r requirements-fingerprint.txt
+.venv/bin/python -m camoufox fetch
+# 从 .env.example 配置私有 .env；代理地区必须是 AU。
+chmod 600 .env
+BROWSER_ENGINE=camoufox .venv/bin/python recovery_runner.py \
+  --areas newtown-nsw-2042 melbourne-vic-3000 \
+  --scrapers realestate --pages 1 --detail-limit 2 --retries 1
+```
+
+- `--cities sydney melbourne` 展开为配置的大学周边区域，不代表整个都市区全量覆盖。
+- 同时选择 `--scrapers domain realestate` 时先运行 Domain，再按完整地址（含房号、州、邮编）、价格、卧室数复用完整详情；可用 `--full-details` 强制重新读取。
+- 每次运行默认最多 1000 个网络请求和约 30 MB 已记录代理传输，图片、视频、字体不下载，公共 CDN 资源走无认证直连。供应商用量与应用计数可能因协议开销不同。
+- 按运行生成 CSV 和 `*_result.json`；`success` 退出 0，空结果或失败退出非零。原计划任务需使用 `set -o pipefail` 保留退出码。
+- 千问模型通过 `QWEN_MODEL` 配置，默认 `qwen-plus`；支持 `DASHSCOPE_API_KEY`、`PROPERTY_RATING_API_KEY`、`QWEN_API_KEY`。评分通过 `--score --score-limit 5` 显式启用。
+- 截至本次试验，Camoufox + FlashProxy AU 已取得 Real Estate 两地各 25 条列表及 2 个详情；Domain 仍受站点保护阻拦，不能据此承诺可无人值守采集。
+
+验证采集模块：`python -m unittest discover -s tests -v`。
+代理会话设计参考取回的 Qrent 服务器 LycheeIP/gost 代码，当前连接来自 FlashProxy Residential Lite；不在仓库中保存密钥。
+
 ## 🌟 Features
 
 ### Core Capabilities
@@ -184,7 +210,7 @@ python csv_cleaner_and_importer.py process output/UNSW_rentdata_251222.csv
   2. Living Experience (0-10)
   3. Internal Facilities (0-10)
   - **Total Score** = (Sum of 3 dimensions) / 30 × 20
-- **API**: DashScope `qwen-plus-1220` model
+- **API**: DashScope model selected by `QWEN_MODEL` (default `qwen-plus`)
 - **Strategy**: Multiple calls for consistency, average results
 
 #### 4. CommuteService (`services/commute.py`)

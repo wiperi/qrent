@@ -122,13 +122,13 @@ class RegionInfo:
             if len(parts) >= 3:
                 nsw_index = -1
                 for i, part in enumerate(parts):
-                    if part.strip().upper() == 'NSW':
+                    if part.strip().upper() in {'NSW', 'VIC', 'QLD', 'SA', 'WA', 'TAS', 'NT', 'ACT'}:
                         nsw_index = i
                         break
                 
                 if nsw_index > 0 and nsw_index < len(parts) - 1:
                     suburb = ' '.join(parts[:nsw_index]).strip().lower()
-                    state = 'NSW'
+                    state = parts[nsw_index].strip().upper()
                     postcode = int(parts[nsw_index + 1].strip())
                     
                     if postcode > 0:

@@ -74,6 +74,7 @@ class DomainScraper(BaseScraper):
         """
         properties = []
         url = self.get_search_url(area)
+        self.last_run_error = None
         logger.info(f"Domain 爬取: {url}")
         
         try:
@@ -94,7 +95,8 @@ class DomainScraper(BaseScraper):
                 logger.info(f"爬取第 {page} 页: {page_url}")
                 
                 # 导航到页面
-                self.browser.navigate(page_url, wait_time=5.0)
+                if not self.browser.navigate(page_url, wait_time=5.0):
+                    raise RuntimeError("Domain navigation failed or was blocked")
                 
                 # 等待页面加载
                 self.browser.wait(3.0)
@@ -130,6 +132,7 @@ class DomainScraper(BaseScraper):
                 time.sleep(self.config.request_delay)
             
         except Exception as e:
+            self.last_run_error = type(e).__name__
             logger.error(f"Domain 爬取失败: {e}")
             import traceback
             traceback.print_exc()
@@ -263,9 +266,9 @@ class DomainScraper(BaseScraper):
         try:
             parts = address_line2.replace('-', ' ').split()
             for i, part in enumerate(parts):
-                if part.upper() == 'NSW':
+                if part.upper() in {'NSW', 'VIC', 'QLD', 'SA', 'WA', 'TAS', 'NT', 'ACT'}:
                     suburb = ' '.join(parts[:i]).strip().lower()
-                    state = 'NSW'
+                    state = part.upper()
                     if i + 1 < len(parts):
                         postcode = parts[i + 1]
                     break
