@@ -16,8 +16,8 @@ jobs:
     steps:
       - name: Probe existing server credentials with pinned host key
         env:
-          QRENT_SSH_HOST: ${{ secrets.SCRAPER_SERVER_HOST }}
-          QRENT_SSH_USER: ${{ secrets.SCRAPER_SERVER_USERNAME }}
+          QRENT_SSH_HOST: ${{ secrets.QRENT_RECOVERY_HOST }}
+          QRENT_SSH_USER: root
           QRENT_SSH_KEY: ${{ secrets.SCRAPER_SERVER_SSH_KEY }}
           QRENT_SSH_KNOWN_HOSTS: ${{ secrets.QRENT_RECOVERY_KNOWN_HOSTS }}
         run: |
