@@ -74,12 +74,14 @@ class DomainScraper(BaseScraper):
         """
         properties = []
         url = self.get_search_url(area)
+        self.last_run_error = None
         logger.info(f"Domain 爬取: {url}")
         
         try:
             # 使用 Playwright
             self.browser = BrowserManager(
                 browser_type=BrowserType.PLAYWRIGHT,
+                source="domain",
                 profile_dir=self.profile_dir
             )
             self.browser.create_driver()
@@ -94,7 +96,8 @@ class DomainScraper(BaseScraper):
                 logger.info(f"爬取第 {page} 页: {page_url}")
                 
                 # 导航到页面
-                self.browser.navigate(page_url, wait_time=5.0)
+                if not self.browser.navigate(page_url, wait_time=5.0):
+                    raise RuntimeError("Domain navigation failed or was blocked")
                 
                 # 等待页面加载
                 self.browser.wait(3.0)
@@ -130,6 +133,7 @@ class DomainScraper(BaseScraper):
                 time.sleep(self.config.request_delay)
             
         except Exception as e:
+            self.last_run_error = type(e).__name__
             logger.error(f"Domain 爬取失败: {e}")
             import traceback
             traceback.print_exc()
@@ -187,10 +191,10 @@ class DomainScraper(BaseScraper):
         
         # 地址
         address1_elem = listing.find('span', {'data-testid': 'address-line1'})
-        address_line1 = clean_address(address1_elem.text if address1_elem else "")
+        address_line1 = " ".join(address1_elem.get_text(" ", strip=True).split()).strip(" ,") if address1_elem else ""
         
         address2_elem = listing.find('span', {'data-testid': 'address-line2'})
-        address_line2_raw = address2_elem.text.strip() if address2_elem else ""
+        address_line2_raw = address2_elem.get_text(" ", strip=True) if address2_elem else ""
         address_line2 = address_line2_raw.lower().replace(' ', '-')
         
         # 解析区域信息
@@ -217,11 +221,20 @@ class DomainScraper(BaseScraper):
         
         # 获取详情页 URL
         url = ""
-        link = listing.find('a', href=lambda h: h and '/rent/' in str(h) or h and '-' in str(h) and str(h).endswith('/'))
+        link = listing.find('a', href=lambda h: bool(h and house_id and
+            re.search(r'-' + re.escape(house_id) + r'(?:[/?#]|$)', str(h))))
         if link:
             href = link.get('href', '')
             if href:
                 url = f"{self.BASE_URL}{href}" if href.startswith('/') else href
+
+        # Current cards put the suburb in address-line2 and state/postcode in the canonical URL.
+        location = re.search(r'-(nsw|vic|qld|sa|wa|tas|nt|act)-(\d{4})-\d+(?:[/?#]|$)', url, re.I)
+        if location:
+            state, postcode = location.group(1).upper(), location.group(2)
+            suburb = suburb or address_line2_raw.strip().lower()
+        if suburb and postcode:
+            address_line2 = f"{suburb.replace(' ', '-')}-{state.lower()}-{postcode}"
         
         # 缩略图
         thumbnail_url = None
@@ -231,7 +244,7 @@ class DomainScraper(BaseScraper):
             if src and is_valid_image_url(src):
                 thumbnail_url = src
         
-        if not house_id or not address_line1:
+        if not house_id or not address_line1 or not url:
             return None
         
         return PropertyData(
@@ -263,9 +276,9 @@ class DomainScraper(BaseScraper):
         try:
             parts = address_line2.replace('-', ' ').split()
             for i, part in enumerate(parts):
-                if part.upper() == 'NSW':
+                if part.upper() in {'NSW', 'VIC', 'QLD', 'SA', 'WA', 'TAS', 'NT', 'ACT'}:
                     suburb = ' '.join(parts[:i]).strip().lower()
-                    state = 'NSW'
+                    state = part.upper()
                     if i + 1 < len(parts):
                         postcode = parts[i + 1]
                     break
@@ -294,6 +307,7 @@ class DomainScraper(BaseScraper):
             if not self.browser:
                 self.browser = BrowserManager(
                     browser_type=BrowserType.PLAYWRIGHT,
+                    source="domain",
                     profile_dir=self.profile_dir
                 )
                 self.browser.create_driver()

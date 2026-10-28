@@ -13,7 +13,7 @@ from dotenv import load_dotenv
 load_dotenv('.env')
 
 API_KEY_POINT = os.getenv('PROPERTY_RATING_API_KEY')
-MODEL_NAME = "qwen-plus-1220"
+MODEL_NAME = os.getenv("QWEN_MODEL", "qwen-plus")
 
 today_date = datetime.now()
 current_date = today_date.strftime('%y%m%d')

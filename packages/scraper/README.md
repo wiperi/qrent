@@ -2,11 +2,44 @@
 
 A production-ready, modular property scraping framework for Australian rental market, specifically designed for university student accommodation near UNSW, USYD, and UTS.
 
+## 2026-10-27 恢复运行入口
+
+腾讯云现有独立部署位于 `/root/qrent-scraper`，使用 SQLite；它与根目录 Docker Compose 的 MySQL 后端是两条数据路径。
+新的 `recovery_runner.py` 可写入原 SQLite 表，按来源区分 ID，失败或部分扫描不会下架存量房源。
+
+```bash
+python3.11 -m venv .venv
+.venv/bin/pip install -r requirements-fingerprint.txt
+.venv/bin/python -m camoufox fetch
+# 从 .env.example 配置私有 .env；代理地区必须是 AU。
+chmod 600 .env
+BROWSER_ENGINE=camoufox .venv/bin/python recovery_runner.py \
+  --areas newtown-nsw-2042 melbourne-vic-3000 \
+  --scrapers domain realestate --pages 1 --detail-limit 4 --details-per-area 1 --retries 1
+```
+
+- `--cities sydney melbourne` 展开为配置的大学周边区域，不代表整个都市区全量覆盖。
+- Domain 默认直连，`PROXY_SOURCES=realestate` 只让 Real Estate 使用 AU 代理；仅采 Domain 时不做收费代理检查。
+- AU 代理故障或额度耗尽时保留 Domain 的直连结果，Real Estate 单独记为失败，整个任务返回部分完成。
+- 同时选择 `--scrapers domain realestate` 时先运行 Domain，再按完整地址（含房号、州、邮编）、价格、卧室数复用最近 7 天内完整详情；可用 `--full-details` 强制重新读取。
+- 详情总量由 `--detail-limit` 限制，单区由 `--details-per-area` 限制；超出明确限额的详情留待后续采集。列表仍保留两个站点各自的 ID 和链接。
+- 每次运行默认最多 1000 个网络请求和约 30 MB 已记录代理传输，图片、视频、字体不下载，公共 CDN 资源走无认证直连。供应商用量与应用计数可能因协议开销不同。
+- 站内 JavaScript（含应用包及验证 SDK）也走无认证普通网络，AU 会话只用于页面和验证/数据交互；最新节流规则的服务器部署状态见恢复报告。
+- 浏览器的 loopback HTTP/CONNECT 出口把后台更新、过滤规则和视频组件连接也分到普通网络；`proxy_wire_bytes`、`direct_wire_bytes`、`wire_hosts` 包含这些连接的传输记录。页面拦截统计不等于供应商扣量，配额同时检查页面与中继两项代理计数。
+- 按运行生成 CSV 和 `*_result.json`；`success` 退出 0，空结果、详情失败或部分扫描退出非零。临时浏览器配置运行后自动清理；诊断时可用 `--keep-profiles` 保留。
+- 千问模型通过 `QWEN_MODEL` 配置，默认 `qwen-plus`；支持 `DASHSCOPE_API_KEY`、`PROPERTY_RATING_API_KEY`、`QWEN_API_KEY`。评分通过 `--score --score-limit 5` 显式启用。
+- 腾讯云真实验收：Domain 直连两地各 20 条，Real Estate + FlashProxy AU 两地各 25 条，共 90 条写入原数据库；4 条详情和 1 条千问评分成功，退出 0。完整证据及部署状态见 [恢复报告](../../docs/reports/2026-10-27-scraper-recovery.md)。
+
+服务器启动模板是 `ops/run_recovery.sh`：带独占锁、2 小时超时、每次约 30 MB 代理传输上限及正确退出码。原目录的每日 02:00 cron 可继续调用 `/root/qrent-scraper/run_scraper.sh`。`ops/backup_sqlite.py` 使用 SQLite 在线备份接口，能包含 WAL 中已经提交的记录。
+
+验证采集模块：`python -m unittest discover -s tests -v`。
+代理会话设计参考取回的 Qrent 服务器 LycheeIP/gost 代码，当前连接来自 FlashProxy Residential Lite；千问配置私下复用本机 `pdftomd` 项目的 DashScope 密钥。不在仓库中保存凭据。
+
 ## 🌟 Features
 
 ### Core Capabilities
 - **Multi-Platform Scraping**: Supports RealEstate.com.au and Domain.com.au
-- **Anti-Bot Protection**: Playwright persistent browser profiles with automatic reset mechanism
+- **Browser Sessions**: Persistent profiles within a capture, with explicit reset configuration
 - **Historical Data Reuse**: Intelligent caching system to avoid redundant API calls
 - **AI-Powered Scoring**: Property quality assessment using DashScope (Qwen) API
 - **Commute Time Calculation**: Google Maps API integration for transit time estimates
@@ -15,7 +48,7 @@ A production-ready, modular property scraping framework for Australian rental ma
 
 ### Advanced Features
 - **Smart Region Matching**: Fuzzy address parsing for flexible location handling
-- **Profile Reset Strategy**: Bypasses IP blocking by resetting browser profile every 30 properties
+- **Session Management**: Browser restart after 30 detail pages, with cookies preserved by default
 - **Concurrent Processing**: Multi-threaded scoring and commute calculation
 - **Real-time Logging**: Live progress monitoring with automatic flush
 - **CSV Export**: Structured data output with date-stamped filenames
@@ -145,7 +178,7 @@ python csv_cleaner_and_importer.py process output/UNSW_rentdata_251222.csv
    ↓
 2. Historical Data Loading (7-day cache)
    ↓
-3. Detail Scraping (with profile reset every 30 properties)
+3. Detail Scraping (browser restart after 30 properties; explicit profile reset only)
    ↓
 4. AI Scoring (DashScope API, 0-20 scale)
    ↓
@@ -184,7 +217,7 @@ python csv_cleaner_and_importer.py process output/UNSW_rentdata_251222.csv
   2. Living Experience (0-10)
   3. Internal Facilities (0-10)
   - **Total Score** = (Sum of 3 dimensions) / 30 × 20
-- **API**: DashScope `qwen-plus-1220` model
+- **API**: DashScope model selected by `QWEN_MODEL` (default `qwen-plus`)
 - **Strategy**: Multiple calls for consistency, average results
 
 #### 4. CommuteService (`services/commute.py`)

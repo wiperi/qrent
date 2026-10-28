@@ -6,9 +6,13 @@ import os
 from dataclasses import dataclass, field
 from typing import Dict, List, Optional
 from dotenv import load_dotenv
+from pathlib import Path
 
 # Load environment variables
-env_paths = ['.env', '../.env', '../../.env', '/app/.env']
+env_paths = [os.getenv('SCRAPER_ENV_FILE', ''),
+             str(Path(__file__).resolve().parents[2] / '.env'),
+             str(Path(__file__).resolve().parents[4] / '.env'),
+             '.env', '/app/.env']
 for env_path in env_paths:
     if os.path.exists(env_path):
         load_dotenv(env_path)
@@ -58,8 +62,8 @@ class ScraperConfig:
 @dataclass
 class ScoringConfig:
     """Scoring service configuration"""
-    api_key: str = field(default_factory=lambda: os.getenv("PROPERTY_RATING_API_KEY") or os.getenv("DASHSCOPE_API_KEY", ""))
-    model_name: str = "qwen-plus-1220"
+    api_key: str = field(default_factory=lambda: os.getenv("PROPERTY_RATING_API_KEY") or os.getenv("DASHSCOPE_API_KEY") or os.getenv("QWEN_API_KEY", ""))
+    model_name: str = field(default_factory=lambda: os.getenv("QWEN_MODEL", "qwen-plus"))
     num_calls: int = 2
     scores_per_call: int = 4
     max_workers: int = 2
