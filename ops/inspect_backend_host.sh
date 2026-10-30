@@ -6,6 +6,8 @@ qrent_docker_root=$(docker info --format '{{.DockerRootDir}}')
 printf 'Read-only deployment host capacity check.\n'
 df -h "$qrent_root" "$qrent_docker_root" /var/run
 df -i "$qrent_root" "$qrent_docker_root" /var/run
+free -m
+swapon --show --bytes
 docker system df
 docker ps -a --format 'table {{.ID}}\t{{.Image}}\t{{.Status}}\t{{.Names}}'
 docker inspect --format '{{.Name}} {{json .Mounts}}' $(docker ps -q)
