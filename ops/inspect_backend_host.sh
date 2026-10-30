@@ -17,7 +17,31 @@ if [[ "${1:-}" != preflight ]]; then
   qrent_redis=$(docker ps -q --filter name='^qrent-redis-1$')
   if [[ -n "$qrent_redis" ]]; then
     docker inspect --format 'Account-store process: running={{.State.Running}} oom_killed={{.State.OOMKilled}} restarts={{.RestartCount}} health={{.State.Health.Status}}' "$qrent_redis"
-    qrent_ping=$(docker exec "$qrent_redis" timeout 5 redis-cli --raw PING 2>&1) || true
+    python3 - "$qrent_redis" <<'PY'
+import json, pathlib, subprocess, sys
+state=json.loads(subprocess.check_output(['docker','inspect','--format','{{json .State}}',sys.argv[1]],text=True))
+pid=int(state['Pid']); root=pathlib.Path('/proc')/str(pid)
+status={k:v.strip() for line in (root/'status').read_text().splitlines() if ':' in line for k,v in [line.split(':',1)]}
+ports=[]
+for version in ['tcp','tcp6']:
+    for line in (root/'net'/version).read_text().splitlines()[1:]:
+        cols=line.split()
+        if cols[3]=='0A':ports.append(int(cols[1].split(':')[-1],16))
+health=[]
+for item in state.get('Health',{}).get('Log',[])[-3:]:
+    output=item.get('Output','').lower()
+    kind=('timeout' if 'timeout' in output or 'timed out' in output else
+          'connection_refused' if 'connection refused' in output else
+          'auth_required' if 'noauth' in output else
+          'exec_unavailable' if 'exec' in output or 'runc' in output else 'other')
+    health.append({'exit_code':item['ExitCode'],'kind':kind})
+print('Account-store runtime: '+json.dumps({'pid':pid,'state':status.get('State','').split()[0],
+    'threads':status.get('Threads'),'rss':status.get('VmRSS'),'swap':status.get('VmSwap'),
+    'listen_ports':sorted(set(ports)),'recent_health':health}))
+PY
+    qrent_ping_exit=0
+    qrent_ping=$(docker exec "$qrent_redis" timeout 5 redis-cli --raw PING 2>&1) || qrent_ping_exit=$?
+    printf 'Account-store local PING exit: %s\n' "$qrent_ping_exit"
     case "$qrent_ping" in
       PONG) printf 'Account-store local PING: PONG\n' ;;
       NOAUTH*) printf 'Account-store local PING: NOAUTH\n' ;;
