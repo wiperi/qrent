@@ -1,6 +1,15 @@
-export async function verifyBackend(base, request = fetch, { checkLatest = true } = {}) {
+export async function verifyBackend(base, request = fetch,
+  { checkLatest = true, checkAccountStore = true } = {}) {
   const echo = await request(`${base}/echo`, { signal: AbortSignal.timeout(10000) });
   if (!echo.ok) throw new Error('Backend echo failed');
+  if (checkAccountStore) {
+    // No token or account mutation: the limiter must work before rejecting logout.
+    const account = await request(`${base}/trpc/auth.logout`, {
+      method: 'POST', headers: { 'content-type': 'application/json' }, body: '{}',
+      signal: AbortSignal.timeout(10000),
+    });
+    if (account.status !== 401) throw new Error('Backend account store is unavailable');
+  }
   const checks = [
     { targetSchool: 'UNSW' },
     { targetSchool: 'USYD' },
@@ -41,7 +50,7 @@ export async function verifyBackend(base, request = fetch, { checkLatest = true 
     }
     results.push({ ...check, returned: rows.length, firstId: rows[0].id });
   }
-  return { status: 'verified', checks: results };
+  return { status: 'verified', checks: results, account_store_checked: checkAccountStore };
 }
 
 if (!process.argv[1] || process.argv[1].endsWith('/verify_backend.mjs')) {
@@ -49,7 +58,8 @@ if (!process.argv[1] || process.argv[1].endsWith('/verify_backend.mjs')) {
   try {
     if (!Number.isInteger(port) || port < 1 || port > 65535) throw new Error('Invalid backend port');
     console.log(JSON.stringify(await verifyBackend(`http://127.0.0.1:${port}`, fetch,
-      { checkLatest: process.env.QRENT_VERIFY_MODE !== 'rollback' })));
+      { checkLatest: process.env.QRENT_VERIFY_MODE !== 'rollback',
+        checkAccountStore: process.env.QRENT_VERIFY_MODE !== 'rollback' })));
   } catch (error) {
     console.error(error.message);
     process.exitCode = 1;

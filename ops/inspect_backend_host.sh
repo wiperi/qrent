@@ -24,7 +24,9 @@ pid=int(state['Pid']); root=pathlib.Path('/proc')/str(pid)
 status={k:v.strip() for line in (root/'status').read_text().splitlines() if ':' in line for k,v in [line.split(':',1)]}
 ports=[]
 for version in ['tcp','tcp6']:
-    for line in (root/'net'/version).read_text().splitlines()[1:]:
+    try: lines=(root/'net'/version).read_text().splitlines()[1:]
+    except FileNotFoundError: continue  # Exited/zombie tasks have no network namespace.
+    for line in lines:
         cols=line.split()
         if cols[3]=='0A':ports.append(int(cols[1].split(':')[-1],16))
 health=[]

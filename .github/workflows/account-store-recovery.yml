@@ -1,0 +1,35 @@
+name: Account store recovery
+
+on:
+  workflow_dispatch:
+    inputs:
+      action:
+        type: choice
+        options: [plan, apply]
+        default: plan
+        required: true
+        description: Plan first; repair only a confirmed stopped or exited Redis process
+
+permissions:
+  contents: read
+
+jobs:
+  recover:
+    if: >-
+      github.repository == 'wiperi/qrent' &&
+      (github.ref == 'refs/heads/main' || github.ref == 'refs/heads/staging')
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    environment: ${{ github.ref == 'refs/heads/main' && 'production' || 'staging' }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.sha }}
+          persist-credentials: false
+      - name: Inspect or repair the existing Redis process with a private volume backup
+        env:
+          DEPLOY_SERVER_HOST: ${{ secrets.DEPLOY_SERVER_HOST }}
+          DEPLOY_SERVER_USERNAME: ${{ secrets.DEPLOY_SERVER_USERNAME }}
+          DEPLOY_SERVER_PASSWORD: ${{ secrets.DEPLOY_SERVER_PASSWORD }}
+          QRENT_STORE_ACTION: ${{ inputs.action }}
+        run: bash ops/release_backend.sh account-store

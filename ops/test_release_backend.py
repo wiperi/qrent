@@ -114,7 +114,7 @@ class ReleaseTransportTests(unittest.TestCase):
         result = self.run_release('capacity')
         self.assertEqual(result.returncode, 0, result.stderr)
         self.assertEqual(len(self.calls), 1)
-        self.assertEqual(self.calls[0]['args'][-5:], ['python3', '-', 'plan', '3', '168h'])
+        self.assertEqual(self.calls[0]['args'][-6:], ['python3', '-', 'plan', '3', '168h', 'none'])
 
     def test_recent_unused_cache_cleanup_requires_a_bounded_explicit_age(self):
         self.env['QRENT_CAPACITY_ACTION'] = 'apply'
@@ -122,7 +122,17 @@ class ReleaseTransportTests(unittest.TestCase):
         self.env['QRENT_BUILD_CACHE_AGE'] = '1h'
         result = self.run_release('capacity')
         self.assertEqual(result.returncode, 0, result.stderr)
-        self.assertEqual(self.calls[0]['args'][-5:], ['python3', '-', 'apply', '2', '1h'])
+        self.assertEqual(self.calls[0]['args'][-6:], ['python3', '-', 'apply', '2', '1h', 'none'])
+
+    def test_exact_retired_release_is_bounded_and_forwarded_without_shell_input(self):
+        self.env['QRENT_RETIRE_RELEASE'] = SHA
+        self.assertEqual(self.run_release('capacity').returncode, 0)
+        self.assertEqual(self.calls[0]['args'][-1], SHA)
+        self.env['QRENT_RETIRE_RELEASE'] = 'none; untrusted-command'
+        # A fresh log isolates the rejected invocation.
+        (self.root/'ssh.jsonl').unlink()
+        self.assertEqual(self.run_release('capacity').returncode, 64)
+        self.assertEqual(self.calls, [])
 
     def test_invalid_build_cache_age_is_rejected_before_connecting(self):
         self.env['QRENT_BUILD_CACHE_AGE'] = '0h; untrusted-command'
@@ -135,6 +145,18 @@ class ReleaseTransportTests(unittest.TestCase):
         result = self.run_release('capacity')
         self.assertEqual(result.returncode, 64)
         self.assertEqual(self.calls, [])
+
+    def test_account_store_recovery_defaults_to_plan_without_image_transfer(self):
+        result=self.run_release('account-store')
+        self.assertEqual(result.returncode,0,result.stderr)
+        self.assertEqual(len(self.calls),1)
+        self.assertEqual(self.calls[0]['args'][-3:],['python3','-','plan'])
+        self.assertIn('Only a confirmed stopped/exited Redis process',self.calls[0]['stdin'])
+
+    def test_invalid_store_action_is_rejected_before_connecting(self):
+        self.env['QRENT_STORE_ACTION']='bad;command'
+        self.assertEqual(self.run_release('account-store').returncode,64)
+        self.assertEqual(self.calls,[])
 
 
 if __name__ == '__main__': unittest.main()

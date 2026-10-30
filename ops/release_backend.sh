@@ -14,7 +14,7 @@ umask 077
 archive="backend-$GITHUB_SHA.tgz"
 image_archive="backend-image-$GITHUB_SHA.tar.gz"
 mode=${1:-release}
-[[ "$mode" == release || "$mode" == inspect || "$mode" == capacity ]] || exit 64
+[[ "$mode" == release || "$mode" == inspect || "$mode" == capacity || "$mode" == account-store ]] || exit 64
 if [[ "$mode" == release ]]; then
   test -s "$archive"
   test -s "$image_archive"
@@ -81,9 +81,17 @@ if [[ "$mode" == capacity ]]; then
   [[ "${QRENT_CAPACITY_ACTION:-plan}" == plan || "${QRENT_CAPACITY_ACTION:-plan}" == apply ]] || exit 64
   [[ "${QRENT_MIN_DISK_GIB:-3}" =~ ^[2-8]$ ]] || exit 64
   [[ "${QRENT_BUILD_CACHE_AGE:-168h}" == 168h || "${QRENT_BUILD_CACHE_AGE:-168h}" == 24h || "${QRENT_BUILD_CACHE_AGE:-168h}" == 1h ]] || exit 64
+  [[ "${QRENT_RETIRE_RELEASE:-none}" == none || "${QRENT_RETIRE_RELEASE:-none}" =~ ^[a-f0-9]{40}$ ]] || exit 64
   script_root=$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)
-  ssh "${ssh_options[@]}" "$DEPLOY_SERVER_HOST" python3 - "${QRENT_CAPACITY_ACTION:-plan}" "${QRENT_MIN_DISK_GIB:-3}" "${QRENT_BUILD_CACHE_AGE:-168h}" \
+  ssh "${ssh_options[@]}" "$DEPLOY_SERVER_HOST" python3 - "${QRENT_CAPACITY_ACTION:-plan}" "${QRENT_MIN_DISK_GIB:-3}" "${QRENT_BUILD_CACHE_AGE:-168h}" "${QRENT_RETIRE_RELEASE:-none}" \
     < "$script_root/recover_backend_capacity.py"
+  exit 0
+fi
+if [[ "$mode" == account-store ]]; then
+  [[ "${QRENT_STORE_ACTION:-plan}" == plan || "${QRENT_STORE_ACTION:-plan}" == apply ]] || exit 64
+  script_root=$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)
+  ssh "${ssh_options[@]}" "$DEPLOY_SERVER_HOST" python3 - "${QRENT_STORE_ACTION:-plan}" \
+    < "$script_root/recover_account_store.py"
   exit 0
 fi
 

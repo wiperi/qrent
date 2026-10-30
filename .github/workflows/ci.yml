@@ -30,6 +30,7 @@ jobs:
               - 'packages/backend/**'
               - 'packages/shared/**'
               - 'ops/*backend*'
+              - 'ops/*account_store*'
               - 'package.json'
               - 'pnpm-lock.yaml'
               - 'pnpm-workspace.yaml'
@@ -171,6 +172,7 @@ jobs:
           python3 -m unittest discover -s ops -p test_deploy_backend.py
           python3 -m unittest discover -s ops -p test_release_backend.py
           python3 -m unittest discover -s ops -p test_backend_capacity.py
+          python3 -m unittest discover -s ops -p test_account_store.py
           python3 -m unittest discover -s ops -p test_receive_backend.py
           node --test ops/test_verify_backend.mjs
       - name: Build the backend release image
