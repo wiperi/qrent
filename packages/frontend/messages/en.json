@@ -234,7 +234,8 @@
   },
   "home": {
     "title": "Find Sydney rentals near your university",
-    "description": "Compare Domain and Real Estate rental prices, areas and public transport commutes around UNSW, the University of Sydney and UTS. Free to use.",
+    "description": "Compare Domain and Real Estate rental prices, areas and public transport commutes around UNSW, the University of Sydney and UTS.",
+    "scope": "Free to use.",
     "ogTitle": "Qrent - Your Perfect Home Awaits",
     "ogDescription": "Discover exceptional rental properties with ease. Your dream home is just a search away.",
     "twitterTitle": "Qrent - Your Perfect Home Awaits",

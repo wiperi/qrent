@@ -183,7 +183,7 @@ export default function Header() {
               <div className="flex items-center">
                 <Link href={`/${locale}`} onClick={closeDrawer}>
                   <Image
-                    src="/qrent-logo.jpg"
+                    src="/qrent-logo.svg"
                     alt="Qrent"
                     width={36}
                     height={36}

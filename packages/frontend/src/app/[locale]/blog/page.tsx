@@ -8,6 +8,7 @@ import { getNotionBlogPosts } from '@/lib/notion-blog';
 import { LOCALE } from '@qrent/shared/enum';
 import { pageMetadata } from '@/lib/seo';
 import RentalLinks from '@/components/RentalLinks';
+import styles from '@/styles/discovery.module.css';
 
 const BLOG_IMAGE_URLS = ['/banner.jpg', '/qrent.jpg'];
 
@@ -43,14 +44,11 @@ export default async function BlogPage({ params }: { params: Promise<{ locale: s
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-white to-slate-50">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
-        <RentalLinks locale={locale} compact />
+      <div className={styles.page}>
         <CategoryProvider>
           <div className="">
-            <h1 className="text-3xl sm:text-4xl font-bold text-slate-900 mb-4">
-              {locale === LOCALE.ZH ? 'Qrent 经验贴' : 'Qrent Blog'}
-            </h1>
-            <p className="text-lg text-slate-600 leading-relaxed">
+            <h1 className={styles.title}>{locale === LOCALE.ZH ? 'Qrent 经验贴' : 'Qrent Blog'}</h1>
+            <p className={styles.lead}>
               {locale === LOCALE.ZH
                 ? '每一篇经验贴，都是从困惑到安心的故事'
                 : 'Every experience post is a story from confusion to peace of mind'}
@@ -72,16 +70,13 @@ export default async function BlogPage({ params }: { params: Promise<{ locale: s
                     aria-label={locale === 'zh' ? '全部租房指南目录' : 'All rental guides'}
                     className="mt-10 border-t border-slate-200 pt-6"
                   >
-                    <h2 className="text-xl font-bold mb-4">
+                    <h2 className={styles.sectionTitle}>
                       {locale === 'zh' ? '全部指南' : 'All guides'}
                     </h2>
-                    <ul className="space-y-2">
+                    <ul className={styles.guideList}>
                       {posts.map(post => (
                         <li key={post.id}>
-                          <Link
-                            className="text-blue-700 underline"
-                            href={`/${locale}/blog/${encodeURIComponent(post.slug)}`}
-                          >
+                          <Link href={`/${locale}/blog/${encodeURIComponent(post.slug)}`}>
                             {locale === 'zh' ? post.title : post.title_en}
                           </Link>
                         </li>
@@ -93,6 +88,7 @@ export default async function BlogPage({ params }: { params: Promise<{ locale: s
             </div>
           </div>
         </CategoryProvider>
+        <RentalLinks locale={locale} compact />
       </div>
     </div>
   );

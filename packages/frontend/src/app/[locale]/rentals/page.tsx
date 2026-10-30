@@ -3,9 +3,10 @@ import { notFound } from 'next/navigation';
 import { isLocale } from '@qrent/shared/utils/helper';
 import { setRequestLocale } from 'next-intl/server';
 import Breadcrumbs from '@/components/Breadcrumbs';
-import RentalLinks from '@/components/RentalLinks';
 import { RENTAL_SCHOOLS, areaName } from '@/lib/rental-schools';
 import { pageMetadata } from '@/lib/seo';
+import { HiArrowRight } from 'react-icons/hi';
+import styles from '@/styles/discovery.module.css';
 
 export async function generateMetadata({ params }: { params: Promise<{ locale: string }> }) {
   const { locale } = await params;
@@ -27,7 +28,7 @@ export default async function RentalsPage({ params }: { params: Promise<{ locale
   setRequestLocale(locale);
   const zh = locale === 'zh';
   return (
-    <main className="max-w-7xl mx-auto px-5 py-10">
+    <main className={styles.page}>
       <Breadcrumbs
         locale={locale}
         items={[
@@ -35,28 +36,41 @@ export default async function RentalsPage({ params }: { params: Promise<{ locale
           { name: zh ? '悉尼租房目录' : 'Sydney rental directory', path: '/rentals' },
         ]}
       />
-      <h1 className="text-3xl font-bold mb-5">
+      <h1 className={styles.title}>
         {zh ? '悉尼大学周边租房与区域' : 'Rentals and areas around Sydney universities'}
       </h1>
-      <p className="max-w-3xl text-slate-600 leading-relaxed mb-8">
+      <p className={styles.lead}>
         {zh
-          ? 'QRent 免费整合 Domain 与 Real Estate 的房源信息。先按学校了解既有采集区域，再按周租、卧室和公共交通时间筛选。当前恢复更新以悉尼三校范围为主，区域列表表示我们的采集范围，不代表到校步行距离或整个悉尼市场覆盖。'
-          : 'QRent is a free way to compare rental information from Domain and Real Estate. Start with your university, then filter by weekly rent, bedrooms and public transport commute. Restored updates currently focus on the three Sydney universities below. Areas describe the existing collection scope, not walking distance or the entire Sydney rental market.'}
+          ? 'QRent 免费整合 Domain 与 Real Estate 的房源信息。先按学校了解既有采集区域，再按周租、卧室和公共交通时间筛选。'
+          : 'QRent is a free way to compare rental information from Domain and Real Estate. Start with your university, then filter by weekly rent, bedrooms and public transport commute.'}
       </p>
-      <div className="grid gap-6 md:grid-cols-3">
+      <p className={styles.note}>
+        {zh
+          ? '当前恢复更新以悉尼三校范围为主，区域列表表示我们的采集范围，不代表到校步行距离或整个悉尼市场覆盖。'
+          : 'Restored updates currently focus on the three Sydney universities below. Areas describe the existing collection scope, not walking distance or the entire Sydney rental market.'}
+      </p>
+      <ul className={styles.schoolList}>
         {RENTAL_SCHOOLS.map(school => (
-          <section key={school.code} className="rounded-xl border border-slate-200 p-6">
-            <h2 className="text-xl font-bold mb-3">
-              <Link href={`/${locale}/rentals/${school.slug}`} className="text-blue-700 underline">
-                {zh ? school.nameZh : school.name} ({school.code})
-              </Link>
-            </h2>
-            <p className="text-slate-600 mb-3">{school.focus[zh ? 'zh' : 'en']}</p>
-            <p className="text-sm text-slate-600">{school.areas.map(areaName).join(' · ')}</p>
-          </section>
+          <li key={school.code}>
+            <Link href={`/${locale}/rentals/${school.slug}`} className={styles.schoolRow}>
+              <div>
+                <h2 className={styles.schoolName}>
+                  {zh ? school.nameZh : school.name}
+                  <span className={styles.schoolCode}>{school.code}</span>
+                </h2>
+                <p className={styles.schoolFocus}>{school.focus[zh ? 'zh' : 'en']}</p>
+                <p className={styles.schoolAreas}>{school.areas.map(areaName).join(' · ')}</p>
+              </div>
+              <HiArrowRight aria-hidden="true" />
+            </Link>
+          </li>
         ))}
+      </ul>
+      <div className={styles.section}>
+        <Link href={`/${locale}/blog`} className={styles.textLink}>
+          {zh ? '查看全部租房指南' : 'Browse all rental guides'}
+        </Link>
       </div>
-      <RentalLinks locale={locale} />
     </main>
   );
 }

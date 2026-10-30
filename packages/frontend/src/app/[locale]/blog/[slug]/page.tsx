@@ -29,9 +29,8 @@ export async function generateMetadata({ params }: PageProps) {
       title: locale === 'zh' ? '找不到文章 | QRent' : 'Article not found | QRent',
       robots: { index: false },
     };
-  const posts = await getNotionBlogPosts();
-  const languages = posts.filter(post => post.slug === slug).map(post => post.language);
-  return generateNotionBlogMetadata(result.post, locale, languages.length ? languages : [locale]);
+  // A shared slug does not establish that two source articles are translations.
+  return generateNotionBlogMetadata(result.post, locale, [locale]);
 }
 export default async function BlogPostPage({ params }: PageProps) {
   const { locale, slug } = await params;
