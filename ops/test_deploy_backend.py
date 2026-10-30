@@ -37,7 +37,14 @@ if args[0]=='inspect':
  fmt=args[2];name=args[3]
  if fmt=='{{.Image}}':print(s['image'])
  elif fmt=='{{.State.Running}}':print('true')
- elif fmt=='{{json .Mounts}}':print('[{"Type":"volume","Name":"qrent_db_data"}]')
+ elif fmt=='{{json .Mounts}}':
+  mounts=[{'Type':'volume','Name':'qrent_db_data','Destination':'/var/lib/mysql'},
+          {'Type':'bind','Source':'/test/init','Destination':'/docker-entrypoint-initdb.d'}]
+  if s.get('reorder_mounts'):
+   reads=s.get('mount_reads',0);s['mount_reads']=reads+1;save()
+   if reads%2:mounts.reverse()
+  if s.get('change_mounts') and s['backend']=='backend-new':mounts[0]['Name']='changed-database-volume'
+  print(json.dumps(mounts))
  else:raise AssertionError(fmt)
  sys.exit(0)
 if args[0]=='tag':sys.exit(0)
@@ -156,6 +163,20 @@ class BackendDeploymentTests(unittest.TestCase):
     def test_changed_database_identity_fails_and_restores_only_backend(self):
         self.state['change_db']=True
         result=self.run_deploy();self.assertNotEqual(result.returncode,0)
+        self.assertEqual(self.after['backend'],'backend-restored')
+        self.assert_no_dependency_mutations()
+
+    def test_equivalent_mounts_in_a_different_order_do_not_trigger_rollback(self):
+        self.state['reorder_mounts']=True
+        result=self.run_deploy()
+        self.assertEqual(result.returncode,0,result.stderr)
+        self.assertEqual(self.after['backend'],'backend-new')
+        self.assert_no_dependency_mutations()
+
+    def test_changed_mount_details_still_trigger_rollback(self):
+        self.state['change_mounts']=True
+        result=self.run_deploy()
+        self.assertNotEqual(result.returncode,0)
         self.assertEqual(self.after['backend'],'backend-restored')
         self.assert_no_dependency_mutations()
 

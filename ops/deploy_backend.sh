@@ -27,7 +27,11 @@ for container in "$db" "$redis" "$backend"; do
     [[ $(docker inspect --format '{{.State.Running}}' "$container") == true ]] || exit 66
 done
 old_image=$(docker inspect --format '{{.Image}}' "$backend")
-db_mounts=$(docker inspect --format '{{json .Mounts}}' "$db")
+mount_snapshot() {
+    docker inspect --format '{{json .Mounts}}' "$1" | python3 -c \
+      'import json,sys;print(json.dumps(sorted(json.load(sys.stdin),key=lambda m:json.dumps(m,sort_keys=True)),sort_keys=True,separators=(",",":")))'
+}
+db_mounts=$(mount_snapshot "$db")
 file_hash() { python3 -c 'import hashlib,sys;print(hashlib.sha256(open(sys.argv[1],"rb").read()).hexdigest())' "$1"; }
 env_hash=$(file_hash "$root/.env")
 compose_hash=$(file_hash "$root/docker-compose.yml")
@@ -50,9 +54,18 @@ PY
 }
 
 unchanged_dependencies() {
-    [[ $("${compose[@]}" ps -q db) == "$db" && $("${compose[@]}" ps -q redis) == "$redis" ]] &&
-    [[ $(docker inspect --format '{{json .Mounts}}' "$db") == "$db_mounts" ]] &&
-    [[ $(file_hash "$root/.env") == "$env_hash" && $(file_hash "$root/docker-compose.yml") == "$compose_hash" ]]
+    local db_ok=false redis_ok=false mounts_ok=false env_ok=false compose_ok=false
+    if [[ $("${compose[@]}" ps -q db) == "$db" ]]; then db_ok=true; fi
+    if [[ $("${compose[@]}" ps -q redis) == "$redis" ]]; then redis_ok=true; fi
+    if [[ $(mount_snapshot "$db") == "$db_mounts" ]]; then mounts_ok=true; fi
+    if [[ $(file_hash "$root/.env") == "$env_hash" ]]; then env_ok=true; fi
+    if [[ $(file_hash "$root/docker-compose.yml") == "$compose_hash" ]]; then compose_ok=true; fi
+    if [[ "$db_ok" == true && "$redis_ok" == true && "$mounts_ok" == true && "$env_ok" == true && "$compose_ok" == true ]]; then
+        return 0
+    fi
+    printf 'Release protection mismatch: db=%s redis=%s mounts=%s env=%s compose=%s\n' \
+      "$db_ok" "$redis_ok" "$mounts_ok" "$env_ok" "$compose_ok" >&2
+    return 1
 }
 
 fail() {
@@ -70,7 +83,7 @@ YAML
             cp "$rollback" "$root/.deploy/backend-current.yml"
             restored=$("${compose[@]}" ps -q backend)
             rollback_healthy=0
-            for attempt in {1..5}; do
+            for attempt in {1..20}; do
                 if docker exec -i -e QRENT_VERIFY_MODE=rollback "$restored" node --input-type=module \
                     < "$source_dir/ops/verify_backend.mjs"; then
                     rollback_healthy=1
