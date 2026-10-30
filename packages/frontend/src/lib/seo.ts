@@ -89,7 +89,7 @@ export function sitemapEntries(posts: SitemapPost[]): MetadataRoute.Sitemap {
     if (seen.has(url)) continue;
     seen.add(url);
     const translations = posts.filter(
-      other => other.slug === post.slug && LANGUAGES.some(lang => lang === other.language)
+      other => other.slug === post.slug && other.language === post.language
     );
     result.push({
       url,

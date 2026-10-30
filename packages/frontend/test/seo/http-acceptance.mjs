@@ -38,3 +38,19 @@ for (const locale of ['en', 'zh']) {
     });
   }
 }
+
+test(
+  'legacy mislabeled English article redirects to the same source identity in Chinese',
+  {
+    skip: !base || process.env.QRENT_SEO_VERIFY_BLOGS !== '1',
+  },
+  async () => {
+    const response = await fetch(`${base}/en/blog/before-renting`, { redirect: 'manual' });
+    assert.equal(response.status, 308);
+    const target = new URL(response.headers.get('location'), base);
+    assert.equal(target.pathname, '/zh/blog/before-renting-2d2cf61ed1da8196a297f90d735eb8b7');
+    const page = await fetch(target);
+    assert.equal(page.status, 200);
+    assert.ok((await page.text()).includes('lang="zh-CN"'));
+  }
+);

@@ -95,7 +95,7 @@
     "concurrency": 4,
     "requireCanonicalSelf": true,
     "requireIndexable": true,
-    "forbiddenUrlPatterns": ["\\?", "/search", "/favorite"],
+    "forbiddenUrlPatterns": ["\\?", "/search", "/favorite", "/en/blog/before-renting$"],
     "childSitemaps": ["sitemap.xml"]
   },
   "pageRules": {
@@ -148,7 +148,7 @@
       "/en",
       "/zh",
       "/zh/rentals/unsw",
-      "/en/blog/before-renting",
+      "/zh/blog/before-renting",
       "/zh/blog/rental-suburbs-platforms"
     ],
     "noindexPages": [
@@ -176,6 +176,12 @@
         "path": "/zh/blog/qrent-seo-missing-article",
         "expectedStatus": 404,
         "requireNoindex": true
+      }
+    ],
+    "legacyRedirects": [
+      {
+        "path": "/en/blog/before-renting",
+        "expectedLocationPattern": "/zh/blog/before-renting-2d2cf61ed1da8196a297f90d735eb8b7$"
       }
     ]
   },

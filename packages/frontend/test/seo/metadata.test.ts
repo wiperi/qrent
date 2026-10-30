@@ -23,6 +23,16 @@ test('a Chinese-only article never advertises an absent English translation', ()
   });
 });
 
+test('an identical source slug alone does not prove that two articles are translations', () => {
+  const entries = sitemapEntries([
+    { slug: 'before-renting', language: 'zh' },
+    { slug: 'before-renting', language: 'en' },
+  ]).filter(entry => entry.url.includes('/blog/'));
+  assert.equal(entries.length, 2);
+  assert.deepEqual(Object.keys(entries[0].alternates?.languages ?? {}), ['zh']);
+  assert.deepEqual(Object.keys(entries[1].alternates?.languages ?? {}), ['en']);
+});
+
 test('sitemap excludes filter pages, deduplicates and keeps only actual article languages and dates', () => {
   const posts = [
     { slug: 'only-zh', language: 'zh', last_edited_time: '2026-10-01T00:00:00Z' },

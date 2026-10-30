@@ -31,6 +31,7 @@ type SearchParams = {
 export default function SearchResults({ searchParams }: { searchParams: SearchParams }) {
   const page = Number(searchParams.page ?? '1') || 1;
   const { user, isLoading } = useAuth();
+  const t = useTranslations('SearchResults');
   const queryClient = useQueryClient();
 
   // Build search parameters from URL - aligned with backend preferenceSchema
@@ -125,7 +126,7 @@ export default function SearchResults({ searchParams }: { searchParams: SearchPa
           {/* Right: pagination + results */}
           <div className="lg:col-span-9">
             <h2 id="results-heading" tabIndex={-1} className="sr-only">
-              Search results
+              {t('searchResults')}
             </h2>
             <div className="flex items-center justify-between">
               <Pagination current={page} totalPages={totalPages} />
