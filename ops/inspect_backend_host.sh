@@ -11,7 +11,21 @@ swapon --show --bytes
 docker system df
 docker ps -a --format 'table {{.ID}}\t{{.Image}}\t{{.Status}}\t{{.Names}}'
 if [[ "${1:-}" != preflight ]]; then
+  docker image ls --no-trunc --format 'Image inventory: {{.ID}} {{.Repository}}:{{.Tag}}'
+  docker image inspect --format 'Image size: {{.Id}} {{.Size}} {{.Created}}' $(docker image ls -q)
   docker inspect --format '{{.Name}} {{json .Mounts}}' $(docker ps -q)
+  qrent_redis=$(docker ps -q --filter name='^qrent-redis-1$')
+  if [[ -n "$qrent_redis" ]]; then
+    docker inspect --format 'Account-store process: running={{.State.Running}} oom_killed={{.State.OOMKilled}} restarts={{.RestartCount}} health={{.State.Health.Status}}' "$qrent_redis"
+    qrent_ping=$(docker exec "$qrent_redis" timeout 5 redis-cli --raw PING 2>&1) || true
+    case "$qrent_ping" in
+      PONG) printf 'Account-store local PING: PONG\n' ;;
+      NOAUTH*) printf 'Account-store local PING: NOAUTH\n' ;;
+      DENIED*) printf 'Account-store local PING: DENIED\n' ;;
+      ERR*) printf 'Account-store local PING: ERR\n' ;;
+      *) printf 'Account-store local PING: unavailable\n' ;;
+    esac
+  fi
   qrent_backend=$(docker ps -q --filter name='^qrent-backend-1$')
   if [[ -n "$qrent_backend" ]]; then
     # Read-only PING probes; credentials remain inside the existing container.
@@ -24,6 +38,7 @@ try { configured = process.env.REDIS_URL ? new URL(process.env.REDIS_URL) : unde
 const report = {
   url_present: !!process.env.REDIS_URL,
   url_valid: !!configured,
+  protocol: ['redis:', 'rediss:'].includes(configured?.protocol) ? configured.protocol : 'unset_or_unsupported',
   host_kind: !configured ? 'unset_or_invalid' :
     ['127.0.0.1', 'localhost', '[::1]'].includes(configured.hostname) ? 'loopback' :
     configured.hostname === 'redis' ? 'compose_service' : 'other',
@@ -33,7 +48,7 @@ const report = {
 };
 function safeCode(error) {
   const allowed = ['ECONNREFUSED', 'ENOTFOUND', 'ETIMEDOUT', 'ECONNRESET',
-    'NOAUTH', 'WRONGPASS', 'NOPERM', 'DENIED', 'LOADING'];
+    'EAI_AGAIN', 'NOAUTH', 'WRONGPASS', 'NOPERM', 'DENIED', 'LOADING', 'ERR', 'MISCONF', 'READONLY'];
   return allowed.find(code => error?.code === code || String(error?.message).startsWith(code)) || 'connection_unavailable';
 }
 async function probe(url) {
@@ -46,7 +61,13 @@ async function probe(url) {
       new Promise((_, reject) => { timer = setTimeout(() => reject({code: 'ETIMEDOUT'}), 5000); }),
     ]);
     return {ping: answer === 'PONG'};
-  } catch (error) { return {ping: false, code: safeCode(error)}; }
+  } catch (error) {
+    const classes = ['Error', 'TypeError', 'SimpleError', 'SocketClosedUnexpectedlyError',
+      'ConnectionTimeoutError', 'AggregateError'];
+    return {ping: false, code: safeCode(error),
+      error_class: classes.includes(error?.constructor?.name) ? error.constructor.name : 'other',
+      nested_codes: Array.isArray(error?.errors) ? error.errors.map(safeCode) : []};
+  }
   finally { clearTimeout(timer); try { if (client?.isOpen) client.destroy(); } catch {} }
 }
 report.configured = await probe(process.env.REDIS_URL);
