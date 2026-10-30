@@ -17,7 +17,7 @@ Base: wiperi/qrent main, 9850e68. Keep this release separate from the broader sc
 - [x] Reuse the already verified backend sorting/startup patch and its seven isolated regressions.
 - [x] Add executable deployment tests for build failure, health failure/rollback, unchanged dependency containers, missing configuration and concurrent deployment.
 - [x] Replace the destructive CD steps; run isolated backend/deployment checks in CI. Validate workflow syntax and relevant local builds.
-- [ ] Push only a dedicated fork branch, create/attach a reviewable PR and collect actual CI results.
+- [x] Push only a dedicated fork branch, create/attach a reviewable PR and collect actual CI results.
 - [ ] Merge after required checks using the user's latest explicit authorization, then obtain the actual CD receipt and public API/page evidence. A PR or green CI alone does not mean deployed.
 
 ## Local verification
@@ -26,3 +26,9 @@ Base: wiperi/qrent main, 9850e68. Keep this release separate from the broader sc
 - Original inline CD: all 7 deployment regressions failed, including intercepted project shutdown and volume cleanup. New deployment runner: 8 passed. Node health verifier: 6 passed. Workflow syntax passed official actionlint 1.7.7, verified against its release checksum; repository formatting passed.
 - Independent review found two Important health false positives. Both were reproduced and fixed: rollback now checks actual DB-backed searches, and the default search page is compared to an explicit date/score reference, allowing tied ordering keys. New regressions failed before the fixes and all 21 relevant tests now pass. The reviewer did not inspect production or secrets; actual Docker build, CI/CD and live-page results remain required.
 - CI also builds the backend Docker image and checks the generated client without network access before allowing a production deployment.
+
+## Production follow-through
+
+- PR #293 passed CI and merged at 21:11 CST. The first main run skipped deployment because optional skipped jobs inherited GitHub's implicit success condition. PR #294 explicitly permits non-cancelled execution after the successful CI gate; it passed CI and merged at 21:19 CST.
+- Run 41062276421 then reached deployment but failed during the SSH handshake with `host key fingerprint mismatch`, before backend replacement. The previously verified ED25519 key was rechecked against the trusted local known-host entry and the current server key; both have fingerprint `SHA256:yFb8C5MaAlip/092pxEXeqWMWRWouUg6mXMMmOeFako`.
+- The connection now uses native OpenSSH with exactly that ED25519 key and `StrictHostKeyChecking=yes`. Credentials remain step-scoped GitHub Secrets and an environment-only askpass helper; no credential values are written to the repository or workstation. Five transport regressions cover host rejection, remote failure, validation, cleanup and literal password handling. A successful CI run still requires the actual deployment receipt and API/page checks.
