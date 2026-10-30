@@ -19,14 +19,6 @@ function getImageForSlug(slug: string): string {
 
 export async function generateMetadata({ params }: { params: Promise<{ locale: string }> }) {
   const { locale } = await params;
-  if (locale === 'en' && !(await getNotionBlogPosts('en')).length) {
-    return pageMetadata(
-      'en',
-      '/blog',
-      'Chinese-language Australian Rental Guides | QRent',
-      'Browse QRent rental preparation, inspections and application guides published in Chinese. English navigation is available; these articles have no verified English translations yet.'
-    );
-  }
   return pageMetadata(
     locale,
     '/blog',
@@ -45,32 +37,6 @@ export const revalidate = 600; // Cache for 10 minutes
 export default async function BlogPage({ params }: { params: Promise<{ locale: string }> }) {
   const { locale } = await params;
   const posts = await getNotionBlogPosts(locale);
-  if (locale === 'en' && !posts.length) {
-    const chineseGuides = await getNotionBlogPosts('zh');
-    return (
-      <main className="max-w-7xl mx-auto px-5 py-10">
-        <h1 className="text-3xl font-bold mb-5">Rental guides available in Chinese</h1>
-        <p className="text-slate-600 mb-6">
-          These guides are published in Chinese. Verified English translations are not currently
-          available.
-        </p>
-        <ul className="space-y-4">
-          {chineseGuides.map(guide => (
-            <li key={guide.id}>
-              <Link
-                className="text-blue-700 underline"
-                lang="zh-CN"
-                href={`/zh/blog/${encodeURIComponent(guide.slug)}`}
-              >
-                {guide.title}
-              </Link>
-            </li>
-          ))}
-        </ul>
-        <RentalLinks locale="en" compact />
-      </main>
-    );
-  }
 
   // 提取所有关键词并去重
   const allKeywords = Array.from(new Set(posts.flatMap(post => post.keywords))).sort();

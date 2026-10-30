@@ -223,8 +223,7 @@ export const BlogPostSchema = z.object({
   id: z.string(),
   slug: z.string().min(1, 'slug 不能为空'),
   title: z.string().min(1, '标题不能为空'),
-  // Untranslated Chinese guides do not need a fabricated English headline.
-  title_en: z.string(),
+  title_en: z.string().min(1, '英文标题不能为空'),
   excerpt_zh: z.string(),
   excerpt_en: z.string(),
   published_at: z.string().min(1, '发布日期不能为空'),
@@ -492,7 +491,6 @@ export class TypeSafeNotionClient {
 
     this.client = new Client({
       auth: env.NOTION_TOKEN,
-      timeoutMs: 15000,
     });
 
     this.databaseId = env.NOTION_DATABASE_ID;
@@ -614,12 +612,12 @@ export class TypeSafeNotionClient {
             pageId: page.id,
             error: error instanceof Error ? error.message : String(error),
           });
-          console.warn(`Invalid published blog record (ID: ${page.id}):`, error);
+          console.warn(`跳过无效的博客文章 (ID: ${page.id}):`, error);
         }
       }
 
       if (errors.length > 0) {
-        throw new NotionValidationError('Published blog catalog is incomplete', errors);
+        console.warn(`处理博客文章时发现 ${errors.length} 个错误:`, errors);
       }
 
       return blogPosts;
@@ -707,7 +705,7 @@ export class TypeSafeNotionClient {
       for (const block of blocks) {
         const entry = block as NotionBlock;
         result.push(
-          entry.has_children && !['child_page', 'child_database'].includes(entry.type)
+          entry.has_children
             ? { ...entry, children: await this.getBlogPostContent(entry.id) }
             : entry
         );
