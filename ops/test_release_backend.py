@@ -47,8 +47,8 @@ class ReleaseTransportTests(unittest.TestCase):
 
     def tearDown(self): self.temp.cleanup()
 
-    def run_release(self):
-        result = subprocess.run(['bash', str(REPO/'ops/release_backend.sh')], cwd=self.root,
+    def run_release(self, *args):
+        result = subprocess.run(['bash', str(REPO/'ops/release_backend.sh'), *args], cwd=self.root,
                                 env=self.env, capture_output=True, text=True, timeout=10)
         log = self.root/'ssh.jsonl'
         self.calls = [json.loads(x) for x in log.read_text().splitlines()] if log.exists() else []
@@ -88,6 +88,15 @@ class ReleaseTransportTests(unittest.TestCase):
         result = self.run_release()
         self.assertNotEqual(result.returncode, 0)
         self.assertEqual(self.calls, [])
+
+    def test_inspection_does_not_require_an_archive_or_start_deployment(self):
+        (self.root/f'backend-{SHA}.tgz').unlink()
+        result = self.run_release('inspect')
+        self.assertEqual(result.returncode, 0, result.stderr)
+        self.assertEqual(len(self.calls), 1)
+        self.assertIn('docker system df', self.calls[0]['stdin'])
+        self.assertNotIn('deploy_backend.sh', self.calls[0]['stdin'])
+        self.assertNotIn('docker build', self.calls[0]['stdin'])
 
 
 if __name__ == '__main__': unittest.main()

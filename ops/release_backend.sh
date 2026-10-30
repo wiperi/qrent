@@ -12,7 +12,9 @@ umask 077
 [[ "$DEPLOY_SERVER_HOST" =~ ^[a-zA-Z0-9][a-zA-Z0-9.:-]*$ ]] || exit 64
 [[ "$DEPLOY_SERVER_USERNAME" =~ ^[a-zA-Z_][a-zA-Z0-9_-]*$ ]] || exit 64
 archive="backend-$GITHUB_SHA.tgz"
-test -s "$archive"
+mode=${1:-release}
+[[ "$mode" == release || "$mode" == inspect ]] || exit 64
+if [[ "$mode" == release ]]; then test -s "$archive"; fi
 
 ssh_tmp=$(mktemp -d "${RUNNER_TEMP:-${TMPDIR:-/tmp}}/qrent-ssh.XXXXXXXX")
 trap 'rm -rf -- "$ssh_tmp"' EXIT
@@ -52,6 +54,12 @@ ssh_options=(
   -l "$DEPLOY_SERVER_USERNAME"
 )
 
+if [[ "$mode" == inspect ]]; then
+  script_root=$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)
+  ssh "${ssh_options[@]}" "$DEPLOY_SERVER_HOST" bash -s < "$script_root/inspect_backend_host.sh"
+  exit 0
+fi
+
 printf 'Uploading tracked release sources with the pinned ED25519 host key.\n'
 ssh "${ssh_options[@]}" "$DEPLOY_SERVER_HOST" \
   "umask 077; set -eu; mkdir -p \"\$HOME/qrent/.deploy/uploads\"; cat > \"\$HOME/qrent/.deploy/uploads/$archive.part\"; mv \"\$HOME/qrent/.deploy/uploads/$archive.part\" \"\$HOME/qrent/.deploy/uploads/$archive\"" \
@@ -66,15 +74,9 @@ qrent_sha="$1"
 qrent_source="$qrent_root/.deploy/releases/$qrent_sha"
 test -s "$qrent_root/.env"
 test -s "$qrent_root/docker-compose.yml"
-printf 'Read-only deployment host capacity check.\n'
-qrent_docker_root=$(docker info --format '{{.DockerRootDir}}')
-df -h "$qrent_root" "$qrent_docker_root" /var/run
-df -i "$qrent_root" "$qrent_docker_root" /var/run
-docker system df
-docker ps -a --format 'table {{.ID}}\t{{.Image}}\t{{.Status}}\t{{.Names}}'
-du -x -h --max-depth=1 "$qrent_docker_root" /var/log 2>/dev/null || true
 mkdir -p "$qrent_source"
 tar -xzf "$qrent_root/.deploy/uploads/backend-$qrent_sha.tgz" -C "$qrent_source"
+bash "$qrent_source/ops/inspect_backend_host.sh" preflight
 QRENT_DEPLOY_ROOT="$qrent_root" QRENT_RELEASE_SHA="$qrent_sha" \
   bash "$qrent_source/ops/deploy_backend.sh"
 cat "$qrent_root/.deploy/receipts/$qrent_sha.json"

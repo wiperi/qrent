@@ -30,7 +30,7 @@ jobs:
         run: |
           git archive --format=tar.gz --output="backend-${GITHUB_SHA}.tgz" HEAD \
             package.json pnpm-lock.yaml pnpm-workspace.yaml .dockerignore \
-            packages/backend packages/shared ops/deploy_backend.sh ops/verify_backend.mjs
+            packages/backend packages/shared ops/deploy_backend.sh ops/verify_backend.mjs ops/inspect_backend_host.sh
 
       - name: Upload and deploy using the pinned ED25519 host key
         env:
