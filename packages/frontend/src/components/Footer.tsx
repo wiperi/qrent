@@ -135,6 +135,14 @@ export default function Footer() {
           </div>
 
           <div className="lg:col-span-1 text-sm text-slate-500">
+            <nav aria-label="Languages" className="mb-3 flex gap-3">
+              <Link href="/en" hrefLang="en" className="underline">
+                English
+              </Link>
+              <Link href="/zh" hrefLang="zh-CN" className="underline">
+                简体中文
+              </Link>
+            </nav>
             <p>{t('copyright')}</p>
             <a href="mailto:yyzyfish5@gmail.com" className="inline-block mt-2 underline">
               yyzyfish5@gmail.com

@@ -12,7 +12,8 @@
     "test:ui": "vitest --ui",
     "test:coverage": "vitest --coverage",
     "test:unit": "vitest run test/unit",
-    "test:integration": "vitest run test/integration"
+    "test:integration": "vitest run test/integration",
+    "test:seo": "TSX_TSCONFIG_PATH=tsconfig.json node --import tsx --test test/seo/*.test.ts test/seo/*.test.tsx"
   },
   "dependencies": {
     "@google/genai": "^1.29.1",

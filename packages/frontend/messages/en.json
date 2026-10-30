@@ -233,12 +233,13 @@
     }
   },
   "home": {
-    "title": "Qrent - Your Perfect Home Awaits",
-    "description": "Discover exceptional rental properties with ease. Your dream home is just a search away.",
+    "title": "Find Sydney rentals near your university",
+    "description": "Compare Domain and Real Estate rental prices, areas and public transport commutes around UNSW, the University of Sydney and UTS. Free to use.",
     "ogTitle": "Qrent - Your Perfect Home Awaits",
     "ogDescription": "Discover exceptional rental properties with ease. Your dream home is just a search away.",
     "twitterTitle": "Qrent - Your Perfect Home Awaits",
-    "twitterDescription": "Discover exceptional rental properties with ease. Your dream home is just a search away."
+    "twitterDescription": "Discover exceptional rental properties with ease. Your dream home is just a search away.",
+    "bannerAlt": "QRent Sydney rental search"
   },
   "search": {
     "title": "Property Search - QRent",

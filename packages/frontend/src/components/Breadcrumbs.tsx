@@ -12,7 +12,7 @@ export default function Breadcrumbs({
     <>
       <nav
         aria-label={locale === 'zh' ? '面包屑导航' : 'Breadcrumb'}
-        className="mb-6 text-sm text-slate-600"
+        className="breadcrumb-nav mb-6 text-sm text-slate-600"
       >
         <ol className="flex flex-wrap gap-2">
           {items.map((item, index) => (

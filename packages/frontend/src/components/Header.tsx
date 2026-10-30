@@ -1,67 +1,67 @@
-'use client'
+'use client';
 
-import { useAuth } from '@/hooks/use-auth'
-import { useAuthModalEvents } from '@/lib/auth-events'
-import { useLocale, useTranslations } from 'next-intl'
-import Image from 'next/image'
-import Link from 'next/link'
-import { useEffect, useRef, useState } from 'react'
-import { HiLogout, HiMenu, HiUser, HiX } from 'react-icons/hi'
-import AuthModal from './AuthModal'
-import LanguageSwitcher from './LanguageSwitcher'
+import { useAuth } from '@/hooks/use-auth';
+import { useAuthModalEvents } from '@/lib/auth-events';
+import { useLocale, useTranslations } from 'next-intl';
+import Image from 'next/image';
+import Link from 'next/link';
+import { useEffect, useRef, useState } from 'react';
+import { HiLogout, HiMenu, HiUser, HiX } from 'react-icons/hi';
+import AuthModal from './AuthModal';
+import LanguageSwitcher from './LanguageSwitcher';
 
 export default function Header() {
-  const [isDrawerOpen, setIsDrawerOpen] = useState(false)
-  const [authModalOpen, setAuthModalOpen] = useState(false)
-  const [authMode, setAuthMode] = useState<'login' | 'signup'>('login')
-  const [userMenuOpen, setUserMenuOpen] = useState(false)
-  const userMenuRef = useRef<HTMLDivElement>(null)
+  const [isDrawerOpen, setIsDrawerOpen] = useState(false);
+  const [authModalOpen, setAuthModalOpen] = useState(false);
+  const [authMode, setAuthMode] = useState<'login' | 'signup'>('login');
+  const [userMenuOpen, setUserMenuOpen] = useState(false);
+  const userMenuRef = useRef<HTMLDivElement>(null);
 
-  const { user, logout } = useAuth()
-  const t = useTranslations('Header')
-  const locale = useLocale()
+  const { user, logout } = useAuth();
+  const t = useTranslations('Header');
+  const locale = useLocale();
 
   // 监听全局认证事件
-  useAuthModalEvents((modalType) => {
-    setAuthMode(modalType)
-    setAuthModalOpen(true)
-  })
+  useAuthModalEvents(modalType => {
+    setAuthMode(modalType);
+    setAuthModalOpen(true);
+  });
 
   const closeDrawer = () => {
-    setIsDrawerOpen(false)
-    document.body.classList.remove('overflow-hidden')
-  }
+    setIsDrawerOpen(false);
+    document.body.classList.remove('overflow-hidden');
+  };
 
   const toggleDrawer = () => {
-    setIsDrawerOpen(!isDrawerOpen)
-    document.body.classList.toggle('overflow-hidden')
-  }
+    setIsDrawerOpen(!isDrawerOpen);
+    document.body.classList.toggle('overflow-hidden');
+  };
 
   const openAuthModal = (mode: 'login' | 'signup') => {
-    setAuthMode(mode)
-    setAuthModalOpen(true)
-  }
+    setAuthMode(mode);
+    setAuthModalOpen(true);
+  };
 
   const handleLogout = () => {
-    logout()
-    setUserMenuOpen(false)
-  }
+    logout();
+    setUserMenuOpen(false);
+  };
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
       if (userMenuRef.current && !userMenuRef.current.contains(event.target as Node)) {
-        setUserMenuOpen(false)
+        setUserMenuOpen(false);
       }
-    }
+    };
 
     if (userMenuOpen) {
-      document.addEventListener('mousedown', handleClickOutside)
+      document.addEventListener('mousedown', handleClickOutside);
     }
 
     return () => {
-      document.removeEventListener('mousedown', handleClickOutside)
-    }
-  }, [userMenuOpen])
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, [userMenuOpen]);
 
   return (
     <>
@@ -69,10 +69,9 @@ export default function Header() {
         <div className="bg-white">
           <div className="max-w-7xl mx-auto px-2 sm:px-4 lg:px-8">
             <div className="h-16 px-2 sm:px-3 lg:px-4 flex items-center justify-between">
-
               {/* Left: logo + blog link */}
               <div className="flex items-center gap-6">
-                <Link href="/" className="flex items-center" aria-label="Qrent home">
+                <Link href={`/${locale}`} className="flex items-center" aria-label="Qrent home">
                   <Image
                     src="/qrent-logo.svg"
                     alt="Qrent"
@@ -82,10 +81,16 @@ export default function Header() {
                     className="rounded-md"
                   />
                 </Link>
-                <Link href={`/${locale}/blog`} className="hidden md:block text-slate-700 hover:text-blue-600 transition-colors font-bold">
+                <Link
+                  href={`/${locale}/blog`}
+                  className="hidden md:block text-slate-700 hover:text-blue-600 transition-colors font-bold"
+                >
                   {t('rentalBlog')}
                 </Link>
-                <Link href={`/${locale}/favorite`} className="hidden md:block text-slate-700 hover:text-blue-600 transition-colors font-bold">
+                <Link
+                  href={`/${locale}/favorite`}
+                  className="hidden md:block text-slate-700 hover:text-blue-600 transition-colors font-bold"
+                >
                   {t('favorite')}
                 </Link>
               </div>
@@ -122,7 +127,13 @@ export default function Header() {
                     >
                       <span className="sr-only">{t('userMenu')}</span>
                       {user.name ? (
-                        <Image alt="avatar" src={`https://api.dicebear.com/7.x/initials/svg?seed=${user.name}`} width={32} height={32} className="h-8 w-8 rounded-full" />
+                        <Image
+                          alt="avatar"
+                          src={`https://api.dicebear.com/7.x/initials/svg?seed=${user.name}`}
+                          width={32}
+                          height={32}
+                          className="h-8 w-8 rounded-full"
+                        />
                       ) : (
                         <HiUser className="h-5 w-5 text-slate-600" />
                       )}
@@ -170,7 +181,7 @@ export default function Header() {
           <aside className="fixed inset-y-0 left-0 z-50 w-72 bg-white shadow-xl">
             <div className="h-16 flex items-center justify-between px-4 border-b">
               <div className="flex items-center">
-                <Link href="/" onClick={closeDrawer}>
+                <Link href={`/${locale}`} onClick={closeDrawer}>
                   <Image
                     src="/qrent-logo.jpg"
                     alt="Qrent"
@@ -191,20 +202,44 @@ export default function Header() {
             <nav className="px-4 py-4 space-y-1" aria-label="Mobile">
               {/* <a href="#guide" className="block rounded-md px-3 py-2 text-slate-700 hover:bg-slate-100 hover:text-blue-600">{t('rentalGuide')}</a> */}
               {/* <a href="#docs" className="block rounded-md px-3 py-2 text-slate-700 hover:bg-slate-100 hover:text-blue-600">{t('documentPreparation')}</a> */}
-              <Link href={`/${locale}`} onClick={closeDrawer} className="block rounded-md px-3 py-2 text-slate-700 hover:bg-slate-100 hover:text-blue-600">{t('homepage')}</Link>
-              <Link href={`/${locale}/blog`} onClick={closeDrawer} className="block rounded-md px-3 py-2 text-slate-700 hover:bg-slate-100 hover:text-blue-600">{t('rentalBlog')}</Link>
-              <Link href={`/${locale}/favorite`} onClick={closeDrawer} className="block rounded-md px-3 py-2 text-slate-700 hover:bg-slate-100 hover:text-blue-600">{t('favorite')}</Link>
+              <Link
+                href={`/${locale}`}
+                onClick={closeDrawer}
+                className="block rounded-md px-3 py-2 text-slate-700 hover:bg-slate-100 hover:text-blue-600"
+              >
+                {t('homepage')}
+              </Link>
+              <Link
+                href={`/${locale}/blog`}
+                onClick={closeDrawer}
+                className="block rounded-md px-3 py-2 text-slate-700 hover:bg-slate-100 hover:text-blue-600"
+              >
+                {t('rentalBlog')}
+              </Link>
+              <Link
+                href={`/${locale}/favorite`}
+                onClick={closeDrawer}
+                className="block rounded-md px-3 py-2 text-slate-700 hover:bg-slate-100 hover:text-blue-600"
+              >
+                {t('favorite')}
+              </Link>
               <div className="my-3 h-px bg-slate-200"></div>
               {!user ? (
                 <>
                   <button
-                    onClick={() => { openAuthModal('login'); closeDrawer(); }}
+                    onClick={() => {
+                      openAuthModal('login');
+                      closeDrawer();
+                    }}
                     className="block w-full text-left rounded-md px-3 py-2 text-slate-700 hover:bg-slate-100 hover:text-blue-600"
                   >
                     {t('login')}
                   </button>
                   <button
-                    onClick={() => { openAuthModal('signup'); closeDrawer(); }}
+                    onClick={() => {
+                      openAuthModal('signup');
+                      closeDrawer();
+                    }}
                     className="block w-full text-left rounded-md px-3 py-2 text-white bg-blue-600 hover:bg-blue-700"
                   >
                     {t('signup')}
@@ -217,7 +252,10 @@ export default function Header() {
                     <div className="text-gray-500">{user.email}</div>
                   </div>
                   <button
-                    onClick={() => { handleLogout(); closeDrawer(); }}
+                    onClick={() => {
+                      handleLogout();
+                      closeDrawer();
+                    }}
                     className="flex items-center w-full rounded-md px-3 py-2 text-slate-700 hover:bg-slate-100 hover:text-blue-600"
                   >
                     <HiLogout className="mr-2 h-4 w-4" />
@@ -236,5 +274,5 @@ export default function Header() {
         initialMode={authMode}
       />
     </>
-  )
+  );
 }

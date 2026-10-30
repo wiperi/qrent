@@ -21,6 +21,7 @@ if (process.env.NODE_ENV === 'development') {
 const withNextIntl = createNextIntlPlugin('./src/i18n.ts');
 
 const nextConfig: NextConfig = {
+  experimental: { globalNotFound: true },
   // Keep metadata in the initial head and missing-article responses as HTTP 404
   // for browsers and crawlers alike, rather than streaming a success shell.
   htmlLimitedBots: /.*/,

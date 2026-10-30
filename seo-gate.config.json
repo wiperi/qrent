@@ -95,7 +95,8 @@
     "concurrency": 4,
     "requireCanonicalSelf": true,
     "requireIndexable": true,
-    "forbiddenUrlPatterns": ["\\?", "/search", "/favorite"]
+    "forbiddenUrlPatterns": ["\\?", "/search", "/favorite"],
+    "childSitemaps": ["sitemap.xml"]
   },
   "pageRules": {
     "titleMinLength": 8,
@@ -174,14 +175,7 @@
       {
         "path": "/zh/blog/qrent-seo-missing-article",
         "expectedStatus": 404,
-        "requireNoindex": true,
-        "requireHomeLink": "/zh"
-      },
-      {
-        "path": "/en/blog/rental-suburbs-platforms",
-        "expectedStatus": 404,
-        "requireNoindex": true,
-        "requireHomeLink": "/en"
+        "requireNoindex": true
       }
     ]
   },

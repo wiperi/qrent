@@ -19,6 +19,7 @@ jobs:
       frontend: ${{ steps.changes.outputs.frontend }}
       shared: ${{ steps.changes.outputs.shared }}
       workflows: ${{ steps.changes.outputs.workflows }}
+      backend_cd: ${{ steps.changes.outputs.backend_cd }}
     steps:
       - uses: actions/checkout@v4
       - uses: dorny/paths-filter@v3
@@ -36,10 +37,13 @@ jobs:
             frontend:
               - 'packages/frontend/**'
               - 'packages/shared/**'
+              - 'seo-gate.config.json'
             shared:
               - 'packages/shared/**'
             workflows:
               - '.github/workflows/**'
+            backend_cd:
+              - '.github/workflows/cd.yml'
 
   # Lint and format check
   lint:
@@ -98,6 +102,19 @@ jobs:
 
       - name: Build frontend
         run: pnpm --filter frontend build
+
+      - name: Verify initial HTML and real 404 responses
+        env:
+          QRENT_SEO_BASE_URL: http://127.0.0.1:3327
+        run: |
+          pnpm --filter frontend exec next start --hostname 127.0.0.1 --port 3327 > /tmp/qrent-seo-server.log 2>&1 &
+          server_pid=$!
+          trap 'kill "$server_pid" 2>/dev/null || true' EXIT
+          for attempt in {1..40}; do
+            if curl --silent --fail http://127.0.0.1:3327/en > /dev/null; then break; fi
+            sleep 1
+          done
+          node --test packages/frontend/test/seo/http-acceptance.mjs
 
       - name: Cache build artifacts
         uses: actions/cache@v4
@@ -230,6 +247,6 @@ jobs:
       !cancelled() && needs.ci-success.result == 'success' && needs.changes.result == 'success' &&
       github.event_name == 'push' && github.repository == 'wiperi/qrent' &&
       (github.ref == 'refs/heads/main' || github.ref == 'refs/heads/staging') &&
-      (needs.changes.outputs.backend == 'true' || needs.changes.outputs.shared == 'true' || needs.changes.outputs.workflows == 'true')
+      (needs.changes.outputs.backend == 'true' || needs.changes.outputs.shared == 'true' || needs.changes.outputs.backend_cd == 'true')
     uses: ./.github/workflows/cd.yml
     secrets: inherit

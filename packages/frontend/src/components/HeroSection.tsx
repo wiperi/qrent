@@ -11,7 +11,10 @@ export default function HeroSection() {
 
   return (
     <section className="relative pb-6">
-      <h1 className="sr-only">{t('title')}</h1>
+      <div className="max-w-7xl mx-auto px-5 mb-5">
+        <h1 className="text-2xl sm:text-3xl font-bold text-slate-900">{t('title')}</h1>
+        <p className="mt-2 max-w-3xl text-slate-600 leading-relaxed">{t('description')}</p>
+      </div>
       <div className="max-w-7xl mx-auto px-5">
         {/* Hero Section Wrapper */}
         <div className="flex flex-col gap-5">
@@ -19,7 +22,7 @@ export default function HeroSection() {
           <div className="relative h-[520px] w-full overflow-hidden rounded-2xl">
             <Image
               src="/banner.jpg"
-              alt="Homepage banner"
+              alt={t('bannerAlt')}
               fill
               priority
               className="object-cover"

@@ -42,3 +42,19 @@ browser. Run offline regressions, production build and the supplied audit.
 Release through an original-repository PR; green CI alone is not acceptance.
 Verify actual frontend production deployment and served HTML/banner. Record
 unverifiable Search Console, field CWV, ranking and backlink checks as unknown.
+
+## Verified platform boundary and final routing choice
+
+The first HTTP checks reproduced upstream Next.js #100596: a matched dynamic
+route that calls notFound() returns 404/noindex, but its recovery UI appears
+only after hydration. Boundary and metadata configuration experiments did not
+resolve that upstream defect and were removed. Unmatched paths use the official
+global-not-found document; the fixed school enum uses dynamicParams=false.
+Those paths have full no-JS 404 documents and pass 6 HTTP checks. Missing blog
+articles retain real 404/noindex and verified browser recovery, with the raw
+HTML limitation reported explicitly rather than disguised as a passed check.
+No unmerged framework patch or new dependency is installed.
+
+Footer language links connect both language graphs. The homepage, school hubs,
+guide index and full published guide directory provide crawlable paths; the
+interactive filter combinations stay noindex.

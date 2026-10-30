@@ -11,13 +11,18 @@ import { pageMetadata, SITE_URL, jsonLd } from '@/lib/seo';
 
 type Props = { params: Promise<{ locale: string; school: string }> };
 export const revalidate = 600;
+export const dynamicParams = false;
 export function generateStaticParams() {
   return RENTAL_SCHOOLS.map(school => ({ school: school.slug }));
 }
 export async function generateMetadata({ params }: Props) {
   const { locale, school: slug } = await params;
   const school = RENTAL_SCHOOLS.find(item => item.slug === slug);
-  if (!school) notFound();
+  if (!school)
+    return {
+      title: locale === 'zh' ? '找不到学校页面 | QRent' : 'University page not found | QRent',
+      robots: { index: false },
+    };
   return pageMetadata(
     locale,
     `/rentals/${school.slug}`,

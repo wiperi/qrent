@@ -1,8 +1,8 @@
 import Link from 'next/link';
-import { getLocale } from 'next-intl/server';
+import { useLocale } from 'next-intl';
 
-export default async function NotFound() {
-  const locale = await getLocale();
+export default function NotFound() {
+  const locale = useLocale();
   const zh = locale === 'zh';
   return (
     <main className="max-w-3xl mx-auto px-5 py-16">
