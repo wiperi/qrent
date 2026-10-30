@@ -52,6 +52,14 @@ class RuntimeRecoveryTests(unittest.TestCase):
         self.backup.write_bytes(b'changed-backup')
         with self.assertRaisesRegex(RuntimeError,'checksum'):runtime.plan(self.root,self.proc)
 
+    def test_different_namespace_or_untrusted_executable_is_rejected(self):
+        parent=self.proc/'100'
+        (parent/'cmdline').write_bytes(b'shim\0-namespace\0other\0-id\0'+self.identity.encode()+b'\0')
+        with self.assertRaisesRegex(RuntimeError,'exact Redis-owned'):runtime.plan(self.root,self.proc)
+        (parent/'cmdline').write_bytes(b'shim\0-namespace\0moby\0-id\0'+self.identity.encode()+b'\0')
+        (parent/'exe').unlink();(parent/'exe').symlink_to('/tmp/containerd-shim-runc-v2')
+        with self.assertRaisesRegex(RuntimeError,'exact Redis-owned'):runtime.plan(self.root,self.proc)
+
     def test_stopped_parent_is_only_resumed(self):
         self.write_process(100,'T',1,'shim-start')
         self.assertEqual(runtime.plan(self.root,self.proc)['signal'],'CONT')
