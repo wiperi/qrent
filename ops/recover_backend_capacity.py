@@ -25,18 +25,28 @@ def process_uses(path, proc_root=Path('/proc')):
     """npx may contain executing tools: unknown process access also blocks removal."""
     if not proc_root.is_dir(): return True
     prefix = str(path).encode()
-    for proc in proc_root.iterdir():
-        if not proc.name.isdigit(): continue
+    try: processes = [p for p in proc_root.iterdir() if p.name.isdigit()]
+    except OSError: return True
+    if not processes: return True
+    for proc in processes:
         try:
+            fields = (proc/'stat').read_text().rpartition(')')[2].split()
+            # Linux PF_KTHREAD: include/linux/sched.h. Kernel threads do not run npx tools.
+            if int(fields[6]) & 0x00200000: continue
+            if fields[0] == 'Z':
+                if list((proc/'fd').iterdir()): return True
+                continue
             cmdline = (proc/'cmdline').read_bytes()
-            if not cmdline: continue
             if prefix in cmdline or prefix in (proc/'maps').read_bytes() or prefix in (proc/'environ').read_bytes(): return True
             for link in [proc/'cwd', proc/'exe', *list((proc/'fd').iterdir())]:
                 try: target = Path(os.readlink(link))
-                except FileNotFoundError: continue
+                except FileNotFoundError:
+                    if link.parent == proc/'fd': continue  # This descriptor was closed.
+                    raise
                 if target == path or path in target.parents: return True
-        except (FileNotFoundError, ProcessLookupError): continue
-        except PermissionError: return True
+        except (FileNotFoundError, ProcessLookupError):
+            if proc.exists(): return True
+        except (OSError, ValueError, IndexError): return True
     return False
 
 
