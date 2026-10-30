@@ -16,7 +16,7 @@ class CapacitySafetyTests(unittest.TestCase):
         for age in ('168h', '24h', '1h'):
             with self.subTest(age=age), patch.object(capacity, 'command', return_value='Total: 1MB') as run:
                 capacity.prune_build_cache(age)
-                run.assert_called_once_with('docker', 'builder', 'prune', '-f', '--filter', 'until='+age)
+                run.assert_called_once_with('docker', 'builder', 'prune', '--all', '-f', '--filter', 'until='+age)
         for age in ('0h', '--all', '1h; rm -rf /', ''):
             with self.subTest(age=age), patch.object(capacity, 'command') as run:
                 with self.assertRaises(ValueError): capacity.prune_build_cache(age)
@@ -26,6 +26,15 @@ class CapacitySafetyTests(unittest.TestCase):
         with patch.object(capacity, 'command') as run:
             with self.assertRaises(AssertionError): capacity.main('apply', 2, '0h')
             run.assert_not_called()
+
+    def test_snapshot_retains_image_identity_and_rollback_tags(self):
+        rows='["sha256:one","qrent-backend","release-previous"]\n["sha256:one","qrent-backend","rollback-current"]\n["sha256:two","mysql","8.0"]'
+        with patch.object(capacity, 'command', return_value=rows) as run:
+            snapshot=capacity.image_inventory()
+            self.assertIn(('sha256:one','qrent-backend','rollback-current'),snapshot)
+            self.assertIn(('sha256:two','mysql','8.0'),snapshot)
+            self.assertEqual(len(snapshot),3)
+            self.assertEqual(run.call_args[0][:3],('docker','image','ls'))
 
     def test_only_named_caches_are_candidates(self):
         with tempfile.TemporaryDirectory() as temp:

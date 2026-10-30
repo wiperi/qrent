@@ -16,7 +16,14 @@ def command(*args):
 def prune_build_cache(minimum_age):
     if minimum_age not in ('168h', '24h', '1h'):
         raise ValueError('Unsupported build-cache age')
-    return command('docker', 'builder', 'prune', '-f', '--filter', 'until='+minimum_age)
+    # --all here belongs only to `builder`: it includes unused non-dangling
+    # build cache, and does not prune the Docker image or volume inventories.
+    return command('docker', 'builder', 'prune', '--all', '-f', '--filter', 'until='+minimum_age)
+
+
+def image_inventory():
+    template = '[{{json .ID}},{{json .Repository}},{{json .Tag}}]'
+    return {tuple(json.loads(line)) for line in command('docker', 'image', 'ls', '--no-trunc', '--format', template).splitlines()}
 
 
 def cache_paths(home, mounts):
@@ -111,6 +118,7 @@ def main(action, min_gib=3, build_cache_age='168h'):
     home = Path.home().resolve(); root = home/'qrent'
     assert (root/'.env').is_file() and (root/'docker-compose.yml').is_file()
     before = containers()
+    images_before = image_inventory()
     protected = {p: hashlib.sha256(p.read_bytes()).digest() for p in (root/'.env', root/'docker-compose.yml')}
     caches = cache_paths(home, protected_mounts())
     report = {'action': action, 'started_at': datetime.now(timezone.utc).isoformat(),
@@ -146,9 +154,11 @@ def main(action, min_gib=3, build_cache_age='168h'):
                 report['old_build_cache_result'] = output.splitlines()[-1:] if output else []
             report['after'] = resources(root)
             report['existing_container_identity_preserved'] = containers() == before
+            report['existing_image_inventory_preserved'] = images_before.issubset(image_inventory())
             report['environment_and_compose_preserved'] = all(hashlib.sha256(p.read_bytes()).digest() == h
                 for p,h in protected.items())
             assert report['existing_container_identity_preserved']
+            assert report['existing_image_inventory_preserved']
             assert report['environment_and_compose_preserved']
             assert report['after']['system']['free_bytes'] >= min_disk, 'More host capacity is required; original services kept'
             assert report['after']['runtime']['free_bytes'] >= 16*1024**2
