@@ -5,7 +5,7 @@ on:
     inputs:
       action:
         type: choice
-        options: [plan, apply, runtime-plan, runtime-apply]
+        options: [plan, apply, start-plan, start-apply, runtime-plan, runtime-apply]
         default: plan
         required: true
         description: Plan first; repair only a confirmed stopped or exited Redis process

@@ -3,9 +3,11 @@ from datetime import datetime, timezone
 import fcntl
 import gzip
 import hashlib
+import ipaddress
 import json
 from pathlib import Path
 import os
+import re
 import shutil
 import subprocess
 import sys
@@ -18,7 +20,7 @@ def command(*args):
 
 
 def container_rows():
-    ids=command('docker','ps','-q','--no-trunc').splitlines()
+    ids=command('docker','ps','-aq','--no-trunc').splitlines()
     if len(ids)<3: raise RuntimeError('Existing production containers are required')
     template='[{{json .Id}},{{json .Image}},{{.State.Pid}},{{json .State.StartedAt}},{{json .Mounts}}]'
     rows=[json.loads(line) for line in command('docker','inspect','--format',template,*ids).splitlines()]
@@ -27,12 +29,12 @@ def container_rows():
 
 
 def redis_state(proc_root=Path('/proc')):
-    template='[{{json .Id}},{{json .Config.Image}},{{.State.Pid}},{{json .State.Health.Status}},{{json .Mounts}}]'
-    identity,image,pid,health,mounts=json.loads(command('docker','inspect','--format',template,'qrent-redis-1'))
+    template='[{{json .Id}},{{json .Config.Image}},{{.State.Pid}},{{json .State.Health.Status}},{{json .Mounts}},{{.State.Running}},{{json .State.Status}},{{.State.ExitCode}},{{json .HostConfig.PortBindings}}]'
+    identity,image,pid,health,mounts,running,status,exit_code,ports=json.loads(command('docker','inspect','--format',template,'qrent-redis-1'))
     if image!='redis:7.4.2-alpine': raise RuntimeError('Unexpected account-store image')
     try:
-        status=(proc_root/str(pid)/'status').read_text()
-        state=next(line.split()[1] for line in status.splitlines() if line.startswith('State:'))
+        proc_status=(proc_root/str(pid)/'status').read_text()
+        state=next(line.split()[1] for line in proc_status.splitlines() if line.startswith('State:'))
     except (OSError,StopIteration): state='unknown'
     data=[m for m in mounts if m.get('Destination')=='/data' and m.get('Type')=='volume']
     if len(data)!=1: raise RuntimeError('The existing Redis data volume is required')
@@ -40,11 +42,105 @@ def redis_state(proc_root=Path('/proc')):
     if (not source.is_dir() or source.is_symlink() or source.resolve()!=source
             or command('docker','volume','inspect','--format','{{.Mountpoint}}',data[0]['Name'])!=str(source)):
         raise RuntimeError('Unexpected account-store volume path')
-    return {'id':identity,'pid':pid,'process_state':state,'health':health,'data_source':str(source)}
+    return {'id':identity,'pid':pid,'process_state':state,'health':health,'data_source':str(source),
+            'running':running,'status':status,'exit_code':exit_code,'ports':ports or {}}
 
 
 def eligible(state):
     return state['health']=='unhealthy' and state['process_state'] in ('T','Z','X')
+
+
+def eligible_start(state):
+    return state['running'] is False and state['status']=='exited' and state['pid']==0 and state['exit_code']==0
+
+
+def public_port_rules(ports,interfaces):
+    addresses=[]
+    for interface in interfaces:
+        if interface['ifname']=='lo' or interface['ifname'].startswith(('docker','br-','veth')): continue
+        for value in interface.get('addr_info',[]):
+            address=ipaddress.ip_address(value['local'])
+            if value.get('scope')=='global' and not address.is_loopback and not address.is_link_local:
+                addresses.append(address)
+    rules=[]
+    for key,bindings in ports.items():
+        if key!='6379/tcp': raise RuntimeError('Unexpected Redis published port configuration')
+        for binding in bindings or []:
+            port=int(binding['HostPort']);host=binding.get('HostIp','')
+            if port<1 or port>65535 or port in (22,80,443,3306): raise RuntimeError('Unexpected public Redis port')
+            bound=ipaddress.ip_address(host) if host else None
+            if bound and bound.is_loopback: continue
+            candidates=[a for a in addresses if not bound or
+                        (bound.is_unspecified and bound.version==a.version) or a==bound]
+            if not candidates: raise RuntimeError('Published Redis interface could not be guarded')
+            for address in candidates:
+                binary='iptables' if address.version==4 else 'ip6tables'
+                for chain,match in [('DOCKER-USER',['-m','conntrack','--ctorigdst',str(address),'--ctorigdstport',str(port)]),
+                                    ('INPUT',['-d',str(address),'--dport',str(port)])]:
+                    rule=[binary,chain,'-p','tcp',*match,'-m','comment','--comment','qrent-redis-private','-j','DROP']
+                    if rule not in rules: rules.append(rule)
+    return rules
+
+
+PORT_GUARD = '''import json,subprocess,sys
+data=json.load(open(sys.argv[1]));rules=data['rules']
+for row in rules:
+ binary,chain,*rule=row
+ if chain=='DOCKER-USER' and subprocess.run([binary,'-w','5','-S',chain],capture_output=True).returncode:
+  subprocess.run([binary,'-w','5','-N',chain],check=True,capture_output=True)
+ result=subprocess.run([binary,'-w','5','-C',chain,*rule],capture_output=True)
+ if result.returncode==1:
+  subprocess.run([binary,'-w','5','-I',chain,'1',*rule],check=True,capture_output=True)
+ elif result.returncode: raise SystemExit('Redis port guard could not be checked')
+ subprocess.run([binary,'-w','5','-C',chain,*rule],check=True,capture_output=True)
+families={row[0] for row in rules}
+for binary in families:
+ if subprocess.run([binary,'-w','5','-C','FORWARD','-j','DOCKER-USER'],capture_output=True).returncode:
+  if binary!='ip6tables' or 'iptables' not in families: raise SystemExit('Docker forwarding guard is unavailable')
+  networks=json.loads(subprocess.check_output(['docker','inspect','--format','{{json .NetworkSettings.Networks}}',data['container']],text=True))
+  if not networks: raise SystemExit('Redis bridge identity is unavailable')
+  for name in networks:
+   if subprocess.check_output(['docker','network','inspect','--format','{{.EnableIPv6}}',name],text=True).strip()!='false':
+    raise SystemExit('Native IPv6 forwarding guard is unavailable')
+'''
+
+
+def verify_guard_hooks(rules,state):
+    families={row[0] for row in rules}
+    for binary in families:
+        try: command(binary,'-w','5','-C','FORWARD','-j','DOCKER-USER')
+        except subprocess.CalledProcessError:
+            if binary!='ip6tables' or 'iptables' not in families: raise
+            # IPv6 may be published through a host proxy onto an IPv4-only bridge.
+            networks=json.loads(command('docker','inspect','--format','{{json .NetworkSettings.Networks}}',state['id']))
+            if not networks or any(command('docker','network','inspect','--format','{{.EnableIPv6}}',name)!='false'
+                                   for name in networks): raise
+
+
+def guard_public_ports(root,state,service_dir=Path('/etc/systemd/system')):
+    rules=public_port_rules(state['ports'],json.loads(command('ip','-j','addr')))
+    if os.geteuid()!=0: raise RuntimeError('A root-owned Redis port guard is required before start')
+    if any(c.isspace() or c=='%' for c in str(root)):
+        raise RuntimeError('Unexpected service path; no process start attempted')
+    if not re.fullmatch(r'[a-f0-9]{64}',state['id']): raise RuntimeError('Unexpected account-store container identity')
+    script=root/'.deploy/redis-port-guard.py';config=root/'.deploy/redis-port-guard.json'
+    script.write_text(PORT_GUARD);config.write_text(json.dumps({'rules':rules,'container':state['id']}));script.chmod(0o600);config.chmod(0o600)
+    unit=service_dir/'qrent-account-store.service'
+    # Only Redis depends on its guard; Docker/MySQL/n8n startup stays independent.
+    unit.write_text('[Unit]\nDescription=Qrent original account store\nRequires=docker.service\nAfter=docker.service\nPartOf=docker.service\n'
+        'StartLimitIntervalSec=120\nStartLimitBurst=3\n[Service]\nType=simple\n'
+        'ExecStartPre=/usr/bin/python3 '+str(script)+' '+str(config)+'\n'
+        'ExecStart=/usr/bin/docker start --attach '+state['id']+'\n'
+        'ExecStop=/usr/bin/docker stop --time 10 '+state['id']+'\n'
+        'Restart=always\nRestartSec=5\nTimeoutStopSec=20\n'
+        '[Install]\nWantedBy=multi-user.target\n')
+    command('/usr/bin/python3',str(script),str(config))
+    verify_guard_hooks(rules,state)
+    command('docker','update','--restart=no',state['id'])
+    command('systemctl','daemon-reload');command('systemctl','enable','qrent-account-store.service')
+    return {'rules':len(rules),'persistent':True,'other_ports_changed':False,
+            'supervisor':'qrent-account-store.service','docker_startup_independent':True,
+            'address_scope':'current fixed host addresses'}
 
 
 def preserve_rows(before,after,identity):
@@ -54,9 +150,11 @@ def preserve_rows(before,after,identity):
     return normalized(before)==normalized(after)
 
 
-def repair_process(state):
-    if not eligible(state): raise RuntimeError('Only a confirmed stopped/exited Redis process is eligible')
-    args=(['docker','kill','--signal','CONT',state['id']] if state['process_state']=='T'
+def repair_process(state,start=False):
+    if not (eligible_start(state) if start else eligible(state)):
+        raise RuntimeError('Only a confirmed stopped/exited Redis process is eligible')
+    args=(['systemctl','start','qrent-account-store.service'] if start else
+          ['docker','kill','--signal','CONT',state['id']] if state['process_state']=='T'
           else ['docker','container','restart','--time','10',state['id']])
     try:
         result=subprocess.run(args,capture_output=True,text=True,timeout=60)
@@ -82,15 +180,17 @@ def volume_signature(source):
 
 
 def main(action='plan',root=None,proc_root=Path('/proc')):
-    if action not in ('plan','apply'): raise ValueError('Invalid account-store recovery action')
+    if action not in ('plan','apply','start-plan','start-apply'): raise ValueError('Invalid account-store recovery action')
+    start=action.startswith('start-')
     os.umask(0o077)
     root=root or Path.home()/'qrent'
     protected={p:hashlib.sha256(p.read_bytes()).digest() for p in (root/'.env',root/'docker-compose.yml')}
     before=container_rows(); state=redis_state(proc_root)
-    report={'action':action,'status':'planned','candidate':state,'eligible':eligible(state),
+    qualified=eligible_start(state) if start else eligible(state)
+    report={'action':action,'status':'planned','candidate':state,'eligible':qualified,
             'database_schema_changed':False,'data_deleted':False,'other_containers_restarted':False}
-    if action=='plan': print(json.dumps(report)); return report
-    if not eligible(state): raise RuntimeError('Redis process does not meet the bounded repair condition')
+    if action.endswith('plan'): print(json.dumps(report)); return report
+    if not qualified: raise RuntimeError('Redis process does not meet the bounded repair condition')
     (root/'.deploy/receipts').mkdir(parents=True,exist_ok=True)
     with (root/'.deploy/backend.lock').open('a') as lock:
         fcntl.flock(lock,fcntl.LOCK_EX|fcntl.LOCK_NB)
@@ -115,10 +215,14 @@ def main(action='plan',root=None,proc_root=Path('/proc')):
                 while chunk:=stream.read(1024**2): digest.update(chunk)
             if redis_state(proc_root)!=state:
                 raise RuntimeError('Account-store state changed during backup; no repair attempted')
+            if start: report['public_port_guard']=guard_public_ports(root,state)
+            if redis_state(proc_root)!=state:
+                raise RuntimeError('Account-store state changed before process action')
             report.update(backup_path=str(backup),backup_sha256=digest.hexdigest(),
                           status='repair_attempt_started')
             receipt.write_text(json.dumps(report,indent=2))
-            repair_process(state)  # Exactly one scoped signal/restart; never recreate the container.
+            if start: repair_process(state,start=True)
+            else: repair_process(state)  # Exactly one scoped action; never recreate the container.
             for attempt in range(6):
                 if local_ping(state['id']): break
                 time.sleep(1)
