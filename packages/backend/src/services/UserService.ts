@@ -70,8 +70,14 @@ class UserService {
 
   async getProfile(userId: number) {
     const user = await prisma.user.findUnique({
-      include: {
-        emailPreferences: true,
+      select: {
+        id: true,
+        email: true,
+        name: true,
+        gender: true,
+        phone: true,
+        emailVerified: true,
+        emailPreferences: { select: { userId: true, type: true } },
       },
       where: { id: userId },
     });

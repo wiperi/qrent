@@ -1,7 +1,81 @@
 import { prisma, Property, Region } from '@qrent/shared';
 import sgMail from '@sendgrid/mail';
+import { createHash } from 'crypto';
+import redis from '../utils/redisClient';
+import HttpError from '../error/HttpError';
+import { reserveIncludedEmail } from '../utils/auth-security';
 
-class EmailService {
+type MailAvailability = { available: boolean; remaining: number; periodEnd: string };
+
+export class EmailService {
+  private quota?: { keyHash: string; until: number; value: MailAvailability };
+  private pendingQuota?: { keyHash: string; promise: Promise<MailAvailability> };
+
+  isConfigured() {
+    return !!process.env.SENDGRID_API_KEY?.startsWith('SG.');
+  }
+
+  async availability(): Promise<MailAvailability> {
+    const unavailable = { available: false, remaining: 0, periodEnd: '' };
+    const key = process.env.SENDGRID_API_KEY;
+    if (!this.isConfigured() || !key) return unavailable;
+    const keyHash = createHash('sha256').update(key).digest('hex');
+    if (
+      this.quota?.keyHash === keyHash &&
+      this.quota.until > Date.now() &&
+      (!this.quota.value.available || Date.parse(this.quota.value.periodEnd) > Date.now() + 10000)
+    )
+      return this.quota.value;
+    if (this.pendingQuota?.keyHash === keyHash) return this.pendingQuota.promise;
+    const promise = (async () => {
+      let value = unavailable;
+      try {
+        const response = await fetch('https://api.sendgrid.com/v3/user/credits', {
+          headers: { Authorization: `Bearer ${key}` },
+          signal: AbortSignal.timeout(5000),
+        });
+        if (response.ok) {
+          const quota = (await response.json()) as {
+            remain?: number;
+            overage?: number;
+            next_reset?: string;
+          };
+          const end = Date.parse(quota.next_reset || '');
+          if (
+            Number.isSafeInteger(quota.remain) &&
+            Number(quota.remain) > 0 &&
+            quota.overage === 0 &&
+            end > Date.now() + 10000 &&
+            end - Date.now() < 45 * 86400000
+          ) {
+            value = {
+              available: true,
+              remaining: Number(quota.remain),
+              periodEnd: quota.next_reset!,
+            };
+          }
+        }
+      } catch {
+        /* Unknown quota must not enable paid/overage sending. */
+      }
+      this.quota = { keyHash, until: Date.now() + 60000, value };
+      return value;
+    })();
+    this.pendingQuota = { keyHash, promise };
+    try {
+      return await promise;
+    } finally {
+      if (this.pendingQuota?.promise === promise) this.pendingQuota = undefined;
+    }
+  }
+
+  private async reserveIncludedCredit() {
+    const quota = await this.availability();
+    if (!quota.available) throw new HttpError(503, 'Included email quota is unavailable');
+    const identity = createHash('sha256').update(process.env.SENDGRID_API_KEY!).digest('hex');
+    await reserveIncludedEmail(redis, identity, quota.periodEnd, quota.remaining);
+  }
+
   setApiKey() {
     sgMail.setApiKey(process.env.SENDGRID_API_KEY!);
   }
@@ -34,6 +108,7 @@ class EmailService {
       `,
     };
 
+    await this.reserveIncludedCredit();
     await sgMail.send(msg);
   }
 
@@ -91,6 +166,7 @@ class EmailService {
       `,
     };
 
+    await this.reserveIncludedCredit();
     await sgMail.send(msg);
   }
 }
