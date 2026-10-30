@@ -13,17 +13,14 @@ export default function HeroSection() {
   return (
     <section className="relative pb-6">
       <div className={styles.heroIntro}>
-        <h1 className={styles.title}>{t('title')}</h1>
-        <div className={styles.heroCopy}>
-          <p>{t('description')}</p>
-          <p>{t('scope')}</p>
-        </div>
+        <h1 className={styles.heroTitle}>{t('title')}</h1>
+        <p className={styles.heroCopy}>{t('description')}</p>
       </div>
       <div className={styles.container}>
         {/* Hero Section Wrapper */}
         <div className="flex flex-col gap-5">
           {/* Top: Hero Image & Search */}
-          <div className="relative h-[520px] w-full overflow-hidden rounded-2xl">
+          <div className="relative h-[430px] md:h-[320px] w-full overflow-hidden rounded-2xl">
             <Image
               src="/banner.jpg"
               alt={t('bannerAlt')}
@@ -49,7 +46,7 @@ export default function HeroSection() {
 
           {/* Bottom: Rental Progress Bar */}
           <div className="w-full">
-            <TodoProgressBar useSticky={false} maxHeight="auto" />
+            <TodoProgressBar useSticky={false} maxHeight="auto" defaultCollapsed />
           </div>
         </div>
       </div>

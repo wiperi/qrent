@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect, useMemo } from 'react';
-import BlogPostCard from '@/components/BlogPostCard';
+import Link from 'next/link';
 import { useCategory } from '@/components/CategoryContext';
 import { LOCALE } from '@qrent/shared/enum';
 import { type BlogPost as NotionBlogPost } from '@/lib/notion';
@@ -58,14 +58,6 @@ export default function FilteredBlogList({ posts, locale }: FilteredBlogListProp
     setCurrentPage(1);
   }, [selectedCategories]);
 
-  const BLOG_IMAGE_URLS = ['/banner.jpg', '/qrent.jpg'];
-
-  function getImageForSlug(slug: string): string {
-    const index =
-      slug.split('').reduce((acc, char) => acc + char.charCodeAt(0), 0) % BLOG_IMAGE_URLS.length;
-    return BLOG_IMAGE_URLS[index];
-  }
-
   if (displayPosts.length === 0) {
     return (
       <div className="text-center py-12">
@@ -89,24 +81,28 @@ export default function FilteredBlogList({ posts, locale }: FilteredBlogListProp
 
   return (
     <div className="space-y-6">
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+      <div className="border-t border-slate-200">
         {displayPosts.map(post => (
-          <BlogPostCard
+          <Link
             key={post.id}
-            title={locale === LOCALE.ZH ? post.title : post.title_en}
-            author={locale === LOCALE.ZH ? 'QRent 团队' : 'QRent Team'}
-            date={new Date(post.published_at).toLocaleDateString(
-              locale === LOCALE.ZH ? 'zh-CN' : 'en-US',
-              {
-                year: 'numeric',
-                month: 'long',
-                day: 'numeric',
-              }
-            )}
-            preview={locale === LOCALE.ZH ? post.excerpt_zh : post.excerpt_en}
-            imageUrl={post.cover_url || getImageForSlug(post.slug)}
-            slug={`/blog/${post.slug}`}
-          />
+            href={`/${locale}/blog/${post.slug}`}
+            className="group block border-b border-slate-200 py-5 focus-visible:outline-2 focus-visible:outline-blue-600"
+          >
+            <article>
+              <h2 className="text-lg font-semibold leading-relaxed text-slate-900 group-hover:text-blue-700 group-hover:underline">
+                {locale === LOCALE.ZH ? post.title : post.title_en}
+              </h2>
+              <p className="my-2 line-clamp-2 text-[0.9375rem] leading-relaxed text-slate-600">
+                {locale === LOCALE.ZH ? post.excerpt_zh : post.excerpt_en}
+              </p>
+              <time className="text-xs text-slate-500" dateTime={post.published_at}>
+                {new Date(post.published_at).toLocaleDateString(
+                  locale === LOCALE.ZH ? 'zh-CN' : 'en-AU',
+                  { year: 'numeric', month: 'short', day: 'numeric', timeZone: 'Australia/Sydney' }
+                )}
+              </time>
+            </article>
+          </Link>
         ))}
       </div>
 
@@ -115,15 +111,6 @@ export default function FilteredBlogList({ posts, locale }: FilteredBlogListProp
         <div className="text-center py-4">
           <div className="text-gray-500">
             {locale === LOCALE.ZH ? '滚动加载更多文章...' : 'Scroll to load more posts...'}
-          </div>
-        </div>
-      )}
-
-      {/* 已加载全部提示 */}
-      {displayPosts.length >= filteredPosts.length && filteredPosts.length > 0 && (
-        <div className="text-center py-4">
-          <div className="text-gray-500">
-            {locale === LOCALE.ZH ? '已加载全部文章' : 'All posts loaded'}
           </div>
         </div>
       )}

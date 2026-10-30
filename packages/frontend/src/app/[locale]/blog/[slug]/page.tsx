@@ -11,7 +11,8 @@ import { SITE_URL, SITE_IMAGE, jsonLd } from '@/lib/seo';
 import type { NotionBlock, NotionBlogPost } from '@/types/blog';
 import { isLocale } from '@qrent/shared/utils/helper';
 import { setRequestLocale } from 'next-intl/server';
-import { notFound } from 'next/navigation';
+import { notFound, permanentRedirect } from 'next/navigation';
+import { canonicalGuideSlug } from '@/lib/guide-routes';
 
 interface PageProps {
   params: Promise<{ locale: string; slug: string }>;
@@ -23,19 +24,22 @@ export async function generateStaticParams() {
 }
 export async function generateMetadata({ params }: PageProps) {
   const { locale, slug } = await params;
+  const canonical = canonicalGuideSlug(locale, slug);
+  if (canonical && canonical !== slug) permanentRedirect(`/${locale}/blog/${canonical}`);
   const result = await getNotionBlogPost(slug, locale);
   if (!result)
     return {
       title: locale === 'zh' ? '找不到文章 | QRent' : 'Article not found | QRent',
       robots: { index: false },
     };
-  // A shared slug does not establish that two source articles are translations.
-  return generateNotionBlogMetadata(result.post, locale, [locale]);
+  return generateNotionBlogMetadata(result.post, locale, ['zh', 'en']);
 }
 export default async function BlogPostPage({ params }: PageProps) {
   const { locale, slug } = await params;
   if (!isLocale(locale)) notFound();
   setRequestLocale(locale);
+  const canonical = canonicalGuideSlug(locale, slug);
+  if (canonical && canonical !== slug) permanentRedirect(`/${locale}/blog/${canonical}`);
   const result = await getNotionBlogPost(slug, locale);
   // Keep notFound outside catch: it is a Next.js response, not a content error.
   if (!result) notFound();
@@ -52,7 +56,7 @@ export default async function BlogPostPage({ params }: PageProps) {
           items={[
             { name: zh ? '首页' : 'Home', path: '' },
             { name: zh ? '租房指南' : 'Rental guides', path: '/blog' },
-            { name: title, path: `/blog/${encodeURIComponent(slug)}` },
+            { name: zh ? '正文' : 'Article', path: `/blog/${encodeURIComponent(slug)}` },
           ]}
         />
       </div>

@@ -1,0 +1,102 @@
+[
+  {
+    "id": "2d2cf61e-d1da-8109-847d-f19366e320d7",
+    "slug": "shared-vs-private-renting",
+    "publishedAt": "2025-12-21",
+    "lastEditedAt": "2025-12-24T10:32:36.870000Z",
+    "keywords": ["房型与预算"],
+    "sourceHash": "207d48c014300c1ac11f0238b103aeeaec8644da880e19c359b528c3ffff51ae",
+    "createdAt": "2025-12-23T04:20:04.024000Z",
+    "reviewedAt": "2026-10-30T19:35:31.842Z"
+  },
+  {
+    "id": "2d2cf61e-d1da-8114-89ec-e57cee92ce29",
+    "slug": "rental-application-australia",
+    "publishedAt": "2025-12-20",
+    "lastEditedAt": "2025-12-23T04:20:04.027000Z",
+    "keywords": ["看房与申请"],
+    "sourceHash": "3cb3fdef65d32a3a4cf33bbe03b5dedffe2b6b609caaa5cbdbf0b1ba5b6192d3",
+    "createdAt": "2025-12-23T04:20:04.027000Z",
+    "reviewedAt": "2026-10-30T19:35:31.842Z"
+  },
+  {
+    "id": "2d2cf61e-d1da-8147-9754-ea8cff7af981",
+    "slug": "types-of-apartments",
+    "publishedAt": "2025-11-15T00:00:00.000+11:00",
+    "lastEditedAt": "2025-12-23T04:20:04.026000Z",
+    "keywords": ["房型与预算"],
+    "sourceHash": "b66f9618f75174a8a83405516dac160e3dc5192465e8e5b79a140697e05d2607",
+    "createdAt": "2025-12-23T04:20:04.026000Z",
+    "reviewedAt": "2026-10-30T19:35:31.842Z"
+  },
+  {
+    "id": "2d2cf61e-d1da-8176-a25d-dd29e8eab379",
+    "slug": "rental-platforms-from-overseas",
+    "publishedAt": "2025-11-08",
+    "lastEditedAt": "2025-12-23T04:20:04.023000Z",
+    "keywords": ["选区与平台", "出发前准备"],
+    "sourceHash": "3722f9913f4759ad05297d3c05f8087daac7561ae00bac698762a53f7f0df465",
+    "createdAt": "2025-12-23T04:20:04.023000Z",
+    "reviewedAt": "2026-10-30T19:35:31.842Z"
+  },
+  {
+    "id": "2d2cf61e-d1da-8191-9b1a-d7362349d5df",
+    "slug": "rental-suburbs-platforms",
+    "publishedAt": "2025-12-25",
+    "lastEditedAt": "2025-12-23T04:20:04.026000Z",
+    "keywords": ["选区与平台"],
+    "sourceHash": "4f666bbc42924f316e293272a656286a1b9407cef9edf3b6266ffa283cd6e4eb",
+    "createdAt": "2025-12-23T04:20:04.026000Z",
+    "reviewedAt": "2026-10-30T19:35:31.842Z"
+  },
+  {
+    "id": "2d2cf61e-d1da-8196-a297-f90d735eb8b7",
+    "slug": "when-to-start-rental-search",
+    "publishedAt": "2025-10-30",
+    "lastEditedAt": "2025-12-24T10:32:59.174000Z",
+    "keywords": ["出发前准备"],
+    "sourceHash": "4b85877b4cb4e17a31590b00fc46dcf79607a7faed076ce2a0524db2178a8f2d",
+    "createdAt": "2025-12-23T04:20:04.029000Z",
+    "reviewedAt": "2026-10-30T19:35:31.842Z"
+  },
+  {
+    "id": "2d2cf61e-d1da-819b-b48e-d44473e8c956",
+    "slug": "rental-application-results",
+    "publishedAt": "2025-12-30",
+    "lastEditedAt": "2025-12-24T10:33:03.129000Z",
+    "keywords": ["看房与申请"],
+    "sourceHash": "53844ffe5ba119369afdc975a02a7f2039b3721108d8986ddb22016da640061c",
+    "createdAt": "2025-12-23T04:20:04.028000Z",
+    "reviewedAt": "2026-10-30T19:35:31.842Z"
+  },
+  {
+    "id": "2d2cf61e-d1da-81b7-bae7-cc3cafc31142",
+    "slug": "available-date-rental-cover-letter",
+    "publishedAt": "2025-12-22",
+    "lastEditedAt": "2025-12-24T10:32:45.713000Z",
+    "keywords": ["看房与申请", "申请材料"],
+    "sourceHash": "7036c9acd79b3a3ef75b71d1b0c88c6743b370e1a05fdb1e35fc31939c0bc1cd",
+    "createdAt": "2025-12-23T04:20:04.030000Z",
+    "reviewedAt": "2026-10-30T19:35:31.842Z"
+  },
+  {
+    "id": "2d2cf61e-d1da-81c9-b243-f6dd682d5c29",
+    "slug": "rental-history-guarantor",
+    "publishedAt": "2025-12-27",
+    "lastEditedAt": "2025-12-24T10:33:01.868000Z",
+    "keywords": ["申请材料"],
+    "sourceHash": "c3722a899c6e8500864bb8f7229718211b1af9fcaa566ff2505a5f45ee2210d2",
+    "createdAt": "2025-12-23T04:20:04.029000Z",
+    "reviewedAt": "2026-10-30T19:35:31.842Z"
+  },
+  {
+    "id": "2d2cf61e-d1da-81d0-88d9-e4a2913cb355",
+    "slug": "rental-inspection",
+    "publishedAt": "2025-11-11T00:00:00.000+11:00",
+    "lastEditedAt": "2025-12-23T04:20:04.025000Z",
+    "keywords": ["看房与申请", "防骗"],
+    "sourceHash": "31263e34529ae6be172a7b9a3fc79059809ccda774018d84c090258c4d5610bf",
+    "createdAt": "2025-12-23T04:20:04.025000Z",
+    "reviewedAt": "2026-10-30T19:35:31.842Z"
+  }
+]

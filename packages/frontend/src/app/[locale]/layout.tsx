@@ -16,6 +16,7 @@ import type { Metadata, Viewport } from 'next';
 import Script from 'next/script';
 import { Analytics } from '@vercel/analytics/next';
 import '../globals.css';
+import '@/styles/guides.css';
 
 export const viewport: Viewport = { width: 'device-width', initialScale: 1, themeColor: '#ffffff' };
 export const metadata: Metadata = {

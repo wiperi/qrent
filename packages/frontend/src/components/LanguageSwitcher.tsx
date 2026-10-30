@@ -5,6 +5,7 @@ import { useLocale, useTranslations } from 'next-intl';
 import { usePathname, useRouter } from 'next/navigation';
 import { useEffect, useRef, useState } from 'react';
 import { HiGlobeAlt } from 'react-icons/hi';
+import { translatedGuidePath } from '@/lib/guide-routes';
 
 export default function LanguageSwitcher() {
   const t = useTranslations('LanguageSwitcher');
@@ -17,7 +18,12 @@ export default function LanguageSwitcher() {
   const switchLanguage = (newLocale: LOCALE) => {
     // Remove the current locale from the pathname
     const pathWithoutLocale = pathname.replace(`/${locale}`, '');
-    const destination = pathWithoutLocale.startsWith('/blog/') ? '/blog' : pathWithoutLocale;
+    if (pathWithoutLocale.startsWith('/blog/')) {
+      router.push(translatedGuidePath(locale, newLocale, pathWithoutLocale.slice(6)));
+      setIsOpen(false);
+      return;
+    }
+    const destination = pathWithoutLocale;
     const query = pathWithoutLocale.startsWith('/blog/') ? '' : window.location.search;
     // Navigate to the new locale
     router.push(`/${newLocale}${destination}${query}`);
