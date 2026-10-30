@@ -46,5 +46,22 @@ class CapacitySafetyTests(unittest.TestCase):
         self.assertEqual(set(mounts), {Path('/host-bind'),Path('/active-cache'),Path('/stopped-cache')})
         self.assertIn(('docker','ps','-aq','--no-trunc'), [c.args for c in run.call_args_list])
 
+    def test_npx_is_kept_when_a_process_may_use_it(self):
+        with tempfile.TemporaryDirectory() as temp:
+            home = Path(temp).resolve(); cache = home/'.npm/_npx'; cache.mkdir(parents=True)
+            with patch.object(capacity, 'process_uses', return_value=True):
+                self.assertEqual(capacity.cache_paths(home, []), [])
+            with patch.object(capacity, 'process_uses', return_value=False):
+                self.assertEqual(capacity.cache_paths(home, []), [cache])
+
+    def test_process_command_reference_blocks_npx_removal(self):
+        with tempfile.TemporaryDirectory() as temp:
+            root = Path(temp).resolve(); proc = root/'123'; proc.mkdir()
+            (proc/'cmdline').write_bytes(b'node\x00/cache/npx/tool.js\x00')
+            self.assertTrue(capacity.process_uses(Path('/cache/npx'), root))
+
+    def test_missing_process_inventory_blocks_npx_removal(self):
+        self.assertTrue(capacity.process_uses(Path('/cache/npx'), Path('/path-that-does-not-exist')))
+
 
 if __name__ == '__main__': unittest.main()

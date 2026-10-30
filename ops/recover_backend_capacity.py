@@ -14,9 +14,30 @@ def command(*args):
 
 
 def cache_paths(home, mounts):
-    paths = [home/'.npm/_cacache', home/'.local/share/pnpm/store', home/'.cache/pnpm']
+    paths = [home/'.npm/_cacache', home/'.local/share/pnpm/store', home/'.cache/pnpm',
+             home/'.npm/_npx', home/'.nvm/.cache']
     return [p for p in paths if p.is_dir() and not p.is_symlink() and p.resolve() == p
-            and not any(p == m or p in m.parents or m in p.parents for m in mounts)]
+            and not any(p == m or p in m.parents or m in p.parents for m in mounts)
+            and (p != home/'.npm/_npx' or not process_uses(p))]
+
+
+def process_uses(path, proc_root=Path('/proc')):
+    """npx may contain executing tools: unknown process access also blocks removal."""
+    if not proc_root.is_dir(): return True
+    prefix = str(path).encode()
+    for proc in proc_root.iterdir():
+        if not proc.name.isdigit(): continue
+        try:
+            cmdline = (proc/'cmdline').read_bytes()
+            if not cmdline: continue
+            if prefix in cmdline or prefix in (proc/'maps').read_bytes() or prefix in (proc/'environ').read_bytes(): return True
+            for link in [proc/'cwd', proc/'exe', *list((proc/'fd').iterdir())]:
+                try: target = Path(os.readlink(link))
+                except FileNotFoundError: continue
+                if target == path or path in target.parents: return True
+        except (FileNotFoundError, ProcessLookupError): continue
+        except PermissionError: return True
+    return False
 
 
 def protected_mounts():

@@ -10,11 +10,13 @@ free -m
 swapon --show --bytes
 docker system df
 docker ps -a --format 'table {{.ID}}\t{{.Image}}\t{{.Status}}\t{{.Names}}'
-docker inspect --format '{{.Name}} {{json .Mounts}}' $(docker ps -q)
-for path in / "$HOME" /var/log; do
-  du -x -h --max-depth=1 "$path" 2>/dev/null | sort -h || true
-done
-du -x --inodes --max-depth=3 /run 2>/dev/null | sort -n | tail -20 || true
+if [[ "${1:-}" != preflight ]]; then
+  docker inspect --format '{{.Name}} {{json .Mounts}}' $(docker ps -q)
+  for path in / "$HOME" /var/log; do
+    du -x -h --max-depth=1 "$path" 2>/dev/null | sort -h || true
+  done
+  du -x --inodes --max-depth=3 /run 2>/dev/null | sort -n | tail -20 || true
+fi
 
 if [[ "${1:-}" == preflight ]]; then
   python3 - "$qrent_root" "$qrent_docker_root" /run <<'PY'
