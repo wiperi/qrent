@@ -146,8 +146,12 @@ jobs:
         env:
           DATABASE_URL: mysql://build:build@127.0.0.1:3306/qrent
         run: pnpm --filter @qrent/shared db:generate
-      - name: Backend search and startup regressions
-        run: pnpm --filter @qrent/backend exec jest --runInBand --runTestsByPath tests/LegacySearchOrder.test.ts tests/StartupDoesNotMigrate.test.ts
+      - name: Backend search, startup and account regressions
+        run: >-
+          pnpm --filter @qrent/backend exec jest --runInBand --runTestsByPath
+          tests/LegacySearchOrder.test.ts tests/StartupDoesNotMigrate.test.ts
+          tests/AuthBoundaries.test.ts tests/AuthLifecycle.test.ts
+          tests/AuthSession.test.ts tests/AuthTransport.test.ts tests/EmailQuota.test.ts
       - name: Backend deployment and health checks
         run: |
           bash -n ops/deploy_backend.sh
