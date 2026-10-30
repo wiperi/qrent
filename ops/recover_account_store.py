@@ -7,6 +7,7 @@ import ipaddress
 import json
 from pathlib import Path
 import os
+import re
 import shutil
 import subprocess
 import sys
@@ -82,7 +83,8 @@ def public_port_rules(ports,interfaces):
 
 
 PORT_GUARD = '''import json,subprocess,sys
-for row in json.load(open(sys.argv[1])):
+data=json.load(open(sys.argv[1]));rules=data['rules']
+for row in rules:
  binary,chain,*rule=row
  if chain=='DOCKER-USER' and subprocess.run([binary,'-w','5','-S',chain],capture_output=True).returncode:
   subprocess.run([binary,'-w','5','-N',chain],check=True,capture_output=True)
@@ -91,29 +93,54 @@ for row in json.load(open(sys.argv[1])):
   subprocess.run([binary,'-w','5','-I',chain,'1',*rule],check=True,capture_output=True)
  elif result.returncode: raise SystemExit('Redis port guard could not be checked')
  subprocess.run([binary,'-w','5','-C',chain,*rule],check=True,capture_output=True)
+families={row[0] for row in rules}
+for binary in families:
+ if subprocess.run([binary,'-w','5','-C','FORWARD','-j','DOCKER-USER'],capture_output=True).returncode:
+  if binary!='ip6tables' or 'iptables' not in families: raise SystemExit('Docker forwarding guard is unavailable')
+  networks=json.loads(subprocess.check_output(['docker','inspect','--format','{{json .NetworkSettings.Networks}}',data['container']],text=True))
+  if not networks: raise SystemExit('Redis bridge identity is unavailable')
+  for name in networks:
+   if subprocess.check_output(['docker','network','inspect','--format','{{.EnableIPv6}}',name],text=True).strip()!='false':
+    raise SystemExit('Native IPv6 forwarding guard is unavailable')
 '''
 
 
-def guard_public_ports(root,state):
+def verify_guard_hooks(rules,state):
+    families={row[0] for row in rules}
+    for binary in families:
+        try: command(binary,'-w','5','-C','FORWARD','-j','DOCKER-USER')
+        except subprocess.CalledProcessError:
+            if binary!='ip6tables' or 'iptables' not in families: raise
+            # IPv6 may be published through a host proxy onto an IPv4-only bridge.
+            networks=json.loads(command('docker','inspect','--format','{{json .NetworkSettings.Networks}}',state['id']))
+            if not networks or any(command('docker','network','inspect','--format','{{.EnableIPv6}}',name)!='false'
+                                   for name in networks): raise
+
+
+def guard_public_ports(root,state,service_dir=Path('/etc/systemd/system')):
     rules=public_port_rules(state['ports'],json.loads(command('ip','-j','addr')))
-    if not rules: return {'rules':0,'persistent':False}
     if os.geteuid()!=0: raise RuntimeError('A root-owned Redis port guard is required before start')
     if any(c.isspace() or c=='%' for c in str(root)):
         raise RuntimeError('Unexpected service path; no process start attempted')
+    if not re.fullmatch(r'[a-f0-9]{64}',state['id']): raise RuntimeError('Unexpected account-store container identity')
     script=root/'.deploy/redis-port-guard.py';config=root/'.deploy/redis-port-guard.json'
-    script.write_text(PORT_GUARD);config.write_text(json.dumps(rules));script.chmod(0o600);config.chmod(0o600)
-    unit=Path('/etc/systemd/system/qrent-redis-port-guard.service')
-    unit.write_text('[Unit]\nDescription=Keep Qrent Redis private\nBefore=docker.service\nAfter=network-pre.target\n'
-        '[Service]\nType=oneshot\nExecStart=/usr/bin/python3 '+str(script)+' '+str(config)+'\nRemainAfterExit=yes\n'
+    script.write_text(PORT_GUARD);config.write_text(json.dumps({'rules':rules,'container':state['id']}));script.chmod(0o600);config.chmod(0o600)
+    unit=service_dir/'qrent-account-store.service'
+    # Only Redis depends on its guard; Docker/MySQL/n8n startup stays independent.
+    unit.write_text('[Unit]\nDescription=Qrent original account store\nRequires=docker.service\nAfter=docker.service\nPartOf=docker.service\n'
+        'StartLimitIntervalSec=120\nStartLimitBurst=3\n[Service]\nType=simple\n'
+        'ExecStartPre=/usr/bin/python3 '+str(script)+' '+str(config)+'\n'
+        'ExecStart=/usr/bin/docker start --attach '+state['id']+'\n'
+        'ExecStop=/usr/bin/docker stop --time 10 '+state['id']+'\n'
+        'Restart=always\nRestartSec=5\nTimeoutStopSec=20\n'
         '[Install]\nWantedBy=multi-user.target\n')
     command('/usr/bin/python3',str(script),str(config))
-    # Verify the host's Docker forwarding hook before making Redis reachable.
-    # On dual-stack IPv4 bridge networks IPv6 publishing uses the INPUT proxy guard.
-    forwarding='iptables' if any(row[0]=='iptables' for row in rules) else 'ip6tables'
-    command(forwarding,'-w','5','-C','FORWARD','-j','DOCKER-USER')
-    command('systemctl','daemon-reload');command('systemctl','enable','qrent-redis-port-guard.service')
-    command('systemctl','start','qrent-redis-port-guard.service')
-    return {'rules':len(rules),'persistent':True,'other_ports_changed':False}
+    verify_guard_hooks(rules,state)
+    command('docker','update','--restart=no',state['id'])
+    command('systemctl','daemon-reload');command('systemctl','enable','qrent-account-store.service')
+    return {'rules':len(rules),'persistent':True,'other_ports_changed':False,
+            'supervisor':'qrent-account-store.service','docker_startup_independent':True,
+            'address_scope':'current fixed host addresses'}
 
 
 def preserve_rows(before,after,identity):
@@ -126,7 +153,7 @@ def preserve_rows(before,after,identity):
 def repair_process(state,start=False):
     if not (eligible_start(state) if start else eligible(state)):
         raise RuntimeError('Only a confirmed stopped/exited Redis process is eligible')
-    args=(['docker','container','start',state['id']] if start else
+    args=(['systemctl','start','qrent-account-store.service'] if start else
           ['docker','kill','--signal','CONT',state['id']] if state['process_state']=='T'
           else ['docker','container','restart','--time','10',state['id']])
     try:

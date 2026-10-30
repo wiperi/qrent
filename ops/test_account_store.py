@@ -5,6 +5,8 @@ import json
 from pathlib import Path
 import subprocess
 import tarfile
+import io
+import sys
 import tempfile
 import unittest
 from unittest.mock import patch
@@ -113,7 +115,7 @@ class StoreRecoveryTests(unittest.TestCase):
         self.assertFalse(store.eligible_start({**stopped,'exit_code':137}))
         with patch.object(store.subprocess,'run',return_value=subprocess.CompletedProcess([],0)) as run:
             store.repair_process(stopped,start=True)
-            self.assertEqual(run.call_args.args[0],['docker','container','start','redis-original'])
+            self.assertEqual(run.call_args.args[0],['systemctl','start','qrent-account-store.service'])
 
     def test_start_guards_public_ports_before_any_container_start(self):
         stopped={**self.state,'running':False,'status':'exited','pid':0,'process_state':'unknown'}
@@ -141,6 +143,32 @@ class StoreRecoveryTests(unittest.TestCase):
         for ports in ({'3306/tcp':[{'HostPort':'3306'}]}, {'6379/tcp':[{'HostPort':'22'}]},
                       {'6379/tcp':[{'HostPort':'6379','HostIp':'0.0.0.0'}]}):
             with self.assertRaises(RuntimeError):store.public_port_rules(ports,[])
+
+    def test_persistent_guard_rejects_native_ipv6_without_a_forward_hook(self):
+        rules=[['iptables','DOCKER-USER','-p','tcp','-j','DROP'],
+               ['ip6tables','INPUT','-p','tcp','-j','DROP']]
+        data=json.dumps({'rules':rules,'container':'a'*64})
+        def run(args,**kwargs):
+            return subprocess.CompletedProcess(args,1 if args[0]=='ip6tables' and 'FORWARD' in args else 0)
+        def output(args,**kwargs):return json.dumps({'qrent-network':{}}) if args[1]=='inspect' else 'true'
+        with patch('builtins.open',return_value=io.StringIO(data)),patch.object(sys,'argv',['guard.py','rules.json']),patch.object(store.subprocess,'run',side_effect=run),patch.object(store.subprocess,'check_output',side_effect=output):
+            with self.assertRaisesRegex(SystemExit,'Native IPv6'):exec(store.PORT_GUARD,{})
+        def proxy(args,**kwargs):return json.dumps({'qrent-network':{}}) if args[1]=='inspect' else 'false'
+        with patch('builtins.open',return_value=io.StringIO(data)),patch.object(sys,'argv',['guard.py','rules.json']),patch.object(store.subprocess,'run',side_effect=run),patch.object(store.subprocess,'check_output',side_effect=proxy):
+            exec(store.PORT_GUARD,{})
+
+    def test_only_redis_startup_depends_on_successful_guard(self):
+        (self.root/'.deploy').mkdir();units=self.root/'units';units.mkdir()
+        state={**self.state,'id':'a'*64,'ports':{'6379/tcp':[{'HostIp':'0.0.0.0','HostPort':'6379'}]}}
+        interfaces=[{'ifname':'eth0','addr_info':[{'local':'198.51.100.78','scope':'global'}]}]
+        def command(*args):return json.dumps(interfaces) if args[:3]==('ip','-j','addr') else ''
+        with patch.object(store,'command',side_effect=command) as commands,patch.object(store.os,'geteuid',return_value=0):
+            store.guard_public_ports(self.root,state,units)
+        text=(units/'qrent-account-store.service').read_text()
+        self.assertIn('ExecStartPre=',text);self.assertIn('docker start --attach '+'a'*64,text)
+        self.assertIn('After=docker.service',text);self.assertNotIn('Before=docker.service',text)
+        self.assertIn(('docker','update','--restart=no','a'*64),[call.args for call in commands.call_args_list])
+        self.assertFalse(any('restart' in call.args for call in commands.call_args_list))
 
 
 if __name__=='__main__': unittest.main()
