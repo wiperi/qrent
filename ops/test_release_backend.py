@@ -165,5 +165,10 @@ class ReleaseTransportTests(unittest.TestCase):
         self.assertIn('pidfd_send_signal',self.calls[0]['stdin'])
         self.assertNotIn('docker container restart',self.calls[0]['stdin'])
 
+    def test_start_plan_is_forwarded_without_restarting_any_container(self):
+        self.env['QRENT_STORE_ACTION']='start-plan'
+        self.assertEqual(self.run_release('account-store').returncode,0)
+        self.assertEqual(self.calls[0]['args'][-1],'start-plan')
+
 
 if __name__ == '__main__': unittest.main()

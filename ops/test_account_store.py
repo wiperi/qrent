@@ -21,7 +21,8 @@ class StoreRecoveryTests(unittest.TestCase):
         (self.root/'docker-compose.yml').write_text('services: {}\n')
         self.volume=self.root/'volume';self.volume.mkdir();(self.volume/'dump.rdb').write_bytes(b'original-redis-state')
         mounts=[{'Type':'volume','Name':'existing','Source':str(self.volume),'Destination':'/data'}]
-        self.state={'id':'redis-original','pid':123,'process_state':'Z','health':'unhealthy','data_source':str(self.volume)}
+        self.state={'id':'redis-original','pid':123,'process_state':'Z','health':'unhealthy','data_source':str(self.volume),
+                    'running':True,'status':'running','exit_code':0,'ports':{}}
         self.before=[['backend','app-image',1,'old',[]],['db','db-image',2,'old',[]],
                      ['redis-original','redis-image',123,'old',mounts]]
         self.after=copy.deepcopy(self.before);self.after[-1][2:4]=[456,'new']
@@ -37,12 +38,12 @@ class StoreRecoveryTests(unittest.TestCase):
 
     def test_process_probe_preserves_exited_state_without_network_namespace(self):
         proc=self.root/'proc/123';proc.mkdir(parents=True);(proc/'status').write_text('State:\tZ (zombie)\n')
-        row=['redis-original','redis:7.4.2-alpine',123,'unhealthy',self.before[-1][4]]
+        row=['redis-original','redis:7.4.2-alpine',123,'unhealthy',self.before[-1][4],True,'running',0,{}]
         with patch.object(store,'command',side_effect=[json.dumps(row),str(self.volume)]):
             self.assertEqual(store.redis_state(self.root/'proc'),self.state)
 
     def test_different_image_or_volume_does_not_qualify(self):
-        row=['redis-original','different-project',123,'unhealthy',self.before[-1][4]]
+        row=['redis-original','different-project',123,'unhealthy',self.before[-1][4],True,'running',0,{}]
         with patch.object(store,'command',return_value=json.dumps(row)):
             with self.assertRaisesRegex(RuntimeError,'image'): store.redis_state()
 
@@ -105,6 +106,41 @@ class StoreRecoveryTests(unittest.TestCase):
         with patch.object(store,'container_rows',return_value=self.before),patch.object(store,'redis_state',side_effect=[self.state,self.state,recovered]),patch.object(store,'repair_process') as repair:
             with self.assertRaisesRegex(RuntimeError,'state changed during backup'): store.main('apply',self.root)
             repair.assert_not_called()
+
+    def test_start_requires_a_known_clean_exit_and_uses_the_same_container(self):
+        stopped={**self.state,'running':False,'status':'exited','pid':0,'process_state':'unknown'}
+        self.assertTrue(store.eligible_start(stopped));self.assertFalse(store.eligible_start(self.state))
+        self.assertFalse(store.eligible_start({**stopped,'exit_code':137}))
+        with patch.object(store.subprocess,'run',return_value=subprocess.CompletedProcess([],0)) as run:
+            store.repair_process(stopped,start=True)
+            self.assertEqual(run.call_args.args[0],['docker','container','start','redis-original'])
+
+    def test_start_guards_public_ports_before_any_container_start(self):
+        stopped={**self.state,'running':False,'status':'exited','pid':0,'process_state':'unknown'}
+        guarded=[]
+        def guard(root,state):guarded.append(True);return {'rules':2,'persistent':True}
+        def repair(state,start=False):self.assertTrue(start);self.assertEqual(guarded,[True])
+        with patch.object(store,'container_rows',side_effect=[self.before,self.after]),patch.object(store,'redis_state',return_value=stopped),patch.object(store,'guard_public_ports',side_effect=guard),patch.object(store,'repair_process',side_effect=repair),patch.object(store,'local_ping',return_value=True):
+            self.assertEqual(store.main('start-apply',self.root)['status'],'verified')
+
+    def test_firewall_rules_match_only_redis_host_ports_and_never_docker_internal_ips(self):
+        interfaces=[{'ifname':'eth0','addr_info':[{'local':'198.51.100.78','scope':'global'},
+                    {'local':'2001:db8::1','scope':'global'}]},
+                    {'ifname':'br-private','addr_info':[{'local':'172.18.0.1','scope':'global'}]}]
+        rules=store.public_port_rules({'6379/tcp':[{'HostIp':'0.0.0.0','HostPort':'6379'}]},interfaces)
+        self.assertEqual(len(rules),2)
+        for rule in rules:
+            self.assertEqual(rule[0],'iptables');self.assertIn('198.51.100.78',rule)
+            self.assertNotIn('172.18.0.1',rule);self.assertNotIn('3306',rule)
+            self.assertEqual(rule[-2:],['-j','DROP'])
+        self.assertEqual(store.public_port_rules({'6379/tcp':[{'HostIp':'127.0.0.1','HostPort':'6379'}]},interfaces),[])
+        v6=store.public_port_rules({'6379/tcp':[{'HostIp':'::','HostPort':'6379'}]},interfaces)
+        self.assertEqual(len(v6),2);self.assertTrue(all(row[0]=='ip6tables' for row in v6))
+
+    def test_unrecognized_port_or_interface_blocks_start(self):
+        for ports in ({'3306/tcp':[{'HostPort':'3306'}]}, {'6379/tcp':[{'HostPort':'22'}]},
+                      {'6379/tcp':[{'HostPort':'6379','HostIp':'0.0.0.0'}]}):
+            with self.assertRaises(RuntimeError):store.public_port_rules(ports,[])
 
 
 if __name__=='__main__': unittest.main()

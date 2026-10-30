@@ -88,7 +88,7 @@ if [[ "$mode" == capacity ]]; then
   exit 0
 fi
 if [[ "$mode" == account-store ]]; then
-  [[ "${QRENT_STORE_ACTION:-plan}" == plan || "${QRENT_STORE_ACTION:-plan}" == apply || "${QRENT_STORE_ACTION:-plan}" == runtime-plan || "${QRENT_STORE_ACTION:-plan}" == runtime-apply ]] || exit 64
+  [[ "${QRENT_STORE_ACTION:-plan}" == plan || "${QRENT_STORE_ACTION:-plan}" == apply || "${QRENT_STORE_ACTION:-plan}" == start-plan || "${QRENT_STORE_ACTION:-plan}" == start-apply || "${QRENT_STORE_ACTION:-plan}" == runtime-plan || "${QRENT_STORE_ACTION:-plan}" == runtime-apply ]] || exit 64
   script_root=$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)
   if [[ "${QRENT_STORE_ACTION:-plan}" == runtime-plan || "${QRENT_STORE_ACTION:-plan}" == runtime-apply ]]; then
     store_action=plan
