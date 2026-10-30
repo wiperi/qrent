@@ -11,7 +11,9 @@ swapon --show --bytes
 docker system df
 docker ps -a --format 'table {{.ID}}\t{{.Image}}\t{{.Status}}\t{{.Names}}'
 docker inspect --format '{{.Name}} {{json .Mounts}}' $(docker ps -q)
-du -x -h --max-depth=1 / "$HOME" /var/log 2>/dev/null | sort -h || true
+for path in / "$HOME" /var/log; do
+  du -x -h --max-depth=1 "$path" 2>/dev/null | sort -h || true
+done
 du -x --inodes --max-depth=3 /run 2>/dev/null | sort -n | tail -20 || true
 
 if [[ "${1:-}" == preflight ]]; then
@@ -20,7 +22,7 @@ import os,sys
 for path in sys.argv[1:]:
     info=os.statvfs(path)
     free=info.f_bavail*info.f_frsize
-    minimum=16*1024**2 if path=='/run' else 3*1024**3
+    minimum=16*1024**2 if path=='/run' else max(3*1024**3,int(os.environ.get('QRENT_REQUIRED_DISK_BYTES','0')))
     if free<minimum or info.f_favail<4096:
         print('Insufficient deployment headroom; existing backend kept.',file=sys.stderr)
         sys.exit(70)

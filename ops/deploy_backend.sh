@@ -4,6 +4,8 @@ set -euo pipefail
 umask 077
 release=${QRENT_RELEASE_SHA:?QRENT_RELEASE_SHA is required}
 [[ "$release" =~ ^[0-9a-f]{40}$ ]] || exit 64
+image_archive=${QRENT_BACKEND_IMAGE_ARCHIVE:?CI-built backend image archive is required}
+test -s "$image_archive"
 root=${QRENT_DEPLOY_ROOT:-$HOME/qrent}
 source_dir=$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)
 [[ -s "$root/.env" && -s "$root/docker-compose.yml" ]] || {
@@ -96,7 +98,7 @@ docker tag "$old_image" "$rollback_image"
 docker run --rm --network none --entrypoint sh \
     -e DATABASE_URL=mysql://build:build@127.0.0.1:3306/qrent "$rollback_image" \
     -c 'pnpm --filter @qrent/shared db:generate'
-docker build -t "$image" -f "$source_dir/packages/backend/Dockerfile" "$source_dir"
+docker load -i "$image_archive"
 docker run --rm --network none --entrypoint node \
     -e DATABASE_URL=mysql://build:build@127.0.0.1:3306/qrent "$image" \
     -e "require(require.resolve('@prisma/client', {paths:['/app/packages/shared']}))"

@@ -1,0 +1,42 @@
+name: Backend capacity recovery
+
+on:
+  workflow_dispatch:
+    inputs:
+      action:
+        type: choice
+        options: [plan, apply]
+        default: plan
+        required: true
+        description: Plan first; apply only named caches and bounded tmpfs headroom
+      min_disk_gib:
+        type: choice
+        options: ['3', '4', '5', '6', '7', '8']
+        default: '3'
+        required: true
+        description: Free disk target based on the CI image size
+
+permissions:
+  contents: read
+
+jobs:
+  recover:
+    if: >-
+      github.repository == 'wiperi/qrent' &&
+      (github.ref == 'refs/heads/main' || github.ref == 'refs/heads/staging')
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    environment: ${{ github.ref == 'refs/heads/main' && 'production' || 'staging' }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.sha }}
+          persist-credentials: false
+      - name: Recover cache capacity while preserving existing services
+        env:
+          DEPLOY_SERVER_HOST: ${{ secrets.DEPLOY_SERVER_HOST }}
+          DEPLOY_SERVER_USERNAME: ${{ secrets.DEPLOY_SERVER_USERNAME }}
+          DEPLOY_SERVER_PASSWORD: ${{ secrets.DEPLOY_SERVER_PASSWORD }}
+          QRENT_CAPACITY_ACTION: ${{ inputs.action }}
+          QRENT_MIN_DISK_GIB: ${{ inputs.min_disk_gib }}
+        run: bash ops/release_backend.sh capacity

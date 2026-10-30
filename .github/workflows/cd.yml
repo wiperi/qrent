@@ -30,7 +30,13 @@ jobs:
         run: |
           git archive --format=tar.gz --output="backend-${GITHUB_SHA}.tgz" HEAD \
             package.json pnpm-lock.yaml pnpm-workspace.yaml .dockerignore \
-            packages/backend packages/shared ops/deploy_backend.sh ops/verify_backend.mjs ops/inspect_backend_host.sh
+            packages/backend packages/shared ops/deploy_backend.sh ops/verify_backend.mjs ops/inspect_backend_host.sh ops/receive_backend_image.sh
+
+      - name: Build the release image on the CI runner
+        run: |
+          docker build -t "qrent-backend:release-${GITHUB_SHA}" -f packages/backend/Dockerfile .
+          docker save "qrent-backend:release-${GITHUB_SHA}" | gzip -1 > "backend-image-${GITHUB_SHA}.tar.gz"
+          docker image inspect --format '{{.Size}}' "qrent-backend:release-${GITHUB_SHA}" > "backend-image-${GITHUB_SHA}.size"
 
       - name: Upload and deploy using the pinned ED25519 host key
         env:
