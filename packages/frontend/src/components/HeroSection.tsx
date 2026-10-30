@@ -5,17 +5,21 @@ import { useTranslations } from 'next-intl';
 import Image from 'next/image';
 import SearchBar from '@/components/SearchBar';
 import TodoProgressBar from './TodoProgressBar';
+import styles from '@/styles/discovery.module.css';
 
 export default function HeroSection() {
   const t = useTranslations('home');
 
   return (
     <section className="relative pb-6">
-      <div className="max-w-7xl mx-auto px-5 mb-5">
-        <h1 className="text-2xl sm:text-3xl font-bold text-slate-900">{t('title')}</h1>
-        <p className="mt-2 max-w-3xl text-slate-600 leading-relaxed">{t('description')}</p>
+      <div className={styles.heroIntro}>
+        <h1 className={styles.title}>{t('title')}</h1>
+        <div className={styles.heroCopy}>
+          <p>{t('description')}</p>
+          <p>{t('scope')}</p>
+        </div>
       </div>
-      <div className="max-w-7xl mx-auto px-5">
+      <div className={styles.container}>
         {/* Hero Section Wrapper */}
         <div className="flex flex-col gap-5">
           {/* Top: Hero Image & Search */}

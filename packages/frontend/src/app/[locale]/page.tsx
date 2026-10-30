@@ -1,5 +1,3 @@
-import Link from 'next/link';
-import { getNotionBlogPosts } from '@/lib/notion-blog';
 import FilterModal from '@/components/FilterModal';
 import HeroSection from '@/components/HeroSection';
 import PropertyGrid from '@/components/PropertyGrid';
@@ -26,43 +24,14 @@ export async function generateMetadata({
   );
 }
 
-export const revalidate = 600;
-
 export default async function Home({ params }: { params: Promise<{ locale: string }> }) {
   const { locale } = await params;
-  const localGuides = await getNotionBlogPosts(locale);
-  const guides = (localGuides.length ? localGuides : await getNotionBlogPosts('zh')).slice(0, 3);
-  const chineseFallback = locale === 'en' && !localGuides.length;
   return (
     <main>
       <HeroSection />
       {/* <UsefulGuide /> */}
       <PropertyGrid />
       <RentalLinks locale={locale} />
-      {guides.length > 0 && (
-        <section className="max-w-7xl mx-auto px-5 pb-12">
-          <h2 className="text-xl font-bold text-slate-900 mb-4">
-            {locale === 'zh'
-              ? '租房准备指南'
-              : chineseFallback
-                ? 'Rental guides available in Chinese'
-                : 'Practical rental guides'}
-          </h2>
-          <ul className="grid gap-3 md:grid-cols-3">
-            {guides.map(guide => (
-              <li key={guide.id} className="rounded-xl border border-slate-200 p-5">
-                <Link
-                  className="text-blue-700 font-semibold underline"
-                  href={`/${guide.language}/blog/${encodeURIComponent(guide.slug)}`}
-                  lang={guide.language === 'zh' ? 'zh-CN' : 'en-AU'}
-                >
-                  {guide.language === 'zh' ? guide.title : guide.title_en}
-                </Link>
-              </li>
-            ))}
-          </ul>
-        </section>
-      )}
       <Suspense fallback={null}>
         <FilterModal />
       </Suspense>

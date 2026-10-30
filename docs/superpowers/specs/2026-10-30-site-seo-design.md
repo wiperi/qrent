@@ -59,7 +59,13 @@ Footer language links connect both language graphs. The homepage, school hubs,
 guide index and full published guide directory provide crawlable paths; the
 interactive filter combinations stay noindex.
 
-## Source article collisions found during production inspection
+## Deferred guide migration: source article collisions
+
+PR #302 implemented the migration below, but its original production build
+failed and its build logs are inaccessible to the current account. The layout
+release restores the deployed f516490 reader; the reviewed migration remains on
+the fork for later diagnosis. These paragraphs describe that deferred design,
+not functionality currently accepted in production.
 
 The original public Notion props contain ten published IDs but only seven
 locale/slug pairs: multiple distinct articles reuse `before-renting`. The old

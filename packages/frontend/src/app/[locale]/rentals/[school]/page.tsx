@@ -8,6 +8,8 @@ import { RENTAL_SCHOOLS, areaName, rentalSearchPath } from '@/lib/rental-schools
 import { getRentalPreview } from '@/lib/rental-preview';
 import { getNotionBlogPosts } from '@/lib/notion-blog';
 import { pageMetadata, SITE_URL, jsonLd } from '@/lib/seo';
+import { HiArrowRight, HiExternalLink } from 'react-icons/hi';
+import styles from '@/styles/discovery.module.css';
 
 type Props = { params: Promise<{ locale: string; school: string }> };
 export const revalidate = 600;
@@ -49,7 +51,7 @@ export default async function SchoolRentals({ params }: Props) {
     ? `${school.nameZh}（${school.code}）租房`
     : `Rentals near ${school.name} (${school.code})`;
   return (
-    <main className="max-w-7xl mx-auto px-5 py-10">
+    <main className={styles.page}>
       <Breadcrumbs
         locale={locale}
         items={[
@@ -58,95 +60,104 @@ export default async function SchoolRentals({ params }: Props) {
           { name: school.code, path: `/rentals/${school.slug}` },
         ]}
       />
-      <h1 className="text-3xl font-bold mb-5">{title}</h1>
-      <p className="max-w-3xl text-slate-600 leading-relaxed mb-4">
-        {school.focus[zh ? 'zh' : 'en']}
-      </p>
-      <p className="max-w-3xl text-slate-600 leading-relaxed mb-6">
+      <h1 className={styles.title}>{title}</h1>
+      <p className={styles.lead}>{school.focus[zh ? 'zh' : 'en']}</p>
+      <p className={styles.note}>
         {zh
           ? 'QRent 已恢复既有悉尼范围的更新，展示 Domain 和 Real Estate 租金。周租通常是整套报价，请核对房源页的出租范围；通勤是公共交通参考值。房源可能已出租或改价，请在申请前到源站和中介确认。'
           : 'QRent has resumed updates within its existing Sydney scope, using Domain and Real Estate rental prices. Weekly rent is usually for the entire property; check the listing for its rental scope. Public transport times are indicative. Listings may be leased or repriced, so confirm with the source and agent before applying.'}
       </p>
-      <Link
-        href={rentalSearchPath(locale, school.code)}
-        className="inline-block rounded-lg bg-blue-600 text-white px-5 py-3 font-semibold mb-10"
-      >
+      <Link href={rentalSearchPath(locale, school.code)} className={styles.primaryAction}>
         {zh ? `筛选 ${school.code} 房源` : `Search ${school.code} rentals`}
+        <HiArrowRight aria-hidden="true" />
       </Link>
-      <section className="mb-10">
-        <h2 className="text-2xl font-bold mb-4">
+      <section className={styles.section}>
+        <h2 className={styles.sectionTitle}>
           {zh ? '既有采集区域' : 'Areas in the existing collection'}
         </h2>
-        <p className="text-slate-600 mb-4">
+        <p className={styles.lead}>
           {zh
             ? '沿用项目历史的学校—区域匹配；并非所有区域都紧邻学校。点击区域后可继续调整预算和通勤条件。'
             : 'These areas follow the project’s historical university–area mapping. Some are farther from campus. Select an area to refine your budget and commute filters.'}
         </p>
-        <ul className="flex flex-wrap gap-3">
+        <ul className={styles.areaList}>
           {school.areas.map(area => (
             <li key={area}>
-              <Link
-                className="text-blue-700 underline"
-                href={rentalSearchPath(locale, school.code, area)}
-              >
+              <Link className={styles.areaLink} href={rentalSearchPath(locale, school.code, area)}>
                 {areaName(area)}
+                <HiArrowRight aria-hidden="true" />
               </Link>
             </li>
           ))}
         </ul>
       </section>
-      <section className="mb-10">
-        <h2 className="text-2xl font-bold mb-4">
+      <section className={styles.section}>
+        <h2 className={styles.sectionTitle}>
           {zh ? '当前数据库房源预览' : 'Rental preview from the current database'}
         </h2>
-        <p className="text-sm text-slate-600 mb-4">
+        <p className={styles.note}>
           {zh
             ? '预览最多缓存 10 分钟，不等于实时可租确认；完整筛选请使用上方搜索。'
             : 'Previews are cached for up to 10 minutes and do not confirm live availability. Use the search above for full filters.'}
         </p>
         {rows && rows.length ? (
-          <ul className="grid gap-4 md:grid-cols-2">
+          <ul className={styles.listingList}>
             {rows.map(row => (
-              <li key={row.id} className="border border-slate-200 rounded-lg p-4">
-                <h3 className="font-bold">
-                  <a
-                    href={row.url}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="text-blue-700 underline"
-                  >
-                    {row.address}, {row.region}
-                  </a>
-                </h3>
-                <p className="mt-2">
+              <li key={row.id} className={styles.listing}>
+                <div>
+                  <h3>
+                    <a href={row.url} target="_blank" rel="noopener noreferrer">
+                      <span>
+                        {row.address}, {row.region}
+                      </span>
+                      <HiExternalLink aria-hidden="true" />
+                      <span className="sr-only">
+                        {zh ? '（新窗口打开）' : ' (opens in a new tab)'}
+                      </span>
+                    </a>
+                  </h3>
+                  <p className={styles.listingSource}>
+                    {new URL(row.url).hostname.includes('domain') ? 'Domain' : 'Real Estate'}
+                  </p>
+                </div>
+                <p className={styles.price}>
                   A${row.price.toLocaleString('en-AU')}
-                  {zh ? '／周' : ' / week'}
-                  {Number.isFinite(row.bedroomCount)
-                    ? ` · ${row.bedroomCount} ${zh ? '卧室' : 'bedrooms'}`
-                    : ''}
-                  {Number.isFinite(row.commuteTime) && row.commuteTime! > 0
-                    ? ` · ${row.commuteTime} ${zh ? '分钟公交参考' : 'min transit estimate'}`
-                    : ''}
+                  <span>{zh ? '／周' : ' / week'}</span>
                 </p>
-                <p className="text-sm text-slate-600 mt-1">
-                  {new URL(row.url).hostname.includes('domain') ? 'Domain' : 'Real Estate'}
-                </p>
+                <ul className={styles.listingDetails}>
+                  {Number.isFinite(row.bedroomCount) && (
+                    <li>
+                      {row.bedroomCount}{' '}
+                      {zh ? '卧室' : row.bedroomCount === 1 ? 'bedroom' : 'bedrooms'}
+                    </li>
+                  )}
+                  {Number.isFinite(row.commuteTime) && row.commuteTime! > 0 && (
+                    <li>
+                      {row.commuteTime} {zh ? '分钟公交参考' : 'min transit estimate'}
+                    </li>
+                  )}
+                </ul>
               </li>
             ))}
           </ul>
         ) : (
-          <p className="text-slate-600">
-            {zh
-              ? '暂时无法显示房源预览，请打开搜索查看。'
-              : 'The preview is temporarily unavailable. Open the search to check listings.'}
-          </p>
+          <div>
+            <p className={styles.lead}>
+              {zh
+                ? '暂时无法显示房源预览，请打开搜索查看。'
+                : 'The preview is temporarily unavailable. Open the search to check listings.'}
+            </p>
+            <Link href={rentalSearchPath(locale, school.code)} className={styles.textLink}>
+              {zh ? `筛选 ${school.code} 房源` : `Search ${school.code} rentals`}
+            </Link>
+          </div>
         )}
       </section>
-      <section className="mb-10">
-        <h2 className="text-2xl font-bold mb-4">
+      <section className={styles.section}>
+        <h2 className={styles.sectionTitle}>
           {zh ? '申请前核对什么' : 'What to check before applying'}
         </h2>
-        <ul className="list-disc pl-6 space-y-2 text-slate-600">
+        <ul className={styles.checklist}>
           <li>
             {zh
               ? '把周租、水电网、交通和押金一起纳入预算，并核对是否整租。'
@@ -163,19 +174,17 @@ export default async function SchoolRentals({ params }: Props) {
               : 'Arrange an inspection and verify the lease and payment recipient before applying or paying.'}
           </li>
         </ul>
-        <ul className="mt-5 space-y-2">
+        <ul className={styles.guideList}>
           {guides.slice(0, 3).map(guide => (
             <li key={guide.id}>
-              <Link
-                className="text-blue-700 underline"
-                href={`/${locale}/blog/${encodeURIComponent(guide.slug)}`}
-              >
+              <Link href={`/${locale}/blog/${encodeURIComponent(guide.slug)}`}>
                 {zh ? guide.title : guide.title_en}
+                <HiArrowRight aria-hidden="true" />
               </Link>
             </li>
           ))}
         </ul>
-        <Link href={`/${locale}/blog`} className="inline-block mt-4 text-blue-700 underline">
+        <Link href={`/${locale}/blog`} className={styles.textLink}>
           {zh ? '查看全部租房指南' : 'Browse all rental guides'}
         </Link>
       </section>
