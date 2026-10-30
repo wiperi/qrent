@@ -1,122 +1,62 @@
-# Continuous Deployment Pipeline
-# Deploys to staging/production after CI passes
 name: CD
 
 on:
-  push:
-    branches: [main, staging]
-    paths:
-      - 'packages/backend/**'
-      - 'packages/shared/**'
-      - '.github/workflows/*.yml'
-      - 'docker-compose.yml'
-      - 'package.json'
-      - 'pnpm-lock.yaml'
-  # Disable PR deployments
-  pull_request:
-    branches: [staging]
+  workflow_call:
 
-# Prevent concurrent deployments to avoid conflicts
+permissions:
+  contents: read
+
 concurrency:
   group: deployment-${{ github.ref }}
   cancel-in-progress: false
 
 jobs:
   deploy:
+    if: >-
+      github.repository == 'wiperi/qrent' &&
+      github.event_name == 'push' &&
+      (github.ref == 'refs/heads/main' || github.ref == 'refs/heads/staging')
     runs-on: ubuntu-latest
+    timeout-minutes: 25
     environment: ${{ github.ref == 'refs/heads/main' && 'production' || 'staging' }}
-
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.sha }}
+          persist-credentials: false
 
-      - name: Set deployment environment
+      - name: Package only tracked backend sources
         run: |
-          if [[ "${{ github.ref }}" == "refs/heads/main" ]]; then
-            echo "DEPLOY_ENV=production" >> $GITHUB_ENV
-            echo "🚀 Deploying to PRODUCTION"
-          else
-            echo "DEPLOY_ENV=staging" >> $GITHUB_ENV
-            echo "🧪 Deploying to STAGING"
-          fi
+          git archive --format=tar.gz --output="backend-${GITHUB_SHA}.tgz" HEAD \
+            package.json pnpm-lock.yaml pnpm-workspace.yaml .dockerignore \
+            packages/backend packages/shared ops/deploy_backend.sh ops/verify_backend.mjs
 
-      - name: Copy files to server
+      - name: Upload release without changing the live environment
         uses: appleboy/scp-action@v0.1.7
         with:
           host: ${{ secrets.DEPLOY_SERVER_HOST }}
           username: ${{ secrets.DEPLOY_SERVER_USERNAME }}
           password: ${{ secrets.DEPLOY_SERVER_PASSWORD }}
-          source: '.,!node_modules,!packages/*/node_modules,!.git'
-          target: '~/qrent/'
+          fingerprint: SHA256:yFb8C5MaAlip/092pxEXeqWMWRWouUg6mXMMmOeFako
+          source: backend-${{ github.sha }}.tgz
+          target: ~/qrent/.deploy/uploads/
 
-      - name: Deploy application
+      - name: Build and replace backend only
         uses: appleboy/ssh-action@v1.0.3
         with:
           host: ${{ secrets.DEPLOY_SERVER_HOST }}
           username: ${{ secrets.DEPLOY_SERVER_USERNAME }}
           password: ${{ secrets.DEPLOY_SERVER_PASSWORD }}
+          fingerprint: SHA256:yFb8C5MaAlip/092pxEXeqWMWRWouUg6mXMMmOeFako
+          command_timeout: 20m
           script: |
-            cd ~/qrent/
-
-            # Create environment file
-            touch .env
-            cat > .env << EOL
-            BACKEND_JWT_SECRET_KEY=${{ secrets.BACKEND_JWT_SECRET_KEY }}
-            BACKEND_LISTEN_HOST=${{ secrets.BACKEND_LISTEN_HOST}}
-            BACKEND_LISTEN_PORT=${{ secrets.BACKEND_LISTEN_PORT }}
-            DB_DATABASE_NAME=${{ secrets.DB_DATABASE_NAME }}
-            DB_PORT=${{ secrets.DB_PORT }}
-            DB_PROPERTY_USER_PASSWORD=${{ secrets.DB_PROPERTY_USER_PASSWORD }}
-            DB_ROOT_PASSWORD=${{ secrets.DB_ROOT_PASSWORD }}
-            DEEPSEEK_API_KEY=${{ secrets.DEEPSEEK_API_KEY }}
-            DATABASE_URL=mysql://root:${{ secrets.DB_ROOT_PASSWORD }}@db:3306/${{ secrets.DB_DATABASE_NAME }}
-            NSW_TRANSPORT_API_KEY=${{ secrets.NSW_TRANSPORT_API_KEY }}
-            SENDGRID_API_KEY=${{ secrets.SENDGRID_API_KEY }}
-            REDIS_PORT=${{ secrets.REDIS_PORT }}
-            REDIS_URL=${{ secrets.REDIS_URL }}
-            EOL
-
-            # Stop current deployment and clean up
-            docker compose down
-            docker system prune -f --volumes
-
-            # Build and start new deployment
-            echo "🔧 Building application..."
-            docker compose build
-
-            echo "🚀 Starting deployment..."
-            docker compose up -d
-
-            # Clean up old images
-            docker image prune -f
-
-            # Wait for services to be healthy
-            echo "⏳ Waiting for services to be healthy..."
-            timeout 20 bash -c 'while ! docker compose ps | grep -q "healthy"; do sleep 2; done'
-
-            # Health check - verify backend API is responding
-            echo "🔍 Running health check..."
-            for i in {1..10}; do
-              response=$(curl -s -o /dev/null -w "%{http_code}" localhost:${{ secrets.BACKEND_LISTEN_PORT }}/echo || echo "000")
-              if [ "$response" == "200" ]; then
-                echo "✅ Deployment successful! Server responding with status 200"
-                break
-              else
-                echo "🔄 Attempt $i: Server not ready (status: $response), retrying in 3s..."
-                sleep 3
-              fi
-              if [ "$i" -eq 10 ]; then
-                echo "❌ Deployment failed: Server not responding after 10 attempts"
-                exit 1
-              fi
-            done
-
-      - name: Deployment notification
-        if: always()
-        run: |
-          if [[ "${{ job.status }}" == "success" ]]; then
-            echo "🎉 Deployment to ${{ env.DEPLOY_ENV }} completed successfully!"
-          else
-            echo "💥 Deployment to ${{ env.DEPLOY_ENV }} failed"
-            exit 1
-          fi
+            set -eu
+            qrent_root="$HOME/qrent"
+            qrent_sha='${{ github.sha }}'
+            qrent_source="$qrent_root/.deploy/releases/$qrent_sha"
+            test -s "$qrent_root/.env"
+            test -s "$qrent_root/docker-compose.yml"
+            mkdir -p "$qrent_source"
+            tar -xzf "$qrent_root/.deploy/uploads/backend-$qrent_sha.tgz" -C "$qrent_source"
+            QRENT_DEPLOY_ROOT="$qrent_root" QRENT_RELEASE_SHA="$qrent_sha" \
+              bash "$qrent_source/ops/deploy_backend.sh"

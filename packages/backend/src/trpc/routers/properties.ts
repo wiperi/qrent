@@ -79,6 +79,17 @@ export const propertiesRouter = t.router({
       // Extract pagination and orderBy params
       const { page, pageSize, orderBy, ...preferences } = input;
 
+      // The existing website requests 12 rows with score-only sorting.
+      // Prioritize recent records for that default; leave other orders intact.
+      const legacyWebsiteOrder =
+        pageSize === 12 &&
+        orderBy?.length === 1 &&
+        Object.keys(orderBy[0]).length === 1 &&
+        orderBy[0].averageScore === 'desc';
+      const searchOrderBy = legacyWebsiteOrder
+        ? [{ publishedAt: 'desc' as const }, { averageScore: 'desc' as const }]
+        : orderBy;
+
       // Create preference with proper null conversion
       const createPreferenceData = {
         targetSchool: preferences.targetSchool,
@@ -104,7 +115,7 @@ export const propertiesRouter = t.router({
         ...createPreferenceData,
         page,
         pageSize,
-        orderBy,
+        orderBy: searchOrderBy,
       });
 
       const localizedProperties = properties.properties.map(p => ({
