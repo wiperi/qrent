@@ -15,6 +15,12 @@ on:
         default: '3'
         required: true
         description: Free disk target based on the CI image size
+      build_cache_age:
+        type: choice
+        options: ['168h', '24h', '1h']
+        default: '168h'
+        required: true
+        description: Minimum age of unused build cache; running images and volumes are preserved
 
 permissions:
   contents: read
@@ -39,4 +45,5 @@ jobs:
           DEPLOY_SERVER_PASSWORD: ${{ secrets.DEPLOY_SERVER_PASSWORD }}
           QRENT_CAPACITY_ACTION: ${{ inputs.action }}
           QRENT_MIN_DISK_GIB: ${{ inputs.min_disk_gib }}
+          QRENT_BUILD_CACHE_AGE: ${{ inputs.build_cache_age }}
         run: bash ops/release_backend.sh capacity

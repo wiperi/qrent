@@ -12,6 +12,21 @@ spec.loader.exec_module(capacity)
 
 
 class CapacitySafetyTests(unittest.TestCase):
+    def test_build_cache_age_is_bounded_and_never_prunes_runtime_images_or_volumes(self):
+        for age in ('168h', '24h', '1h'):
+            with self.subTest(age=age), patch.object(capacity, 'command', return_value='Total: 1MB') as run:
+                capacity.prune_build_cache(age)
+                run.assert_called_once_with('docker', 'builder', 'prune', '-f', '--filter', 'until='+age)
+        for age in ('0h', '--all', '1h; rm -rf /', ''):
+            with self.subTest(age=age), patch.object(capacity, 'command') as run:
+                with self.assertRaises(ValueError): capacity.prune_build_cache(age)
+                run.assert_not_called()
+
+    def test_invalid_cache_age_stops_before_host_inspection_or_cleanup(self):
+        with patch.object(capacity, 'command') as run:
+            with self.assertRaises(AssertionError): capacity.main('apply', 2, '0h')
+            run.assert_not_called()
+
     def test_only_named_caches_are_candidates(self):
         with tempfile.TemporaryDirectory() as temp:
             home = Path(temp).resolve()
