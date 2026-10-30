@@ -24,7 +24,7 @@ import os,sys
 for path in sys.argv[1:]:
     info=os.statvfs(path)
     free=info.f_bavail*info.f_frsize
-    minimum=16*1024**2 if path=='/run' else max(3*1024**3,int(os.environ.get('QRENT_REQUIRED_DISK_BYTES','0')))
+    minimum=16*1024**2 if path=='/run' else max(2*1024**3,int(os.environ.get('QRENT_REQUIRED_DISK_BYTES','0')))
     if free<minimum or info.f_favail<4096:
         print('Insufficient deployment headroom; existing backend kept.',file=sys.stderr)
         sys.exit(70)

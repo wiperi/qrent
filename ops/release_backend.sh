@@ -25,12 +25,13 @@ import hashlib,os,sys
 h=hashlib.sha256()
 with open(sys.argv[1],'rb') as f:
     for chunk in iter(lambda:f.read(1024*1024),b''): h.update(chunk)
-required=max(3*1024**3, os.path.getsize(sys.argv[1])+2*int(sys.argv[2])+512*1024**2)
-print(h.hexdigest(),required)
+compressed=os.path.getsize(sys.argv[1])
+required=max(2*1024**3, compressed+2*int(sys.argv[2])+512*1024**2)
+print(h.hexdigest(),required,compressed)
 PY
   )
-  read -r image_sha required_bytes <<< "$image_metadata"
-  printf 'Image unpacked bytes: %s; required free disk bytes: %s\n' "$image_size" "$required_bytes"
+  read -r image_sha required_bytes compressed_bytes <<< "$image_metadata"
+  printf 'Image unpacked bytes: %s; compressed bytes: %s; required free disk bytes: %s\n' "$image_size" "$compressed_bytes" "$required_bytes"
 fi
 
 ssh_tmp=$(mktemp -d "${RUNNER_TEMP:-${TMPDIR:-/tmp}}/qrent-ssh.XXXXXXXX")
@@ -78,7 +79,7 @@ if [[ "$mode" == inspect ]]; then
 fi
 if [[ "$mode" == capacity ]]; then
   [[ "${QRENT_CAPACITY_ACTION:-plan}" == plan || "${QRENT_CAPACITY_ACTION:-plan}" == apply ]] || exit 64
-  [[ "${QRENT_MIN_DISK_GIB:-3}" =~ ^[3-8]$ ]] || exit 64
+  [[ "${QRENT_MIN_DISK_GIB:-3}" =~ ^[2-8]$ ]] || exit 64
   script_root=$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)
   ssh "${ssh_options[@]}" "$DEPLOY_SERVER_HOST" python3 - "${QRENT_CAPACITY_ACTION:-plan}" "${QRENT_MIN_DISK_GIB:-3}" \
     < "$script_root/recover_backend_capacity.py"

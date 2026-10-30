@@ -96,7 +96,7 @@ def containers():
 
 def main(action, min_gib=3):
     assert action in ('plan', 'apply')
-    assert min_gib in range(3,9)
+    assert min_gib in range(2,9)
     min_disk = min_gib * 1024**3
     os.umask(0o077)
     home = Path.home().resolve(); root = home/'qrent'

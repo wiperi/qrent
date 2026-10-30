@@ -11,7 +11,7 @@ on:
         description: Plan first; apply only named caches and bounded tmpfs headroom
       min_disk_gib:
         type: choice
-        options: ['3', '4', '5', '6', '7', '8']
+        options: ['2', '3', '4', '5', '6', '7', '8']
         default: '3'
         required: true
         description: Free disk target based on the CI image size
