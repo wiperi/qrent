@@ -216,6 +216,7 @@ jobs:
   deploy:
     needs: [ci-success, changes]
     if: >-
+      !cancelled() && needs.ci-success.result == 'success' && needs.changes.result == 'success' &&
       github.event_name == 'push' && github.repository == 'wiperi/qrent' &&
       (github.ref == 'refs/heads/main' || github.ref == 'refs/heads/staging') &&
       (needs.changes.outputs.backend == 'true' || needs.changes.outputs.shared == 'true' || needs.changes.outputs.workflows == 'true')
