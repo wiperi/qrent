@@ -135,6 +135,7 @@ jobs:
         run: |
           bash -n ops/deploy_backend.sh
           bash -n ops/release_backend.sh
+          bash -n ops/inspect_backend_host.sh
           python3 -m unittest discover -s ops -p test_deploy_backend.py
           python3 -m unittest discover -s ops -p test_release_backend.py
           node --test ops/test_verify_backend.mjs
