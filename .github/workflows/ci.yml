@@ -44,6 +44,16 @@ jobs:
               - '.github/workflows/**'
             backend_cd:
               - '.github/workflows/cd.yml'
+              - 'packages/backend/**'
+              - 'packages/shared/**'
+              - 'package.json'
+              - 'pnpm-lock.yaml'
+              - 'pnpm-workspace.yaml'
+              - '.dockerignore'
+              - 'ops/deploy_backend.sh'
+              - 'ops/release_backend.sh'
+              - 'ops/receive_backend_image.sh'
+              - 'ops/verify_backend.mjs'
 
   # Lint and format check
   lint:
@@ -251,6 +261,6 @@ jobs:
       !cancelled() && needs.ci-success.result == 'success' && needs.changes.result == 'success' &&
       github.event_name == 'push' && github.repository == 'wiperi/qrent' &&
       (github.ref == 'refs/heads/main' || github.ref == 'refs/heads/staging') &&
-      (needs.changes.outputs.backend == 'true' || needs.changes.outputs.shared == 'true' || needs.changes.outputs.backend_cd == 'true')
+      needs.changes.outputs.backend_cd == 'true'
     uses: ./.github/workflows/cd.yml
     secrets: inherit
