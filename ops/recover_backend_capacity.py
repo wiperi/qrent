@@ -14,9 +14,47 @@ def command(*args):
 
 
 def cache_paths(home, mounts):
-    paths = [home/'.npm/_cacache', home/'.local/share/pnpm/store', home/'.cache/pnpm']
+    paths = [home/'.npm/_cacache', home/'.local/share/pnpm/store', home/'.cache/pnpm',
+             home/'.npm/_npx', home/'.nvm/.cache']
     return [p for p in paths if p.is_dir() and not p.is_symlink() and p.resolve() == p
-            and not any(p == m or p in m.parents or m in p.parents for m in mounts)]
+            and not any(p == m or p in m.parents or m in p.parents for m in mounts)
+            and (p != home/'.npm/_npx' or not process_uses(p))]
+
+
+def process_uses(path, proc_root=Path('/proc')):
+    """npx may contain executing tools: unknown process access also blocks removal."""
+    if not proc_root.is_dir(): return True
+    prefix = str(path).encode()
+    try: processes = [p for p in proc_root.iterdir() if p.name.isdigit()]
+    except OSError: return True
+    if not processes: return True
+    for proc in processes:
+        try:
+            fields = (proc/'stat').read_text().rpartition(')')[2].split()
+            # Linux PF_KTHREAD: include/linux/sched.h. Kernel threads do not run npx tools.
+            if int(fields[6]) & 0x00200000: continue
+            tasks = [p for p in (proc/'task').iterdir() if p.name.isdigit()]
+            if not tasks: return True
+            for task in tasks:
+                try:
+                    task_fields = (task/'stat').read_text().rpartition(')')[2].split()
+                    # A dead leader does not imply its other threads have exited.
+                    if task_fields[0] == 'Z': continue
+                    cmdline = (task/'cmdline').read_bytes()
+                    if prefix in cmdline or prefix in (task/'maps').read_bytes() or prefix in (task/'environ').read_bytes(): return True
+                    for link in [task/'cwd', task/'exe', *list((task/'fd').iterdir())]:
+                        try: target = Path(os.readlink(link))
+                        except FileNotFoundError:
+                            if link.parent == task/'fd': continue  # This descriptor was closed.
+                            raise
+                        if target == path or path in target.parents: return True
+                except (FileNotFoundError, ProcessLookupError):
+                    if task.exists(): return True
+            if {p.name for p in (proc/'task').iterdir() if p.name.isdigit()} != {p.name for p in tasks}: return True
+        except (FileNotFoundError, ProcessLookupError):
+            if proc.exists(): return True
+        except (OSError, ValueError, IndexError): return True
+    return False
 
 
 def protected_mounts():
@@ -58,7 +96,7 @@ def containers():
 
 def main(action, min_gib=3):
     assert action in ('plan', 'apply')
-    assert min_gib in range(3,9)
+    assert min_gib in range(2,9)
     min_disk = min_gib * 1024**3
     os.umask(0o077)
     home = Path.home().resolve(); root = home/'qrent'
