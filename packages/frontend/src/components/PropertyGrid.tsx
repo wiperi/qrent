@@ -34,7 +34,6 @@ export default function PropertyGrid() {
         ],
       }),
     enabled: !isLoading, // 只在认证状态确定后才启用查询
-    
   });
 
   // @Deprecated: 后端应该直接返回房源状态
@@ -158,6 +157,7 @@ export default function PropertyGrid() {
             subscribed={property.subscribed}
             averageScore={property.averageScore}
             keywords={property.keywords}
+            description={property.description}
             availableDate={property.availableDate}
             publishedAt={property.publishedAt}
             propertyId={property.id as number}

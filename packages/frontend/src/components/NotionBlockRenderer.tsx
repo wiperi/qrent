@@ -17,14 +17,13 @@ const NotionBlockRenderer: React.FC<NotionBlockRendererProps> = ({ block, locale
   const { type } = block;
   const value = (block as any)[type] || {};
 
-
   // 渲染子块（递归）
   const renderChildren = (children?: NotionBlock[]) => {
     if (!children || children.length === 0) return null;
 
     return (
       <div className="ml-4">
-        {children.map((childBlock) => (
+        {children.map(childBlock => (
           <NotionBlockRenderer key={childBlock.id} block={childBlock} locale={locale} />
         ))}
       </div>
@@ -47,7 +46,7 @@ const NotionBlockRenderer: React.FC<NotionBlockRendererProps> = ({ block, locale
 
     case 'heading_1':
       return (
-        <h1
+        <h2
           className="text-3xl font-bold text-slate-900 mb-6 mt-8"
           dangerouslySetInnerHTML={{ __html: richTextToHtml(value.rich_text || []) }}
         />
@@ -98,12 +97,7 @@ const NotionBlockRenderer: React.FC<NotionBlockRendererProps> = ({ block, locale
     case 'to_do':
       return (
         <div className="flex items-start mb-2">
-          <input
-            type="checkbox"
-            checked={value.checked || false}
-            readOnly
-            className="mt-1 mr-2"
-          />
+          <input type="checkbox" checked={value.checked || false} readOnly className="mt-1 mr-2" />
           <span
             className={`text-slate-700 leading-relaxed ${value.checked ? 'line-through text-slate-500' : ''}`}
             dangerouslySetInnerHTML={{ __html: richTextToHtml(value.rich_text || []) }}
@@ -118,9 +112,7 @@ const NotionBlockRenderer: React.FC<NotionBlockRendererProps> = ({ block, locale
             className="cursor-pointer text-slate-700 font-medium mb-2"
             dangerouslySetInnerHTML={{ __html: richTextToHtml(value.rich_text || []) }}
           />
-          <div className="ml-4">
-            {renderChildren((block as any).children)}
-          </div>
+          <div className="ml-4">{renderChildren((block as any).children)}</div>
         </details>
       );
 
@@ -201,11 +193,7 @@ const NotionBlockRenderer: React.FC<NotionBlockRendererProps> = ({ block, locale
 
       return (
         <div className="my-6">
-          <video
-            controls
-            className="w-full rounded-lg shadow-sm"
-            preload="metadata"
-          >
+          <video controls className="w-full rounded-lg shadow-sm" preload="metadata">
             <source src={videoUrl} />
             您的浏览器不支持视频播放。
           </video>
@@ -233,7 +221,11 @@ const NotionBlockRenderer: React.FC<NotionBlockRendererProps> = ({ block, locale
             className="inline-flex items-center px-4 py-2 bg-blue-100 text-blue-700 rounded-lg hover:bg-blue-200 transition-colors"
           >
             <svg className="w-4 h-4 mr-2" fill="currentColor" viewBox="0 0 20 20">
-              <path fillRule="evenodd" d="M3 17a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm3.293-7.707a1 1 0 011.414 0L9 10.586V3a1 1 0 112 0v7.586l1.293-1.293a1 1 0 111.414 1.414l-3 3a1 1 0 01-1.414 0l-3-3a1 1 0 010-1.414z" clipRule="evenodd" />
+              <path
+                fillRule="evenodd"
+                d="M3 17a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm3.293-7.707a1 1 0 011.414 0L9 10.586V3a1 1 0 112 0v7.586l1.293-1.293a1 1 0 111.414 1.414l-3 3a1 1 0 01-1.414 0l-3-3a1 1 0 010-1.414z"
+                clipRule="evenodd"
+              />
             </svg>
             {fileName}
           </a>
@@ -246,15 +238,8 @@ const NotionBlockRenderer: React.FC<NotionBlockRendererProps> = ({ block, locale
 
       return (
         <div className="my-4 border border-slate-200 rounded-lg p-4 hover:bg-slate-50 transition-colors">
-          <a
-            href={bookmarkUrl}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="block"
-          >
-            <div className="text-blue-600 font-medium mb-1">
-              {bookmarkUrl}
-            </div>
+          <a href={bookmarkUrl} target="_blank" rel="noopener noreferrer" className="block">
+            <div className="text-blue-600 font-medium mb-1">{bookmarkUrl}</div>
             {value.caption && value.caption.length > 0 && (
               <p
                 className="text-sm text-slate-500"
@@ -269,9 +254,7 @@ const NotionBlockRenderer: React.FC<NotionBlockRendererProps> = ({ block, locale
       return (
         <div className="my-6 overflow-x-auto">
           <table className="min-w-full border border-slate-200 rounded-lg">
-            <tbody>
-              {renderChildren((block as any).children)}
-            </tbody>
+            <tbody>{renderChildren((block as any).children)}</tbody>
           </table>
         </div>
       );
@@ -298,11 +281,7 @@ const NotionBlockRenderer: React.FC<NotionBlockRendererProps> = ({ block, locale
       );
 
     case 'column':
-      return (
-        <div className="space-y-2">
-          {renderChildren((block as any).children)}
-        </div>
-      );
+      return <div className="space-y-2">{renderChildren((block as any).children)}</div>;
 
     // 不支持的块类型
     default:

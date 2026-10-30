@@ -36,13 +36,29 @@ export default function Footer() {
           <nav aria-label="Footer navigation">
             <ul className="space-y-2 text-slate-700">
               <li>
-                <Link href={`/${locale}/about`} className="hover:text-blue-600 transition-colors">{t('about')}</Link>
+                <Link href={`/${locale}/rentals`} className="hover:text-blue-600">
+                  {locale === 'zh' ? '悉尼学校与租房区域' : 'Sydney university rentals'}
+                </Link>
               </li>
               <li>
-                <Link href={`/${locale}/team`} className="hover:text-blue-600 transition-colors">{t('meetOurTeam')}</Link>
+                <Link href={`/${locale}/blog`} className="hover:text-blue-600">
+                  {locale === 'zh' ? '租房指南' : 'Rental guides'}
+                </Link>
               </li>
               <li>
-                <Link href={`/${locale}/contact`} className="hover:text-blue-600 transition-colors">{t('getInTouch')}</Link>
+                <Link href={`/${locale}/about`} className="hover:text-blue-600 transition-colors">
+                  {t('about')}
+                </Link>
+              </li>
+              <li>
+                <Link href={`/${locale}/team`} className="hover:text-blue-600 transition-colors">
+                  {t('meetOurTeam')}
+                </Link>
+              </li>
+              <li>
+                <Link href={`/${locale}/contact`} className="hover:text-blue-600 transition-colors">
+                  {t('getInTouch')}
+                </Link>
               </li>
             </ul>
           </nav>
@@ -98,16 +114,13 @@ export default function Footer() {
                 onClick={handleEmailCopy}
                 aria-label={t('copyEmail')}
                 title={t('copyEmail')}
-                className={`inline-flex h-10 w-10 items-center justify-center rounded-full border transition cursor-pointer ${showCheckmark
-                  ? 'border-blue-600 text-white bg-blue-600'
-                  : 'border-slate-200 text-slate-700 hover:text-white hover:bg-blue-600 hover:border-blue-600'
-                  }`}
+                className={`inline-flex h-10 w-10 items-center justify-center rounded-full border transition cursor-pointer ${
+                  showCheckmark
+                    ? 'border-blue-600 text-white bg-blue-600'
+                    : 'border-slate-200 text-slate-700 hover:text-white hover:bg-blue-600 hover:border-blue-600'
+                }`}
               >
-                {showCheckmark ? (
-                  <FaCheck className="h-4 w-4" />
-                ) : (
-                  <MdEmail className="h-5 w-5" />
-                )}
+                {showCheckmark ? <FaCheck className="h-4 w-4" /> : <MdEmail className="h-5 w-5" />}
               </button>
 
               {/* 提示框 */}
@@ -119,15 +132,17 @@ export default function Footer() {
                 </div>
               )}
             </div>
-
           </div>
 
           <div className="lg:col-span-1 text-sm text-slate-500">
             <p>{t('copyright')}</p>
+            <a href="mailto:yyzyfish5@gmail.com" className="inline-block mt-2 underline">
+              yyzyfish5@gmail.com
+            </a>
             <p className="mt-2">{t('icp')}</p>
           </div>
         </div>
       </div>
     </footer>
-  )
+  );
 }

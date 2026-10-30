@@ -1,3 +1,6 @@
+import { cache } from 'react';
+import { unstable_cache } from 'next/cache';
+import { pageMetadata, SITE_URL, SITE_IMAGE } from './seo';
 import { LOCALE } from '@qrent/shared/enum';
 import {
   getBlogPostBySlug,
@@ -19,12 +22,17 @@ export interface NotionBlock {
 /**
  * 获取所有已发布的博客文章（用于博客列表页面）
  */
+const publishedPosts = unstable_cache(
+  () => getPublishedBlogPosts(),
+  ['qrent-published-blog-posts'],
+  { revalidate: 600 }
+);
 export async function getNotionBlogPosts(locale?: string): Promise<NotionBlogPost[]> {
   try {
-    const language = locale === 'en' ? SupportedLanguage.EN : SupportedLanguage.ZH;
-    return await getPublishedBlogPosts(language);
+    const posts = await publishedPosts();
+    return locale ? posts.filter(post => post.language === locale) : posts;
   } catch (error) {
-    console.error('获取 Notion 博客文章失败:', error);
+    console.error('Unable to load published guides:', error);
     return [];
   }
 }
@@ -32,31 +40,21 @@ export async function getNotionBlogPosts(locale?: string): Promise<NotionBlogPos
 /**
  * 获取单篇博客文章及其内容（用于博客详情页面）
  */
-export async function getNotionBlogPost(
-  slug: string,
-  locale?: string
-): Promise<{
-  post: NotionBlogPost;
-  blocks: NotionBlock[];
-} | null> {
-  try {
+export const getNotionBlogPost = cache(
+  async (
+    slug: string,
+    locale?: string
+  ): Promise<{
+    post: NotionBlogPost;
+    blocks: NotionBlock[];
+  } | null> => {
     const language = locale === 'en' ? SupportedLanguage.EN : SupportedLanguage.ZH;
     const post = await getBlogPostBySlug(slug, language);
-    if (!post) {
-      return null;
-    }
-
+    if (!post) return null;
     const blocks = await getBlogPostContent(post.id);
-
-    return {
-      post,
-      blocks: blocks as NotionBlock[],
-    };
-  } catch (error) {
-    console.error(`获取 Notion 博客文章 ${slug} 失败:`, error);
-    return null;
+    return { post, blocks: blocks as NotionBlock[] };
   }
-}
+);
 
 /**
  * 获取所有博客文章的 slug（用于 generateStaticParams）
@@ -64,7 +62,7 @@ export async function getNotionBlogPost(
 export async function getNotionBlogSlugs(): Promise<string[]> {
   try {
     // 获取所有语言的文章，以便生成所有可能的路径
-    const posts = await getPublishedBlogPosts();
+    const posts = await getNotionBlogPosts();
     return posts.map(post => post.slug);
   } catch (error) {
     console.error('获取博客 slug 列表失败:', error);
@@ -83,7 +81,7 @@ export async function getRecommendedPosts(
 ): Promise<NotionBlogPost[]> {
   try {
     const language = locale === 'en' ? SupportedLanguage.EN : SupportedLanguage.ZH;
-    const allPosts = await getPublishedBlogPosts(language);
+    const allPosts = await getNotionBlogPosts(language);
 
     // 1. 过滤掉当前文章
     const otherPosts = allPosts.filter(post => post.slug !== currentSlug);
@@ -114,7 +112,7 @@ export async function getRecommendedPosts(
     // 出错时尝试返回最新的文章作为兜底，需重新获取一次（避免复用可能污染的数据）
     try {
       const language = locale === 'en' ? SupportedLanguage.EN : SupportedLanguage.ZH;
-      const allPosts = await getPublishedBlogPosts(language);
+      const allPosts = await getNotionBlogPosts(language);
       return allPosts
         .filter(post => post.slug !== currentSlug)
         .sort((a, b) => new Date(b.published_at).getTime() - new Date(a.published_at).getTime())
@@ -142,7 +140,7 @@ export function convertNotionPostToBlogPost(
     coverUrl: notionPost.cover_url,
     schema: {
       '@context': 'https://schema.org',
-      '@type': 'Article',
+      '@type': 'BlogPosting',
       headline: locale === LOCALE.ZH ? notionPost.title : notionPost.title_en,
       image: notionPost.cover_url ? [notionPost.cover_url] : [],
       datePublished: notionPost.published_at,
@@ -150,14 +148,14 @@ export function convertNotionPostToBlogPost(
       author: {
         '@type': 'Organization',
         name: 'Qrent',
-        url: 'https://qrent.com.au',
+        url: SITE_URL,
       },
       publisher: {
         '@type': 'Organization',
         name: 'Qrent',
         logo: {
           '@type': 'ImageObject',
-          url: 'https://qrent.com.au/qrent-logo.svg',
+          url: SITE_IMAGE,
         },
       },
       description: locale === LOCALE.ZH ? notionPost.excerpt_zh : notionPost.excerpt_en,
@@ -172,29 +170,26 @@ export function convertNotionPostToBlogPost(
 /**
  * 生成博客文章的 SEO 元数据
  */
-export function generateNotionBlogMetadata(post: NotionBlogPost, locale: string = LOCALE.ZH) {
+export function generateNotionBlogMetadata(
+  post: NotionBlogPost,
+  locale: string = LOCALE.ZH,
+  languages: string[] = [locale]
+) {
   const title = locale === LOCALE.ZH ? post.title : post.title_en;
-  const excerpt = locale === LOCALE.ZH ? post.excerpt_zh : post.excerpt_en;
-
+  const excerpt = (locale === LOCALE.ZH ? post.excerpt_zh : post.excerpt_en) || title;
+  const meta = pageMetadata(locale, `/blog/${encodeURIComponent(post.slug)}`, title, excerpt, {
+    languages,
+  });
   return {
-    title,
-    description: excerpt,
+    ...meta,
     keywords: post.keywords.join(', '),
     openGraph: {
-      title,
-      description: excerpt,
-      type: 'article',
+      ...meta.openGraph,
+      type: 'article' as const,
       publishedTime: post.published_at,
       modifiedTime: post.last_edited_time,
-      authors: ['Qrent'],
+      authors: ['QRent'],
       tags: post.keywords,
-      images: post.cover_url ? [{ url: post.cover_url }] : [],
-    },
-    twitter: {
-      card: 'summary_large_image',
-      title,
-      description: excerpt,
-      images: post.cover_url ? [post.cover_url] : [],
     },
   };
 }

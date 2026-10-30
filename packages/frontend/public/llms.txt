@@ -1,0 +1,26 @@
+# QRent
+
+> QRent is a free bilingual rental comparison project for students in Sydney, Australia.
+
+Restored updates currently focus on the existing collection areas for UNSW Sydney,
+the University of Sydney and UTS. Information comes from Domain and Real Estate.
+Prices and availability must be confirmed on the original listing. Commute times
+are indicative public transport estimates, not guaranteed journey times.
+Melbourne updates are currently deferred. QRent does not cover all Sydney homes.
+
+## Main pages
+
+- [English home](https://www.qrent.rent/en)
+- [中文首页](https://www.qrent.rent/zh)
+- [Sydney university rental directory](https://www.qrent.rent/en/rentals)
+- [UNSW rentals](https://www.qrent.rent/en/rentals/unsw)
+- [University of Sydney rentals](https://www.qrent.rent/en/rentals/usyd)
+- [UTS rentals](https://www.qrent.rent/en/rentals/uts)
+- [Rental guides](https://www.qrent.rent/en/blog)
+- [中文租房指南](https://www.qrent.rent/zh/blog)
+- [About QRent](https://www.qrent.rent/en/about)
+- [Contact](https://www.qrent.rent/en/contact)
+- [Canonical sitemap](https://www.qrent.rent/sitemap.xml)
+
+The sitemap lists only actual published language versions. Search and personal
+favorites are utility pages, not authoritative articles or permanent listing URLs.

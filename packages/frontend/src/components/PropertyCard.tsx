@@ -7,6 +7,7 @@ import { useTRPCClient } from '@/lib/trpc';
 import { useQueryClient } from '@tanstack/react-query';
 import { useToast } from '@/hooks/use-toast';
 import Image from 'next/image';
+import { displayKeywords } from '@/lib/property-keywords';
 
 interface PropertyCardProps {
   id: number;
@@ -20,6 +21,7 @@ interface PropertyCardProps {
   url: string;
   averageScore: number;
   keywords: string;
+  description?: string | null;
   availableDate?: string | null;
   publishedAt: string;
   thumbnailUrl: string;
@@ -38,6 +40,7 @@ export default function PropertyCard({
   url,
   averageScore,
   keywords,
+  description,
   availableDate,
   publishedAt,
   thumbnailUrl,
@@ -69,11 +72,10 @@ export default function PropertyCard({
 
     try {
       // Make API call with abort signal
-      await (newSubscribedState 
+      await (newSubscribedState
         ? trpc.properties.subscribe.mutate({ propertyId }, { signal: controller.signal })
-        : trpc.properties.unsubscribe.mutate({ propertyId }, { signal: controller.signal })
-      );
-      
+        : trpc.properties.unsubscribe.mutate({ propertyId }, { signal: controller.signal }));
+
       // Clear timeout on success
       clearTimeout(timeoutId);
 
@@ -84,12 +86,13 @@ export default function PropertyCard({
     } catch (error) {
       // Error handling - rollback state and show message
       setLocalSubscribed(!newSubscribedState);
-      
+
       // Show error message using toast
-      const errorMessage = error instanceof Error && (error.name === 'AbortError' || error.message.includes('aborted'))
-        ? t('subscriptionTimeoutError')
-        : t('subscriptionError');
-      
+      const errorMessage =
+        error instanceof Error && (error.name === 'AbortError' || error.message.includes('aborted'))
+          ? t('subscriptionTimeoutError')
+          : t('subscriptionError');
+
       toast({
         title: t('error'),
         description: errorMessage,
@@ -162,13 +165,7 @@ export default function PropertyCard({
     return baseAlt;
   };
 
-  const keywordList = keywords.trim()
-    ? keywords
-        .split(',')
-        .map(k => k.trim())
-        .filter(Boolean)
-        .slice(0, 10)
-    : [];
+  const keywordList = displayKeywords(locale, keywords, description ?? '');
 
   // 动态计算能显示的关键词数量（确保完整显示，不截断）
   useEffect(() => {
@@ -307,8 +304,6 @@ export default function PropertyCard({
               )}
             </button>
           </div>
-         
-          
 
           {/* Bottom left: Property info overlay on image */}
           <div className="absolute bottom-0 left-0 right-0 p-4 z-10">

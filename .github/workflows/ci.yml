@@ -151,7 +151,7 @@ jobs:
           qrent-backend:ci
           -e "require(require.resolve('@prisma/client', {paths:['/app/packages/shared']}))"
 
-  # Test frontend (stub - tests not implemented yet) 
+  # Isolated SEO and SSR regressions; no database, model or transit credentials.
   test-frontend:
     runs-on: ubuntu-latest
     needs: [changes, lint]
@@ -161,13 +161,18 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Frontend tests placeholder
-        run: |
-          echo "🚧 Frontend tests not implemented yet"
-          echo "TODO: Add Vitest tests for frontend package"
-          echo "Expected test commands:"
-          echo "  - pnpm --filter frontend test:unit"
-          echo "  - pnpm --filter frontend test:integration"
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 10.19.0
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - name: Metadata, discovery and no-JS guide links
+        env:
+          TSX_TSCONFIG_PATH: packages/frontend/tsconfig.json
+        run: node --import tsx --test packages/frontend/test/seo/*.test.ts packages/frontend/test/seo/*.test.tsx
 
   # Type checking
   typecheck:

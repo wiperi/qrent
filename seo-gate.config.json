@@ -1,0 +1,191 @@
+{
+  "site": {
+    "publicBaseUrl": "https://www.qrent.rent",
+    "productionBaseUrl": "https://www.qrent.rent",
+    "localBaseUrl": "http://127.0.0.1:3327",
+    "healthPath": "/en"
+  },
+  "cache": {
+    "enabled": false
+  },
+  "localVerify": {
+    "requiredPages": [
+      {
+        "path": "/en"
+      },
+      {
+        "path": "/en/about"
+      },
+      {
+        "path": "/en/team"
+      },
+      {
+        "path": "/en/contact"
+      },
+      {
+        "path": "/en/blog"
+      },
+      {
+        "path": "/en/rentals"
+      },
+      {
+        "path": "/en/rentals/unsw",
+        "requireBreadcrumb": true,
+        "expectedSchemaTypes": ["CollectionPage", "BreadcrumbList"]
+      },
+      {
+        "path": "/en/rentals/usyd",
+        "requireBreadcrumb": true,
+        "expectedSchemaTypes": ["CollectionPage", "BreadcrumbList"]
+      },
+      {
+        "path": "/en/rentals/uts",
+        "requireBreadcrumb": true,
+        "expectedSchemaTypes": ["CollectionPage", "BreadcrumbList"]
+      },
+      {
+        "path": "/zh"
+      },
+      {
+        "path": "/zh/about"
+      },
+      {
+        "path": "/zh/team"
+      },
+      {
+        "path": "/zh/contact"
+      },
+      {
+        "path": "/zh/blog"
+      },
+      {
+        "path": "/zh/rentals"
+      },
+      {
+        "path": "/zh/rentals/unsw",
+        "requireBreadcrumb": true,
+        "expectedSchemaTypes": ["CollectionPage", "BreadcrumbList"]
+      },
+      {
+        "path": "/zh/rentals/usyd",
+        "requireBreadcrumb": true,
+        "expectedSchemaTypes": ["CollectionPage", "BreadcrumbList"]
+      },
+      {
+        "path": "/zh/rentals/uts",
+        "requireBreadcrumb": true,
+        "expectedSchemaTypes": ["CollectionPage", "BreadcrumbList"]
+      }
+    ],
+    "smokePaths": [
+      {
+        "path": "/zh",
+        "contains": "房源已恢复更新"
+      },
+      {
+        "path": "/en",
+        "contains": "rental prices from Real Estate and Domain"
+      }
+    ]
+  },
+  "sitemaps": {
+    "indexPath": "/sitemap.xml",
+    "deepAudit": "all",
+    "deepAuditCache": false,
+    "concurrency": 4,
+    "requireCanonicalSelf": true,
+    "requireIndexable": true,
+    "forbiddenUrlPatterns": ["\\?", "/search", "/favorite"]
+  },
+  "pageRules": {
+    "titleMinLength": 8,
+    "descriptionMinLength": 20,
+    "requireCanonical": true,
+    "requireSelfCanonical": true,
+    "requireH1": true,
+    "requireVisibleH1": true,
+    "requireOpenGraph": true,
+    "requireTwitterCard": "summary_large_image",
+    "requireJsonLd": true,
+    "requireImageAlt": true,
+    "requireViewport": true,
+    "requireHtmlLang": true,
+    "requiredHreflangCount": 1,
+    "minInternalLinks": 5,
+    "schemaRules": [
+      {
+        "pattern": "/blog/[^/]+$",
+        "type": "BlogPosting",
+        "requiredFields": [
+          "headline",
+          "datePublished",
+          "dateModified",
+          "author",
+          "image",
+          "mainEntityOfPage"
+        ]
+      },
+      {
+        "pattern": "/blog/[^/]+$|/rentals/[^/]+$",
+        "type": "BreadcrumbList"
+      }
+    ]
+  },
+  "links": {
+    "internalMode": "all",
+    "externalMode": "off",
+    "externalStatusCheck": "off",
+    "requireNoopenerForBlank": true
+  },
+  "assets": {
+    "robotsPath": "/robots.txt",
+    "robotsMustContain": ["Sitemap: https://www.qrent.rent/sitemap.xml"],
+    "llmsPath": "/llms.txt"
+  },
+  "specialPages": {
+    "botSamplePaths": [
+      "/en",
+      "/zh",
+      "/zh/rentals/unsw",
+      "/en/blog/before-renting",
+      "/zh/blog/rental-suburbs-platforms"
+    ],
+    "noindexPages": [
+      {
+        "path": "/zh/search?university=UNSW&areas=eastgardens&page=1"
+      },
+      {
+        "path": "/en/search"
+      },
+      {
+        "path": "/zh/favorite"
+      },
+      {
+        "path": "/zh/search/mobile"
+      }
+    ],
+    "statusPages": [
+      {
+        "path": "/zh/qrent-seo-missing-page",
+        "expectedStatus": 404,
+        "requireNoindex": true,
+        "requireHomeLink": "/zh"
+      },
+      {
+        "path": "/zh/blog/qrent-seo-missing-article",
+        "expectedStatus": 404,
+        "requireNoindex": true,
+        "requireHomeLink": "/zh"
+      },
+      {
+        "path": "/en/blog/rental-suburbs-platforms",
+        "expectedStatus": 404,
+        "requireNoindex": true,
+        "requireHomeLink": "/en"
+      }
+    ]
+  },
+  "reporting": {
+    "jsonOutputPath": "/tmp/qrent-seo-gate-report.json"
+  }
+}
