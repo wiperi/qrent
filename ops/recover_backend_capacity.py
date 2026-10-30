@@ -9,9 +9,6 @@ import shutil
 import subprocess
 import sys
 
-MIN_DISK = 3 * 1024**3
-
-
 def command(*args):
     return subprocess.check_output(args, text=True).strip()
 
@@ -20,6 +17,21 @@ def cache_paths(home, mounts):
     paths = [home/'.npm/_cacache', home/'.local/share/pnpm/store', home/'.cache/pnpm']
     return [p for p in paths if p.is_dir() and not p.is_symlink() and p.resolve() == p
             and not any(p == m or p in m.parents or m in p.parents for m in mounts)]
+
+
+def protected_mounts():
+    result = []
+    def visit(rows):
+        for row in rows:
+            target = Path(row['target']).resolve()
+            if target != Path('/'): result.append(target)
+            visit(row.get('children', []))
+    visit(json.loads(command('findmnt', '--json', '--output', 'TARGET'))['filesystems'])
+    ids = command('docker', 'ps', '-aq', '--no-trunc').splitlines()
+    if ids:
+        for row in command('docker', 'inspect', '--format', '{{json .Mounts}}', *ids).splitlines():
+            result.extend(Path(m['Source']).resolve() for m in json.loads(row))
+    return result
 
 
 def resize_options(original):
@@ -44,18 +56,20 @@ def containers():
     return [json.loads(row) for row in command('docker', 'inspect', '--format', template, *ids).splitlines()]
 
 
-def main(action):
+def main(action, min_gib=3):
     assert action in ('plan', 'apply')
+    assert min_gib in range(3,9)
+    min_disk = min_gib * 1024**3
     os.umask(0o077)
     home = Path.home().resolve(); root = home/'qrent'
     assert (root/'.env').is_file() and (root/'docker-compose.yml').is_file()
     before = containers()
     protected = {p: hashlib.sha256(p.read_bytes()).digest() for p in (root/'.env', root/'docker-compose.yml')}
-    mounts = [Path(m['Source']).resolve() for row in before for m in row[4]]
-    caches = cache_paths(home, mounts)
+    caches = cache_paths(home, protected_mounts())
     report = {'action': action, 'started_at': datetime.now(timezone.utc).isoformat(),
               'before': resources(root), 'caches': [], 'runtime_state_deleted': False,
-              'images_or_volumes_deleted': False, 'containers_restarted': False}
+              'images_or_volumes_deleted': False, 'containers_restarted': False,
+              'required_system_free_bytes': min_disk}
     for path in caches:
         size = int(command('du', '-sx', '-B1', str(path)).split()[0])
         report['caches'].append({'path': str(path), 'bytes': size})
@@ -75,12 +89,11 @@ def main(action):
                 command('mount', '-o', resize_options(options), '/run')
                 report['runtime_limit_temporarily_raised'] = True
             for path in caches:
-                if resources(root)['system']['free_bytes'] >= MIN_DISK: break
+                if resources(root)['system']['free_bytes'] >= min_disk: break
                 # Recheck mount protection immediately before removing a named cache.
-                now_mounts = [Path(m['Source']).resolve() for row in containers() for m in row[4]]
-                assert path in cache_paths(home, now_mounts)
+                assert path in cache_paths(home, protected_mounts())
                 shutil.rmtree(path)
-            if resources(root)['system']['free_bytes'] < MIN_DISK:
+            if resources(root)['system']['free_bytes'] < min_disk:
                 output = command('docker', 'builder', 'prune', '-f', '--filter', 'until=168h')
                 report['old_build_cache_result'] = output.splitlines()[-1:] if output else []
             report['after'] = resources(root)
@@ -89,7 +102,7 @@ def main(action):
                 for p,h in protected.items())
             assert report['existing_container_identity_preserved']
             assert report['environment_and_compose_preserved']
-            assert report['after']['system']['free_bytes'] >= MIN_DISK, 'More host capacity is required; original services kept'
+            assert report['after']['system']['free_bytes'] >= min_disk, 'More host capacity is required; original services kept'
             assert report['after']['runtime']['free_bytes'] >= 16*1024**2
             assert report['after']['runtime']['free_inodes'] >= 4096
             report['status'] = 'verified'
@@ -101,4 +114,5 @@ def main(action):
             print(json.dumps(report))
 
 
-if __name__ == '__main__': main(sys.argv[1] if len(sys.argv) > 1 else 'plan')
+if __name__ == '__main__':
+    main(sys.argv[1] if len(sys.argv) > 1 else 'plan', int(sys.argv[2]) if len(sys.argv) > 2 else 3)

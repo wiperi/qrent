@@ -136,9 +136,11 @@ jobs:
           bash -n ops/deploy_backend.sh
           bash -n ops/release_backend.sh
           bash -n ops/inspect_backend_host.sh
+          bash -n ops/receive_backend_image.sh
           python3 -m unittest discover -s ops -p test_deploy_backend.py
           python3 -m unittest discover -s ops -p test_release_backend.py
           python3 -m unittest discover -s ops -p test_backend_capacity.py
+          python3 -m unittest discover -s ops -p test_receive_backend.py
           node --test ops/test_verify_backend.mjs
       - name: Build the backend release image
         run: docker build -t qrent-backend:ci -f packages/backend/Dockerfile .

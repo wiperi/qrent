@@ -9,6 +9,12 @@ on:
         default: plan
         required: true
         description: Plan first; apply only named caches and bounded tmpfs headroom
+      min_disk_gib:
+        type: choice
+        options: ['3', '4', '5', '6', '7', '8']
+        default: '3'
+        required: true
+        description: Free disk target based on the CI image size
 
 permissions:
   contents: read
@@ -32,4 +38,5 @@ jobs:
           DEPLOY_SERVER_USERNAME: ${{ secrets.DEPLOY_SERVER_USERNAME }}
           DEPLOY_SERVER_PASSWORD: ${{ secrets.DEPLOY_SERVER_PASSWORD }}
           QRENT_CAPACITY_ACTION: ${{ inputs.action }}
+          QRENT_MIN_DISK_GIB: ${{ inputs.min_disk_gib }}
         run: bash ops/release_backend.sh capacity

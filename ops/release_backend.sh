@@ -18,6 +18,19 @@ mode=${1:-release}
 if [[ "$mode" == release ]]; then
   test -s "$archive"
   test -s "$image_archive"
+  read -r image_size < "backend-image-$GITHUB_SHA.size"
+  [[ "$image_size" =~ ^[1-9][0-9]{0,11}$ ]] || exit 64
+  image_metadata=$(python3 - "$image_archive" "$image_size" <<'PY'
+import hashlib,os,sys
+h=hashlib.sha256()
+with open(sys.argv[1],'rb') as f:
+    for chunk in iter(lambda:f.read(1024*1024),b''): h.update(chunk)
+required=max(3*1024**3, os.path.getsize(sys.argv[1])+2*int(sys.argv[2])+512*1024**2)
+print(h.hexdigest(),required)
+PY
+  )
+  read -r image_sha required_bytes <<< "$image_metadata"
+  printf 'Image unpacked bytes: %s; required free disk bytes: %s\n' "$image_size" "$required_bytes"
 fi
 
 ssh_tmp=$(mktemp -d "${RUNNER_TEMP:-${TMPDIR:-/tmp}}/qrent-ssh.XXXXXXXX")
@@ -65,8 +78,9 @@ if [[ "$mode" == inspect ]]; then
 fi
 if [[ "$mode" == capacity ]]; then
   [[ "${QRENT_CAPACITY_ACTION:-plan}" == plan || "${QRENT_CAPACITY_ACTION:-plan}" == apply ]] || exit 64
+  [[ "${QRENT_MIN_DISK_GIB:-3}" =~ ^[3-8]$ ]] || exit 64
   script_root=$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)
-  ssh "${ssh_options[@]}" "$DEPLOY_SERVER_HOST" python3 - "${QRENT_CAPACITY_ACTION:-plan}" \
+  ssh "${ssh_options[@]}" "$DEPLOY_SERVER_HOST" python3 - "${QRENT_CAPACITY_ACTION:-plan}" "${QRENT_MIN_DISK_GIB:-3}" \
     < "$script_root/recover_backend_capacity.py"
   exit 0
 fi
@@ -77,7 +91,7 @@ ssh "${ssh_options[@]}" "$DEPLOY_SERVER_HOST" \
   < "$archive"
 
 printf 'Checking capacity before transferring the CI-built image.\n'
-ssh "${ssh_options[@]}" "$DEPLOY_SERVER_HOST" bash -s -- "$GITHUB_SHA" <<'REMOTE'
+ssh "${ssh_options[@]}" "$DEPLOY_SERVER_HOST" bash -s -- "$GITHUB_SHA" "$required_bytes" <<'REMOTE'
 set -eu
 umask 077
 qrent_root="$HOME/qrent"
@@ -87,26 +101,10 @@ test -s "$qrent_root/.env"
 test -s "$qrent_root/docker-compose.yml"
 mkdir -p "$qrent_source"
 tar -xzf "$qrent_root/.deploy/uploads/backend-$qrent_sha.tgz" -C "$qrent_source"
-bash "$qrent_source/ops/inspect_backend_host.sh" preflight
+QRENT_REQUIRED_DISK_BYTES="$2" bash "$qrent_source/ops/inspect_backend_host.sh" preflight
 REMOTE
 
-image_sha=$(python3 -c 'import hashlib,sys;h=hashlib.sha256();f=open(sys.argv[1],"rb");[(h.update(c)) for c in iter(lambda:f.read(1024*1024),b"")];print(h.hexdigest())' "$image_archive")
+printf 'Receiving and loading the CI image with cleanup on every remote exit.\n'
 ssh "${ssh_options[@]}" "$DEPLOY_SERVER_HOST" \
-  "umask 077; set -eu; cat > \"\$HOME/qrent/.deploy/uploads/$image_archive.part\"; mv \"\$HOME/qrent/.deploy/uploads/$image_archive.part\" \"\$HOME/qrent/.deploy/uploads/$image_archive\"" \
+  "bash \"\$HOME/qrent/.deploy/releases/$GITHUB_SHA/ops/receive_backend_image.sh\" $GITHUB_SHA $image_sha" \
   < "$image_archive"
-
-printf 'Loading the CI-built image and replacing only the backend.\n'
-ssh "${ssh_options[@]}" "$DEPLOY_SERVER_HOST" bash -s -- "$GITHUB_SHA" "$image_sha" <<'REMOTE'
-set -eu
-umask 077
-qrent_root="$HOME/qrent"
-qrent_sha="$1"
-qrent_source="$qrent_root/.deploy/releases/$qrent_sha"
-qrent_image="$qrent_root/.deploy/uploads/backend-image-$qrent_sha.tar.gz"
-printf '%s  %s\n' "$2" "$qrent_image" | sha256sum -c -
-QRENT_DEPLOY_ROOT="$qrent_root" QRENT_RELEASE_SHA="$qrent_sha" \
-  QRENT_BACKEND_IMAGE_ARCHIVE="$qrent_image" \
-  bash "$qrent_source/ops/deploy_backend.sh"
-cat "$qrent_root/.deploy/receipts/$qrent_sha.json"
-rm -- "$qrent_image"
-REMOTE

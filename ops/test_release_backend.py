@@ -28,7 +28,7 @@ calls=len(log.read_text().splitlines()) if log.exists() else 0
 with log.open('a') as f:f.write(json.dumps({'args':args,'stdin':sys.stdin.read()})+'\n')
 if calls==0 and os.environ.get('TEST_REJECT_HOST'):
  print('Host key verification failed.',file=sys.stderr);sys.exit(255)
-if calls==3 and os.environ.get('TEST_REJECT_DEPLOY'):sys.exit(37)
+if calls==2 and os.environ.get('TEST_REJECT_DEPLOY'):sys.exit(37)
 if calls==1 and os.environ.get('TEST_REJECT_CAPACITY'):sys.exit(70)
 '''
 
@@ -42,6 +42,7 @@ class ReleaseTransportTests(unittest.TestCase):
         ssh.write_text('#!'+sys.executable+'\n'+FAKE_SSH); ssh.chmod(0o700)
         (self.root/f'backend-{SHA}.tgz').write_text('fake-source-archive')
         (self.root/f'backend-image-{SHA}.tar.gz').write_text('fake-ci-built-image')
+        (self.root/f'backend-image-{SHA}.size').write_text('104857600\n')
         self.env = dict(os.environ, PATH=str(self.bin)+os.pathsep+os.environ['PATH'],
                         TEST_ROOT=str(self.root), RUNNER_TEMP=str(self.root), GITHUB_SHA=SHA,
                         DEPLOY_SERVER_HOST='deployment.invalid', DEPLOY_SERVER_USERNAME='qrent',
@@ -62,13 +63,12 @@ class ReleaseTransportTests(unittest.TestCase):
     def test_upload_and_deployment_use_the_pinned_algorithm_and_private_askpass(self):
         result = self.run_release()
         self.assertEqual(result.returncode, 0, result.stderr)
-        self.assertEqual(len(self.calls), 4)
+        self.assertEqual(len(self.calls), 3)
         self.assertEqual(self.calls[0]['stdin'], 'fake-source-archive')
         self.assertIn('preflight', self.calls[1]['stdin'])
         self.assertEqual(self.calls[2]['stdin'], 'fake-ci-built-image')
-        self.assertIn('ops/deploy_backend.sh', self.calls[3]['stdin'])
-        self.assertIn('sha256sum -c', self.calls[3]['stdin'])
-        self.assertIn(SHA, self.calls[3]['args'])
+        self.assertIn('receive_backend_image.sh', ' '.join(self.calls[2]['args']))
+        self.assertIn(SHA, ' '.join(self.calls[2]['args']))
 
     def test_host_verification_failure_prevents_deployment(self):
         self.env['TEST_REJECT_HOST'] = '1'
@@ -80,7 +80,7 @@ class ReleaseTransportTests(unittest.TestCase):
         self.env['TEST_REJECT_DEPLOY'] = '1'
         result = self.run_release()
         self.assertEqual(result.returncode, 37)
-        self.assertEqual(len(self.calls), 4)
+        self.assertEqual(len(self.calls), 3)
 
     def test_capacity_failure_prevents_image_transfer_and_replacement(self):
         self.env['TEST_REJECT_CAPACITY'] = '1'
@@ -114,7 +114,7 @@ class ReleaseTransportTests(unittest.TestCase):
         result = self.run_release('capacity')
         self.assertEqual(result.returncode, 0, result.stderr)
         self.assertEqual(len(self.calls), 1)
-        self.assertEqual(self.calls[0]['args'][-3:], ['python3', '-', 'plan'])
+        self.assertEqual(self.calls[0]['args'][-4:], ['python3', '-', 'plan', '3'])
 
     def test_invalid_capacity_action_is_rejected_before_connecting(self):
         self.env['QRENT_CAPACITY_ACTION'] = 'untrusted-command'
