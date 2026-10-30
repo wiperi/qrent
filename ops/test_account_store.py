@@ -100,5 +100,11 @@ class StoreRecoveryTests(unittest.TestCase):
             with self.assertRaisesRegex(RuntimeError,'changed while backing up'): store.main('apply',self.root)
             repair.assert_not_called()
 
+    def test_recovery_during_backup_blocks_a_second_process_action(self):
+        recovered={**self.state,'pid':456,'process_state':'S','health':'healthy'}
+        with patch.object(store,'container_rows',return_value=self.before),patch.object(store,'redis_state',side_effect=[self.state,self.state,recovered]),patch.object(store,'repair_process') as repair:
+            with self.assertRaisesRegex(RuntimeError,'state changed during backup'): store.main('apply',self.root)
+            repair.assert_not_called()
+
 
 if __name__=='__main__': unittest.main()

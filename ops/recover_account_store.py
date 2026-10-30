@@ -113,6 +113,8 @@ def main(action='plan',root=None,proc_root=Path('/proc')):
             digest=hashlib.sha256()
             with backup.open('rb') as stream:
                 while chunk:=stream.read(1024**2): digest.update(chunk)
+            if redis_state(proc_root)!=state:
+                raise RuntimeError('Account-store state changed during backup; no repair attempted')
             report.update(backup_path=str(backup),backup_sha256=digest.hexdigest(),
                           status='repair_attempt_started')
             receipt.write_text(json.dumps(report,indent=2))
