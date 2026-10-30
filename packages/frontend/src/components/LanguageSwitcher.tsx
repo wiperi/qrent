@@ -17,8 +17,10 @@ export default function LanguageSwitcher() {
   const switchLanguage = (newLocale: LOCALE) => {
     // Remove the current locale from the pathname
     const pathWithoutLocale = pathname.replace(`/${locale}`, '');
+    const destination = pathWithoutLocale.startsWith('/blog/') ? '/blog' : pathWithoutLocale;
+    const query = pathWithoutLocale.startsWith('/blog/') ? '' : window.location.search;
     // Navigate to the new locale
-    router.push(`/${newLocale}${pathWithoutLocale}`);
+    router.push(`/${newLocale}${destination}${query}`);
     setIsOpen(false);
   };
 
@@ -55,15 +57,17 @@ export default function LanguageSwitcher() {
         <div className="absolute right-0 mt-2 w-32 bg-white rounded-md shadow-xl border border-gray-200 py-1 z-[9999]">
           <button
             onClick={() => switchLanguage(LOCALE.EN)}
-            className={`flex items-center w-full px-4 py-2 text-sm hover:bg-gray-50 transition-colors ${locale === LOCALE.EN ? 'text-blue-600 bg-blue-50' : 'text-gray-700'
-              }`}
+            className={`flex items-center w-full px-4 py-2 text-sm hover:bg-gray-50 transition-colors ${
+              locale === LOCALE.EN ? 'text-blue-600 bg-blue-50' : 'text-gray-700'
+            }`}
           >
             {t('english')}
           </button>
           <button
             onClick={() => switchLanguage(LOCALE.ZH)}
-            className={`flex items-center w-full px-4 py-2 text-sm hover:bg-gray-50 transition-colors ${locale === LOCALE.ZH ? 'text-blue-600 bg-blue-50' : 'text-gray-700'
-              }`}
+            className={`flex items-center w-full px-4 py-2 text-sm hover:bg-gray-50 transition-colors ${
+              locale === LOCALE.ZH ? 'text-blue-600 bg-blue-50' : 'text-gray-700'
+            }`}
           >
             {t('chinese')}
           </button>

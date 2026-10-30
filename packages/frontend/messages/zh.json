@@ -233,12 +233,13 @@
     }
   },
   "home": {
-    "title": "Qrent - 澳洲留学生租房平台",
-    "description": "轻松发现优质住房。您的梦想之家只需一次搜索即可找到。",
+    "title": "悉尼留学生租房，按学校和通勤筛选",
+    "description": "免费对比 Domain 和 Real Estate 租金，查看 UNSW、悉尼大学和 UTS 周边房源、区域与公共交通通勤。",
     "ogTitle": "Qrent - 澳洲留学生租房平台",
     "ogDescription": "轻松发现优质住房。您的梦想之家只需一次搜索即可找到。",
     "twitterTitle": "Qrent - 澳洲留学生租房平台",
-    "twitterDescription": "轻松发现优质住房。您的梦想之家只需一次搜索即可找到。"
+    "twitterDescription": "轻松发现优质住房。您的梦想之家只需一次搜索即可找到。",
+    "bannerAlt": "QRent 悉尼租房搜索"
   },
   "search": {
     "title": "房源搜索 - Qrent",
@@ -361,8 +362,7 @@
     "ariaLabel": "租房社群"
   },
   "NotificationBar": {
-    "message1": "🎉 现已支持基于学校位置和通勤时间找房",
-    "message2": "💝 加入微信群获得专属带找房服务，多对1服务，全流程托管，您提需求，我们帮您安排一切",
-    "message3": "⭐ 根据你的学校和需求，动态显示评分"
+    "label": "更新通知",
+    "message": "房源已恢复更新，现支持 Real Estate 和 Domain 两个平台的租金信息。"
   }
 }

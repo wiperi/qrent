@@ -10,6 +10,9 @@ export default createMiddleware({
 
   // Always use locale prefix
   localePrefix: 'always',
+  localeDetection: false,
+  // Page metadata only advertises translations that actually exist.
+  alternateLinks: false,
 });
 
 export const config = {

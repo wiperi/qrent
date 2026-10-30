@@ -1,3 +1,4 @@
+import Link from 'next/link';
 import BlogPostCard from '@/components/BlogPostCard';
 import TodoProgressBar from '@/components/TodoProgressBar';
 import FilteredBlogList from '@/components/FilteredBlogList';
@@ -5,7 +6,8 @@ import CategoryFilter from '@/components/CategoryFilter';
 import { CategoryProvider } from '@/components/CategoryContext';
 import { getNotionBlogPosts } from '@/lib/notion-blog';
 import { LOCALE } from '@qrent/shared/enum';
-import { Metadata } from 'next';
+import { pageMetadata } from '@/lib/seo';
+import RentalLinks from '@/components/RentalLinks';
 
 const BLOG_IMAGE_URLS = ['/banner.jpg', '/qrent.jpg'];
 
@@ -15,10 +17,19 @@ function getImageForSlug(slug: string): string {
   return BLOG_IMAGE_URLS[index];
 }
 
-export const metadata: Metadata = {
-  title: 'Blog - QRent',
-  description: 'Latest rental insights and tips powered by Notion',
-};
+export async function generateMetadata({ params }: { params: Promise<{ locale: string }> }) {
+  const { locale } = await params;
+  return pageMetadata(
+    locale,
+    '/blog',
+    locale === 'zh'
+      ? '澳洲留学生租房指南与经验 | QRent'
+      : 'Australian Student Rental Guides & Tips | QRent',
+    locale === 'zh'
+      ? '阅读澳洲租房准备、选区、申请、看房与入住的实用经验，并按大学浏览悉尼房源。'
+      : 'Read practical guides to preparing, choosing an area, applying, inspecting and moving into an Australian rental. Explore Sydney homes by university.'
+  );
+}
 
 export const revalidate = 600; // Cache for 10 minutes
 
@@ -33,6 +44,7 @@ export default async function BlogPage({ params }: { params: Promise<{ locale: s
   return (
     <div className="min-h-screen bg-gradient-to-b from-white to-slate-50">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
+        <RentalLinks locale={locale} compact />
         <CategoryProvider>
           <div className="">
             <h1 className="text-3xl sm:text-4xl font-bold text-slate-900 mb-4">
@@ -55,6 +67,28 @@ export default async function BlogPage({ params }: { params: Promise<{ locale: s
                 <CategoryFilter categories={allKeywords} locale={locale} />
 
                 <FilteredBlogList posts={posts} locale={locale} />
+                {posts.length > 0 && (
+                  <nav
+                    aria-label={locale === 'zh' ? '全部租房指南目录' : 'All rental guides'}
+                    className="mt-10 border-t border-slate-200 pt-6"
+                  >
+                    <h2 className="text-xl font-bold mb-4">
+                      {locale === 'zh' ? '全部指南' : 'All guides'}
+                    </h2>
+                    <ul className="space-y-2">
+                      {posts.map(post => (
+                        <li key={post.id}>
+                          <Link
+                            className="text-blue-700 underline"
+                            href={`/${locale}/blog/${encodeURIComponent(post.slug)}`}
+                          >
+                            {locale === 'zh' ? post.title : post.title_en}
+                          </Link>
+                        </li>
+                      ))}
+                    </ul>
+                  </nav>
+                )}
               </div>
             </div>
           </div>

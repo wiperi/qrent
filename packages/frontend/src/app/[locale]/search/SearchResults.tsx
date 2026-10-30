@@ -11,32 +11,34 @@ import { useMemo, useEffect } from 'react';
 import { HiSearch } from 'react-icons/hi';
 
 type SearchParams = {
-  q?: string
-  page?: string
-  university?: string
-  propertyType?: string
-  priceMin?: string
-  priceMax?: string
-  bedroomsMin?: string
-  bedroomsMax?: string
-  bathroomsMin?: string
-  bathroomsMax?: string
-  commuteMin?: string
-  commuteMax?: string
-  rating?: string
-  moveInDate?: string
-  areas?: string
-}
+  q?: string;
+  page?: string;
+  university?: string;
+  propertyType?: string;
+  priceMin?: string;
+  priceMax?: string;
+  bedroomsMin?: string;
+  bedroomsMax?: string;
+  bathroomsMin?: string;
+  bathroomsMax?: string;
+  commuteMin?: string;
+  commuteMax?: string;
+  rating?: string;
+  moveInDate?: string;
+  areas?: string;
+};
 
 export default function SearchResults({ searchParams }: { searchParams: SearchParams }) {
-  const page = Number(searchParams.page ?? '1') || 1
+  const page = Number(searchParams.page ?? '1') || 1;
   const { user, isLoading } = useAuth();
   const queryClient = useQueryClient();
 
   // Build search parameters from URL - aligned with backend preferenceSchema
   const searchFilters = useMemo(() => {
-    const university = searchParams.university || 'UNSW'
-    const regions = searchParams.areas ? searchParams.areas.split(',').filter(Boolean).join(' ') : undefined
+    const university = searchParams.university || 'UNSW';
+    const regions = searchParams.areas
+      ? searchParams.areas.split(',').filter(Boolean).join(' ')
+      : undefined;
 
     return {
       targetSchool: university,
@@ -53,29 +55,32 @@ export default function SearchResults({ searchParams }: { searchParams: SearchPa
       minRating: searchParams.rating ? Number(searchParams.rating) : undefined,
       propertyType: searchParams.propertyType ? Number(searchParams.propertyType) : undefined,
       regions,
-      moveInDate: searchParams.moveInDate ? (() => {
-        const dateStr = searchParams.moveInDate;
-        // Ensure the date string is in YYYY-MM-DD format
-        if (/^\d{4}-\d{2}-\d{2}$/.test(dateStr)) {
-          // Send as ISO string - backend will handle the conversion
-          return dateStr + 'T00:00:00.000Z' as Date | string;
-        }
-        return undefined;
-      })() : undefined,
-      orderBy: [{
-        averageScore: 'desc' as const,
-      }]
-    }
-  }, [searchParams, page])
+      moveInDate: searchParams.moveInDate
+        ? (() => {
+            const dateStr = searchParams.moveInDate;
+            // Ensure the date string is in YYYY-MM-DD format
+            if (/^\d{4}-\d{2}-\d{2}$/.test(dateStr)) {
+              // Send as ISO string - backend will handle the conversion
+              return (dateStr + 'T00:00:00.000Z') as Date | string;
+            }
+            return undefined;
+          })()
+        : undefined,
+      orderBy: [
+        {
+          averageScore: 'desc' as const,
+        },
+      ],
+    };
+  }, [searchParams, page]);
 
-  const trpc = useTRPCClient()
+  const trpc = useTRPCClient();
 
   const { data, isPending, error } = useQuery({
     queryKey: ['properties.search', searchFilters, user?.id],
     queryFn: () => trpc.properties.search.query(searchFilters),
     enabled: !isLoading, // 只在认证状态确定后才启用查询
-   
-  })
+  });
 
   // 当用户登录状态变化时，重新获取房产数据
   useEffect(() => {
@@ -97,16 +102,16 @@ export default function SearchResults({ searchParams }: { searchParams: SearchPa
   //   subscriptions?.map((sub: { id: number }) => sub.id) || []
   // )
 
-  const properties = data?.properties || []
+  const properties = data?.properties || [];
   const searchSummary = {
     totalCount: data?.totalCount || 0,
     filteredCount: data?.filteredCount || 0,
     averagePrice: data?.averagePrice || 0,
     averageCommuteTime: data?.averageCommuteTime || 0,
-    topRegions: data?.topRegions || []
-  }
+    topRegions: data?.topRegions || [],
+  };
 
-  const totalPages = Math.max(1, Math.ceil(searchSummary.filteredCount / 12))
+  const totalPages = Math.max(1, Math.ceil(searchSummary.filteredCount / 12));
 
   return (
     <section className="pb-12 md:pb-16">
@@ -114,15 +119,14 @@ export default function SearchResults({ searchParams }: { searchParams: SearchPa
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 lg:gap-8">
           {/* Left: stats/info */}
           <aside className="lg:col-span-3">
-            <StatsPanel
-              searchSummary={searchSummary}
-              isPending={isPending}
-            />
+            <StatsPanel searchSummary={searchSummary} isPending={isPending} />
           </aside>
 
           {/* Right: pagination + results */}
           <div className="lg:col-span-9">
-            <h2 id="results-heading" tabIndex={-1} className="sr-only">Search results</h2>
+            <h2 id="results-heading" tabIndex={-1} className="sr-only">
+              Search results
+            </h2>
             <div className="flex items-center justify-between">
               <Pagination current={page} totalPages={totalPages} />
             </div>
@@ -153,6 +157,7 @@ export default function SearchResults({ searchParams }: { searchParams: SearchPa
                     subscribed={property.subscribed}
                     averageScore={property.averageScore}
                     keywords={property.keywords}
+                    description={property.description}
                     availableDate={property.availableDate}
                     publishedAt={property.publishedAt}
                     propertyId={property.id as number}
@@ -168,21 +173,26 @@ export default function SearchResults({ searchParams }: { searchParams: SearchPa
         </div>
       </div>
     </section>
-  )
+  );
 }
 
 function StatsPanel({
   searchSummary,
-  isPending
+  isPending,
 }: {
   searchSummary: {
-    totalCount: number
-    filteredCount: number
-    averagePrice: number
-    averageCommuteTime: number
-    topRegions: { region: string | null; propertyCount: number; averagePrice: number; averageCommuteTime: number }[]
-  }
-  isPending: boolean
+    totalCount: number;
+    filteredCount: number;
+    averagePrice: number;
+    averageCommuteTime: number;
+    topRegions: {
+      region: string | null;
+      propertyCount: number;
+      averagePrice: number;
+      averageCommuteTime: number;
+    }[];
+  };
+  isPending: boolean;
 }) {
   const t = useTranslations('SearchResults');
   return (
@@ -204,7 +214,8 @@ function StatsPanel({
           <div className="mt-1 h-6 bg-slate-200 rounded animate-pulse" />
         ) : (
           <div className="mt-1 text-lg font-semibold text-slate-900">
-            ${Math.round(searchSummary.averagePrice)}{t('perWeek')}
+            ${Math.round(searchSummary.averagePrice)}
+            {t('perWeek')}
           </div>
         )}
       </div>
@@ -258,58 +269,64 @@ function StatsPanel({
         )}
       </div>
     </div>
-  )
+  );
 }
 
 function Pagination({ current, totalPages }: { current: number; totalPages: number }) {
-  const searchParams = useSearchParams()
-  const locale = useLocale()
-  const t = useTranslations('SearchResults')
-  const prevPage = Math.max(1, current - 1)
-  const nextPage = Math.min(totalPages, current + 1)
+  const searchParams = useSearchParams();
+  const locale = useLocale();
+  const t = useTranslations('SearchResults');
+  const prevPage = Math.max(1, current - 1);
+  const nextPage = Math.min(totalPages, current + 1);
 
   const makeHref = (pageNum: number) => {
-    const params = new URLSearchParams(searchParams.toString())
-    params.set('page', String(pageNum))
+    const params = new URLSearchParams(searchParams.toString());
+    params.set('page', String(pageNum));
     // Remove modal state parameter to prevent modal from opening on pagination
-    params.delete('filters')
-    return `/${locale}/search?${params.toString()}`
-  }
+    params.delete('filters');
+    return `/${locale}/search?${params.toString()}`;
+  };
 
   return (
     <nav className="flex items-center gap-2" aria-label="Pagination">
       <Link
         href={makeHref(prevPage)}
         aria-disabled={current === 1}
-        className={`px-3 py-1.5 rounded-md border text-sm ${current === 1
-          ? 'cursor-not-allowed border-slate-200 text-slate-300'
-          : 'border-slate-200 text-slate-700 hover:border-blue-300 hover:text-blue-600'
-          }`}
+        className={`px-3 py-1.5 rounded-md border text-sm ${
+          current === 1
+            ? 'cursor-not-allowed border-slate-200 text-slate-300'
+            : 'border-slate-200 text-slate-700 hover:border-blue-300 hover:text-blue-600'
+        }`}
       >
         {t('prev')}
       </Link>
       <span className="text-sm text-slate-600">
-        {t('page')} <span className="font-medium text-slate-900">{current}</span> {t('of')} {totalPages}
+        {t('page')} <span className="font-medium text-slate-900">{current}</span> {t('of')}{' '}
+        {totalPages}
       </span>
       <Link
         href={makeHref(nextPage)}
         aria-disabled={current === totalPages}
-        className={`px-3 py-1.5 rounded-md border text-sm ${current === totalPages
-          ? 'cursor-not-allowed border-slate-200 text-slate-300'
-          : 'border-slate-200 text-slate-700 hover:border-blue-300 hover:text-blue-600'
-          }`}
+        className={`px-3 py-1.5 rounded-md border text-sm ${
+          current === totalPages
+            ? 'cursor-not-allowed border-slate-200 text-slate-300'
+            : 'border-slate-200 text-slate-700 hover:border-blue-300 hover:text-blue-600'
+        }`}
       >
         {t('next')}
       </Link>
     </nav>
-  )
+  );
 }
 
 function ResultsSkeleton() {
   return (
     <div className="mt-6 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
       {Array.from({ length: 6 }).map((_, i) => (
-        <div key={i} className="animate-pulse overflow-hidden rounded-2xl border border-slate-200 bg-white">
+        <div
+          key={i}
+          className="animate-pulse overflow-hidden rounded-2xl border border-slate-200 bg-white"
+        >
           <div className="h-48 bg-slate-200" />
           <div className="p-4 space-y-3">
             <div className="h-4 bg-slate-200 rounded w-2/3" />
@@ -321,12 +338,12 @@ function ResultsSkeleton() {
         </div>
       ))}
     </div>
-  )
+  );
 }
 
 function EmptyState({ query }: { query: string }) {
-  const t = useTranslations('SearchResults')
-  const locale = useLocale()
+  const t = useTranslations('SearchResults');
+  const locale = useLocale();
 
   return (
     <div className="mt-10 rounded-xl border border-dashed border-slate-300 bg-white p-10 text-center">
@@ -335,11 +352,7 @@ function EmptyState({ query }: { query: string }) {
       </div>
       <h3 className="mt-4 text-lg font-semibold text-slate-900">{t('noResults')}</h3>
       <p className="mt-2 text-sm text-slate-600">
-        {query ? (
-          <>{t('noResultsForQuery', { query })}</>
-        ) : (
-          <>{t('adjustFilters')}</>
-        )}
+        {query ? <>{t('noResultsForQuery', { query })}</> : <>{t('adjustFilters')}</>}
       </p>
       <div className="mt-6">
         <Link
@@ -350,5 +363,5 @@ function EmptyState({ query }: { query: string }) {
         </Link>
       </div>
     </div>
-  )
+  );
 }

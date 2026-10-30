@@ -13,7 +13,6 @@ interface FilteredBlogListProps {
 
 export default function FilteredBlogList({ posts, locale }: FilteredBlogListProps) {
   const { selectedCategories } = useCategory();
-  const [displayPosts, setDisplayPosts] = useState<NotionBlogPost[]>([]);
   const [currentPage, setCurrentPage] = useState(1);
   const POSTS_PER_PAGE = 20;
 
@@ -25,23 +24,25 @@ export default function FilteredBlogList({ posts, locale }: FilteredBlogListProp
 
     return posts.filter(post => {
       // 检查文章是否包含所有选择的分类（多选是AND关系）
-      return selectedCategories.every(category => 
-        post.keywords.some((keyword:string) => keyword.toLowerCase() === category.toLowerCase())
+      return selectedCategories.every(category =>
+        post.keywords.some((keyword: string) => keyword.toLowerCase() === category.toLowerCase())
       );
     });
   }, [posts, selectedCategories]);
 
-  // 分页显示
-  useEffect(() => {
-    const startIndex = 0;
-    const endIndex = currentPage * POSTS_PER_PAGE;
-    setDisplayPosts(filteredPosts.slice(startIndex, endIndex));
-  }, [filteredPosts, currentPage]);
+  // Derive the first page during SSR so crawlers and no-JS users see articles.
+  const displayPosts = useMemo(
+    () => filteredPosts.slice(0, currentPage * POSTS_PER_PAGE),
+    [filteredPosts, currentPage]
+  );
 
   // 滚动加载更多
   useEffect(() => {
     const handleScroll = () => {
-      if (window.innerHeight + document.documentElement.scrollTop >= document.documentElement.offsetHeight - 100) {
+      if (
+        window.innerHeight + document.documentElement.scrollTop >=
+        document.documentElement.offsetHeight - 100
+      ) {
         if (displayPosts.length < filteredPosts.length) {
           setCurrentPage(prev => prev + 1);
         }
@@ -78,8 +79,8 @@ export default function FilteredBlogList({ posts, locale }: FilteredBlogListProp
                 ? '没有找到符合所选分类的文章，请尝试其他分类。'
                 : 'No posts found matching the selected categories. Try different categories.'
               : locale === LOCALE.ZH
-              ? '这可能是我们的问题，请联系我们的开发人员。'
-              : 'This may be our problem, please contact our development team.'}
+                ? '这可能是我们的问题，请联系我们的开发人员。'
+                : 'This may be our problem, please contact our development team.'}
           </p>
         </div>
       </div>
@@ -92,7 +93,7 @@ export default function FilteredBlogList({ posts, locale }: FilteredBlogListProp
         {displayPosts.map(post => (
           <BlogPostCard
             key={post.id}
-            title={post.title}
+            title={locale === LOCALE.ZH ? post.title : post.title_en}
             author={locale === LOCALE.ZH ? 'QRent 团队' : 'QRent Team'}
             date={new Date(post.published_at).toLocaleDateString(
               locale === LOCALE.ZH ? 'zh-CN' : 'en-US',

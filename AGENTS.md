@@ -8,3 +8,7 @@
 - Never commit `.env`, credentials, raw databases or private deployment backups. A green PR is not proof of deployment: verify the production CD result, public API and rendered page.
 
 The backend image override and private receipts live under the existing server project's `.deploy/` directory. Subsequent CI releases use the same Compose project and retain the previous image for rollback; do not replace this with a standalone Compose project pointed at fresh volumes.
+
+Frontend changes also go through the original GitHub repository. Verify the original Vercel integration's production deployment and served pages separately from the backend CD. Frontend-only CI/test changes must not redeploy the backend unnecessarily.
+
+SEO regressions live in `packages/frontend/test/seo/`; they are isolated from the older Vitest setup that uses a database. `seo-gate.config.json` configures the owner's `fisher-byte/site-audit-zyppy` toolkit. Audit canonical URLs on `https://www.qrent.rent`, actual published-language articles, and the link graph. Keep fixed school discovery paths separate from noindex filter/search URLs. Dynamic blog 404 initial HTML has a known upstream Next.js limitation (issue #100596); verify HTTP 404/noindex and real browser recovery separately, and do not claim a no-JS article-error page passed.

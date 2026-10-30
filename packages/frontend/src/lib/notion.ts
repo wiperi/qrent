@@ -1,3 +1,4 @@
+import { collectNotionPages } from './notion-pagination';
 import { Client } from '@notionhq/client';
 import { z } from 'zod';
 
@@ -500,45 +501,54 @@ export class TypeSafeNotionClient {
    */
   private async queryDatabase(filter?: object, sorts?: object[]): Promise<NotionQueryResponse> {
     try {
-      const response = await fetch(`https://api.notion.com/v1/databases/${this.databaseId}/query`, {
-        method: 'POST',
-        headers: {
-          Authorization: `Bearer ${process.env.NOTION_TOKEN}`,
-          'Content-Type': 'application/json',
-          'Notion-Version': '2022-06-28',
-        },
-        body: JSON.stringify({
-          filter,
-          sorts,
-        }),
-      });
+      const results = await collectNotionPages(async startCursor => {
+        const response = await fetch(
+          `https://api.notion.com/v1/databases/${this.databaseId}/query`,
+          {
+            method: 'POST',
+            signal: AbortSignal.timeout(15000),
+            headers: {
+              Authorization: `Bearer ${process.env.NOTION_TOKEN}`,
+              'Content-Type': 'application/json',
+              'Notion-Version': '2022-06-28',
+            },
+            body: JSON.stringify({
+              filter,
+              sorts,
+              page_size: 100,
+              start_cursor: startCursor,
+            }),
+          }
+        );
 
-      if (!response.ok) {
-        const errorText = await response.text();
-        let errorDetails;
-        try {
-          errorDetails = JSON.parse(errorText);
-        } catch {
-          errorDetails = { message: errorText };
+        if (!response.ok) {
+          const errorText = await response.text();
+          let errorDetails;
+          try {
+            errorDetails = JSON.parse(errorText);
+          } catch {
+            errorDetails = { message: errorText };
+          }
+
+          throw new NotionApiError(
+            `Notion API error: ${response.status} ${response.statusText}. Details: ${errorText}`,
+            response.status,
+            errorDetails.code,
+            errorDetails.request_id
+          );
         }
 
-        throw new NotionApiError(
-          `Notion API error: ${response.status} ${response.statusText}. Details: ${errorText}`,
-          response.status,
-          errorDetails.code,
-          errorDetails.request_id
-        );
-      }
+        const data = await response.json();
 
-      const data = await response.json();
+        // 验证 API 响应格式
+        const result = NotionQueryResponseSchema.safeParse(data);
+        if (!result.success) {
+          throw new NotionValidationError('Notion API 返回的数据格式不正确', result.error.issues);
+        }
 
-      // 验证 API 响应格式
-      const result = NotionQueryResponseSchema.safeParse(data);
-      if (!result.success) {
-        throw new NotionValidationError('Notion API 返回的数据格式不正确', result.error.issues);
-      }
-
-      return result.data;
+        return result.data;
+      });
+      return { object: 'list', results, has_more: false, next_cursor: null };
     } catch (error) {
       if (error instanceof NotionApiError || error instanceof NotionValidationError) {
         throw error;
@@ -684,12 +694,23 @@ export class TypeSafeNotionClient {
    */
   async getBlogPostContent(pageId: string): Promise<NotionBlock[]> {
     try {
-      const response = await this.client.blocks.children.list({
-        block_id: pageId,
-        page_size: 100,
-      });
-
-      return response.results as NotionBlock[];
+      const blocks = await collectNotionPages(startCursor =>
+        this.client.blocks.children.list({
+          block_id: pageId,
+          page_size: 100,
+          start_cursor: startCursor,
+        })
+      );
+      const result: NotionBlock[] = [];
+      for (const block of blocks) {
+        const entry = block as NotionBlock;
+        result.push(
+          entry.has_children
+            ? { ...entry, children: await this.getBlogPostContent(entry.id) }
+            : entry
+        );
+      }
+      return result;
     } catch (error) {
       throw new NotionApiError(
         `获取页面内容失败 (${pageId}): ${error instanceof Error ? error.message : String(error)}`

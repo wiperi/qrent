@@ -19,6 +19,7 @@ jobs:
       frontend: ${{ steps.changes.outputs.frontend }}
       shared: ${{ steps.changes.outputs.shared }}
       workflows: ${{ steps.changes.outputs.workflows }}
+      backend_cd: ${{ steps.changes.outputs.backend_cd }}
     steps:
       - uses: actions/checkout@v4
       - uses: dorny/paths-filter@v3
@@ -36,10 +37,13 @@ jobs:
             frontend:
               - 'packages/frontend/**'
               - 'packages/shared/**'
+              - 'seo-gate.config.json'
             shared:
               - 'packages/shared/**'
             workflows:
               - '.github/workflows/**'
+            backend_cd:
+              - '.github/workflows/cd.yml'
 
   # Lint and format check
   lint:
@@ -99,6 +103,19 @@ jobs:
       - name: Build frontend
         run: pnpm --filter frontend build
 
+      - name: Verify initial HTML and real 404 responses
+        env:
+          QRENT_SEO_BASE_URL: http://127.0.0.1:3327
+        run: |
+          pnpm --filter frontend exec next start --hostname 127.0.0.1 --port 3327 > /tmp/qrent-seo-server.log 2>&1 &
+          server_pid=$!
+          trap 'kill "$server_pid" 2>/dev/null || true' EXIT
+          for attempt in {1..40}; do
+            if curl --silent --fail http://127.0.0.1:3327/en > /dev/null; then break; fi
+            sleep 1
+          done
+          node --test packages/frontend/test/seo/http-acceptance.mjs
+
       - name: Cache build artifacts
         uses: actions/cache@v4
         with:
@@ -151,7 +168,7 @@ jobs:
           qrent-backend:ci
           -e "require(require.resolve('@prisma/client', {paths:['/app/packages/shared']}))"
 
-  # Test frontend (stub - tests not implemented yet) 
+  # Isolated SEO and SSR regressions; no database, model or transit credentials.
   test-frontend:
     runs-on: ubuntu-latest
     needs: [changes, lint]
@@ -161,13 +178,18 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Frontend tests placeholder
-        run: |
-          echo "🚧 Frontend tests not implemented yet"
-          echo "TODO: Add Vitest tests for frontend package"
-          echo "Expected test commands:"
-          echo "  - pnpm --filter frontend test:unit"
-          echo "  - pnpm --filter frontend test:integration"
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 10.19.0
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - name: Metadata, discovery and no-JS guide links
+        env:
+          TSX_TSCONFIG_PATH: packages/frontend/tsconfig.json
+        run: node --import tsx --test packages/frontend/test/seo/*.test.ts packages/frontend/test/seo/*.test.tsx
 
   # Type checking
   typecheck:
@@ -225,6 +247,6 @@ jobs:
       !cancelled() && needs.ci-success.result == 'success' && needs.changes.result == 'success' &&
       github.event_name == 'push' && github.repository == 'wiperi/qrent' &&
       (github.ref == 'refs/heads/main' || github.ref == 'refs/heads/staging') &&
-      (needs.changes.outputs.backend == 'true' || needs.changes.outputs.shared == 'true' || needs.changes.outputs.workflows == 'true')
+      (needs.changes.outputs.backend == 'true' || needs.changes.outputs.shared == 'true' || needs.changes.outputs.backend_cd == 'true')
     uses: ./.github/workflows/cd.yml
     secrets: inherit

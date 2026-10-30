@@ -5,8 +5,8 @@ export default function robots(): MetadataRoute.Robots {
     rules: {
       userAgent: '*',
       allow: '/',
-      disallow: ['/api/', '/app-mobile/', '/_next/', '/_vercel/', '/favicon.ico'],
+      disallow: ['/api/', '/_vercel/'],
     },
-    sitemap: 'https://qrent.rent/sitemap.xml',
+    sitemap: 'https://www.qrent.rent/sitemap.xml',
   };
 }
