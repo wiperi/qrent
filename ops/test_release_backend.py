@@ -146,5 +146,17 @@ class ReleaseTransportTests(unittest.TestCase):
         self.assertEqual(result.returncode, 64)
         self.assertEqual(self.calls, [])
 
+    def test_account_store_recovery_defaults_to_plan_without_image_transfer(self):
+        result=self.run_release('account-store')
+        self.assertEqual(result.returncode,0,result.stderr)
+        self.assertEqual(len(self.calls),1)
+        self.assertEqual(self.calls[0]['args'][-3:],['python3','-','plan'])
+        self.assertIn('Only a confirmed stopped/exited Redis process',self.calls[0]['stdin'])
+
+    def test_invalid_store_action_is_rejected_before_connecting(self):
+        self.env['QRENT_STORE_ACTION']='bad;command'
+        self.assertEqual(self.run_release('account-store').returncode,64)
+        self.assertEqual(self.calls,[])
+
 
 if __name__ == '__main__': unittest.main()
