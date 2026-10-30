@@ -158,5 +158,12 @@ class ReleaseTransportTests(unittest.TestCase):
         self.assertEqual(self.run_release('account-store').returncode,64)
         self.assertEqual(self.calls,[])
 
+    def test_runtime_recovery_plan_uses_only_the_kernel_guard_script(self):
+        self.env['QRENT_STORE_ACTION']='runtime-plan'
+        self.assertEqual(self.run_release('account-store').returncode,0)
+        self.assertEqual(self.calls[0]['args'][-3:],['python3','-','plan'])
+        self.assertIn('pidfd_send_signal',self.calls[0]['stdin'])
+        self.assertNotIn('docker container restart',self.calls[0]['stdin'])
+
 
 if __name__ == '__main__': unittest.main()

@@ -88,8 +88,15 @@ if [[ "$mode" == capacity ]]; then
   exit 0
 fi
 if [[ "$mode" == account-store ]]; then
-  [[ "${QRENT_STORE_ACTION:-plan}" == plan || "${QRENT_STORE_ACTION:-plan}" == apply ]] || exit 64
+  [[ "${QRENT_STORE_ACTION:-plan}" == plan || "${QRENT_STORE_ACTION:-plan}" == apply || "${QRENT_STORE_ACTION:-plan}" == runtime-plan || "${QRENT_STORE_ACTION:-plan}" == runtime-apply ]] || exit 64
   script_root=$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)
+  if [[ "${QRENT_STORE_ACTION:-plan}" == runtime-plan || "${QRENT_STORE_ACTION:-plan}" == runtime-apply ]]; then
+    store_action=plan
+    if [[ "$QRENT_STORE_ACTION" == runtime-apply ]]; then store_action=apply; fi
+    ssh "${ssh_options[@]}" "$DEPLOY_SERVER_HOST" python3 - "$store_action" \
+      < "$script_root/recover_account_runtime.py"
+    exit 0
+  fi
   ssh "${ssh_options[@]}" "$DEPLOY_SERVER_HOST" python3 - "${QRENT_STORE_ACTION:-plan}" \
     < "$script_root/recover_account_store.py"
   exit 0
