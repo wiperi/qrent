@@ -91,7 +91,9 @@ def containers():
     if len(ids) < 3:
         raise RuntimeError('Expected existing production containers; no maintenance performed')
     template = '[{{json .Id}},{{json .Image}},{{.State.Pid}},{{json .State.StartedAt}},{{json .Mounts}}]'
-    return [json.loads(row) for row in command('docker', 'inspect', '--format', template, *ids).splitlines()]
+    rows = [json.loads(row) for row in command('docker', 'inspect', '--format', template, *ids).splitlines()]
+    for row in rows: row[4].sort(key=lambda m: json.dumps(m,sort_keys=True))
+    return sorted(rows,key=lambda row:row[0])
 
 
 def main(action, min_gib=3):

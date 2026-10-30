@@ -106,5 +106,16 @@ class CapacitySafetyTests(unittest.TestCase):
                 (task/'cmdline').write_bytes(b'node\x00/cache/npx/tool.js\x00')
             self.assertTrue(capacity.process_uses(Path('/cache/npx'), root))
 
+    def test_container_snapshot_does_not_depend_on_mount_order(self):
+        mounts=[{'Source':'/test/data','Destination':'/var/lib/mysql'},
+                {'Source':'/test/init','Destination':'/docker-entrypoint-initdb.d'}]
+        first=json.dumps(['db','image',123,'unchanged',mounts])
+        second=json.dumps(['db','image',123,'unchanged',list(reversed(mounts))])
+        other=json.dumps(['redis','image',456,'unchanged',[]])
+        third=json.dumps(['backend','image',789,'unchanged',[]])
+        with patch.object(capacity,'command',side_effect=['db\nredis\nbackend',first+'\n'+other+'\n'+third,
+                                                         'redis\ndb\nbackend',other+'\n'+second+'\n'+third]):
+            self.assertEqual(capacity.containers(),capacity.containers())
+
 
 if __name__ == '__main__': unittest.main()
