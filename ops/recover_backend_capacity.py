@@ -199,7 +199,7 @@ def main(action, min_gib=3, build_cache_age='168h', retire_release='none'):
             if resources(root)['system']['free_bytes'] < min_disk and retired:
                 assert retired == retirement_candidate(root, retire_release, image_inventory())
                 # One explicit obsolete release only; no force/prune and no volume operation.
-                command('docker', 'image', 'rm', retired[1]+':'+retired[2])
+                command('docker', 'image', 'rm', '--no-prune', retired[1]+':'+retired[2])
                 report['images_or_volumes_deleted'] = True
                 report['retired_image'] = retired
             if resources(root)['system']['free_bytes'] < min_disk and apt_cache:
