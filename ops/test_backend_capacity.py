@@ -12,6 +12,59 @@ spec.loader.exec_module(capacity)
 
 
 class CapacitySafetyTests(unittest.TestCase):
+    def test_default_retirement_does_not_inspect_or_remove_images(self):
+        with patch.object(capacity, 'command') as run:
+            self.assertIsNone(capacity.retirement_candidate(Path('/unused'), 'none', set()))
+            run.assert_not_called()
+
+    def retirement_fixture(self, root):
+        ref='qrent-backend:release-'+'a'*40
+        receipts=root/'.deploy/receipts'; receipts.mkdir(parents=True)
+        receipt={'status':'deployed','release':'a'*40,'new_backend_image':ref,
+                 'previous_backend_image':'sha256:'+'b'*64}
+        (receipts/('a'*40+'.json')).write_text(json.dumps(receipt))
+        return ref,receipt
+
+    def protected_images(self):
+        return {('sha256:'+'a'*64,'qrent-backend','release-'+'a'*40),
+                ('sha256:'+'b'*64,'qrent-backend','rollback-'+'a'*40)}
+
+    def test_retirement_preserves_current_previous_and_all_stopped_container_images(self):
+        for image in ('a'*64, 'b'*64, 'f'*64):
+            with self.subTest(image=image), tempfile.TemporaryDirectory() as temp:
+                root=Path(temp);ref,_=self.retirement_fixture(root)
+                candidate=('sha256:'+image,'qrent-backend','release-'+'d'*40)
+                replies=[json.dumps(['sha256:'+'a'*64,ref]),'current\nstopped',
+                         'sha256:'+'a'*64+'\nsha256:'+'f'*64]
+                with patch.object(capacity,'command',side_effect=replies):
+                    with self.assertRaisesRegex(ValueError,'must be preserved|aliases'):
+                        capacity.retirement_candidate(root,'d'*40,{candidate,*self.protected_images()})
+
+    def test_only_an_unreferenced_exact_release_with_verified_rollback_is_eligible(self):
+        with tempfile.TemporaryDirectory() as temp:
+            root=Path(temp);ref,_=self.retirement_fixture(root)
+            candidate=('sha256:'+'c'*64,'qrent-backend','release-'+'d'*40)
+            replies=[json.dumps(['sha256:'+'a'*64,ref]),'current', 'sha256:'+'a'*64]
+            with patch.object(capacity,'command',side_effect=replies) as run:
+                self.assertEqual(capacity.retirement_candidate(root,'d'*40,{candidate,*self.protected_images()}),candidate)
+                self.assertFalse(any('rm' in call.args for call in run.call_args_list))
+            with patch.object(capacity,'command',return_value=replies[0]):
+                with self.assertRaisesRegex(ValueError,'aliases'):
+                    capacity.retirement_candidate(root,'d'*40,
+                        {candidate,(candidate[0],'another-project','latest'),*self.protected_images()})
+                with self.assertRaisesRegex(ValueError,'must already exist'):
+                    capacity.retirement_candidate(root,'d'*40,{candidate})
+            path=root/'.deploy/receipts'/('a'*40+'.json')
+            data=json.loads(path.read_text());data['status']='failed_original_backend_kept';path.write_text(json.dumps(data))
+            with patch.object(capacity,'command',return_value=replies[0]):
+                with self.assertRaisesRegex(ValueError,'rollback receipt'):
+                    capacity.retirement_candidate(root,'d'*40,{candidate})
+
+    def test_invalid_retirement_identity_stops_before_host_inspection(self):
+        with patch.object(capacity,'command') as run:
+            with self.assertRaises(AssertionError): capacity.main('apply',2,'168h','bad;command')
+            run.assert_not_called()
+
     def test_build_cache_age_is_bounded_and_never_prunes_runtime_images_or_volumes(self):
         for age in ('168h', '24h', '1h'):
             with self.subTest(age=age), patch.object(capacity, 'command', return_value='Total: 1MB') as run:

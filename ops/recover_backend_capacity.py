@@ -4,6 +4,7 @@ import fcntl
 import hashlib
 import json
 import os
+import re
 from pathlib import Path
 import shutil
 import subprocess
@@ -24,6 +25,34 @@ def prune_build_cache(minimum_age):
 def image_inventory():
     template = '[{{json .ID}},{{json .Repository}},{{json .Tag}}]'
     return {tuple(json.loads(line)) for line in command('docker', 'image', 'ls', '--no-trunc', '--format', template).splitlines()}
+
+
+def retirement_candidate(root, release, inventory):
+    if release == 'none': return None
+    if not re.fullmatch(r'[a-f0-9]{40}', release): raise ValueError('Invalid retired release')
+    current, reference = json.loads(command('docker', 'inspect', '--format',
+        '[{{json .Image}},{{json .Config.Image}}]', 'qrent-backend-1'))
+    match = re.fullmatch(r'qrent-backend:release-([a-f0-9]{40})', reference)
+    if not match: raise ValueError('A managed current backend is required')
+    receipt = json.loads((root/'.deploy/receipts'/(match[1]+'.json')).read_text())
+    if (receipt.get('status') != 'deployed' or receipt.get('release') != match[1]
+            or receipt.get('new_backend_image') != reference
+            or not re.fullmatch(r'sha256:[a-f0-9]{64}', receipt.get('previous_backend_image',''))):
+        raise ValueError('Verified rollback receipt is required')
+    if (current, 'qrent-backend', 'release-'+match[1]) not in inventory or not any(
+            row[0] == receipt['previous_backend_image'] for row in inventory):
+        raise ValueError('Current and rollback images must already exist')
+    tag = 'release-'+release
+    candidates = [row for row in inventory if row[1:] == ('qrent-backend', tag)]
+    if not candidates: return None  # A previously retired tag remains a no-op.
+    candidate = candidates[0]
+    aliases = {row for row in inventory if row[0] == candidate[0]}
+    if aliases != {candidate}: raise ValueError('Additional image aliases must be preserved')
+    used = command('docker', 'ps', '-aq', '--no-trunc').splitlines()
+    in_use = set(command('docker', 'inspect', '--format', '{{.Image}}', *used).splitlines()) if used else set()
+    if candidate[0] in {current, receipt['previous_backend_image'], *in_use}:
+        raise ValueError('Current, rollback and container images must be preserved')
+    return candidate
 
 
 def cache_paths(home, mounts):
@@ -119,16 +148,18 @@ def containers():
     return sorted(rows,key=lambda row:row[0])
 
 
-def main(action, min_gib=3, build_cache_age='168h'):
+def main(action, min_gib=3, build_cache_age='168h', retire_release='none'):
     assert action in ('plan', 'apply')
     assert min_gib in range(2,9)
     assert build_cache_age in ('168h', '24h', '1h')
+    assert retire_release == 'none' or re.fullmatch(r'[a-f0-9]{40}', retire_release)
     min_disk = min_gib * 1024**3
     os.umask(0o077)
     home = Path.home().resolve(); root = home/'qrent'
     assert (root/'.env').is_file() and (root/'docker-compose.yml').is_file()
     before = containers()
     images_before = image_inventory()
+    retired = retirement_candidate(root, retire_release, images_before)
     protected = {p: hashlib.sha256(p.read_bytes()).digest() for p in (root/'.env', root/'docker-compose.yml')}
     mounts = protected_mounts()
     caches = cache_paths(home, mounts)
@@ -137,6 +168,8 @@ def main(action, min_gib=3, build_cache_age='168h'):
               'before': resources(root), 'caches': [], 'runtime_state_deleted': False,
               'images_or_volumes_deleted': False, 'containers_restarted': False,
               'build_cache_minimum_age': build_cache_age,
+              'retire_release_requested': retire_release,
+              'retirement_candidate': retired,
               'required_system_free_bytes': min_disk}
     for path in caches:
         size = int(command('du', '-sx', '-B1', str(path)).split()[0])
@@ -163,6 +196,12 @@ def main(action, min_gib=3, build_cache_age='168h'):
                 # Recheck mount protection immediately before removing a named cache.
                 assert path in cache_paths(home, protected_mounts())
                 shutil.rmtree(path)
+            if resources(root)['system']['free_bytes'] < min_disk and retired:
+                assert retired == retirement_candidate(root, retire_release, image_inventory())
+                # One explicit obsolete release only; no force/prune and no volume operation.
+                command('docker', 'image', 'rm', retired[1]+':'+retired[2])
+                report['images_or_volumes_deleted'] = True
+                report['retired_image'] = retired
             if resources(root)['system']['free_bytes'] < min_disk and apt_cache:
                 assert apt_cache == apt_cache_path(protected_mounts())
                 # apt-get clean locks and removes only downloaded package archives,
@@ -174,7 +213,8 @@ def main(action, min_gib=3, build_cache_age='168h'):
                 report['old_build_cache_result'] = output.splitlines()[-1:] if output else []
             report['after'] = resources(root)
             report['existing_container_identity_preserved'] = containers() == before
-            report['existing_image_inventory_preserved'] = images_before.issubset(image_inventory())
+            keep_images = images_before - ({retired} if report.get('retired_image') else set())
+            report['existing_image_inventory_preserved'] = keep_images.issubset(image_inventory())
             report['environment_and_compose_preserved'] = all(hashlib.sha256(p.read_bytes()).digest() == h
                 for p,h in protected.items())
             assert report['existing_container_identity_preserved']
@@ -194,4 +234,4 @@ def main(action, min_gib=3, build_cache_age='168h'):
 
 if __name__ == '__main__':
     main(sys.argv[1] if len(sys.argv) > 1 else 'plan', int(sys.argv[2]) if len(sys.argv) > 2 else 3,
-         sys.argv[3] if len(sys.argv) > 3 else '168h')
+         sys.argv[3] if len(sys.argv) > 3 else '168h', sys.argv[4] if len(sys.argv) > 4 else 'none')

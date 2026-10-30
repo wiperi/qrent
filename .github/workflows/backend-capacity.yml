@@ -21,6 +21,11 @@ on:
         default: '168h'
         required: true
         description: Minimum age of unused build cache; running images and volumes are preserved
+      retire_release_sha:
+        type: string
+        default: none
+        required: true
+        description: Optional exact obsolete release SHA; current, previous and all container images are protected
 
 permissions:
   contents: read
@@ -46,4 +51,5 @@ jobs:
           QRENT_CAPACITY_ACTION: ${{ inputs.action }}
           QRENT_MIN_DISK_GIB: ${{ inputs.min_disk_gib }}
           QRENT_BUILD_CACHE_AGE: ${{ inputs.build_cache_age }}
+          QRENT_RETIRE_RELEASE: ${{ inputs.retire_release_sha }}
         run: bash ops/release_backend.sh capacity
