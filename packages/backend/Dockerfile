@@ -5,7 +5,7 @@ FROM node:20-alpine AS base
 WORKDIR /app
 
 # Install pnpm globally
-RUN npm install -g pnpm
+RUN npm install -g pnpm@10.19.0
 
 # Copy package configs and install dependencies
 COPY package.json pnpm-lock.yaml pnpm-workspace.yaml ./
@@ -20,6 +20,9 @@ RUN pnpm install --frozen-lockfile
 # Copy project files
 COPY packages/backend ./packages/backend
 COPY packages/shared ./packages/shared
+
+# Generate the client while building; container startup never changes the database.
+RUN DATABASE_URL=mysql://build:build@127.0.0.1:3306/qrent pnpm --filter @qrent/shared db:generate
 
 # Copy startup script
 COPY packages/backend/startup.sh ./

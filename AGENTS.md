@@ -1,0 +1,10 @@
+# Qrent deployment and data workflow
+
+- Backend code, Docker and dependency changes go through a GitHub PR and merge. CI validates the commit, then calls `.github/workflows/cd.yml` to deploy the backend using the existing production/staging environment Secrets. Developers do not need routine SSH access to the deployment server.
+- Deployment credentials belong to GitHub environment Secrets. Do not export their values to a workstation or fork, or treat empty local deployment fields as a reason to request the server password again.
+- Backend and MySQL run on the deployment server. The crawler runs separately on the machine the project owner calls yibin's server, and updates property data through a database account. Data fixes can use the authorized private database connection directly; back up before DML and preserve existing schema, primary keys, users and favorites.
+- Do not run schema pushes or data-loss migrations as application startup. Backend releases must preserve MySQL/Redis containers, database mounts and the live environment. Never stop the entire Compose project or prune volumes for a backend release.
+- Crawler collection, enrichment and database publication are separate from backend deployment. Keep the existing request ledger, successful caches and failed/uncertain requests. Avoid repeating already successful model or address-campus calls. Recovery model spending is capped at CNY 50/month; other new API/proxy spending at USD 4/month, with no paid transit fallback.
+- Never commit `.env`, credentials, raw databases or private deployment backups. A green PR is not proof of deployment: verify the production CD result, public API and rendered page.
+
+The backend image override and private receipts live under the existing server project's `.deploy/` directory. Subsequent CI releases use the same Compose project and retain the previous image for rollback; do not replace this with a standalone Compose project pointed at fresh volumes.

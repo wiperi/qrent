@@ -8,7 +8,7 @@ on:
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
-  cancel-in-progress: true
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
 
 jobs:
   # Detect changes to optimize which jobs run
@@ -28,6 +28,11 @@ jobs:
             backend:
               - 'packages/backend/**'
               - 'packages/shared/**'
+              - 'ops/*backend*'
+              - 'package.json'
+              - 'pnpm-lock.yaml'
+              - 'pnpm-workspace.yaml'
+              - '.dockerignore'
             frontend:
               - 'packages/frontend/**'
               - 'packages/shared/**'
@@ -102,21 +107,43 @@ jobs:
             packages/frontend/.next
           key: ${{ runner.os }}-build-${{ github.sha }}
 
-  # Test backend (stub - tests not implemented yet)
+  # Isolated tests: no production database, model, transit or email requests.
   test-backend:
     runs-on: ubuntu-latest
     needs: [changes, lint]
-    if: needs.changes.outputs.backend == 'true' || needs.changes.outputs.shared == 'true'
+    if: needs.changes.outputs.backend == 'true' || needs.changes.outputs.shared == 'true' || needs.changes.outputs.workflows == 'true'
     
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Backend tests placeholder
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 10.19.0
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - name: Generate client without connecting to a database
+        env:
+          DATABASE_URL: mysql://build:build@127.0.0.1:3306/qrent
+        run: pnpm --filter @qrent/shared db:generate
+      - name: Backend search and startup regressions
+        run: pnpm --filter @qrent/backend exec jest --runInBand --runTestsByPath tests/LegacySearchOrder.test.ts tests/StartupDoesNotMigrate.test.ts
+      - name: Backend deployment and health checks
         run: |
-          echo "🚧 Backend tests not implemented yet"
-          echo "TODO: Add Jest tests for backend package"
-          echo "Expected test command: pnpm --filter backend test"
+          bash -n ops/deploy_backend.sh
+          python3 -m unittest discover -s ops -p test_deploy_backend.py
+          node --test ops/test_verify_backend.mjs
+      - name: Build the backend release image
+        run: docker build -t qrent-backend:ci -f packages/backend/Dockerfile .
+      - name: Check the generated Prisma client without network access
+        run: >-
+          docker run --rm --network none --entrypoint node
+          -e DATABASE_URL=mysql://build:build@127.0.0.1:3306/qrent
+          qrent-backend:ci
+          -e "require(require.resolve('@prisma/client', {paths:['/app/packages/shared']}))"
 
   # Test frontend (stub - tests not implemented yet) 
   test-frontend:
@@ -185,3 +212,12 @@ jobs:
             echo "❌ Some CI checks failed"
             exit 1
           fi
+
+  deploy:
+    needs: [ci-success, changes]
+    if: >-
+      github.event_name == 'push' && github.repository == 'wiperi/qrent' &&
+      (github.ref == 'refs/heads/main' || github.ref == 'refs/heads/staging') &&
+      (needs.changes.outputs.backend == 'true' || needs.changes.outputs.shared == 'true' || needs.changes.outputs.workflows == 'true')
+    uses: ./.github/workflows/cd.yml
+    secrets: inherit
