@@ -80,8 +80,9 @@ fi
 if [[ "$mode" == capacity ]]; then
   [[ "${QRENT_CAPACITY_ACTION:-plan}" == plan || "${QRENT_CAPACITY_ACTION:-plan}" == apply ]] || exit 64
   [[ "${QRENT_MIN_DISK_GIB:-3}" =~ ^[2-8]$ ]] || exit 64
+  [[ "${QRENT_BUILD_CACHE_AGE:-168h}" == 168h || "${QRENT_BUILD_CACHE_AGE:-168h}" == 24h || "${QRENT_BUILD_CACHE_AGE:-168h}" == 1h ]] || exit 64
   script_root=$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)
-  ssh "${ssh_options[@]}" "$DEPLOY_SERVER_HOST" python3 - "${QRENT_CAPACITY_ACTION:-plan}" "${QRENT_MIN_DISK_GIB:-3}" \
+  ssh "${ssh_options[@]}" "$DEPLOY_SERVER_HOST" python3 - "${QRENT_CAPACITY_ACTION:-plan}" "${QRENT_MIN_DISK_GIB:-3}" "${QRENT_BUILD_CACHE_AGE:-168h}" \
     < "$script_root/recover_backend_capacity.py"
   exit 0
 fi

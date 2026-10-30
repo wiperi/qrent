@@ -114,7 +114,21 @@ class ReleaseTransportTests(unittest.TestCase):
         result = self.run_release('capacity')
         self.assertEqual(result.returncode, 0, result.stderr)
         self.assertEqual(len(self.calls), 1)
-        self.assertEqual(self.calls[0]['args'][-4:], ['python3', '-', 'plan', '3'])
+        self.assertEqual(self.calls[0]['args'][-5:], ['python3', '-', 'plan', '3', '168h'])
+
+    def test_recent_unused_cache_cleanup_requires_a_bounded_explicit_age(self):
+        self.env['QRENT_CAPACITY_ACTION'] = 'apply'
+        self.env['QRENT_MIN_DISK_GIB'] = '2'
+        self.env['QRENT_BUILD_CACHE_AGE'] = '1h'
+        result = self.run_release('capacity')
+        self.assertEqual(result.returncode, 0, result.stderr)
+        self.assertEqual(self.calls[0]['args'][-5:], ['python3', '-', 'apply', '2', '1h'])
+
+    def test_invalid_build_cache_age_is_rejected_before_connecting(self):
+        self.env['QRENT_BUILD_CACHE_AGE'] = '0h; untrusted-command'
+        result = self.run_release('capacity')
+        self.assertEqual(result.returncode, 64)
+        self.assertEqual(self.calls, [])
 
     def test_invalid_capacity_action_is_rejected_before_connecting(self):
         self.env['QRENT_CAPACITY_ACTION'] = 'untrusted-command'

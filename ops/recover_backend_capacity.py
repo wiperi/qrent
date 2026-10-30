@@ -13,6 +13,12 @@ def command(*args):
     return subprocess.check_output(args, text=True).strip()
 
 
+def prune_build_cache(minimum_age):
+    if minimum_age not in ('168h', '24h', '1h'):
+        raise ValueError('Unsupported build-cache age')
+    return command('docker', 'builder', 'prune', '-f', '--filter', 'until='+minimum_age)
+
+
 def cache_paths(home, mounts):
     paths = [home/'.npm/_cacache', home/'.local/share/pnpm/store', home/'.cache/pnpm',
              home/'.npm/_npx', home/'.nvm/.cache']
@@ -96,9 +102,10 @@ def containers():
     return sorted(rows,key=lambda row:row[0])
 
 
-def main(action, min_gib=3):
+def main(action, min_gib=3, build_cache_age='168h'):
     assert action in ('plan', 'apply')
     assert min_gib in range(2,9)
+    assert build_cache_age in ('168h', '24h', '1h')
     min_disk = min_gib * 1024**3
     os.umask(0o077)
     home = Path.home().resolve(); root = home/'qrent'
@@ -109,6 +116,7 @@ def main(action, min_gib=3):
     report = {'action': action, 'started_at': datetime.now(timezone.utc).isoformat(),
               'before': resources(root), 'caches': [], 'runtime_state_deleted': False,
               'images_or_volumes_deleted': False, 'containers_restarted': False,
+              'build_cache_minimum_age': build_cache_age,
               'required_system_free_bytes': min_disk}
     for path in caches:
         size = int(command('du', '-sx', '-B1', str(path)).split()[0])
@@ -134,7 +142,7 @@ def main(action, min_gib=3):
                 assert path in cache_paths(home, protected_mounts())
                 shutil.rmtree(path)
             if resources(root)['system']['free_bytes'] < min_disk:
-                output = command('docker', 'builder', 'prune', '-f', '--filter', 'until=168h')
+                output = prune_build_cache(build_cache_age)
                 report['old_build_cache_result'] = output.splitlines()[-1:] if output else []
             report['after'] = resources(root)
             report['existing_container_identity_preserved'] = containers() == before
@@ -155,4 +163,5 @@ def main(action, min_gib=3):
 
 
 if __name__ == '__main__':
-    main(sys.argv[1] if len(sys.argv) > 1 else 'plan', int(sys.argv[2]) if len(sys.argv) > 2 else 3)
+    main(sys.argv[1] if len(sys.argv) > 1 else 'plan', int(sys.argv[2]) if len(sys.argv) > 2 else 3,
+         sys.argv[3] if len(sys.argv) > 3 else '168h')
