@@ -28,10 +28,20 @@ def image_inventory():
 
 def cache_paths(home, mounts):
     paths = [home/'.npm/_cacache', home/'.local/share/pnpm/store', home/'.cache/pnpm',
-             home/'.npm/_npx', home/'.nvm/.cache']
+             home/'.npm/_npx', home/'.nvm/.cache', home/'.cache/node-gyp',
+             home/'.cache/typescript']
     return [p for p in paths if p.is_dir() and not p.is_symlink() and p.resolve() == p
             and not any(p == m or p in m.parents or m in p.parents for m in mounts)
-            and (p != home/'.npm/_npx' or not process_uses(p))]
+            and (p not in (home/'.npm/_npx', home/'.cache/node-gyp', home/'.cache/typescript')
+                 or not process_uses(p))]
+
+
+def apt_cache_path(mounts, path=Path('/var/cache/apt/archives')):
+    if (path.is_dir() and not path.is_symlink() and path.resolve() == path
+            and not any(path == m or path in m.parents or m in path.parents for m in mounts)
+            and shutil.which('apt-get')):
+        return path
+    return None
 
 
 def process_uses(path, proc_root=Path('/proc')):
@@ -120,7 +130,9 @@ def main(action, min_gib=3, build_cache_age='168h'):
     before = containers()
     images_before = image_inventory()
     protected = {p: hashlib.sha256(p.read_bytes()).digest() for p in (root/'.env', root/'docker-compose.yml')}
-    caches = cache_paths(home, protected_mounts())
+    mounts = protected_mounts()
+    caches = cache_paths(home, mounts)
+    apt_cache = apt_cache_path(mounts)
     report = {'action': action, 'started_at': datetime.now(timezone.utc).isoformat(),
               'before': resources(root), 'caches': [], 'runtime_state_deleted': False,
               'images_or_volumes_deleted': False, 'containers_restarted': False,
@@ -129,6 +141,8 @@ def main(action, min_gib=3, build_cache_age='168h'):
     for path in caches:
         size = int(command('du', '-sx', '-B1', str(path)).split()[0])
         report['caches'].append({'path': str(path), 'bytes': size})
+    if apt_cache:
+        report['apt_download_cache_bytes'] = int(command('du', '-sx', '-B1', str(apt_cache)).split()[0])
     if action == 'plan':
         print(json.dumps(report)); return
     (root/'.deploy/receipts').mkdir(parents=True, exist_ok=True)
@@ -149,6 +163,12 @@ def main(action, min_gib=3, build_cache_age='168h'):
                 # Recheck mount protection immediately before removing a named cache.
                 assert path in cache_paths(home, protected_mounts())
                 shutil.rmtree(path)
+            if resources(root)['system']['free_bytes'] < min_disk and apt_cache:
+                assert apt_cache == apt_cache_path(protected_mounts())
+                # apt-get clean locks and removes only downloaded package archives,
+                # not installed packages, package indexes, logs, or runtime state.
+                command('apt-get', 'clean')
+                report['apt_download_cache_cleaned'] = True
             if resources(root)['system']['free_bytes'] < min_disk:
                 output = prune_build_cache(build_cache_age)
                 report['old_build_cache_result'] = output.splitlines()[-1:] if output else []
