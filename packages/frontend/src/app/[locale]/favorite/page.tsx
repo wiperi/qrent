@@ -17,13 +17,13 @@ export default function FavoritePage() {
   const t = useTranslations('FavoritePage');
   const trpc = useTRPCClient();
   const queryClient = useQueryClient();
-  const { user, isLoading } = useAuth();
+  const { user, isLoading, hasSessionError, refreshUser } = useAuth();
 
   // 获取用户收藏的房产列表
   const { data, isPending, error } = useQuery({
     queryKey: ['properties.subscriptions', user?.id],
     queryFn: () => trpc.properties.getSubscriptions.query(),
-    enabled: !isLoading,
+    enabled: !isLoading && !!user,
   });
 
   // 监听用户认证状态变化，重新获取收藏数据
@@ -34,7 +34,7 @@ export default function FavoritePage() {
   }, [user?.id, isLoading, queryClient]);
 
   // 加载状态
-  if (isPending) {
+  if (isLoading || (!!user && isPending)) {
     return (
       <div className="container mx-auto px-4 py-8">
         <h1 className="text-3xl font-bold mb-6">{t('title')}</h1>
@@ -55,6 +55,26 @@ export default function FavoritePage() {
           ))}
         </div>
       </div>
+    );
+  }
+
+  if (!user) {
+    return (
+      <main className="mx-auto max-w-5xl px-4 py-10">
+        <h1 className="text-3xl font-bold text-slate-900">
+          {t(hasSessionError ? 'title' : 'loginRequired')}
+        </h1>
+        <p className="mt-3 text-slate-600">
+          {t(hasSessionError ? 'networkError' : 'unauthorizedError')}
+        </p>
+        <button
+          type="button"
+          onClick={() => (hasSessionError ? void refreshUser() : showLoginModal())}
+          className="mt-5 rounded-lg bg-blue-600 px-4 py-2 font-semibold text-white"
+        >
+          {t(hasSessionError ? 'retrySession' : 'goToLogin')}
+        </button>
+      </main>
     );
   }
 
@@ -143,7 +163,6 @@ export default function FavoritePage() {
               <div className="mt-4">
                 <button
                   onClick={() => {
-                    console.log('Login button clicked, opening global auth modal');
                     showLoginModal();
                   }}
                   className="inline-block bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 transition-colors cursor-pointer"

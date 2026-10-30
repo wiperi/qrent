@@ -8,6 +8,9 @@ import { useQueryClient } from '@tanstack/react-query';
 import { useToast } from '@/hooks/use-toast';
 import Image from 'next/image';
 import { displayKeywords } from '@/lib/property-keywords';
+import { useAuth } from '@/hooks/use-auth';
+import { showLoginModal } from '@/lib/auth-events';
+import { readAuthToken } from '@/lib/auth-storage';
 
 interface PropertyCardProps {
   id: number;
@@ -54,6 +57,7 @@ export default function PropertyCard({
   const locale = useLocale();
   const propertyTypeName = propertyType === 1 ? t('house') : t('apartment');
   const trpc = useTRPCClient();
+  const { user, isLoading } = useAuth();
   const [localSubscribed, setLocalSubscribed] = useState(subscribed || false);
   const { toast } = useToast();
 
@@ -61,6 +65,12 @@ export default function PropertyCard({
     e.stopPropagation();
     e.preventDefault();
     if (!propertyId) return;
+    if (isLoading) return;
+    if (!user) {
+      showLoginModal();
+      return;
+    }
+    const session = readAuthToken();
 
     // Immediately toggle local state for UI feedback
     const newSubscribedState = !localSubscribed;
@@ -78,12 +88,15 @@ export default function PropertyCard({
 
       // Clear timeout on success
       clearTimeout(timeoutId);
+      if (readAuthToken() !== session) return;
 
       // Success - invalidate queries to sync with server
       queryClient.invalidateQueries({ queryKey: ['properties'] });
       queryClient.invalidateQueries({ queryKey: ['properties.search'] });
       queryClient.invalidateQueries({ queryKey: ['properties.subscriptions'] });
     } catch (error) {
+      clearTimeout(timeoutId);
+      if (readAuthToken() !== session) return;
       // Error handling - rollback state and show message
       setLocalSubscribed(!newSubscribedState);
 
@@ -109,7 +122,7 @@ export default function PropertyCard({
   // 同步外部传入的 subscribed 状态 - 修复前进/后退时的状态问题
   useEffect(() => {
     setLocalSubscribed(subscribed || false);
-  }, [subscribed]);
+  }, [subscribed, user?.id]);
 
   // 自动调整地址字体大小
   useEffect(() => {
