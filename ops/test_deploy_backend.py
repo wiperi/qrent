@@ -41,7 +41,8 @@ if args[0]=='inspect':
  else:raise AssertionError(fmt)
  sys.exit(0)
 if args[0]=='tag':sys.exit(0)
-if args[0]=='build':sys.exit(17 if s.get('build_fail') else 0)
+if args[0]=='build':raise AssertionError('Production must not build images')
+if args[0]=='load':sys.exit(17 if s.get('load_fail') else 0)
 if args[0]=='run':
  assert '--network' in args and args[args.index('--network')+1]=='none'
  sys.exit(0)
@@ -61,12 +62,14 @@ class BackendDeploymentTests(unittest.TestCase):
         self.bin = self.home/'bin';self.bin.mkdir()
         (self.root/'.env').write_text('DATABASE_URL=local-test-placeholder\nKEEP_ORIGINAL=yes\n')
         (self.root/'docker-compose.yml').write_text('services: {}\n')
+        self.archive = self.root/'backend-image.tar.gz'; self.archive.write_text('fake-image')
         self.state = {'db':'db-original','redis':'redis-original','backend':'backend-original','image':'old-image'}
         for name,body in {'docker':FAKE_DOCKER,'flock':
                 'import fcntl,sys\ntry:fcntl.flock(int(sys.argv[-1]),fcntl.LOCK_EX|fcntl.LOCK_NB)\nexcept BlockingIOError:sys.exit(1)\n'}.items():
             p=self.bin/name;p.write_text('#!'+sys.executable+'\n'+body);p.chmod(0o700)
         self.env=dict(os.environ,HOME=str(self.home),PATH=str(self.bin)+os.pathsep+os.environ['PATH'],
                       TEST_ROOT=str(self.root),QRENT_DEPLOY_ROOT=str(self.root),QRENT_RELEASE_SHA=SHA,
+                      QRENT_BACKEND_IMAGE_ARCHIVE=str(self.archive),
                       QRENT_HEALTH_RETRY_SECONDS='0')
 
     def tearDown(self):self.temp.cleanup()
@@ -107,11 +110,12 @@ class BackendDeploymentTests(unittest.TestCase):
         self.assertEqual(receipt['status'],'deployed')
         self.assertNotIn('DATABASE_URL',json.dumps(receipt))
 
-    def test_build_failure_keeps_original_backend(self):
-        self.state['build_fail']=True
+    def test_image_load_failure_keeps_original_backend(self):
+        self.state['load_fail']=True
         result=self.run_deploy();self.assertNotEqual(result.returncode,0)
         self.assertEqual(self.after['backend'],'backend-original')
-        self.assertTrue(any(a[0]=='build' for a in self.commands))
+        self.assertTrue(any(a[0]=='load' for a in self.commands))
+        self.assertFalse(any(a[0]=='build' for a in self.commands))
         self.assert_no_dependency_mutations()
 
     def test_failed_health_restores_image_without_legacy_schema_push(self):

@@ -32,6 +32,11 @@ jobs:
             package.json pnpm-lock.yaml pnpm-workspace.yaml .dockerignore \
             packages/backend packages/shared ops/deploy_backend.sh ops/verify_backend.mjs ops/inspect_backend_host.sh
 
+      - name: Build the release image on the CI runner
+        run: |
+          docker build -t "qrent-backend:release-${GITHUB_SHA}" -f packages/backend/Dockerfile .
+          docker save "qrent-backend:release-${GITHUB_SHA}" | gzip -1 > "backend-image-${GITHUB_SHA}.tar.gz"
+
       - name: Upload and deploy using the pinned ED25519 host key
         env:
           DEPLOY_SERVER_HOST: ${{ secrets.DEPLOY_SERVER_HOST }}
