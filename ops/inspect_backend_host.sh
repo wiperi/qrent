@@ -11,6 +11,8 @@ swapon --show --bytes
 docker system df
 docker ps -a --format 'table {{.ID}}\t{{.Image}}\t{{.Status}}\t{{.Names}}'
 if [[ "${1:-}" != preflight ]]; then
+  docker image ls --no-trunc --format 'Image inventory: {{.ID}} {{.Repository}}:{{.Tag}}'
+  docker image inspect --format 'Image size: {{.Id}} {{.Size}} {{.Created}}' $(docker image ls -q)
   docker inspect --format '{{.Name}} {{json .Mounts}}' $(docker ps -q)
   qrent_redis=$(docker ps -q --filter name='^qrent-redis-1$')
   if [[ -n "$qrent_redis" ]]; then
