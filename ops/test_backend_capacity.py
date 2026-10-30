@@ -43,6 +43,32 @@ class CapacitySafetyTests(unittest.TestCase):
             (home/'qrent').mkdir()
             self.assertEqual(capacity.cache_paths(home, []), [allowed])
 
+    def test_build_tool_caches_require_no_live_process_and_preserve_other_tools(self):
+        with tempfile.TemporaryDirectory() as temp:
+            home = Path(temp).resolve()
+            for name in ('node-gyp', 'typescript', 'n8n'):
+                (home/'.cache'/name).mkdir(parents=True)
+            (home/'.nvm/versions/node').mkdir(parents=True)
+            with patch.object(capacity, 'process_uses', return_value=True):
+                self.assertEqual(capacity.cache_paths(home, []), [])
+            with patch.object(capacity, 'process_uses', return_value=False):
+                self.assertEqual(set(capacity.cache_paths(home, [])),
+                                 {home/'.cache/node-gyp', home/'.cache/typescript'})
+                self.assertEqual(capacity.cache_paths(home, [home/'.cache/node-gyp/include',
+                                                         home/'.cache/typescript']), [])
+
+    def test_apt_download_cache_requires_a_real_unmounted_directory_and_apt(self):
+        with tempfile.TemporaryDirectory() as temp:
+            path = Path(temp).resolve()/'archives'; path.mkdir()
+            with patch.object(capacity.shutil, 'which', return_value='/usr/bin/apt-get'):
+                self.assertEqual(capacity.apt_cache_path([], path), path)
+                self.assertIsNone(capacity.apt_cache_path([path/'partial'], path))
+                self.assertIsNone(capacity.apt_cache_path([path.parent], path))
+                link = path.parent/'link'; link.symlink_to(path, target_is_directory=True)
+                self.assertIsNone(capacity.apt_cache_path([], link))
+            with patch.object(capacity.shutil, 'which', return_value=None):
+                self.assertIsNone(capacity.apt_cache_path([], path))
+
     def test_bind_mounted_cache_is_preserved(self):
         with tempfile.TemporaryDirectory() as temp:
             home = Path(temp).resolve()
