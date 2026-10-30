@@ -12,6 +12,52 @@ docker system df
 docker ps -a --format 'table {{.ID}}\t{{.Image}}\t{{.Status}}\t{{.Names}}'
 if [[ "${1:-}" != preflight ]]; then
   docker inspect --format '{{.Name}} {{json .Mounts}}' $(docker ps -q)
+  qrent_backend=$(docker ps -q --filter name='^qrent-backend-1$')
+  if [[ -n "$qrent_backend" ]]; then
+    # Read-only PING probes; credentials remain inside the existing container.
+    docker exec -i "$qrent_backend" node --input-type=module <<'JS'
+import { createRequire } from 'node:module';
+const require = createRequire('/app/packages/backend/package.json');
+const { createClient } = require('redis');
+let configured;
+try { configured = process.env.REDIS_URL ? new URL(process.env.REDIS_URL) : undefined; } catch {}
+const report = {
+  url_present: !!process.env.REDIS_URL,
+  url_valid: !!configured,
+  host_kind: !configured ? 'unset_or_invalid' :
+    ['127.0.0.1', 'localhost', '[::1]'].includes(configured.hostname) ? 'loopback' :
+    configured.hostname === 'redis' ? 'compose_service' : 'other',
+  port: configured?.port || '6379',
+  username_present: !!configured?.username,
+  password_present: !!configured?.password,
+};
+function safeCode(error) {
+  const allowed = ['ECONNREFUSED', 'ENOTFOUND', 'ETIMEDOUT', 'ECONNRESET',
+    'NOAUTH', 'WRONGPASS', 'NOPERM', 'DENIED', 'LOADING'];
+  return allowed.find(code => error?.code === code || String(error?.message).startsWith(code)) || 'connection_unavailable';
+}
+async function probe(url) {
+  let client, timer;
+  try {
+    client = createClient({url, socket: {connectTimeout: 3000, reconnectStrategy: false}});
+    client.on('error', () => {});
+    const answer = await Promise.race([
+      (async () => { await client.connect(); return await client.ping(); })(),
+      new Promise((_, reject) => { timer = setTimeout(() => reject({code: 'ETIMEDOUT'}), 5000); }),
+    ]);
+    return {ping: answer === 'PONG'};
+  } catch (error) { return {ping: false, code: safeCode(error)}; }
+  finally { clearTimeout(timer); try { if (client?.isOpen) client.destroy(); } catch {} }
+}
+report.configured = await probe(process.env.REDIS_URL);
+if (!configured || configured.hostname !== 'redis') {
+  const internal = configured ? new URL(configured) : new URL('redis://redis:6379');
+  internal.hostname = 'redis'; internal.port = '6379';
+  report.compose_same_credentials = await probe(internal.toString());
+}
+console.log('Account-store connectivity: ' + JSON.stringify(report));
+JS
+  fi
   for path in / "$HOME" /var/log "$HOME/.cache" "$HOME/.nvm" "$qrent_root/.deploy"; do
     [[ -d "$path" ]] || continue
     du -x -h --max-depth=1 "$path" 2>/dev/null | sort -h || true
