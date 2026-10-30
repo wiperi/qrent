@@ -1,4 +1,4 @@
-"""Inspect/reap only the verified shim of an already exited Redis init process."""
+"""Inspect/wake the verified runtime reaper for a zombie Redis init task."""
 from datetime import datetime,timezone
 import fcntl
 import hashlib
@@ -32,15 +32,16 @@ def plan(root,proc_root=Path('/proc')):
     if init['state']!='Z': raise RuntimeError('Only an already exited zombie init may qualify')
     parent=process(init['parent'],proc_root)
     parent_root=proc_root/str(parent['pid'])
-    executable=Path(os.readlink(parent_root/'exe')).name.removesuffix(' (deleted)')
+    executable=os.readlink(parent_root/'exe').removesuffix(' (deleted)')
     args=(parent_root/'cmdline').read_bytes().split(b'\0')
-    if executable!='containerd-shim-runc-v2' or not any(
-            args[i] in (b'-id',b'--id') and args[i+1].decode()==identity for i in range(len(args)-1)):
+    if (executable not in ('/usr/bin/containerd-shim-runc-v2','/usr/local/bin/containerd-shim-runc-v2')
+            or not any(args[i] in (b'-id',b'--id') and args[i+1].decode()==identity for i in range(len(args)-1))
+            or not any(args[i] in (b'-namespace',b'--namespace') and args[i+1]==b'moby' for i in range(len(args)-1))):
         raise RuntimeError('The exact Redis-owned shim could not be verified')
     if parent['state'] not in ('S','R','T'): raise RuntimeError('Unexpected shim state')
     return {'original_store_id':identity,'init':init,'shim':parent,'backup_verified':True,
-            'signal':'CONT' if parent['state']=='T' else 'KILL',
-            'other_container_processes_targeted':False,'data_deleted':False}
+            'signal':'CONT' if parent['state']=='T' else 'CHLD',
+            'container_processes_signaled':False,'running_tasks_stopped':False,'data_deleted':False}
 
 
 def main(action='plan',root=None,proc_root=Path('/proc')):
@@ -60,7 +61,7 @@ def main(action='plan',root=None,proc_root=Path('/proc')):
             stamp=datetime.now(timezone.utc).strftime('%Y%m%dT%H%M%S%fZ')
             receipt=root/'.deploy/receipts'/('account-runtime-'+stamp+'.json')
             report['status']='signal_attempt_started';receipt.write_text(json.dumps(report,indent=2))
-            signal.pidfd_send_signal(descriptor,signal.SIGCONT if result['signal']=='CONT' else signal.SIGKILL)
+            signal.pidfd_send_signal(descriptor,signal.SIGCONT if result['signal']=='CONT' else signal.SIGCHLD)
             report.update(status='signal_sent_requires_service_verification',finished_at=datetime.now(timezone.utc).isoformat())
             receipt.write_text(json.dumps(report,indent=2));print(json.dumps(report));return report
         finally: os.close(descriptor)

@@ -39,7 +39,7 @@ class RuntimeRecoveryTests(unittest.TestCase):
     def test_plan_matches_exact_redis_shim_and_verifies_existing_backup(self):
         result=runtime.main('plan',self.root,self.proc)
         self.assertEqual(result['status'],'planned');self.assertEqual(result['shim']['pid'],100)
-        self.assertEqual(result['signal'],'KILL');self.assertTrue(result['backup_verified'])
+        self.assertEqual(result['signal'],'CHLD');self.assertTrue(result['backup_verified'])
 
     def test_running_init_or_unrelated_parent_never_qualifies(self):
         self.write_process(123,'S',100,'init-start')
@@ -59,7 +59,7 @@ class RuntimeRecoveryTests(unittest.TestCase):
     def test_pidfd_signal_targets_one_verified_runtime_and_requires_later_health_check(self):
         with patch.object(runtime.os,'pidfd_open',return_value=999,create=True) as opened,patch.object(runtime.os,'close') as closed,patch.object(runtime.signal,'pidfd_send_signal',create=True) as send:
             result=runtime.main('apply',self.root,self.proc)
-            opened.assert_called_once_with(100);send.assert_called_once_with(999,signal.SIGKILL)
+            opened.assert_called_once_with(100);send.assert_called_once_with(999,signal.SIGCHLD)
             closed.assert_called_once_with(999)
         self.assertEqual(result['status'],'signal_sent_requires_service_verification')
 
