@@ -32,32 +32,9 @@ jobs:
             package.json pnpm-lock.yaml pnpm-workspace.yaml .dockerignore \
             packages/backend packages/shared ops/deploy_backend.sh ops/verify_backend.mjs
 
-      - name: Upload release without changing the live environment
-        uses: appleboy/scp-action@v0.1.7
-        with:
-          host: ${{ secrets.DEPLOY_SERVER_HOST }}
-          username: ${{ secrets.DEPLOY_SERVER_USERNAME }}
-          password: ${{ secrets.DEPLOY_SERVER_PASSWORD }}
-          fingerprint: SHA256:yFb8C5MaAlip/092pxEXeqWMWRWouUg6mXMMmOeFako
-          source: backend-${{ github.sha }}.tgz
-          target: ~/qrent/.deploy/uploads/
-
-      - name: Build and replace backend only
-        uses: appleboy/ssh-action@v1.0.3
-        with:
-          host: ${{ secrets.DEPLOY_SERVER_HOST }}
-          username: ${{ secrets.DEPLOY_SERVER_USERNAME }}
-          password: ${{ secrets.DEPLOY_SERVER_PASSWORD }}
-          fingerprint: SHA256:yFb8C5MaAlip/092pxEXeqWMWRWouUg6mXMMmOeFako
-          command_timeout: 20m
-          script: |
-            set -eu
-            qrent_root="$HOME/qrent"
-            qrent_sha='${{ github.sha }}'
-            qrent_source="$qrent_root/.deploy/releases/$qrent_sha"
-            test -s "$qrent_root/.env"
-            test -s "$qrent_root/docker-compose.yml"
-            mkdir -p "$qrent_source"
-            tar -xzf "$qrent_root/.deploy/uploads/backend-$qrent_sha.tgz" -C "$qrent_source"
-            QRENT_DEPLOY_ROOT="$qrent_root" QRENT_RELEASE_SHA="$qrent_sha" \
-              bash "$qrent_source/ops/deploy_backend.sh"
+      - name: Upload and deploy using the pinned ED25519 host key
+        env:
+          DEPLOY_SERVER_HOST: ${{ secrets.DEPLOY_SERVER_HOST }}
+          DEPLOY_SERVER_USERNAME: ${{ secrets.DEPLOY_SERVER_USERNAME }}
+          DEPLOY_SERVER_PASSWORD: ${{ secrets.DEPLOY_SERVER_PASSWORD }}
+        run: bash ops/release_backend.sh
