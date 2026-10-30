@@ -66,6 +66,13 @@ qrent_sha="$1"
 qrent_source="$qrent_root/.deploy/releases/$qrent_sha"
 test -s "$qrent_root/.env"
 test -s "$qrent_root/docker-compose.yml"
+printf 'Read-only deployment host capacity check.\n'
+qrent_docker_root=$(docker info --format '{{.DockerRootDir}}')
+df -h "$qrent_root" "$qrent_docker_root" /var/run
+df -i "$qrent_root" "$qrent_docker_root" /var/run
+docker system df
+docker ps -a --format 'table {{.ID}}\t{{.Image}}\t{{.Status}}\t{{.Names}}'
+du -x -h --max-depth=1 "$qrent_docker_root" /var/log 2>/dev/null || true
 mkdir -p "$qrent_source"
 tar -xzf "$qrent_root/.deploy/uploads/backend-$qrent_sha.tgz" -C "$qrent_source"
 QRENT_DEPLOY_ROOT="$qrent_root" QRENT_RELEASE_SHA="$qrent_sha" \
