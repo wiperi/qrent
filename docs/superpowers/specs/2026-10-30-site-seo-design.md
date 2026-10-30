@@ -58,3 +58,26 @@ No unmerged framework patch or new dependency is installed.
 Footer language links connect both language graphs. The homepage, school hubs,
 guide index and full published guide directory provide crawlable paths; the
 interactive filter combinations stay noindex.
+
+## Source article collisions found during production inspection
+
+The original public Notion props contain ten published IDs but only seven
+locale/slug pairs: multiple distinct articles reuse `before-renting`. The old
+English URL actually serves a Chinese body, and copied English metadata is not
+evidence of a translation. Correct these defects without writing the CMS:
+inspect cached actual body text for strong language evidence, preserve dates
+and source IDs, and assign stable unique paths to duplicate IDs. Pin the two
+article identities verified at the legacy Chinese/English URLs; if an identity
+moves to its actual language, redirect the legacy URL to that same identity.
+Do not infer article hreflang from a matching slug. If no English guide body
+exists, label links to Chinese content explicitly rather than inventing an
+English translation. Free CMS reads use the existing ten-minute cache and
+configured-provider failures abort the catalog refresh instead of publishing
+partial data. No model or transit call is authorized by this implementation.
+
+Keep the catalog and its article bodies in one atomic cached snapshot. Empty,
+ambiguous or too-short bodies stay out of discovery until their language can be
+verified. One malformed published source record fails the refresh; it must not
+silently erase a portion of the directory. Chinese articles do not need a fake
+English headline. Do not traverse child pages or child databases outside the
+published article body. Preserve the source identity on legacy redirects.

@@ -4,6 +4,7 @@ import RentalLinks from '@/components/RentalLinks';
 import {
   generateNotionBlogMetadata,
   getNotionBlogPost,
+  getNotionBlogRedirect,
   getNotionBlogPosts,
   getRecommendedPosts,
 } from '@/lib/notion-blog';
@@ -11,7 +12,7 @@ import { SITE_URL, SITE_IMAGE, jsonLd } from '@/lib/seo';
 import type { NotionBlock, NotionBlogPost } from '@/types/blog';
 import { isLocale } from '@qrent/shared/utils/helper';
 import { setRequestLocale } from 'next-intl/server';
-import { notFound } from 'next/navigation';
+import { notFound, permanentRedirect } from 'next/navigation';
 
 interface PageProps {
   params: Promise<{ locale: string; slug: string }>;
@@ -23,18 +24,21 @@ export async function generateStaticParams() {
 }
 export async function generateMetadata({ params }: PageProps) {
   const { locale, slug } = await params;
+  const redirect = await getNotionBlogRedirect(locale, slug);
+  if (redirect) permanentRedirect(redirect);
   const result = await getNotionBlogPost(slug, locale);
   if (!result)
     return {
       title: locale === 'zh' ? '找不到文章 | QRent' : 'Article not found | QRent',
       robots: { index: false },
     };
-  const posts = await getNotionBlogPosts();
-  const languages = posts.filter(post => post.slug === slug).map(post => post.language);
-  return generateNotionBlogMetadata(result.post, locale, languages.length ? languages : [locale]);
+  // Matching slugs and copied English metadata are not evidence of a translation.
+  return generateNotionBlogMetadata(result.post, locale, [locale]);
 }
 export default async function BlogPostPage({ params }: PageProps) {
   const { locale, slug } = await params;
+  const redirect = await getNotionBlogRedirect(locale, slug);
+  if (redirect) permanentRedirect(redirect);
   if (!isLocale(locale)) notFound();
   setRequestLocale(locale);
   const result = await getNotionBlogPost(slug, locale);

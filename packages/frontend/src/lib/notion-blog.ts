@@ -1,9 +1,9 @@
+import { buildBlogSnapshot, legacyBlogRedirect } from './blog-catalog';
 import { cache } from 'react';
 import { unstable_cache } from 'next/cache';
 import { pageMetadata, SITE_URL, SITE_IMAGE } from './seo';
 import { LOCALE } from '@qrent/shared/enum';
 import {
-  getBlogPostBySlug,
   getBlogPostContent,
   getPublishedBlogPosts,
   SupportedLanguage,
@@ -22,19 +22,32 @@ export interface NotionBlock {
 /**
  * 获取所有已发布的博客文章（用于博客列表页面）
  */
-const publishedPosts = unstable_cache(
-  () => getPublishedBlogPosts(),
-  ['qrent-published-blog-posts'],
+const publishedSnapshot = unstable_cache(
+  async () => {
+    return buildBlogSnapshot(await getPublishedBlogPosts(), getBlogPostContent);
+  },
+  ['qrent-guide-catalog-snapshot-v3'],
   { revalidate: 600 }
 );
+
 export async function getNotionBlogPosts(locale?: string): Promise<NotionBlogPost[]> {
-  try {
-    const posts = await publishedPosts();
-    return locale ? posts.filter(post => post.language === locale) : posts;
-  } catch (error) {
-    console.error('Unable to load published guides:', error);
-    return [];
+  if (!process.env.NOTION_TOKEN || !process.env.NOTION_DATABASE_ID) {
+    if (process.env.VERCEL_ENV === 'production')
+      throw new Error('Published guide source is not configured');
+    return []; // Credential-free local/CI builds never invent guide data.
   }
+  const posts = (await publishedSnapshot())
+    .map(entry => entry.post)
+    .filter(post => post.bodyLanguageVerified);
+  return locale ? posts.filter(post => post.language === locale) : posts;
+}
+
+export async function getNotionBlogRedirect(locale: string, slug: string): Promise<string | null> {
+  return legacyBlogRedirect(
+    locale,
+    slug,
+    (await publishedSnapshot()).map(entry => entry.post)
+  );
 }
 
 /**
@@ -49,10 +62,11 @@ export const getNotionBlogPost = cache(
     blocks: NotionBlock[];
   } | null> => {
     const language = locale === 'en' ? SupportedLanguage.EN : SupportedLanguage.ZH;
-    const post = await getBlogPostBySlug(slug, language);
-    if (!post) return null;
-    const blocks = await getBlogPostContent(post.id);
-    return { post, blocks: blocks as NotionBlock[] };
+    const entry = (await publishedSnapshot()).find(
+      entry => entry.post.slug === slug && entry.post.language === language
+    );
+    if (!entry || !entry.post.bodyLanguageVerified) return null;
+    return { post: entry.post, blocks: entry.blocks as NotionBlock[] };
   }
 );
 
