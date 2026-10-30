@@ -57,7 +57,12 @@ export function breadcrumbs(locale: string, items: { name: string; path: string 
   };
 }
 
-export type SitemapPost = { slug: string; language: string; last_edited_time?: string };
+export type SitemapPost = {
+  slug: string;
+  language: string;
+  last_edited_time?: string;
+  translation_group?: string;
+};
 export function sitemapEntries(posts: SitemapPost[]): MetadataRoute.Sitemap {
   const paths = [
     '',
@@ -89,7 +94,10 @@ export function sitemapEntries(posts: SitemapPost[]): MetadataRoute.Sitemap {
     if (seen.has(url)) continue;
     seen.add(url);
     const translations = posts.filter(
-      other => other.slug === post.slug && other.language === post.language
+      other =>
+        other.slug === post.slug &&
+        (other.language === post.language ||
+          (post.translation_group && other.translation_group === post.translation_group))
     );
     result.push({
       url,

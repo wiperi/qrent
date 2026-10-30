@@ -19,7 +19,7 @@ test('guide titles and links exist in initial HTML before any browser effect', (
       keywords: ['inspection'],
       language: 'en',
       status: 'Published',
-      published_at: '2026-10-01',
+      published_at: '2025-11-15T00:00:00.000+11:00',
       created_time: '2026-10-01',
       last_edited_time: '2026-10-01',
       url: 'https://www.notion.so/fixture',
@@ -35,4 +35,5 @@ test('guide titles and links exist in initial HTML before any browser effect', (
   assert.match(html, /href="\/en\/blog\/inspection-guide"/);
   assert.match(html, /Rental inspection guide/);
   assert.ok(!html.includes('No Posts Found'));
+  assert.match(html, /15 Nov 2025/);
 });

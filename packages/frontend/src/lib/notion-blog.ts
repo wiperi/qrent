@@ -1,14 +1,8 @@
 import { cache } from 'react';
-import { unstable_cache } from 'next/cache';
+import { pairedGuides } from './paired-guides';
 import { pageMetadata, SITE_URL, SITE_IMAGE } from './seo';
 import { LOCALE } from '@qrent/shared/enum';
-import {
-  getBlogPostBySlug,
-  getBlogPostContent,
-  getPublishedBlogPosts,
-  SupportedLanguage,
-  type BlogPost as NotionBlogPost,
-} from './notion';
+import { SupportedLanguage, type BlogPost as NotionBlogPost } from './notion';
 
 // 为了向后兼容，定义 NotionBlock 类型
 export interface NotionBlock {
@@ -22,19 +16,10 @@ export interface NotionBlock {
 /**
  * 获取所有已发布的博客文章（用于博客列表页面）
  */
-const publishedPosts = unstable_cache(
-  () => getPublishedBlogPosts(),
-  ['qrent-published-blog-posts'],
-  { revalidate: 600 }
-);
 export async function getNotionBlogPosts(locale?: string): Promise<NotionBlogPost[]> {
-  try {
-    const posts = await publishedPosts();
-    return locale ? posts.filter(post => post.language === locale) : posts;
-  } catch (error) {
-    console.error('Unable to load published guides:', error);
-    return [];
-  }
+  return pairedGuides
+    .filter(entry => !locale || entry.post.language === locale)
+    .map(entry => entry.post);
 }
 
 /**
@@ -49,10 +34,10 @@ export const getNotionBlogPost = cache(
     blocks: NotionBlock[];
   } | null> => {
     const language = locale === 'en' ? SupportedLanguage.EN : SupportedLanguage.ZH;
-    const post = await getBlogPostBySlug(slug, language);
-    if (!post) return null;
-    const blocks = await getBlogPostContent(post.id);
-    return { post, blocks: blocks as NotionBlock[] };
+    const entry = pairedGuides.find(
+      entry => entry.post.slug === slug && entry.post.language === language
+    );
+    return entry ? { post: entry.post, blocks: entry.blocks } : null;
   }
 );
 

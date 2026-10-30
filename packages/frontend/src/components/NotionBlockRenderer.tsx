@@ -3,6 +3,7 @@ import { richTextToHtml } from '@/lib/notion';
 import type { NotionBlock } from '@/types/blog';
 import Image from 'next/image';
 import React from 'react';
+import MarkdownGuide from './MarkdownGuide';
 
 interface NotionBlockRendererProps {
   block: NotionBlock;
@@ -29,6 +30,8 @@ const NotionBlockRenderer: React.FC<NotionBlockRendererProps> = ({ block, locale
 
   // 根据块类型渲染不同的组件
   switch (type) {
+    case 'markdown':
+      return <MarkdownGuide content={String(block.content ?? '')} />;
     case 'paragraph':
       const paragraphText = richTextToHtml(value.rich_text || []);
       if (!paragraphText.trim()) {
