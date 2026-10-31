@@ -67,7 +67,10 @@ def disk_snapshot(data_root=Path('/var/lib/docker/containers'),proc_root=Path('/
 
 def redact_runtime_error(value):
     value=re.sub(r'[a-zA-Z][a-zA-Z0-9+.-]*://\S+','[url]',str(value))
-    value=re.sub(r'''(?i)((?:["']?)(?:password|requirepass|token|secret|authorization|api[\s_-]?key)(?:["']?)[\s=:]+)["']?[^"'\s,;]+''',r'\1[redacted]',value)
+    # Startup errors are diagnostic only. Discard the entire remaining message
+    # at a credential boundary, including schemes, spaces and multiline values.
+    sensitive=re.search(r'''(?i)(?:["']?)(?:password|requirepass|token|secret|authorization|api[\s_-]?key)(?:["']?)[\s=:]+|\bbearer\s+''',value)
+    if sensitive:value=value[:sensitive.end()]+'[redacted]'
     value=re.sub(r'\b(?:sk-|SG\.)[A-Za-z0-9_.-]+','[redacted]',value)
     return value[:1600]
 

@@ -36,6 +36,8 @@ class ControlRecoveryTests(unittest.TestCase):
     def test_runtime_error_redacts_urls_and_quoted_or_cli_credentials(self):
         value=control.redact_runtime_error('failed redis://user:private-url@host "api_key": "private-key", --requirepass private-pass token=private-token sk-privatekey')
         self.assertNotIn('private-',value);self.assertIn('failed',value)
+        for message in ('Authorization: Bearer example-token','--requirepass "example secret with spaces"','"password": "example secret,semicolon;still secret"','token: "example\nsecond line secret"'):
+            self.assertNotIn('example',control.redact_runtime_error(message));self.assertNotIn('secret',control.redact_runtime_error(message))
 
     def test_enable_preserves_all_other_daemon_options_and_sends_only_hup(self):
         config=self.root/'daemon.json';config.write_text(json.dumps({'log-driver':'json-file','unrelated':'retained'}))
