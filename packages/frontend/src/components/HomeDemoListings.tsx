@@ -13,6 +13,7 @@ import { validPreviewRow } from '@/lib/rental-preview';
 import {
   demoFilters,
   demoFilterError,
+  demoBedroomChoice,
   demoErrorMessage,
   demoFilterSummary,
   demoParams,
@@ -69,12 +70,7 @@ export default function HomeDemoListings() {
     .sort((a, b) => b - a)[0];
   const school = RENTAL_SCHOOLS.find(item => item.code === applied.university);
   const formSchool = RENTAL_SCHOOLS.find(item => item.code === form.university);
-  const bedrooms =
-    form.bedroomsMin === form.bedroomsMax || (!form.bedroomsMax && Number(form.bedroomsMin) >= 5)
-      ? form.bedroomsMin
-      : !form.bedroomsMin && !form.bedroomsMax
-        ? ''
-        : 'range';
+  const bedrooms = demoBedroomChoice(form);
   const reset = () => {
     const next = demoFilters(new URLSearchParams());
     setForm(next);

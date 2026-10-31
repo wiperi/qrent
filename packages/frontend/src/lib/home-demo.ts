@@ -185,6 +185,14 @@ export function demoSearchHref(locale: string, filters: DemoFilters) {
   return `/${locale}/search?${params}`;
 }
 
+export function demoBedroomChoice(filters: DemoFilters) {
+  const { bedroomsMin: min, bedroomsMax: max } = filters;
+  if (!min && !max) return '';
+  if (min === max && ['1', '2', '3', '4'].includes(min)) return min;
+  if (min === '5' && !max) return '5';
+  return 'range';
+}
+
 export function demoFilterSummary(filters: DemoFilters, locale: string) {
   const zh = locale === 'zh';
   const rows = [filters.university];

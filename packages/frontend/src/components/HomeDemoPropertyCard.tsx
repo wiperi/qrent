@@ -63,14 +63,22 @@ export default function HomeDemoPropertyCard({
       void refreshUser();
       return;
     }
-    if (!user || !readAuthToken()) {
+    const session = readAuthToken();
+    if (!user || !session) {
       showLoginModal();
+      return;
+    }
+    if (session !== token) {
+      setMessage(
+        zh
+          ? '账户状态正在同步，请稍后重试。'
+          : 'Your account is updating. Please try again shortly.'
+      );
       return;
     }
     busy.current = true;
     setPending(true);
     setMessage('');
-    const session = readAuthToken();
     const value = !favorited;
     setOverride({ session, value });
     const controller = new AbortController();

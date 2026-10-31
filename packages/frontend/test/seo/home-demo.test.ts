@@ -3,6 +3,7 @@ import test from 'node:test';
 import {
   availabilityLabel,
   demoFilters,
+  demoBedroomChoice,
   demoFilterError,
   demoFilterSummary,
   demoParams,
@@ -50,6 +51,11 @@ test('demo, full search and subscription preserve the same applied conditions an
   assert.equal(href.searchParams.get('sort'), 'price');
   assert.deepEqual(demoFilters(href.searchParams), filters);
   assert.deepEqual(demoFilters(demoParams(filters)), filters);
+  assert.equal(demoBedroomChoice(filters), '2');
+  assert.equal(demoBedroomChoice({ ...filters, bedroomsMin: '6', bedroomsMax: '' }), 'range');
+  assert.equal(demoBedroomChoice({ ...filters, bedroomsMin: '6', bedroomsMax: '6' }), 'range');
+  assert.equal(demoBedroomChoice({ ...filters, bedroomsMin: '5', bedroomsMax: '5' }), 'range');
+  assert.equal(demoBedroomChoice({ ...filters, bedroomsMin: '5', bedroomsMax: '' }), '5');
   const summary = demoFilterSummary(filters, 'zh').join(' ');
   for (const term of ['950', '40', '2卧', '16.5', '2026-11-15', 'Wolli Creek'])
     assert(summary.includes(term), term);
