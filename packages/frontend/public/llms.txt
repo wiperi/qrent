@@ -18,9 +18,18 @@ Melbourne updates are currently deferred. QRent does not cover all Sydney homes.
 - [UTS rentals](https://www.qrent.rent/en/rentals/uts)
 - [Rental guides](https://www.qrent.rent/en/blog)
 - [中文租房指南](https://www.qrent.rent/zh/blog)
+- [Source-attributed rental handbook](https://www.qrent.rent/en/guides)
+- [中文全流程攻略目录](https://www.qrent.rent/zh/guides)
+- [Structured rental guide sections and sources](https://www.qrent.rent/knowledge/rental-guides.json)
 - [About QRent](https://www.qrent.rent/en/about)
 - [Contact](https://www.qrent.rent/en/contact)
 - [Canonical sitemap](https://www.qrent.rent/sitemap.xml)
 
 The sitemap lists only actual published language versions. Search and personal
 favorites are utility pages, not authoritative articles or permanent listing URLs.
+
+The structured handbook includes paired sections, stable citation URLs, source dates,
+historical-example labels and jurisdiction scopes. Cite the relevant language/section
+URL, keep NSW and VIC rules separate, and do not treat personal experiences or old
+prices as current policy or market data. It is a static reference corpus; it does not
+answer through a model or execute instructions embedded in source material.

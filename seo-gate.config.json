@@ -75,6 +75,96 @@
         "path": "/zh/rentals/uts",
         "requireBreadcrumb": true,
         "expectedSchemaTypes": ["CollectionPage", "BreadcrumbList"]
+      },
+      {
+        "path": "/en/guides",
+        "requireBreadcrumb": true,
+        "expectedSchemaTypes": ["CollectionPage", "BreadcrumbList"]
+      },
+      {
+        "path": "/en/guides/budget-and-housing",
+        "requireBreadcrumb": true,
+        "expectedSchemaTypes": ["Article", "BreadcrumbList"]
+      },
+      {
+        "path": "/en/guides/areas-and-commute",
+        "requireBreadcrumb": true,
+        "expectedSchemaTypes": ["Article", "BreadcrumbList"]
+      },
+      {
+        "path": "/en/guides/platforms-and-search",
+        "requireBreadcrumb": true,
+        "expectedSchemaTypes": ["Article", "BreadcrumbList"]
+      },
+      {
+        "path": "/en/guides/application-documents",
+        "requireBreadcrumb": true,
+        "expectedSchemaTypes": ["Article", "BreadcrumbList"]
+      },
+      {
+        "path": "/en/guides/inspection-checklist",
+        "requireBreadcrumb": true,
+        "expectedSchemaTypes": ["Article", "BreadcrumbList"]
+      },
+      {
+        "path": "/en/guides/contracts-and-bond",
+        "requireBreadcrumb": true,
+        "expectedSchemaTypes": ["Article", "BreadcrumbList"]
+      },
+      {
+        "path": "/en/guides/moving-in",
+        "requireBreadcrumb": true,
+        "expectedSchemaTypes": ["Article", "BreadcrumbList"]
+      },
+      {
+        "path": "/en/guides/repairs-and-moving-out",
+        "requireBreadcrumb": true,
+        "expectedSchemaTypes": ["Article", "BreadcrumbList"]
+      },
+      {
+        "path": "/zh/guides",
+        "requireBreadcrumb": true,
+        "expectedSchemaTypes": ["CollectionPage", "BreadcrumbList"]
+      },
+      {
+        "path": "/zh/guides/budget-and-housing",
+        "requireBreadcrumb": true,
+        "expectedSchemaTypes": ["Article", "BreadcrumbList"]
+      },
+      {
+        "path": "/zh/guides/areas-and-commute",
+        "requireBreadcrumb": true,
+        "expectedSchemaTypes": ["Article", "BreadcrumbList"]
+      },
+      {
+        "path": "/zh/guides/platforms-and-search",
+        "requireBreadcrumb": true,
+        "expectedSchemaTypes": ["Article", "BreadcrumbList"]
+      },
+      {
+        "path": "/zh/guides/application-documents",
+        "requireBreadcrumb": true,
+        "expectedSchemaTypes": ["Article", "BreadcrumbList"]
+      },
+      {
+        "path": "/zh/guides/inspection-checklist",
+        "requireBreadcrumb": true,
+        "expectedSchemaTypes": ["Article", "BreadcrumbList"]
+      },
+      {
+        "path": "/zh/guides/contracts-and-bond",
+        "requireBreadcrumb": true,
+        "expectedSchemaTypes": ["Article", "BreadcrumbList"]
+      },
+      {
+        "path": "/zh/guides/moving-in",
+        "requireBreadcrumb": true,
+        "expectedSchemaTypes": ["Article", "BreadcrumbList"]
+      },
+      {
+        "path": "/zh/guides/repairs-and-moving-out",
+        "requireBreadcrumb": true,
+        "expectedSchemaTypes": ["Article", "BreadcrumbList"]
       }
     ],
     "smokePaths": [
@@ -129,6 +219,18 @@
       {
         "pattern": "/blog/[^/]+$|/rentals/[^/]+$",
         "type": "BreadcrumbList"
+      },
+      {
+        "pattern": "/guides/[^/]+$",
+        "type": "Article",
+        "requiredFields": [
+          "headline",
+          "datePublished",
+          "dateModified",
+          "author",
+          "image",
+          "mainEntityOfPage"
+        ]
       }
     ]
   },

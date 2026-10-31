@@ -1,5 +1,6 @@
 import type { Metadata, MetadataRoute } from 'next';
 import { RENTAL_SCHOOLS } from './rental-schools';
+import { rentalGuideModules } from '../content/rental-library/modules';
 
 export const SITE_URL = 'https://www.qrent.rent';
 export const SITE_IMAGE = `${SITE_URL}/qrent.jpg`;
@@ -70,6 +71,8 @@ export function sitemapEntries(posts: SitemapPost[]): MetadataRoute.Sitemap {
     '/team',
     '/contact',
     '/blog',
+    '/guides',
+    ...rentalGuideModules.map(module => `/guides/${module.slug}`),
     '/rentals',
     ...RENTAL_SCHOOLS.map(school => `/rentals/${school.slug}`),
   ];
