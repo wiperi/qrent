@@ -143,7 +143,7 @@ export default function Footer() {
                 简体中文
               </Link>
             </nav>
-            <p>{t('copyright')}</p>
+            <p suppressHydrationWarning>{t('copyright', { year: new Date().getUTCFullYear() })}</p>
             <a href="mailto:yyzyfish5@gmail.com" className="inline-block mt-2 underline">
               yyzyfish5@gmail.com
             </a>
