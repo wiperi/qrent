@@ -17,7 +17,12 @@ export function rentalGuidePath(locale: string, slug: string, sectionId?: string
 }
 
 export function getModuleExperiences(slug: string) {
-  return references.experiences.filter(item => item.module === slug);
+  const sourceIds = new Set(
+    rentalGuideModules
+      .find(module => module.slug === slug)
+      ?.sections.flatMap(section => section.sourceRefs)
+  );
+  return references.experiences.filter(item => sourceIds.has(item.id));
 }
 
 export function plainGuideText(value: string) {
@@ -39,6 +44,7 @@ export function getRentalSearchItems(locale: LibraryLocale): RentalSearchItem[] 
         0,
         locale === 'zh' ? 150 : 260
       ),
+      searchText: plainGuideText(section.body[locale]),
       keywords: `${section.aliases.zh} ${section.aliases.en}`,
       path: rentalGuidePath(locale, module.slug, section.id),
     }))

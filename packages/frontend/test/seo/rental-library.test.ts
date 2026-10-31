@@ -2,6 +2,7 @@ import assert from 'node:assert/strict';
 import test from 'node:test';
 import {
   getRentalSearchItems,
+  getModuleExperiences,
   rentalKnowledgeExport,
   rentalGuideModules,
   references,
@@ -57,6 +58,7 @@ test('both original files and all twenty collected posts retain identities and m
     references.experiences.find(row => row.id === 'collection-10')!.displayDate,
     /年份未显示/
   );
+  assert(getModuleExperiences('areas-and-commute').some(item => item.id === 'collection-15'));
 });
 
 test('local search finds specific material, inspection and water sections in either language', () => {
@@ -75,6 +77,23 @@ test('local search finds specific material, inspection and water sections in eit
     searchRentalLibrary(en, 'parent support letter')[0]?.id,
     'application-documents/parent-letter-and-history'
   );
+  for (const [query, id] of [
+    ['洗衣机', 'inspection-checklist/room-checklist'],
+    ['烟雾报警器', 'contracts-and-bond/lease-checklist'],
+  ])
+    assert(
+      searchRentalLibrary(zh, query).some(item => item.id === id),
+      query
+    );
+  for (const [query, id] of [
+    ['laundry', 'inspection-checklist/room-checklist'],
+    ['washing machine', 'inspection-checklist/room-checklist'],
+    ['smoke alarms', 'contracts-and-bond/lease-checklist'],
+  ])
+    assert(
+      searchRentalLibrary(en, query).some(item => item.id === id),
+      query
+    );
   assert.deepEqual(searchRentalLibrary(zh, 'qzxv987654321'), []);
   assert.deepEqual(searchRentalLibrary(zh, '  '), []);
 });

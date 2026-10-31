@@ -4,6 +4,7 @@ export type RentalSearchItem = {
   moduleTitle: string;
   title: string;
   excerpt: string;
+  searchText: string;
   keywords: string;
   path: string;
 };
@@ -55,7 +56,7 @@ export function searchRentalLibrary(items: RentalSearchItem[], input: string, li
     .map((item, index) => {
       const title = normalize(item.title);
       const aliases = normalize(item.keywords);
-      const body = normalize(`${item.moduleTitle} ${item.excerpt}`);
+      const body = normalize(`${item.moduleTitle} ${item.searchText}`);
       const matched = terms.filter(term => `${title} ${aliases} ${body}`.includes(term));
       const score =
         matched.reduce(
