@@ -170,5 +170,15 @@ class ReleaseTransportTests(unittest.TestCase):
         self.assertEqual(self.run_release('account-store').returncode,0)
         self.assertEqual(self.calls[0]['args'][-1],'start-plan')
 
+    def test_docker_control_defaults_to_plan_without_image_transfer(self):
+        self.assertEqual(self.run_release('control').returncode,0)
+        self.assertEqual(self.calls[0]['args'][-3:],['python3','-','plan'])
+        self.assertIn('LiveRestoreEnabled',self.calls[0]['stdin'])
+
+    def test_invalid_controller_action_is_rejected_before_connecting(self):
+        self.env['QRENT_CONTROL_ACTION']='restart;bad'
+        self.assertEqual(self.run_release('control').returncode,64)
+        self.assertEqual(self.calls,[])
+
 
 if __name__ == '__main__': unittest.main()

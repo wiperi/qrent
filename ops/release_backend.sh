@@ -14,7 +14,7 @@ umask 077
 archive="backend-$GITHUB_SHA.tgz"
 image_archive="backend-image-$GITHUB_SHA.tar.gz"
 mode=${1:-release}
-[[ "$mode" == release || "$mode" == inspect || "$mode" == capacity || "$mode" == account-store ]] || exit 64
+[[ "$mode" == release || "$mode" == inspect || "$mode" == capacity || "$mode" == account-store || "$mode" == control ]] || exit 64
 if [[ "$mode" == release ]]; then
   test -s "$archive"
   test -s "$image_archive"
@@ -99,6 +99,13 @@ if [[ "$mode" == account-store ]]; then
   fi
   ssh "${ssh_options[@]}" "$DEPLOY_SERVER_HOST" python3 - "${QRENT_STORE_ACTION:-plan}" \
     < "$script_root/recover_account_store.py"
+  exit 0
+fi
+if [[ "$mode" == control ]]; then
+  [[ "${QRENT_CONTROL_ACTION:-plan}" == plan || "${QRENT_CONTROL_ACTION:-plan}" == enable-live-restore || "${QRENT_CONTROL_ACTION:-plan}" == restart-controller ]] || exit 64
+  script_root=$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)
+  ssh "${ssh_options[@]}" "$DEPLOY_SERVER_HOST" python3 - "${QRENT_CONTROL_ACTION:-plan}" \
+    < "$script_root/recover_docker_control.py"
   exit 0
 fi
 
