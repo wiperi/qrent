@@ -1,0 +1,769 @@
+{
+  "reviewDate": "2026-10-31",
+  "method": "公开搜索结果主题样本 + 两份原资料覆盖，不是排名或搜索量报告",
+  "cashSpent": 0,
+  "priorityMeaning": "P1/P2是内容匹配与可落实程度，不是搜索量或KD",
+  "keywords": [
+    {
+      "id": "K01",
+      "zh": "澳洲租房攻略",
+      "en": "Australian rental guide",
+      "intent": "信息",
+      "targetPath": "/guides",
+      "role": "主词",
+      "priority": "P1",
+      "sourceEvidence": [
+        {
+          "label": "UNSW 官方校内外住宿与选区",
+          "url": "https://www.unsw.edu.au/student/student-life/campus/accommodation"
+        }
+      ],
+      "action": "八阶段总入口，不另造泛词落地页",
+      "validation": "主题搜索结果已查；具体词需求待验证",
+      "monthlySearchVolume": null,
+      "keywordDifficulty": null
+    },
+    {
+      "id": "K02",
+      "zh": "留学生澳洲租房流程",
+      "en": "rental process for international students Australia",
+      "intent": "信息",
+      "targetPath": "/guides",
+      "role": "次词",
+      "priority": "P1",
+      "sourceEvidence": [
+        {
+          "label": "Study Australia 留学生租房申请",
+          "url": "https://www.studyaustralia.gov.au/en/tools-and-resources/tips-and-advice-for-students/five-rental-housing-application-tips-for-international-students"
+        }
+      ],
+      "action": "从找房到入住串联目录",
+      "validation": "主题搜索结果已查；具体词需求待验证",
+      "monthlySearchVolume": null,
+      "keywordDifficulty": null
+    },
+    {
+      "id": "K03",
+      "zh": "悉尼留学生租房预算",
+      "en": "Sydney student rental budget",
+      "intent": "信息",
+      "targetPath": "/guides/budget-and-housing",
+      "role": "主词",
+      "priority": "P1",
+      "sourceEvidence": [
+        {
+          "label": "UNSW 官方校内外住宿与选区",
+          "url": "https://www.unsw.edu.au/student/student-life/campus/accommodation"
+        }
+      ],
+      "action": "给计算法与总费用，历史样例写明日期",
+      "validation": "主题搜索结果已查；具体词需求待验证",
+      "monthlySearchVolume": null,
+      "keywordDifficulty": null
+    },
+    {
+      "id": "K04",
+      "zh": "澳洲周租换算月租",
+      "en": "weekly rent to monthly rent Australia",
+      "intent": "信息",
+      "targetPath": "/guides/budget-and-housing#budget-calculation",
+      "role": "次词",
+      "priority": "P2",
+      "sourceEvidence": [],
+      "action": "保留52÷12换算，后续观察需求",
+      "validation": "资料覆盖；搜索需求待验证",
+      "monthlySearchVolume": null,
+      "keywordDifficulty": null
+    },
+    {
+      "id": "K05",
+      "zh": "学生公寓和社会公寓区别",
+      "en": "student accommodation vs private rental Australia",
+      "intent": "比较",
+      "targetPath": "/blog/types-of-apartments",
+      "role": "主词",
+      "priority": "P1",
+      "sourceEvidence": [
+        {
+          "label": "UNSW 官方校内外住宿与选区",
+          "url": "https://www.unsw.edu.au/student/student-life/campus/accommodation"
+        }
+      ],
+      "action": "沿用已有文章，模块页提供流程上下文",
+      "validation": "主题搜索结果已查；具体词需求待验证",
+      "monthlySearchVolume": null,
+      "keywordDifficulty": null
+    },
+    {
+      "id": "K06",
+      "zh": "澳洲整租还是分租",
+      "en": "whole property vs room rental Australia",
+      "intent": "比较",
+      "targetPath": "/blog/shared-vs-private-renting",
+      "role": "主词",
+      "priority": "P2",
+      "sourceEvidence": [],
+      "action": "整租总价、人均、空房风险分别说明",
+      "validation": "资料覆盖；搜索需求待验证",
+      "monthlySearchVolume": null,
+      "keywordDifficulty": null
+    },
+    {
+      "id": "K07",
+      "zh": "studio和ensuite区别",
+      "en": "studio vs ensuite student accommodation",
+      "intent": "信息",
+      "targetPath": "/guides/budget-and-housing#housing-options",
+      "role": "次词",
+      "priority": "P2",
+      "sourceEvidence": [],
+      "action": "按独立卫浴与厨房共享解释，不造价格保证",
+      "validation": "资料覆盖；搜索需求待验证",
+      "monthlySearchVolume": null,
+      "keywordDifficulty": null
+    },
+    {
+      "id": "K08",
+      "zh": "UNSW租房",
+      "en": "rentals near UNSW",
+      "intent": "找房",
+      "targetPath": "/rentals/unsw",
+      "role": "主词",
+      "priority": "P1",
+      "sourceEvidence": [
+        {
+          "label": "UNSW 官方校内外住宿与选区",
+          "url": "https://www.unsw.edu.au/student/student-life/campus/accommodation"
+        }
+      ],
+      "action": "学校目录接真实筛选，保留历史采集范围",
+      "validation": "主题搜索结果已查；具体词需求待验证",
+      "monthlySearchVolume": null,
+      "keywordDifficulty": null
+    },
+    {
+      "id": "K09",
+      "zh": "新南威尔士大学租房区域",
+      "en": "UNSW rental suburbs guide",
+      "intent": "选区",
+      "targetPath": "/guides/areas-and-commute#unsw-areas",
+      "role": "次词",
+      "priority": "P1",
+      "sourceEvidence": [
+        {
+          "label": "UNSW 官方校内外住宿与选区",
+          "url": "https://www.unsw.edu.au/student/student-life/campus/accommodation"
+        }
+      ],
+      "action": "按门牌与校区核对通勤，不把区域印象当统计",
+      "validation": "主题搜索结果已查；具体词需求待验证",
+      "monthlySearchVolume": null,
+      "keywordDifficulty": null
+    },
+    {
+      "id": "K10",
+      "zh": "Kingsford租房UNSW",
+      "en": "Kingsford rentals UNSW",
+      "intent": "找房",
+      "targetPath": "/rentals/unsw",
+      "role": "次词",
+      "priority": "P2",
+      "sourceEvidence": [
+        {
+          "label": "UNSW 官方校内外住宿与选区",
+          "url": "https://www.unsw.edu.au/student/student-life/campus/accommodation"
+        }
+      ],
+      "action": "复用学校目录和筛选，不生成薄区域页",
+      "validation": "主题搜索结果已查；具体词需求待验证",
+      "monthlySearchVolume": null,
+      "keywordDifficulty": null
+    },
+    {
+      "id": "K11",
+      "zh": "悉尼大学租房",
+      "en": "University of Sydney student rentals",
+      "intent": "找房",
+      "targetPath": "/rentals/usyd",
+      "role": "主词",
+      "priority": "P1",
+      "sourceEvidence": [
+        {
+          "label": "Domain 悉尼大学生租房指南",
+          "url": "https://www.domain.com.au/living/uni-student-rental-cheat-sheet-sydney/"
+        }
+      ],
+      "action": "确认Camperdown/Darlington教学楼",
+      "validation": "主题搜索结果已查；具体词需求待验证",
+      "monthlySearchVolume": null,
+      "keywordDifficulty": null
+    },
+    {
+      "id": "K12",
+      "zh": "UTS租房",
+      "en": "UTS student rentals",
+      "intent": "找房",
+      "targetPath": "/rentals/uts",
+      "role": "主词",
+      "priority": "P1",
+      "sourceEvidence": [
+        {
+          "label": "Domain 悉尼大学生租房指南",
+          "url": "https://www.domain.com.au/living/uni-student-rental-cheat-sheet-sydney/"
+        }
+      ],
+      "action": "确认City/Broadway实际楼宇",
+      "validation": "主题搜索结果已查；具体词需求待验证",
+      "monthlySearchVolume": null,
+      "keywordDifficulty": null
+    },
+    {
+      "id": "K13",
+      "zh": "悉尼租房选区和通勤",
+      "en": "Sydney student rental areas and commute",
+      "intent": "选区",
+      "targetPath": "/guides/areas-and-commute",
+      "role": "主词",
+      "priority": "P1",
+      "sourceEvidence": [
+        {
+          "label": "UNSW 官方校内外住宿与选区",
+          "url": "https://www.unsw.edu.au/student/student-life/campus/accommodation"
+        },
+        {
+          "label": "Domain 悉尼大学生租房指南",
+          "url": "https://www.domain.com.au/living/uni-student-rental-cheat-sheet-sydney/"
+        }
+      ],
+      "action": "用门到门通勤串联三校，不另铺同义页面",
+      "validation": "主题搜索结果已查；具体词需求待验证",
+      "monthlySearchVolume": null,
+      "keywordDifficulty": null
+    },
+    {
+      "id": "K14",
+      "zh": "墨尔本大学租房区域",
+      "en": "University of Melbourne rental suburbs",
+      "intent": "选区",
+      "targetPath": "/guides/areas-and-commute#melbourne-campus-reference",
+      "role": "次词",
+      "priority": "P2",
+      "sourceEvidence": [],
+      "action": "仅历史资料参考，不推广为墨尔本最新房源服务",
+      "validation": "资料覆盖；搜索需求待验证",
+      "monthlySearchVolume": null,
+      "keywordDifficulty": null
+    },
+    {
+      "id": "K15",
+      "zh": "realestate租房教程",
+      "en": "how to use realestate.com.au for rentals",
+      "intent": "操作",
+      "targetPath": "/guides/platforms-and-search",
+      "role": "主词",
+      "priority": "P1",
+      "sourceEvidence": [
+        {
+          "label": "UNSW 官方校内外住宿与选区",
+          "url": "https://www.unsw.edu.au/student/student-life/campus/accommodation"
+        }
+      ],
+      "action": "串联Rent、状态、可入住日、看房和申请入口",
+      "validation": "主题搜索结果已查；具体词需求待验证",
+      "monthlySearchVolume": null,
+      "keywordDifficulty": null
+    },
+    {
+      "id": "K16",
+      "zh": "Domain和Real Estate租房",
+      "en": "Domain and Real Estate rental search",
+      "intent": "操作",
+      "targetPath": "/guides/platforms-and-search#search-workflow",
+      "role": "次词",
+      "priority": "P2",
+      "sourceEvidence": [
+        {
+          "label": "UNSW 官方校内外住宿与选区",
+          "url": "https://www.unsw.edu.au/student/student-life/campus/accommodation"
+        }
+      ],
+      "action": "说明平台配合，避免为近义词再开页",
+      "validation": "主题搜索结果已查；具体词需求待验证",
+      "monthlySearchVolume": null,
+      "keywordDifficulty": null
+    },
+    {
+      "id": "K17",
+      "zh": "Available Date什么意思",
+      "en": "available date meaning rental",
+      "intent": "信息",
+      "targetPath": "/blog/available-date-rental-cover-letter",
+      "role": "主词",
+      "priority": "P1",
+      "sourceEvidence": [
+        {
+          "label": "Study Australia 留学生租房申请",
+          "url": "https://www.studyaustralia.gov.au/en/tools-and-resources/tips-and-advice-for-students/five-rental-housing-application-tips-for-international-students"
+        }
+      ],
+      "action": "旧文章保持地址，链接起租日与材料章节",
+      "validation": "主题搜索结果已查；具体词需求待验证",
+      "monthlySearchVolume": null,
+      "keywordDifficulty": null
+    },
+    {
+      "id": "K18",
+      "zh": "Flatmates分租教程",
+      "en": "Flatmates room search guide",
+      "intent": "操作",
+      "targetPath": "/guides/platforms-and-search#room-search",
+      "role": "次词",
+      "priority": "P2",
+      "sourceEvidence": [
+        {
+          "label": "UNSW 官方校内外住宿与选区",
+          "url": "https://www.unsw.edu.au/student/student-life/campus/accommodation"
+        }
+      ],
+      "action": "区分private/shared与卫浴、人数、账单",
+      "validation": "主题搜索结果已查；具体词需求待验证",
+      "monthlySearchVolume": null,
+      "keywordDifficulty": null
+    },
+    {
+      "id": "K19",
+      "zh": "人在国内怎么租澳洲房",
+      "en": "renting in Australia from overseas",
+      "intent": "操作",
+      "targetPath": "/blog/rental-platforms-from-overseas",
+      "role": "主词",
+      "priority": "P1",
+      "sourceEvidence": [
+        {
+          "label": "UNSW 官方校内外住宿与选区",
+          "url": "https://www.unsw.edu.au/student/student-life/campus/accommodation"
+        }
+      ],
+      "action": "保留代看和先短住的选择，实际查看渠道规则",
+      "validation": "主题搜索结果已查；具体词需求待验证",
+      "monthlySearchVolume": null,
+      "keywordDifficulty": null
+    },
+    {
+      "id": "K20",
+      "zh": "澳洲租房申请材料清单",
+      "en": "rental application documents international students Australia",
+      "intent": "信息",
+      "targetPath": "/guides/application-documents",
+      "role": "主词",
+      "priority": "P1",
+      "sourceEvidence": [
+        {
+          "label": "Study Australia 留学生租房申请",
+          "url": "https://www.studyaustralia.gov.au/en/tools-and-resources/tips-and-advice-for-students/five-rental-housing-application-tips-for-international-students"
+        }
+      ],
+      "action": "结构化材料表，按中介要求适用",
+      "validation": "主题搜索结果已查；具体词需求待验证",
+      "monthlySearchVolume": null,
+      "keywordDifficulty": null
+    },
+    {
+      "id": "K21",
+      "zh": "澳洲租房cover letter",
+      "en": "rental cover letter Australia",
+      "intent": "材料",
+      "targetPath": "/blog/available-date-rental-cover-letter",
+      "role": "次词",
+      "priority": "P1",
+      "sourceEvidence": [
+        {
+          "label": "Study Australia 留学生租房申请",
+          "url": "https://www.studyaustralia.gov.au/en/tools-and-resources/tips-and-advice-for-students/five-rental-housing-application-tips-for-international-students"
+        }
+      ],
+      "action": "沿用现有文章，链接完整材料清单",
+      "validation": "主题搜索结果已查；具体词需求待验证",
+      "monthlySearchVolume": null,
+      "keywordDifficulty": null
+    },
+    {
+      "id": "K22",
+      "zh": "租房父母资助信parent letter",
+      "en": "parent support letter rental Australia",
+      "intent": "材料",
+      "targetPath": "/guides/application-documents#parent-letter-and-history",
+      "role": "次词",
+      "priority": "P1",
+      "sourceEvidence": [
+        {
+          "label": "Study Australia 留学生租房申请",
+          "url": "https://www.studyaustralia.gov.au/en/tools-and-resources/tips-and-advice-for-students/five-rental-housing-application-tips-for-international-students"
+        }
+      ],
+      "action": "分清资助信与法律担保，不虚构资金门槛",
+      "validation": "主题搜索结果已查；具体词需求待验证",
+      "monthlySearchVolume": null,
+      "keywordDifficulty": null
+    },
+    {
+      "id": "K23",
+      "zh": "没有澳洲租房记录怎么办",
+      "en": "rent without Australian rental history",
+      "intent": "材料",
+      "targetPath": "/blog/rental-history-guarantor",
+      "role": "主词",
+      "priority": "P1",
+      "sourceEvidence": [
+        {
+          "label": "Study Australia 留学生租房申请",
+          "url": "https://www.studyaustralia.gov.au/en/tools-and-resources/tips-and-advice-for-students/five-rental-housing-application-tips-for-international-students"
+        }
+      ],
+      "action": "真实境外住址和经同意的证明人",
+      "validation": "主题搜索结果已查；具体词需求待验证",
+      "monthlySearchVolume": null,
+      "keywordDifficulty": null
+    },
+    {
+      "id": "K24",
+      "zh": "澳洲租房guarantor担保人",
+      "en": "rental guarantor international student Australia",
+      "intent": "材料",
+      "targetPath": "/blog/rental-history-guarantor",
+      "role": "次词",
+      "priority": "P1",
+      "sourceEvidence": [
+        {
+          "label": "Study Australia 留学生租房申请",
+          "url": "https://www.studyaustralia.gov.au/en/tools-and-resources/tips-and-advice-for-students/five-rental-housing-application-tips-for-international-students"
+        }
+      ],
+      "action": "解释需要确认的责任，不自动生成法律承诺",
+      "validation": "主题搜索结果已查；具体词需求待验证",
+      "monthlySearchVolume": null,
+      "keywordDifficulty": null
+    },
+    {
+      "id": "K25",
+      "zh": "renter profile怎么填",
+      "en": "how to fill renter profile Australia",
+      "intent": "操作",
+      "targetPath": "/guides/application-documents#parent-letter-and-history",
+      "role": "次词",
+      "priority": "P2",
+      "sourceEvidence": [],
+      "action": "身份、居住史、工作收入与证明人分别填写",
+      "validation": "资料覆盖；搜索需求待验证",
+      "monthlySearchVolume": null,
+      "keywordDifficulty": null
+    },
+    {
+      "id": "K26",
+      "zh": "澳洲租房申请多久出结果",
+      "en": "rental application response time Australia",
+      "intent": "信息",
+      "targetPath": "/blog/rental-application-results",
+      "role": "主词",
+      "priority": "P1",
+      "sourceEvidence": [
+        {
+          "label": "Study Australia 留学生租房申请",
+          "url": "https://www.studyaustralia.gov.au/en/tools-and-resources/tips-and-advice-for-students/five-rental-housing-application-tips-for-international-students"
+        }
+      ],
+      "action": "保留不同时间线，避免保证当天获批",
+      "validation": "主题搜索结果已查；具体词需求待验证",
+      "monthlySearchVolume": null,
+      "keywordDifficulty": null
+    },
+    {
+      "id": "K27",
+      "zh": "怎么提高澳洲租房申请成功率",
+      "en": "improve rental application Australia",
+      "intent": "信息",
+      "targetPath": "/blog/rental-application-australia",
+      "role": "主词",
+      "priority": "P1",
+      "sourceEvidence": [
+        {
+          "label": "Study Australia 留学生租房申请",
+          "url": "https://www.studyaustralia.gov.au/en/tools-and-resources/tips-and-advice-for-students/five-rental-housing-application-tips-for-international-students"
+        }
+      ],
+      "action": "真实完整材料与沟通，不承诺成功率",
+      "validation": "主题搜索结果已查；具体词需求待验证",
+      "monthlySearchVolume": null,
+      "keywordDifficulty": null
+    },
+    {
+      "id": "K28",
+      "zh": "澳洲租房看房清单",
+      "en": "rental inspection checklist Australia",
+      "intent": "清单",
+      "targetPath": "/guides/inspection-checklist",
+      "role": "主词",
+      "priority": "P1",
+      "sourceEvidence": [
+        {
+          "label": "搜索样本：中文悉尼看房和入住清单",
+          "url": "https://sofang.com.au/sydney-rental-inspection-move-in-condition-checklist/"
+        }
+      ],
+      "action": "门禁、周边、室内、设施和沟通均覆盖",
+      "validation": "主题搜索结果已查；具体词需求待验证",
+      "monthlySearchVolume": null,
+      "keywordDifficulty": null
+    },
+    {
+      "id": "K29",
+      "zh": "悉尼租房代看清单",
+      "en": "Sydney proxy rental inspection checklist",
+      "intent": "清单",
+      "targetPath": "/guides/inspection-checklist#proxy-deliverables",
+      "role": "次词",
+      "priority": "P1",
+      "sourceEvidence": [
+        {
+          "label": "搜索样本：中文悉尼看房和入住清单",
+          "url": "https://sofang.com.au/sydney-rental-inspection-move-in-condition-checklist/"
+        }
+      ],
+      "action": "给影像交付与未测试项目，不只列房间",
+      "validation": "主题搜索结果已查；具体词需求待验证",
+      "monthlySearchVolume": null,
+      "keywordDifficulty": null
+    },
+    {
+      "id": "K30",
+      "zh": "澳洲看房空调采光隔音",
+      "en": "rental inspection air conditioning light noise",
+      "intent": "清单",
+      "targetPath": "/guides/inspection-checklist#room-checklist",
+      "role": "次词",
+      "priority": "P2",
+      "sourceEvidence": [],
+      "action": "作为清单子项，待需求验证",
+      "validation": "资料覆盖；搜索需求待验证",
+      "monthlySearchVolume": null,
+      "keywordDifficulty": null
+    },
+    {
+      "id": "K31",
+      "zh": "NSW租房押金多少",
+      "en": "NSW rental bond amount",
+      "intent": "规则",
+      "targetPath": "/guides/contracts-and-bond",
+      "role": "主词",
+      "priority": "P1",
+      "sourceEvidence": [
+        {
+          "label": "NSW 起租费用",
+          "url": "https://www.nsw.gov.au/housing-and-construction/rules/costs-at-start-of-a-residential-tenancy"
+        }
+      ],
+      "action": "NSW与VIC/ACT分开，限额有官方出处",
+      "validation": "主题搜索结果已查；具体词需求待验证",
+      "monthlySearchVolume": null,
+      "keywordDifficulty": null
+    },
+    {
+      "id": "K32",
+      "zh": "holding fee和bond区别",
+      "en": "holding fee vs bond NSW",
+      "intent": "规则",
+      "targetPath": "/guides/contracts-and-bond#nsw-upfront-payments",
+      "role": "次词",
+      "priority": "P1",
+      "sourceEvidence": [
+        {
+          "label": "NSW 起租费用",
+          "url": "https://www.nsw.gov.au/housing-and-construction/rules/costs-at-start-of-a-residential-tenancy"
+        }
+      ],
+      "action": "holding fee、bond、advance rent分别说明",
+      "validation": "主题搜索结果已查；具体词需求待验证",
+      "monthlySearchVolume": null,
+      "keywordDifficulty": null
+    },
+    {
+      "id": "K33",
+      "zh": "RBO怎么交押金",
+      "en": "how to lodge bond Rental Bonds Online NSW",
+      "intent": "操作",
+      "targetPath": "/guides/contracts-and-bond#bond-lodgement",
+      "role": "次词",
+      "priority": "P1",
+      "sourceEvidence": [
+        {
+          "label": "NSW 起租费用",
+          "url": "https://www.nsw.gov.au/housing-and-construction/rules/costs-at-start-of-a-residential-tenancy"
+        }
+      ],
+      "action": "核对官方入口、姓名、房屋和交存凭证",
+      "validation": "主题搜索结果已查；具体词需求待验证",
+      "monthlySearchVolume": null,
+      "keywordDifficulty": null
+    },
+    {
+      "id": "K34",
+      "zh": "NSW租房合同注意事项",
+      "en": "NSW tenancy agreement checklist",
+      "intent": "清单",
+      "targetPath": "/guides/contracts-and-bond#lease-checklist",
+      "role": "次词",
+      "priority": "P1",
+      "sourceEvidence": [
+        {
+          "label": "NSW 起租费用",
+          "url": "https://www.nsw.gov.au/housing-and-construction/rules/costs-at-start-of-a-residential-tenancy"
+        }
+      ],
+      "action": "旧模板仅作栏目参考，当前合同逐项看",
+      "validation": "主题搜索结果已查；具体词需求待验证",
+      "monthlySearchVolume": null,
+      "keywordDifficulty": null
+    },
+    {
+      "id": "K35",
+      "zh": "condition report怎么填",
+      "en": "how to complete a rental condition report NSW",
+      "intent": "清单",
+      "targetPath": "/guides/moving-in",
+      "role": "主词",
+      "priority": "P1",
+      "sourceEvidence": [
+        {
+          "label": "NSW condition report",
+          "url": "https://www.nsw.gov.au/housing-and-construction/rules/rental-property-condition-reports"
+        },
+        {
+          "label": "搜索样本：中文悉尼看房和入住清单",
+          "url": "https://sofang.com.au/sydney-rental-inspection-move-in-condition-checklist/"
+        }
+      ],
+      "action": "清单配合照片命名与既有缺陷记录",
+      "validation": "主题搜索结果已查；具体词需求待验证",
+      "monthlySearchVolume": null,
+      "keywordDifficulty": null
+    },
+    {
+      "id": "K36",
+      "zh": "condition report几天内交",
+      "en": "condition report deadline NSW Victoria",
+      "intent": "规则",
+      "targetPath": "/guides/moving-in#state-report-deadlines",
+      "role": "次词",
+      "priority": "P1",
+      "sourceEvidence": [
+        {
+          "label": "NSW condition report",
+          "url": "https://www.nsw.gov.au/housing-and-construction/rules/rental-property-condition-reports"
+        },
+        {
+          "label": "VIC condition report",
+          "url": "https://www.consumer.vic.gov.au/housing/renting/rent-bond-bills-and-condition-reports/condition-reports"
+        }
+      ],
+      "action": "NSW七天与VIC五工作日明确区分",
+      "validation": "主题搜索结果已查；具体词需求待验证",
+      "monthlySearchVolume": null,
+      "keywordDifficulty": null
+    },
+    {
+      "id": "K37",
+      "zh": "NSW租房水电网开户",
+      "en": "rental utility connections NSW",
+      "intent": "操作",
+      "targetPath": "/guides/moving-in#utilities-and-water",
+      "role": "次词",
+      "priority": "P2",
+      "sourceEvidence": [
+        {
+          "label": "NSW 用水费用",
+          "url": "https://www.nsw.gov.au/housing-and-construction/rules/connection-and-supply-of-water-to-rental-properties"
+        }
+      ],
+      "action": "先确认租约、独立计量与embedded network",
+      "validation": "主题搜索结果已查；具体词需求待验证",
+      "monthlySearchVolume": null,
+      "keywordDifficulty": null
+    },
+    {
+      "id": "K38",
+      "zh": "NSW冷水收费吗",
+      "en": "can tenants be charged for water in NSW",
+      "intent": "规则",
+      "targetPath": "/guides/moving-in#utilities-and-water",
+      "role": "次词",
+      "priority": "P1",
+      "sourceEvidence": [
+        {
+          "label": "NSW 用水费用",
+          "url": "https://www.nsw.gov.au/housing-and-construction/rules/connection-and-supply-of-water-to-rental-properties"
+        }
+      ],
+      "action": "修正冷水一概免费的旧说法",
+      "validation": "主题搜索结果已查；具体词需求待验证",
+      "monthlySearchVolume": null,
+      "keywordDifficulty": null
+    },
+    {
+      "id": "K39",
+      "zh": "NSW退押金流程",
+      "en": "NSW rental bond refund process",
+      "intent": "操作",
+      "targetPath": "/guides/repairs-and-moving-out",
+      "role": "主词",
+      "priority": "P1",
+      "sourceEvidence": [
+        {
+          "label": "NSW 退押金流程",
+          "url": "https://www.nsw.gov.au/housing-and-construction/renting-a-place-to-live/getting-your-bond-back"
+        }
+      ],
+      "action": "证据、通知、最终检查和退款渠道串联",
+      "validation": "主题搜索结果已查；具体词需求待验证",
+      "monthlySearchVolume": null,
+      "keywordDifficulty": null
+    },
+    {
+      "id": "K40",
+      "zh": "NSW房东不维修怎么办",
+      "en": "NSW tenant repair help",
+      "intent": "规则",
+      "targetPath": "/guides/repairs-and-moving-out#repair-records",
+      "role": "次词",
+      "priority": "P2",
+      "sourceEvidence": [
+        {
+          "label": "NSW 免费租赁投诉服务",
+          "url": "https://www.nsw.gov.au/departments-and-agencies/fair-trading/complaints-and-enquiries/housing-and-property/tenancy-landlord-and-agent"
+        }
+      ],
+      "action": "已给留证和求助，具体急修权限继续按州核对",
+      "validation": "主题搜索结果已查；具体词需求待验证",
+      "monthlySearchVolume": null,
+      "keywordDifficulty": null
+    },
+    {
+      "id": "K41",
+      "zh": "悉尼租房免费维权咨询",
+      "en": "free tenancy advice and complaints NSW",
+      "intent": "求助",
+      "targetPath": "/guides/repairs-and-moving-out#dispute-help",
+      "role": "次词",
+      "priority": "P1",
+      "sourceEvidence": [
+        {
+          "label": "NSW 免费租赁投诉服务",
+          "url": "https://www.nsw.gov.au/departments-and-agencies/fair-trading/complaints-and-enquiries/housing-and-property/tenancy-landlord-and-agent"
+        }
+      ],
+      "action": "免费投诉不等于一切仲裁诉讼免费",
+      "validation": "主题搜索结果已查；具体词需求待验证",
+      "monthlySearchVolume": null,
+      "keywordDifficulty": null
+    }
+  ]
+}

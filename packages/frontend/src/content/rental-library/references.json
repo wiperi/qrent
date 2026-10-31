@@ -1,0 +1,486 @@
+{
+  "sources": [
+    {
+      "id": "qrent-handbook",
+      "fileName": "Qrent究极澳洲租房全流程攻略.md",
+      "sha256": "1c51710714d9ca757b8aa49acef07e8db4c4e34bedbac16dbc88343b09358272",
+      "sourceDate": "2025-04-06",
+      "title": {
+        "zh": "Qrent 澳洲租房全流程攻略 2025-04-06 版",
+        "en": "Qrent rental handbook, 6 April 2025 edition"
+      }
+    },
+    {
+      "id": "saved-rental-posts",
+      "fileName": "澳洲租房收藏图文整理.docx",
+      "sha256": "31c8221f08e89d38ccb2a368ed5f00dd6b633cf7d9c432fcaf8ac21c3c7e63d0",
+      "sourceDate": "2026-10-30",
+      "title": {
+        "zh": "澳洲租房收藏图文整理（20 篇）",
+        "en": "Collected rental notes (20 posts)"
+      }
+    }
+  ],
+  "experiences": [
+    {
+      "id": "collection-01",
+      "title": {
+        "zh": "澳洲租房前检查攻略 condition report",
+        "en": "Move-in condition report checklist"
+      },
+      "author": "译文儿",
+      "displayDate": "2024-01-25",
+      "sourceUrl": "https://www.xiaohongshu.com/explore/65b360ad000000001003fdc5",
+      "collectionSourceId": "saved-rental-posts",
+      "locator": {
+        "kind": "nonempty-paragraphs",
+        "indexBase": 0,
+        "start": 24,
+        "end": 49
+      },
+      "module": "moving-in",
+      "note": {
+        "zh": "记录墙面、门窗、排水、家电与既有损坏，用照片对应报告项目。",
+        "en": "Record walls, locks, drainage, appliances and existing damage, with photos tied to report items."
+      },
+      "evidenceType": "personal-experience"
+    },
+    {
+      "id": "collection-02",
+      "title": {
+        "zh": "澳洲租房如何维权以及免费维权途径1",
+        "en": "Tenant rights and dispute routes"
+      },
+      "author": "Momo（法师养成版）",
+      "displayDate": "编辑于2023-12-03",
+      "sourceUrl": "https://www.xiaohongshu.com/explore/656c2e9d000000000602a277",
+      "collectionSourceId": "saved-rental-posts",
+      "locator": {
+        "kind": "nonempty-paragraphs",
+        "indexBase": 0,
+        "start": 50,
+        "end": 70
+      },
+      "module": "repairs-and-moving-out",
+      "note": {
+        "zh": "原帖以 ACT 为主，保留证据与查所在州机构的思路，不跨州套用四周上限或保证胜诉。",
+        "en": "The original mainly concerns ACT. Keep evidence and find the relevant state service; do not generalise bond limits or promise outcomes."
+      },
+      "evidenceType": "personal-experience"
+    },
+    {
+      "id": "collection-03",
+      "title": {
+        "zh": "一文看懂澳洲租房押金攻略",
+        "en": "Bond, holding payments and bills"
+      },
+      "author": "CiCi西西在澳洲",
+      "displayDate": "2024-12-08",
+      "sourceUrl": "https://www.xiaohongshu.com/explore/67563435000000000102a00e",
+      "collectionSourceId": "saved-rental-posts",
+      "locator": {
+        "kind": "nonempty-paragraphs",
+        "indexBase": 0,
+        "start": 71,
+        "end": 94
+      },
+      "module": "contracts-and-bond",
+      "note": {
+        "zh": "区分预订款、押金和账单，保存收据、住户变更及退租沟通；原帖混用州规则。",
+        "en": "Distinguish holding payments, bond and bills; retain receipts, tenant-change records and exit correspondence. The source mixes state rules."
+      },
+      "evidenceType": "personal-experience"
+    },
+    {
+      "id": "collection-04",
+      "title": {
+        "zh": "2024悉尼租房合同攻略 再也不担心黑心房东",
+        "en": "Reading a NSW tenancy agreement"
+      },
+      "author": "悉尼房产管家",
+      "displayDate": "2024-03-28",
+      "sourceUrl": "https://www.xiaohongshu.com/explore/6604f4fe0000000014004840",
+      "collectionSourceId": "saved-rental-posts",
+      "locator": {
+        "kind": "nonempty-paragraphs",
+        "indexBase": 0,
+        "start": 95,
+        "end": 114
+      },
+      "module": "contracts-and-bond",
+      "note": {
+        "zh": "核对当事人、租期、付款、紧急维修、物业规则和报告；截图是旧模板的部分页面。",
+        "en": "Check parties, dates, payments, emergency contacts, strata rules and the condition report. Screenshots show only part of an older template."
+      },
+      "evidenceType": "personal-experience"
+    },
+    {
+      "id": "collection-05",
+      "title": {
+        "zh": "科普 澳洲租房如何正规交Bond 附真实截图",
+        "en": "Using Rental Bonds Online in NSW"
+      },
+      "author": "靠谱Lance｜悉尼物业管理",
+      "displayDate": "编辑于2023-11-03",
+      "sourceUrl": "https://www.xiaohongshu.com/explore/6544a557000000002500af43",
+      "collectionSourceId": "saved-rental-posts",
+      "locator": {
+        "kind": "nonempty-paragraphs",
+        "indexBase": 0,
+        "start": 115,
+        "end": 132
+      },
+      "module": "contracts-and-bond",
+      "note": {
+        "zh": "核对 RBO 邀请中的租客与房屋信息，保存交存凭证；截图也提供非在线交存方式。",
+        "en": "Check tenant and property details in the RBO invitation and keep lodgement evidence. The example also describes an offline alternative."
+      },
+      "evidenceType": "personal-experience"
+    },
+    {
+      "id": "collection-06",
+      "title": {
+        "zh": "近期悉尼租房问题回答 申请房子必备文件",
+        "en": "Preparing application documents and communication"
+      },
+      "author": "十元梨妹",
+      "displayDate": "编辑于2024-09-09",
+      "sourceUrl": "https://www.xiaohongshu.com/explore/66dfd1e40000000025032cff",
+      "collectionSourceId": "saved-rental-posts",
+      "locator": {
+        "kind": "nonempty-paragraphs",
+        "indexBase": 0,
+        "start": 133,
+        "end": 148
+      },
+      "module": "application-documents",
+      "note": {
+        "zh": "看房前整理资料、检查漏传签证，并准备可联系的电话和付款安排。原文预算为历史个案。",
+        "en": "Prepare documents, check missing uploads such as the visa, and arrange reliable communication and payment. Budgets are historical examples."
+      },
+      "evidenceType": "personal-experience"
+    },
+    {
+      "id": "collection-07",
+      "title": {
+        "zh": "是谁在realestate上租房 申的全中",
+        "en": "Cover letter structure from an application example"
+      },
+      "author": "小红薯689C6E40",
+      "displayDate": "2025-01-15",
+      "sourceUrl": "https://www.xiaohongshu.com/explore/6788988200000000190056bc",
+      "collectionSourceId": "saved-rental-posts",
+      "locator": {
+        "kind": "nonempty-paragraphs",
+        "indexBase": 0,
+        "start": 149,
+        "end": 161
+      },
+      "module": "application-documents",
+      "note": {
+        "zh": "申请信围绕真实身份、经济支持、居住经历及入住日期；获批经历不等于成功保证。",
+        "en": "Structure the letter around real identity, support, housing history and move-in timing. An approval story is not a guarantee."
+      },
+      "evidenceType": "personal-experience"
+    },
+    {
+      "id": "collection-08",
+      "title": {
+        "zh": "和四十个人抢房源当天收到offer的经验分享",
+        "en": "Following up after an inspection"
+      },
+      "author": "勾勾勾大姐",
+      "displayDate": "编辑于2023-01-29",
+      "sourceUrl": "https://www.xiaohongshu.com/explore/63d640c2000000001d021db6",
+      "collectionSourceId": "saved-rental-posts",
+      "locator": {
+        "kind": "nonempty-paragraphs",
+        "indexBase": 0,
+        "start": 162,
+        "end": 179
+      },
+      "module": "application-documents",
+      "note": {
+        "zh": "先查房屋历史、实地看房、确认申请渠道，再以真实材料说明情况并及时跟进。",
+        "en": "Check property history, inspect, confirm the application channel, submit truthful evidence and follow up."
+      },
+      "evidenceType": "personal-experience"
+    },
+    {
+      "id": "collection-09",
+      "title": {
+        "zh": "realestate 租房心得",
+        "en": "Preparing for different application platforms"
+      },
+      "author": "好好拉屎",
+      "displayDate": "2025-01-15",
+      "sourceUrl": "https://www.xiaohongshu.com/explore/67876b46000000001c00e944",
+      "collectionSourceId": "saved-rental-posts",
+      "locator": {
+        "kind": "nonempty-paragraphs",
+        "indexBase": 0,
+        "start": 180,
+        "end": 203
+      },
+      "module": "platforms-and-search",
+      "note": {
+        "zh": "Brisbane/UQ 个案说明 renter profile 不代替中介指定的申请系统；OSHC 与 Medicare 不可混用。",
+        "en": "A Brisbane/UQ example shows that a renter profile does not replace the agent’s application system. OSHC and Medicare are different."
+      },
+      "evidenceType": "personal-experience"
+    },
+    {
+      "id": "collection-10",
+      "title": {
+        "zh": "澳洲租房代看房保姆级清单 申请技巧",
+        "en": "A checklist for someone inspecting on your behalf"
+      },
+      "author": "我不是闲狗",
+      "displayDate": "编辑于01-10（年份未显示）",
+      "sourceUrl": "https://www.xiaohongshu.com/explore/679a074a000000001902e7bd",
+      "collectionSourceId": "saved-rental-posts",
+      "locator": {
+        "kind": "nonempty-paragraphs",
+        "indexBase": 0,
+        "start": 204,
+        "end": 240
+      },
+      "module": "inspection-checklist",
+      "note": {
+        "zh": "包含通勤、设施、噪音、采光、账单、申请渠道，以及各房间和楼道影像交付要求。",
+        "en": "Covers travel, facilities, noise, light, bills, application channels and room-by-room inspection recordings."
+      },
+      "evidenceType": "personal-experience"
+    },
+    {
+      "id": "collection-11",
+      "title": {
+        "zh": "国内0租房经验澳洲留学租房经验分享",
+        "en": "First rental application without local history"
+      },
+      "author": "猫冰果",
+      "displayDate": "2025-01-17",
+      "sourceUrl": "https://www.xiaohongshu.com/explore/678a18250000000018015d37",
+      "collectionSourceId": "saved-rental-posts",
+      "locator": {
+        "kind": "nonempty-paragraphs",
+        "indexBase": 0,
+        "start": 241,
+        "end": 264
+      },
+      "module": "application-documents",
+      "note": {
+        "zh": "如实填写住址、工作、收入与证明人；先征求推荐人同意，再提供可核实资料。",
+        "en": "Give accurate address, employment, income and referee details; get consent before arranging verification."
+      },
+      "evidenceType": "personal-experience"
+    },
+    {
+      "id": "collection-12",
+      "title": {
+        "zh": "墨尔本租房区域推荐",
+        "en": "Melbourne areas by university campus"
+      },
+      "author": "板栗留学工作室芃苗",
+      "displayDate": "2022-09-13",
+      "sourceUrl": "https://www.xiaohongshu.com/explore/63206c8f00000000180181fc",
+      "collectionSourceId": "saved-rental-posts",
+      "locator": {
+        "kind": "nonempty-paragraphs",
+        "indexBase": 0,
+        "start": 265,
+        "end": 287
+      },
+      "module": "areas-and-commute",
+      "note": {
+        "zh": "区分墨大、RMIT 与 Monash 两校区；2022 年价格的周期和房型口径不清，不作现价。",
+        "en": "Distinguish Melbourne, RMIT and the two Monash campuses. The 2022 price units and housing types are unclear, so they are not current quotes."
+      },
+      "evidenceType": "personal-experience"
+    },
+    {
+      "id": "collection-13",
+      "title": {
+        "zh": "2k字干货 UNSW附近租房区域介绍",
+        "en": "UNSW neighbourhood comparison"
+      },
+      "author": "Sherri悉尼日记",
+      "displayDate": "编辑于2024-11-04",
+      "sourceUrl": "https://www.xiaohongshu.com/explore/6728b6e1000000001b02aac0",
+      "collectionSourceId": "saved-rental-posts",
+      "locator": {
+        "kind": "nonempty-paragraphs",
+        "indexBase": 0,
+        "start": 288,
+        "end": 319
+      },
+      "module": "areas-and-commute",
+      "note": {
+        "zh": "按近校、公交与生活配套比较区域；2024 年价格口径混用，微缩推广图部分文字不清。",
+        "en": "Compare campus proximity, transport and amenities. The 2024 price categories are mixed; some tiny promotional text was unreadable."
+      },
+      "evidenceType": "personal-experience"
+    },
+    {
+      "id": "collection-14",
+      "title": {
+        "zh": "悉尼大学租房攻略 纯干货无广",
+        "en": "University of Sydney neighbourhood notes"
+      },
+      "author": "红薯🍠",
+      "displayDate": "2025-01-09",
+      "sourceUrl": "https://www.xiaohongshu.com/explore/67807909000000001703e09b",
+      "collectionSourceId": "saved-rental-posts",
+      "locator": {
+        "kind": "nonempty-paragraphs",
+        "indexBase": 0,
+        "start": 320,
+        "end": 342
+      },
+      "module": "areas-and-commute",
+      "note": {
+        "zh": "按校园位置比较 Ultimo、Glebe、Newtown 等；旧价格及主观治安评价不当现行统计。",
+        "en": "Compare Ultimo, Glebe, Newtown and other areas by campus access. Historical prices and safety opinions are not current statistics."
+      },
+      "evidenceType": "personal-experience"
+    },
+    {
+      "id": "collection-15",
+      "title": {
+        "zh": "新南热门租房区域分析导图 租哪的房",
+        "en": "UNSW rental-area planning diagram"
+      },
+      "author": "我不是闲狗",
+      "displayDate": "2024-08-11",
+      "sourceUrl": "https://www.xiaohongshu.com/explore/66b8aa87000000001e018514",
+      "collectionSourceId": "saved-rental-posts",
+      "locator": {
+        "kind": "nonempty-paragraphs",
+        "indexBase": 0,
+        "start": 343,
+        "end": 375
+      },
+      "module": "budget-and-housing",
+      "note": {
+        "zh": "保留先预算、后区域、再筛房和实看的顺序；2024 年导图金额是人均周租而非整套租金。",
+        "en": "Keep the budget-to-area-to-search-to-inspection sequence. The 2024 diagram uses per-person weekly figures, not whole-property prices."
+      },
+      "evidenceType": "personal-experience"
+    },
+    {
+      "id": "collection-16",
+      "title": {
+        "zh": "澳洲租房小攻略 以realestate为例",
+        "en": "Searching and booking inspections on Real Estate"
+      },
+      "author": "Jessie.S",
+      "displayDate": "2024-09-21",
+      "sourceUrl": "https://www.xiaohongshu.com/explore/66ee85040000000026033915",
+      "collectionSourceId": "saved-rental-posts",
+      "locator": {
+        "kind": "nonempty-paragraphs",
+        "indexBase": 0,
+        "start": 376,
+        "end": 391
+      },
+      "module": "platforms-and-search",
+      "note": {
+        "zh": "按州与邮编选 Rent，检查入住日和 Deposit Taken；公开看房登记，未排期则联系中介。",
+        "en": "Choose Rent and confirm state/postcode, availability and Deposit Taken status. Register for scheduled inspections or contact the agent."
+      },
+      "evidenceType": "personal-experience"
+    },
+    {
+      "id": "collection-17",
+      "title": {
+        "zh": "Scape Darling Square入住体验",
+        "en": "A Darling Square twin-room experience"
+      },
+      "author": "梦想是吃很多土豆",
+      "displayDate": "编辑于2024-05-08",
+      "sourceUrl": "https://www.xiaohongshu.com/explore/663b862a000000001e02f3be",
+      "collectionSourceId": "saved-rental-posts",
+      "locator": {
+        "kind": "nonempty-paragraphs",
+        "indexBase": 0,
+        "start": 392,
+        "end": 401
+      },
+      "module": "budget-and-housing",
+      "note": {
+        "zh": "个案提醒核对床位分隔、室友安排、换房政策、噪音与公共设施，不推广为整栋现状。",
+        "en": "A personal account highlights bed separation, roommate arrangements, room changes, noise and shared facilities, not a building-wide current verdict."
+      },
+      "evidenceType": "personal-experience"
+    },
+    {
+      "id": "collection-18",
+      "title": {
+        "zh": "土澳留子 学生公寓踩过的坑 悉大附近",
+        "en": "Comparing student-accommodation room types"
+      },
+      "author": "Kat嘎叽",
+      "displayDate": "编辑于2024-05-14",
+      "sourceUrl": "https://www.xiaohongshu.com/explore/65b5ce68000000001100246a",
+      "collectionSourceId": "saved-rental-posts",
+      "locator": {
+        "kind": "nonempty-paragraphs",
+        "indexBase": 0,
+        "start": 402,
+        "end": 427
+      },
+      "module": "budget-and-housing",
+      "note": {
+        "zh": "比较实际面积、窗景、储物、冷热空调、洗衣费用及维护；疫情优惠和个人事件保留历史属性。",
+        "en": "Compare usable space, windows, storage, heating/cooling, laundry and maintenance. Pandemic discounts and personal incidents remain historical."
+      },
+      "evidenceType": "personal-experience"
+    },
+    {
+      "id": "collection-19",
+      "title": {
+        "zh": "关于我在悉尼是如何租到200刀房之分租篇1",
+        "en": "Searching for a room on Flatmates"
+      },
+      "author": "十元梨妹",
+      "displayDate": "2024-04-19",
+      "sourceUrl": "https://www.xiaohongshu.com/explore/662245e6000000001c004fa3",
+      "collectionSourceId": "saved-rental-posts",
+      "locator": {
+        "kind": "nonempty-paragraphs",
+        "indexBase": 0,
+        "start": 428,
+        "end": 441
+      },
+      "module": "platforms-and-search",
+      "note": {
+        "zh": "区分 private/shared room、卫浴、住户人数、包账单和室友习惯；历史消息付费规则不作现行功能。",
+        "en": "Distinguish private/shared rooms, bathrooms, occupancy, bills and household habits. Historical messaging restrictions are not current platform guarantees."
+      },
+      "evidenceType": "personal-experience"
+    },
+    {
+      "id": "collection-20",
+      "title": {
+        "zh": "关于我在悉尼是如何租到200刀房之整租篇",
+        "en": "Searching for a whole property and its history"
+      },
+      "author": "十元梨妹",
+      "displayDate": "2024-04-18",
+      "sourceUrl": "https://www.xiaohongshu.com/explore/66210c47000000001c006073",
+      "collectionSourceId": "saved-rental-posts",
+      "locator": {
+        "kind": "nonempty-paragraphs",
+        "indexBase": 0,
+        "start": 442,
+        "end": 459
+      },
+      "module": "platforms-and-search",
+      "note": {
+        "zh": "用总周租与卧室数做初筛，再查通勤、平面图和历史照片；微小尺寸不清，不推算。",
+        "en": "Filter by whole-property rent and bedrooms, then check travel, floor plans and historical photos. Do not infer unreadable dimensions."
+      },
+      "evidenceType": "personal-experience"
+    }
+  ]
+}

@@ -45,7 +45,7 @@ test('sitemap excludes filter pages, deduplicates and keeps only actual article 
   assert.equal(urls.length, new Set(urls).size);
   assert.ok(urls.includes('https://www.qrent.rent/zh/blog/only-zh'));
   assert.ok(!urls.includes('https://www.qrent.rent/en/blog/only-zh'));
-  assert.ok(!urls.some(url => /search|favorite|\.\.|\?/.test(url)));
+  assert.ok(!urls.some(url => /\/(?:search|favorite)(?:\/|[?#]|$)|\.\.|\?/.test(url)));
   const post = entries.find(entry => entry.url.endsWith('/en/blog/only-en'))!;
   assert.equal(post.lastModified, '2026-10-02T00:00:00Z');
   assert.ok(

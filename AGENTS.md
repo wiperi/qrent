@@ -15,6 +15,14 @@ SEO regressions live in `packages/frontend/test/seo/`; they are isolated from th
 
 Published guides are versioned Chinese/English pairs in `packages/frontend/src/content/guides/`, exported from the ten public Notion source pages. Guide updates now require both full bodies in the same PR; Notion edits do not hot-publish to the website. Keep source IDs, body hashes and original publication dates; record the paired publication review time separately. CI checks pair coverage, body identity and stale translations. No request-time translation or paid model calls belong in the guide reader.
 
+The additional source-based handbook lives in `packages/frontend/src/content/rental-library/`.
+Keep both languages, stable section IDs, source-file hashes, original post dates and
+jurisdiction/evidence labels together. The owner's original Markdown and DOCX remain
+private and unchanged. `/guides` supplements the existing `/blog` identities; the
+static noindex `/knowledge/rental-guides.json` export supplies cited reference data,
+not generated answers. Do not turn old quotes or personal stories into current
+prices or universal legal rules. Review official-rule changes with their state scope.
+
 The original Redis container is now supervised by `qrent-account-store.service`.
 Its Docker restart policy is `no`; the unit verifies the private Redis port guard
 before attaching to the existing container. Use that service for Redis lifecycle

@@ -6,6 +6,8 @@ import { getNotionBlogPosts } from '@/lib/notion-blog';
 import { pageMetadata } from '@/lib/seo';
 import RentalLinks from '@/components/RentalLinks';
 import styles from '@/styles/discovery.module.css';
+import Link from 'next/link';
+import libraryStyles from '@/styles/rental-library.module.css';
 
 export async function generateMetadata({ params }: { params: Promise<{ locale: string }> }) {
   const { locale } = await params;
@@ -39,6 +41,16 @@ export default async function BlogPage({ params }: { params: Promise<{ locale: s
           ? `${posts.length} 篇实用经验，从选区到入住。`
           : `${posts.length} practical guides, from choosing an area to moving in.`}
       </p>
+      <div className={libraryStyles.blogEntry}>
+        <Link href={`/${locale}/guides`}>
+          {locale === 'zh' ? '按阶段查全流程攻略 →' : 'Browse the rental handbook →'}
+        </Link>
+        <p>
+          {locale === 'zh'
+            ? '预算、选区、申请、看房、签约与入住'
+            : 'Budget, areas, applications, inspections and moving in'}
+        </p>
+      </div>
       <CategoryProvider>
         <div className={styles.blogLayout}>
           <div>
