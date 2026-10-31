@@ -179,6 +179,77 @@ class StoreRecoveryTests(unittest.TestCase):
         with patch.object(store,'command',side_effect=command):
             with self.assertRaisesRegex(RuntimeError,'not quiescent'):store.orphan_cleared(self.root,state,proc)
 
+    def test_bundle_plan_requires_exact_error_stopped_oci_and_original_private_backup(self):
+        state,proc,tasks=self.setup_reconciled_orphan();runtime=self.root/'runtime';oci=self.root/'oci';data=self.root/'containers'
+        bundle=runtime/state['id'];(bundle/'rootfs').mkdir(parents=True)
+        (bundle/'config.json').write_text(json.dumps({'root':{'path':'rootfs'}}))
+        mountinfo=self.root/'mountinfo';mountinfo.write_text('')
+        metadata=data/state['id'];metadata.mkdir(parents=True)
+        original={'Image':'redis-image','Config':{'Image':'redis:7.4.2-alpine'},'State':{'Error':'mkdir '+str(bundle)+': file exists'}}
+        (metadata/'config.v2.json').write_text(json.dumps(original));(metadata/'hostconfig.json').write_text(json.dumps({'AutoRemove':False,'RestartPolicy':{'Name':'no'}}))
+        orphan=self.root/'.deploy/receipts/account-orphan-100-1000.json'
+        record=json.loads(orphan.read_text());record['target_image']='redis-image';orphan.write_text(json.dumps(record))
+        receipt=self.root/'.deploy/receipts/account-store-20261031.json';record=json.loads(receipt.read_text())
+        record.update(action='resume-apply',status='requires_attention',reconciled_orphan={'orphan_receipt':orphan.name});receipt.write_text(json.dumps(record))
+        value={'id':state['id'],'status':'stopped','pid':0,'bundle':str(bundle)}
+        tools=patch.object(store,'trusted_runc',return_value='/usr/bin/runc');tools.start();self.addCleanup(tools.stop)
+        groups=patch.object(store,'empty_redis_cgroup');groups.start();self.addCleanup(groups.stop)
+        namespace=patch.object(store,'host_mount_namespace',return_value='host-mnt');namespace.start();self.addCleanup(namespace.stop)
+        mounts=patch.object(store,'business_mounts',return_value={'business':'mount-hash'});mounts.start();self.addCleanup(mounts.stop)
+        with patch.object(store,'command',side_effect=self.resume_commands(tasks)),patch.object(store.subprocess,'run',return_value=subprocess.CompletedProcess([],0,stdout=json.dumps(value))):
+            proof=store.bundle_plan(self.root,state,proc,runtime,oci,mountinfo,data)
+            self.assertEqual(proof['rootfs_mount_count'],0)
+        for changes in ({'status':'running','pid':456},{'bundle':str(self.root/'other')},{'id':'b'*64}):
+            with patch.object(store,'command',side_effect=self.resume_commands(tasks)),patch.object(store.subprocess,'run',return_value=subprocess.CompletedProcess([],0,stdout=json.dumps({**value,**changes}))):
+                with self.assertRaisesRegex(RuntimeError,'OCI instance'):store.bundle_plan(self.root,state,proc,runtime,oci,mountinfo,data)
+
+    def test_bundle_mount_scan_rejects_mounts_outside_selected_rootfs(self):
+        bundle=self.root/'bundle';mountinfo=self.root/'mountinfo'
+        mountinfo.write_text('1 0 0:1 / '+str(bundle/'rootfs')+' rw - overlay overlay rw\n')
+        self.assertEqual(store.bundle_mounts(bundle,mountinfo),[bundle/'rootfs'])
+        mountinfo.write_text('1 0 0:1 / '+str(bundle/'other')+' rw - tmpfs tmpfs rw\n')
+        with self.assertRaisesRegex(RuntimeError,'Unexpected mount'):store.bundle_mounts(bundle,mountinfo)
+
+    def test_bundle_cleanup_quarantines_only_runtime_and_preserves_original_volume(self):
+        state={**self.state,'running':False,'status':'exited','pid':0,'process_state':'unknown','exit_code':128}
+        receipts=self.root/'.deploy/receipts';receipts.mkdir(parents=True);(self.root/'.deploy/backups').mkdir()
+        bundle=self.root/'runtime-bundle';(bundle/'rootfs').mkdir(parents=True);configuration=json.dumps({'root':{'path':'rootfs'}});(bundle/'config.json').write_text(configuration)
+        quarantine=self.root/'quarantine';quarantine.mkdir()
+        info=bundle.stat();proof={'bundle':str(bundle),'bundle_identity':[info.st_dev,info.st_ino],'rootfs_mount_count':1,
+            'oci_root':str(self.root/'oci'),'attempt_marker':str(receipts/'account-bundle-case.json'),
+            'business_mounts_sha256':{'business':'mount-hash'},'host_mount_namespace':'host-mnt','runc_binary':'/usr/bin/runc'}
+        before=copy.deepcopy(self.before);before[-1][2]=0;after=copy.deepcopy(before);after[-1][2:4]=[456,'new']
+        with patch.object(store,'container_rows',side_effect=[before,after]),patch.object(store,'redis_state',return_value=state),patch.object(store,'bundle_plan',return_value=proof),patch.object(store,'runtime_reconciled',return_value=({},None)),patch.object(store,'host_mount_namespace',return_value='host-mnt'),patch.object(store,'business_mounts',return_value={'business':'mount-hash'}),patch.object(store,'empty_redis_cgroup'),patch.object(store,'atomic_runtime_quarantine',side_effect=lambda source,destination:source.rename(destination)),patch.object(store,'guard_public_ports',return_value={'persistent':True}),patch.object(store,'private_runtime_quarantine',return_value=quarantine),patch.object(store,'bundle_mounts',side_effect=[[bundle/'rootfs'],[]]),patch.object(store.os,'geteuid',return_value=0),patch.object(store.subprocess,'run',return_value=subprocess.CompletedProcess([],0)) as run,patch.object(store,'repair_process') as start,patch.object(store,'local_ping',return_value=True):
+            report=store.recover_bundle('bundle-apply',self.root)
+        self.assertEqual(report['status'],'verified');self.assertFalse(bundle.exists())
+        self.assertEqual((Path(report['runtime_quarantine'])/'config.json').read_text(),configuration)
+        self.assertEqual((self.volume/'dump.rdb').read_bytes(),b'original-redis-state')
+        self.assertEqual(run.call_args_list[0].args[0],['/usr/bin/runc','--root',proof['oci_root'],'delete',state['id']])
+        self.assertEqual(run.call_args_list[1].args[0],['/usr/bin/umount','--recursive','--',str(bundle/'rootfs')])
+        start.assert_called_once_with(state,start=True,resume=True)
+
+    def test_busy_bundle_rootfs_never_gets_force_unmounted_or_started(self):
+        state={**self.state,'running':False,'status':'exited','pid':0,'exit_code':128}
+        receipts=self.root/'.deploy/receipts';receipts.mkdir(parents=True);(self.root/'.deploy/backups').mkdir()
+        bundle=self.root/'runtime-bundle';bundle.mkdir();(bundle/'config.json').write_text('{}');info=bundle.stat()
+        proof={'bundle':str(bundle),'bundle_identity':[info.st_dev,info.st_ino],'oci_root':str(self.root/'oci'),'attempt_marker':str(receipts/'account-bundle-case.json'),'business_mounts_sha256':{},'host_mount_namespace':'host-mnt','runc_binary':'/usr/bin/runc'}
+        with patch.object(store,'container_rows',return_value=self.before),patch.object(store,'redis_state',return_value=state),patch.object(store,'bundle_plan',return_value=proof),patch.object(store,'runtime_reconciled',return_value=({},None)),patch.object(store,'business_mounts',return_value={}),patch.object(store,'host_mount_namespace',return_value='host-mnt'),patch.object(store,'empty_redis_cgroup'),patch.object(store,'guard_public_ports',return_value={'persistent':True}),patch.object(store,'bundle_mounts',side_effect=[[bundle/'rootfs'],[bundle/'rootfs']]),patch.object(store.os,'geteuid',return_value=0),patch.object(store.subprocess,'run',return_value=subprocess.CompletedProcess([],0)) as run,patch.object(store,'repair_process') as start:
+            with self.assertRaisesRegex(RuntimeError,'mounts remain'):store.recover_bundle('bundle-apply',self.root)
+        start.assert_not_called();self.assertTrue(bundle.exists())
+        self.assertNotIn('--force',str(run.call_args_list));self.assertNotIn('--lazy',str(run.call_args_list))
+
+    def test_bundle_mount_scan_rejects_propagation_and_cgroup_processes(self):
+        bundle=self.root/'bundle';mountinfo=self.root/'mountinfo'
+        mountinfo.write_text('1 0 0:1 / '+str(bundle/'rootfs')+' rw shared:7 - overlay overlay rw\n')
+        with self.assertRaisesRegex(RuntimeError,'propagated'):store.bundle_mounts(bundle,mountinfo)
+        group=self.root/'cgroups';group.mkdir();(group/'cgroup.controllers').write_text('cpu memory')
+        identity='a'*64;path=group/'system.slice'/('docker-'+identity+'.scope');path.mkdir(parents=True)
+        (path/'cgroup.procs').write_text('');(path/'cgroup.threads').write_text('')
+        config={'linux':{'cgroupsPath':'system.slice:docker:'+identity}}
+        store.empty_redis_cgroup(config,identity,group)
+        (path/'cgroup.threads').write_text('1599')
+        with self.assertRaisesRegex(RuntimeError,'still contains'):store.empty_redis_cgroup(config,identity,group)
+
     def test_start_guards_public_ports_before_any_container_start(self):
         stopped={**self.state,'running':False,'status':'exited','pid':0,'process_state':'unknown'}
         guarded=[]
