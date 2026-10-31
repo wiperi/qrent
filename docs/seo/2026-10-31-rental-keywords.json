@@ -9,7 +9,7 @@
       "zh": "澳洲租房攻略",
       "en": "Australian rental guide",
       "intent": "信息",
-      "targetPath": "/guides",
+      "targetPath": "/blog",
       "role": "主词",
       "priority": "P1",
       "sourceEvidence": [
@@ -18,7 +18,7 @@
           "url": "https://www.unsw.edu.au/student/student-life/campus/accommodation"
         }
       ],
-      "action": "八阶段总入口，不另造泛词落地页",
+      "action": "统一攻略入口，不另造泛词落地页",
       "validation": "主题搜索结果已查；具体词需求待验证",
       "monthlySearchVolume": null,
       "keywordDifficulty": null
@@ -28,7 +28,7 @@
       "zh": "留学生澳洲租房流程",
       "en": "rental process for international students Australia",
       "intent": "信息",
-      "targetPath": "/guides",
+      "targetPath": "/blog",
       "role": "次词",
       "priority": "P1",
       "sourceEvidence": [

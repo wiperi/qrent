@@ -138,4 +138,5 @@ test('all library pages enter the sitemap with both languages while the data exp
       assert.equal(Object.keys(row.alternates?.languages ?? {}).length, 2);
     }
   assert(!sitemap.some(item => item.url.includes('/knowledge/') || item.url.includes('?')));
+  assert(!sitemap.some(item => /\/(?:en|zh)\/guides$/.test(item.url)));
 });

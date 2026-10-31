@@ -18,7 +18,10 @@ Published guides are versioned Chinese/English pairs in `packages/frontend/src/c
 The additional source-based handbook lives in `packages/frontend/src/content/rental-library/`.
 Keep both languages, stable section IDs, source-file hashes, original post dates and
 jurisdiction/evidence labels together. The owner's original Markdown and DOCX remain
-private and unchanged. `/guides` supplements the existing `/blog` identities; the
+private and unchanged. `/blog` is the single entrance for the ten experience
+articles and eight source-based articles, with shared topics and full-content
+search. `/guides` permanently redirects to it; `/guides/<module>` article URLs
+and section citations remain stable. The
 static noindex `/knowledge/rental-guides.json` export supplies cited reference data,
 not generated answers. Do not turn old quotes or personal stories into current
 prices or universal legal rules. Review official-rule changes with their state scope.

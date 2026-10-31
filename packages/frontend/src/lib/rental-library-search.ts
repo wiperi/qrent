@@ -48,7 +48,14 @@ function searchTerms(query: string) {
   ];
 }
 
-export function searchRentalLibrary(items: RentalSearchItem[], input: string, limit = 8) {
+type SearchableContent = Pick<RentalSearchItem, 'title' | 'keywords' | 'searchText'> &
+  Partial<Pick<RentalSearchItem, 'moduleTitle'>>;
+
+export function searchRentalLibrary<T extends SearchableContent>(
+  items: T[],
+  input: string,
+  limit = 8
+) {
   const query = normalize(input.slice(0, 160));
   const terms = searchTerms(query);
   if (!query || !terms.length) return [];
@@ -56,7 +63,7 @@ export function searchRentalLibrary(items: RentalSearchItem[], input: string, li
     .map((item, index) => {
       const title = normalize(item.title);
       const aliases = normalize(item.keywords);
-      const body = normalize(`${item.moduleTitle} ${item.searchText}`);
+      const body = normalize(`${item.moduleTitle ?? ''} ${item.searchText}`);
       const matched = terms.filter(term => `${title} ${aliases} ${body}`.includes(term));
       const score =
         matched.reduce(
@@ -73,6 +80,6 @@ export function searchRentalLibrary(items: RentalSearchItem[], input: string, li
     })
     .filter(row => row.score > 0 && row.matched >= Math.max(1, Math.ceil(terms.length * 0.35)))
     .sort((a, b) => b.score - a.score || a.index - b.index)
-    .slice(0, Math.max(1, Math.min(20, limit)))
+    .slice(0, Math.max(1, Math.min(items.length, limit)))
     .map(row => row.item);
 }

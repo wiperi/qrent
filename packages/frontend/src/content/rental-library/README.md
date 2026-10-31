@@ -13,6 +13,10 @@ from `word/document.xml`, preserved in the reference registry. Dates without a k
 year stay incomplete. `official-references.ts` separately records reviewed state and
 institutional pages. Editorial review does not independently verify a personal story.
 
+All eighteen experience/source-based articles share the `/blog` list, topic filters
+and full-content search. The old `/guides` index permanently redirects there;
+the eight `/guides/<module>` articles and their section anchors keep their URLs.
+
 The library is an organisation of the supplied material, not a verbatim archive of
 both files. Repeated image descriptions, irrelevant promotions, private examples,
 blanket group judgements and unreadable text are excluded. Useful document fields,

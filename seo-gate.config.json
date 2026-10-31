@@ -77,11 +77,6 @@
         "expectedSchemaTypes": ["CollectionPage", "BreadcrumbList"]
       },
       {
-        "path": "/en/guides",
-        "requireBreadcrumb": true,
-        "expectedSchemaTypes": ["CollectionPage", "BreadcrumbList"]
-      },
-      {
         "path": "/en/guides/budget-and-housing",
         "requireBreadcrumb": true,
         "expectedSchemaTypes": ["Article", "BreadcrumbList"]
@@ -120,11 +115,6 @@
         "path": "/en/guides/repairs-and-moving-out",
         "requireBreadcrumb": true,
         "expectedSchemaTypes": ["Article", "BreadcrumbList"]
-      },
-      {
-        "path": "/zh/guides",
-        "requireBreadcrumb": true,
-        "expectedSchemaTypes": ["CollectionPage", "BreadcrumbList"]
       },
       {
         "path": "/zh/guides/budget-and-housing",
