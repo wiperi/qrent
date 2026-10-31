@@ -99,5 +99,16 @@ class ControlRecoveryTests(unittest.TestCase):
         self.assertEqual(len(rows),3);self.assertFalse(redis['running']);self.assertTrue(redis['manually_stopped'])
         self.assertEqual(rows['1']['process'],{'pid':101,'started':'123'})
 
+    def test_runtime_inspection_returns_ownership_without_process_arguments_or_service_secrets(self):
+        proc=self.root/'proc';task=proc/'1484';(task/'task/1484').mkdir(parents=True)
+        identity='a'*64
+        (task/'cmdline').write_bytes(b'/usr/bin/containerd-shim-runc-v2\0-namespace\0moby\0-id\0'+identity.encode()+b'\0private-argument\0')
+        fields=['S','100']+['0']*18;fields[19]='123'
+        (task/'stat').write_text('1484 (shim) '+' '.join(fields));(task/'task/1484/children').write_text('1599')
+        with patch.object(control.os,'readlink',return_value='/usr/bin/containerd-shim-runc-v2'),patch.object(control,'command',return_value='ActiveState=active\nSubState=running\nMainPID=123\nEnvironment=private-service-config'),patch.object(control.subprocess,'run',return_value=subprocess.CompletedProcess([],0,stdout=identity+' 0 STOPPED\n')):
+            result=control.runtime_diagnostics(proc)
+        self.assertEqual(result['shims'][0]['children'],[1599]);self.assertEqual(result['containerd_tasks'][0]['state'],'STOPPED')
+        self.assertNotIn('private',json.dumps(result));self.assertNotIn('Environment',result['account_store_service'])
+
 
 if __name__=='__main__':unittest.main()

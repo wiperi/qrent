@@ -101,6 +101,42 @@ def verify_controller_unit(binary,args):
         raise RuntimeError('Containerd must remain independent of the controller restart')
 
 
+def runtime_diagnostics(proc_root=Path('/proc')):
+    """Read runtime ownership and service state without waiting on Docker locks."""
+    report={'shims':[]}
+    for process in proc_root.iterdir():
+        if not process.name.isdigit():continue
+        try:
+            if Path(os.readlink(process/'exe')).name!='containerd-shim-runc-v2':continue
+            args=(process/'cmdline').read_bytes().split(b'\0')
+            namespace=args[args.index(b'-namespace')+1].decode()
+            identity=args[args.index(b'-id')+1].decode()
+            if namespace!='moby' or not re.fullmatch('[a-f0-9]{64}',identity):continue
+            fields=(process/'stat').read_text().rpartition(')')[2].split()
+            children=(process/'task'/process.name/'children').read_text().split()
+            report['shims'].append({'id':identity,'pid':int(process.name),'state':fields[0],
+                'parent':int(fields[1]),'started':fields[19],
+                'children':[int(child) for child in children if child.isdigit()]})
+        except (OSError,ValueError,IndexError):continue
+    report['shims'].sort(key=lambda row:row['id'])
+    try:
+        value=command('systemctl','show','qrent-account-store.service','-p','ActiveState','-p','SubState','-p','MainPID','-p','Result','-p','ExecMainStatus')
+        report['account_store_service']={key:value for line in value.splitlines()
+            for key,separator,value in [line.partition('=')]
+            if separator and key in ('ActiveState','SubState','MainPID','Result','ExecMainStatus')
+            and re.fullmatch('[a-z0-9-]+',value)}
+    except (OSError,subprocess.SubprocessError):report['account_store_service']={'unavailable':True}
+    try:
+        result=subprocess.run(['ctr','--address','/run/containerd/containerd.sock','--namespace','moby','tasks','list'],capture_output=True,text=True,timeout=10)
+        report['containerd_task_query_exit']=result.returncode
+        report['containerd_tasks']=[{'id':parts[0],'pid':int(parts[1]),'state':parts[2]}
+            for line in result.stdout.splitlines() for parts in [line.split()]
+            if len(parts)==3 and re.fullmatch('[a-f0-9]{64}',parts[0]) and parts[1].isdigit()
+            and parts[2] in ('RUNNING','STOPPED','PAUSED','UNKNOWN','CREATED','PAUSING')]
+    except (OSError,subprocess.SubprocessError):report['containerd_task_query_unavailable']=True
+    return report
+
+
 def enable_live_restore(root):
     pid,binary,path,args=controller()
     identity=kernel_identity(pid)
@@ -141,6 +177,7 @@ def main(action='plan',root=None,data_root=Path('/var/lib/docker/containers'),pr
             'volumes_or_schema_changed':False}
     report['runtime_version']=(version or {}).get('Version')
     if action=='plan':
+        report['runtime']=runtime_diagnostics(proc_root)
         try:
             _,binary,_,args=controller();verify_controller_unit(binary,args)
             report['unit_restart_eligible']=True
@@ -155,6 +192,7 @@ def main(action='plan',root=None,data_root=Path('/var/lib/docker/containers'),pr
         try:
             if action=='enable-live-restore':
                 if not (info and info.get('LiveRestoreEnabled') is True): enable_live_restore(root)
+                report['live_restore_active']=True
                 report['status']='live_restore_verified'
             else:
                 fresh=api('/info');now,current_redis=disk_snapshot(data_root,proc_root)

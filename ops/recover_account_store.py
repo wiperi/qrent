@@ -16,7 +16,7 @@ import time
 
 
 def command(*args):
-    return subprocess.check_output(args, text=True).strip()
+    return subprocess.check_output(args, text=True, timeout=10).strip()
 
 
 def container_rows():
