@@ -1,6 +1,10 @@
 import assert from 'node:assert/strict';
+import { readFileSync } from 'node:fs';
 import test from 'node:test';
 
+const articleManifest = JSON.parse(
+  readFileSync(new URL('../../src/content/guides/manifest.json', import.meta.url), 'utf8')
+);
 const base = process.env.QRENT_SEO_BASE_URL;
 const options = { skip: !base };
 const corpus = base
@@ -25,6 +29,40 @@ test(
 );
 
 for (const locale of ['en', 'zh']) {
+  test(
+    `${locale}: visible topics, search and every article link exist before JavaScript`,
+    options,
+    async () => {
+      const response = await fetch(`${base}/${locale}/blog`);
+      const html = await response.text();
+      assert.equal(response.status, 200);
+      assert(html.includes(`rel="canonical" href="https://www.qrent.rent/${locale}/blog"`));
+      assert(!/name="robots" content="[^"]*noindex/.test(html));
+      assert.match(html, /type="search"/);
+      const topicHtml = html.match(/<fieldset\b[^>]*>([\s\S]*?)<\/fieldset>/)?.[1];
+      assert(topicHtml, 'topics must be directly visible before JavaScript');
+      const topics = new Set(
+        articleManifest.flatMap(source => {
+          if (locale === 'zh') return source.keywords;
+          return JSON.parse(
+            readFileSync(
+              new URL(`../../src/content/guides/en/${source.slug}.json`, import.meta.url),
+              'utf8'
+            )
+          ).keywords;
+        })
+      );
+      assert.equal((topicHtml.match(/<button\b/g) ?? []).length, topics.size + 1);
+      for (const topic of topics) assert(topicHtml.includes(topic), topic);
+      assert(!topicHtml.includes('<select'));
+      assert.match(html, /aria-pressed="true"/);
+      assert(html.includes(locale === 'zh' ? '全部主题' : 'All topics'));
+      assert(!html.includes('Filter by topic'));
+      const paths = articleManifest.map(source => `/${locale}/blog/${source.slug}`);
+      assert.equal(paths.length, 10);
+      for (const path of paths) assert(html.includes(`href="${path}"`), path);
+    }
+  );
   test(
     `${locale}: the library and all eight source-attributed modules render before JavaScript`,
     options,

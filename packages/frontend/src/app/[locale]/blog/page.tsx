@@ -57,7 +57,14 @@ export default async function BlogPage({ params }: { params: Promise<{ locale: s
             <TodoProgressBar />
           </div>
           <div className="min-w-0">
-            <CategoryFilter categories={allKeywords} locale={locale} />
+            <CategoryFilter
+              categories={allKeywords.map(name => ({
+                name,
+                count: posts.filter(post => post.keywords.includes(name)).length,
+              }))}
+              total={posts.length}
+              locale={locale}
+            />
             <FilteredBlogList posts={posts} locale={locale} />
           </div>
         </div>

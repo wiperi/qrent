@@ -1,35 +1,70 @@
 'use client';
 
 import { useId } from 'react';
+import { HiSearch } from 'react-icons/hi';
 import { useCategory } from '@/components/CategoryContext';
+import styles from '@/styles/blog-browser.module.css';
 
 export default function CategoryFilter({
   categories,
   locale,
+  total,
 }: {
-  categories: string[];
+  categories: { name: string; count: number }[];
   locale: string;
+  total: number;
 }) {
-  const { selectedCategories, setSelectedCategories } = useCategory();
+  const { query, setQuery, selectedCategories, setSelectedCategories } = useCategory();
   const id = useId();
+  const zh = locale === 'zh';
+  const topics = [{ name: '', count: total }, ...categories];
   return (
-    <div className="mb-4 flex flex-wrap items-center gap-3">
-      <label htmlFor={id} className="text-sm text-slate-600">
-        {locale === 'zh' ? '按主题筛选' : 'Filter by topic'}
-      </label>
-      <select
-        id={id}
-        value={selectedCategories[0] ?? ''}
-        onChange={event => setSelectedCategories(event.target.value ? [event.target.value] : [])}
-        className="min-h-11 max-w-full rounded-lg border border-slate-300 bg-white px-3 text-sm text-slate-800 focus-visible:outline-2 focus-visible:outline-blue-600"
-      >
-        <option value="">{locale === 'zh' ? '全部主题' : 'All topics'}</option>
-        {categories.map(category => (
-          <option key={category} value={category}>
-            {category}
-          </option>
-        ))}
-      </select>
+    <div className={styles.controls}>
+      <div className={styles.search}>
+        <label htmlFor={id}>{zh ? '搜索攻略' : 'Search the guides'}</label>
+        <div className={styles.searchField}>
+          <HiSearch aria-hidden="true" />
+          <input
+            id={id}
+            type="search"
+            value={query}
+            maxLength={160}
+            onChange={event => setQuery(event.target.value)}
+            onKeyDown={event => {
+              if (event.key === 'Escape') setQuery('');
+            }}
+            placeholder={zh ? '搜索标题、摘要或主题' : 'Search titles, summaries or topics'}
+            aria-controls="blog-results"
+          />
+          {query && (
+            <button type="button" onClick={() => setQuery('')}>
+              {zh ? '清除' : 'Clear'}
+            </button>
+          )}
+        </div>
+      </div>
+      <fieldset className={styles.topics}>
+        <legend>{zh ? '按主题浏览' : 'Browse by topic'}</legend>
+        <div className={styles.topicList}>
+          {topics.map(topic => (
+            <button
+              key={topic.name}
+              type="button"
+              aria-pressed={
+                topic.name
+                  ? selectedCategories.includes(topic.name)
+                  : selectedCategories.length === 0
+              }
+              aria-controls="blog-results"
+              onClick={() => setSelectedCategories(topic.name ? [topic.name] : [])}
+              className={styles.topic}
+            >
+              {topic.name || (zh ? '全部主题' : 'All topics')}
+              <span className={styles.count}>{topic.count}</span>
+            </button>
+          ))}
+        </div>
+      </fieldset>
     </div>
   );
 }
