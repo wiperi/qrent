@@ -52,7 +52,7 @@ export default async function GuideModulePage({ params }: Props) {
         locale={locale}
         items={[
           { name: zh ? '首页' : 'Home', path: '' },
-          { name: zh ? '全流程攻略' : 'Handbook', path: '/guides' },
+          { name: zh ? '租房攻略' : 'Rental guides', path: '/blog' },
           { name: module.title[locale], path: `/guides/${slug}` },
         ]}
       />
@@ -153,7 +153,7 @@ export default async function GuideModulePage({ params }: Props) {
                 ← {rentalGuideModules[index - 1].title[locale]}
               </Link>
             ) : (
-              <Link href={`/${locale}/guides`}>{zh ? '返回目录' : 'Handbook'}</Link>
+              <Link href={`/${locale}/blog`}>{zh ? '全部攻略' : 'All rental guides'}</Link>
             )}
             {index < rentalGuideModules.length - 1 ? (
               <Link href={`/${locale}/guides/${rentalGuideModules[index + 1].slug}`}>

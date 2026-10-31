@@ -8,8 +8,8 @@ P1/P2 表示资料覆盖、用户意图和现有页面承接优先级，不表�
 
 | 编号 | 中文候选 / English candidate | 意图 | 主承接页面 | 角色 / 优先级 | 内容动作 |
 | --- | --- | --- | --- | --- | --- |
-| K01 | 澳洲租房攻略 / Australian rental guide | 信息 | [/guides](https://www.qrent.rent/zh/guides) | 主词 · P1 | 八阶段总入口，不另造泛词落地页 |
-| K02 | 留学生澳洲租房流程 / rental process for international students Australia | 信息 | [/guides](https://www.qrent.rent/zh/guides) | 次词 · P1 | 从找房到入住串联目录 |
+| K01 | 澳洲租房攻略 / Australian rental guide | 信息 | [/blog](https://www.qrent.rent/zh/blog) | 主词 · P1 | 统一攻略入口，不另造泛词落地页 |
+| K02 | 留学生澳洲租房流程 / rental process for international students Australia | 信息 | [/blog](https://www.qrent.rent/zh/blog) | 次词 · P1 | 从找房到入住串联目录 |
 | K03 | 悉尼留学生租房预算 / Sydney student rental budget | 信息 | [/guides/budget-and-housing](https://www.qrent.rent/zh/guides/budget-and-housing) | 主词 · P1 | 给计算法与总费用，历史样例写明日期 |
 | K04 | 澳洲周租换算月租 / weekly rent to monthly rent Australia | 信息 | [/guides/budget-and-housing#budget-calculation](https://www.qrent.rent/zh/guides/budget-and-housing#budget-calculation) | 次词 · P2 | 保留52÷12换算，后续观察需求 |
 | K05 | 学生公寓和社会公寓区别 / student accommodation vs private rental Australia | 比较 | [/blog/types-of-apartments](https://www.qrent.rent/zh/blog/types-of-apartments) | 主词 · P1 | 沿用已有文章，模块页提供流程上下文 |
@@ -67,7 +67,7 @@ P1/P2 表示资料覆盖、用户意图和现有页面承接优先级，不表�
 ## 后续验证和采集
 
 1. 发布后以 Search Console 的实际页面曝光、查询词、国家、语言和点击为依据，先补充已有页面。暂不把候选词当作已排名的词。
-2. 把 /guides、八个模块和现有十篇经验帖分开观察；出现相同意图的两个 URL 时，先统一主承接页和内链。
+2. 以 /blog 为统一入口，分别观察十八篇正文的搜索表现；出现相同意图的两个 URL 时，先统一主承接页和内链。
 3. 房租、空置率与通勤等实时需求只能接当前数据，并注明范围。旧表和个人经历不改名为“2026最新行情”。
 4. P2 中的墨尔本、急修细则和平台界面词，先验证需求及来源，再决定补充；不恢复墨尔本采集、不调用付费地图。
 5. 机器表格保留每条证据 URL、需求验证状态和空的数值字段，方便后续导入分析工具。

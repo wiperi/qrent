@@ -71,7 +71,6 @@ export function sitemapEntries(posts: SitemapPost[]): MetadataRoute.Sitemap {
     '/team',
     '/contact',
     '/blog',
-    '/guides',
     ...rentalGuideModules.map(module => `/guides/${module.slug}`),
     '/rentals',
     ...RENTAL_SCHOOLS.map(school => `/rentals/${school.slug}`),

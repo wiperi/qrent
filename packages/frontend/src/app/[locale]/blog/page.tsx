@@ -2,12 +2,10 @@ import TodoProgressBar from '@/components/TodoProgressBar';
 import FilteredBlogList from '@/components/FilteredBlogList';
 import CategoryFilter from '@/components/CategoryFilter';
 import { CategoryProvider } from '@/components/CategoryContext';
-import { getNotionBlogPosts } from '@/lib/notion-blog';
-import { pageMetadata } from '@/lib/seo';
+import { getGuideIndexEntries, getGuideIndexTopics } from '@/lib/guide-index';
+import { jsonLd, pageMetadata, SITE_URL } from '@/lib/seo';
 import RentalLinks from '@/components/RentalLinks';
 import styles from '@/styles/discovery.module.css';
-import Link from 'next/link';
-import libraryStyles from '@/styles/rental-library.module.css';
 
 export async function generateMetadata({ params }: { params: Promise<{ locale: string }> }) {
   const { locale } = await params;
@@ -18,8 +16,8 @@ export async function generateMetadata({ params }: { params: Promise<{ locale: s
       ? '澳洲留学生租房指南与经验 | QRent'
       : 'Australian Student Rental Guides & Tips | QRent',
     locale === 'zh'
-      ? '阅读澳洲租房准备、选区、申请、看房与入住的实用经验，并按大学浏览悉尼房源。'
-      : 'Read practical guides to preparing, choosing an area, applying, inspecting and moving into an Australian rental. Explore Sydney homes by university.'
+      ? '按主题阅读澳洲租房攻略与经验，搜索预算、选区、申请材料、看房、合同押金、入住与退租清单，并按大学浏览悉尼房源。'
+      : 'Search Australian rental guides and experiences by topic: budgets, areas, applications, inspections, leases, bonds, moving in and moving out. Explore Sydney homes by university.'
   );
 }
 
@@ -28,48 +26,51 @@ export const revalidate = 600; // Cache for 10 minutes
 // 主页面组件（服务器组件）
 export default async function BlogPage({ params }: { params: Promise<{ locale: string }> }) {
   const { locale } = await params;
-  const posts = await getNotionBlogPosts(locale);
-
-  // 提取所有关键词并去重
-  const allKeywords = Array.from(new Set(posts.flatMap(post => post.keywords))).sort();
+  const language = locale === 'zh' ? 'zh' : 'en';
+  const entries = getGuideIndexEntries(language);
+  const categories = getGuideIndexTopics(entries, language);
 
   return (
     <main className={styles.page}>
       <h1 className={styles.title}>{locale === 'zh' ? '租房攻略' : 'Rental guides'}</h1>
       <p className={styles.note}>
         {locale === 'zh'
-          ? `${posts.length} 篇实用经验，从选区到入住。`
-          : `${posts.length} practical guides, from choosing an area to moving in.`}
+          ? `${entries.length} 篇攻略与经验，从预算、找房到入住和退租。`
+          : `${entries.length} guides and experiences, from budgeting and finding a home to moving in and out.`}
       </p>
-      <div className={libraryStyles.blogEntry}>
-        <Link href={`/${locale}/guides`}>
-          {locale === 'zh' ? '按阶段查全流程攻略 →' : 'Browse the rental handbook →'}
-        </Link>
-        <p>
-          {locale === 'zh'
-            ? '预算、选区、申请、看房、签约与入住'
-            : 'Budget, areas, applications, inspections and moving in'}
-        </p>
-      </div>
       <CategoryProvider>
         <div className={styles.blogLayout}>
           <div>
             <TodoProgressBar />
           </div>
           <div className="min-w-0">
-            <CategoryFilter
-              categories={allKeywords.map(name => ({
-                name,
-                count: posts.filter(post => post.keywords.includes(name)).length,
-              }))}
-              total={posts.length}
-              locale={locale}
-            />
-            <FilteredBlogList posts={posts} locale={locale} />
+            <CategoryFilter categories={categories} total={entries.length} locale={locale} />
+            <FilteredBlogList entries={entries} locale={locale} />
           </div>
         </div>
       </CategoryProvider>
       <RentalLinks locale={locale} compact />
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{
+          __html: jsonLd({
+            '@context': 'https://schema.org',
+            '@type': 'CollectionPage',
+            name: locale === 'zh' ? '租房攻略' : 'Rental guides',
+            url: `${SITE_URL}/${locale}/blog`,
+            inLanguage: locale === 'zh' ? 'zh-CN' : 'en-AU',
+            mainEntity: {
+              '@type': 'ItemList',
+              itemListElement: entries.map((entry, index) => ({
+                '@type': 'ListItem',
+                position: index + 1,
+                name: entry.title,
+                url: `${SITE_URL}${entry.path}`,
+              })),
+            },
+          }),
+        }}
+      />
     </main>
   );
 }

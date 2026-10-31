@@ -4,22 +4,22 @@ import { useState, useEffect, useMemo } from 'react';
 import Link from 'next/link';
 import { useCategory } from '@/components/CategoryContext';
 import { LOCALE } from '@qrent/shared/enum';
-import { type BlogPost as NotionBlogPost } from '@/lib/notion';
-import { filterBlogPosts } from '@/lib/blog-search';
+import type { GuideIndexEntry } from '@/lib/guide-index';
+import { filterGuideIndex } from '@/lib/guide-index-search';
 
 interface FilteredBlogListProps {
-  posts: NotionBlogPost[];
+  entries: GuideIndexEntry[];
   locale: string;
 }
 
-export default function FilteredBlogList({ posts, locale }: FilteredBlogListProps) {
+export default function FilteredBlogList({ entries, locale }: FilteredBlogListProps) {
   const { query, setQuery, selectedCategories, clearCategories } = useCategory();
   const [currentPage, setCurrentPage] = useState(1);
   const POSTS_PER_PAGE = 20;
 
   const filteredPosts = useMemo(
-    () => filterBlogPosts(posts, query, selectedCategories),
-    [posts, query, selectedCategories]
+    () => filterGuideIndex(entries, query, selectedCategories),
+    [entries, query, selectedCategories]
   );
   const zh = locale === LOCALE.ZH;
   const resetFilters = () => {
@@ -85,24 +85,26 @@ export default function FilteredBlogList({ posts, locale }: FilteredBlogListProp
   return (
     <section id="blog-results" className="space-y-6" aria-label={zh ? '攻略列表' : 'Guide list'}>
       <p role="status" className="mb-3 text-sm leading-relaxed text-slate-600">
-        {zh ? `找到 ${filteredPosts.length} 篇攻略` : `${filteredPosts.length} guides found`}
+        {zh
+          ? `找到 ${filteredPosts.length} 篇攻略`
+          : `${filteredPosts.length} guide${filteredPosts.length === 1 ? '' : 's'} found`}
       </p>
       <div className="border-t border-slate-200">
         {displayPosts.map(post => (
           <Link
             key={post.id}
-            href={`/${locale}/blog/${post.slug}`}
+            href={post.path}
             className="group block border-b border-slate-200 py-5 focus-visible:outline-2 focus-visible:outline-blue-600"
           >
             <article>
               <h2 className="text-lg font-semibold leading-relaxed text-slate-900 group-hover:text-blue-700 group-hover:underline">
-                {locale === LOCALE.ZH ? post.title : post.title_en}
+                {post.title}
               </h2>
               <p className="my-2 line-clamp-2 text-[0.9375rem] leading-relaxed text-slate-600">
-                {locale === LOCALE.ZH ? post.excerpt_zh : post.excerpt_en}
+                {post.excerpt}
               </p>
-              <time className="text-xs text-slate-500" dateTime={post.published_at}>
-                {new Date(post.published_at).toLocaleDateString(
+              <time className="text-xs text-slate-500" dateTime={post.publishedAt}>
+                {new Date(post.publishedAt).toLocaleDateString(
                   locale === LOCALE.ZH ? 'zh-CN' : 'en-AU',
                   { year: 'numeric', month: 'short', day: 'numeric', timeZone: 'Australia/Sydney' }
                 )}

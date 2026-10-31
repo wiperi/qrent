@@ -33,7 +33,7 @@ export default function CategoryFilter({
             onKeyDown={event => {
               if (event.key === 'Escape') setQuery('');
             }}
-            placeholder={zh ? '搜索标题、摘要或主题' : 'Search titles, summaries or topics'}
+            placeholder={zh ? '搜索问题、关键词或正文' : 'Search all guide content'}
             aria-controls="blog-results"
           />
           {query && (
