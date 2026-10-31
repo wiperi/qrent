@@ -135,19 +135,23 @@ class StoreRecoveryTests(unittest.TestCase):
         state={**self.state,'id':identity,'running':False,'status':'exited','pid':0,'exit_code':128,'process_state':'unknown'}
         return state,proc,'TASK PID STATUS\n'+'\n'.join(tasks)
 
+    @staticmethod
+    def resume_commands(tasks):
+        return lambda *args:('ActiveState=failed\nSubState=failed\nMainPID=0\nJob=0' if args[0]=='systemctl' else tasks)
+
     def test_exit_128_resume_requires_orphan_absence_and_preserved_business_tasks(self):
         state,proc,tasks=self.setup_reconciled_orphan()
         self.assertFalse(store.eligible_start(state));self.assertTrue(store.eligible_resume(state))
-        with patch.object(store,'command',return_value=tasks):
+        with patch.object(store,'command',side_effect=self.resume_commands(tasks)):
             proof=store.orphan_cleared(self.root,state,proc)
         self.assertTrue(proof['runtime_task_absent'])
-        with patch.object(store,'command',return_value=tasks+'\n'+state['id']+' 123 RUNNING'):
+        with patch.object(store,'command',side_effect=self.resume_commands(tasks+'\n'+state['id']+' 123 RUNNING')):
             with self.assertRaisesRegex(RuntimeError,'Unexpected runtime'):store.orphan_cleared(self.root,state,proc)
 
     def test_uncertain_old_process_or_prior_resume_marker_blocks_replay(self):
         state,proc,tasks=self.setup_reconciled_orphan();directory=proc/'100';directory.mkdir()
         fields=['S','1']+['0']*18;fields[19]='1000';(directory/'stat').write_text('100 (old shim) '+' '.join(fields))
-        with patch.object(store,'command',return_value=tasks):
+        with patch.object(store,'command',side_effect=self.resume_commands(tasks)):
             with self.assertRaisesRegex(RuntimeError,'still present'):store.orphan_cleared(self.root,state,proc)
             (directory/'stat').unlink();proof=store.orphan_cleared(self.root,state,proc)
             Path(proof['attempt_marker']).write_text('{}')
@@ -155,7 +159,7 @@ class StoreRecoveryTests(unittest.TestCase):
 
     def test_resume_applies_once_with_a_new_backup_and_same_guarded_service(self):
         state,proc,tasks=self.setup_reconciled_orphan()
-        with patch.object(store,'command',return_value=tasks):proof=store.orphan_cleared(self.root,state,proc)
+        with patch.object(store,'command',side_effect=self.resume_commands(tasks)):proof=store.orphan_cleared(self.root,state,proc)
         before=copy.deepcopy(self.before);before[-1][0]=state['id'];before[-1][2]=0
         after=copy.deepcopy(before);after[-1][2:4]=[456,'new']
         with patch.object(store,'container_rows',side_effect=[before,after]),patch.object(store,'redis_state',return_value=state),patch.object(store,'orphan_cleared',return_value=proof),patch.object(store,'guard_public_ports',return_value={'persistent':True}),patch.object(store,'repair_process') as repair,patch.object(store,'local_ping',return_value=True):
@@ -163,6 +167,17 @@ class StoreRecoveryTests(unittest.TestCase):
         repair.assert_called_once_with(state,start=True,resume=True)
         self.assertEqual(report['status'],'verified');self.assertTrue(Path(proof['attempt_marker']).exists())
         self.assertEqual((self.volume/'dump.rdb').read_bytes(),b'original-redis-state')
+
+    def test_resume_rechecks_runtime_after_guard_and_never_competes_with_an_active_start(self):
+        state,proc,tasks=self.setup_reconciled_orphan()
+        with patch.object(store,'command',side_effect=self.resume_commands(tasks)):proof=store.orphan_cleared(self.root,state,proc)
+        with patch.object(store,'container_rows',return_value=self.before),patch.object(store,'redis_state',return_value=state),patch.object(store,'orphan_cleared',side_effect=[proof,proof,RuntimeError('runtime task reappeared')]),patch.object(store,'guard_public_ports',return_value={'persistent':True}),patch.object(store,'repair_process') as repair:
+            with self.assertRaisesRegex(RuntimeError,'reappeared'):store.main('resume-apply',self.root,proc)
+            repair.assert_not_called()
+        Path(proof['attempt_marker']).unlink()
+        def command(*args):return 'ActiveState=activating\nSubState=auto-restart\nMainPID=0\nJob=77' if args[0]=='systemctl' else tasks
+        with patch.object(store,'command',side_effect=command):
+            with self.assertRaisesRegex(RuntimeError,'not quiescent'):store.orphan_cleared(self.root,state,proc)
 
     def test_start_guards_public_ports_before_any_container_start(self):
         stopped={**self.state,'running':False,'status':'exited','pid':0,'process_state':'unknown'}

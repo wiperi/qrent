@@ -58,7 +58,7 @@ def eligible_resume(state):
     return state['running'] is False and state['status']=='exited' and state['pid']==0 and state['exit_code']==128
 
 
-def orphan_cleared(root,state,proc_root=Path('/proc')):
+def orphan_cleared(root,state,proc_root=Path('/proc'),own_marker=None):
     paths=sorted((root/'.deploy/receipts').glob('account-orphan-*.json'),key=lambda path:path.stat().st_mtime_ns,reverse=True)
     if not paths:raise RuntimeError('A verified orphan recovery receipt is required')
     recovery=json.loads(paths[0].read_text())
@@ -85,6 +85,11 @@ def orphan_cleared(root,state,proc_root=Path('/proc')):
                 or fields[19]!=previous['started'] or fields[0] not in ('S','R','D','I')):
             raise RuntimeError('A business process changed since orphan recovery')
     if ids!=set(recovery['business_processes']):raise RuntimeError('Runtime tasks have not fully reconciled')
+    service=dict(line.partition('=')[::2] for line in command('systemctl','show','qrent-account-store.service',
+        '-p','ActiveState','-p','SubState','-p','MainPID','-p','Job').splitlines() if '=' in line)
+    if (service.get('ActiveState') not in ('inactive','failed') or service.get('SubState') not in ('dead','failed')
+            or service.get('MainPID')!='0' or service.get('Job') not in ('','0')):
+        raise RuntimeError('An existing account-store start producer is not quiescent')
     backups=sorted((root/'.deploy/receipts').glob('account-store-*.json'),reverse=True)
     previous=json.loads(backups[0].read_text());backup=Path(previous.get('backup_path',''))
     if (previous['candidate']['id']!=state['id'] or previous['candidate'].get('data_source')!=state['data_source']
@@ -92,7 +97,12 @@ def orphan_cleared(root,state,proc_root=Path('/proc')):
             or hashlib.sha256(backup.read_bytes()).hexdigest()!=recovery.get('backup_sha256')):
         raise RuntimeError('Original pre-orphan backup differs')
     marker=root/'.deploy/receipts'/('account-resume-'+str(recovery['shim']['pid'])+'-'+recovery['shim']['started']+'.json')
-    if marker.exists():raise RuntimeError('This reconciled orphan already has a resume attempt; do not repeat')
+    if marker.exists():
+        value=json.loads(marker.read_text())
+        if (own_marker!=marker or value.get('status')!='resume_attempt_started'
+                or value.get('original_store_id')!=state['id'] or value.get('orphan_receipt')!=paths[0].name):
+            raise RuntimeError('This reconciled orphan already has a resume attempt; do not repeat')
+    elif own_marker is not None:raise RuntimeError('The current resume marker disappeared')
     return {'orphan_receipt':paths[0].name,'attempt_marker':str(marker),'runtime_task_absent':True}
 
 
@@ -270,8 +280,10 @@ def main(action='plan',root=None,proc_root=Path('/proc')):
             if start: report['public_port_guard']=guard_public_ports(root,state)
             if redis_state(proc_root)!=state:
                 raise RuntimeError('Account-store state changed before process action')
-            report.update(backup_path=str(backup),backup_sha256=digest.hexdigest(),
-                          status='repair_attempt_started')
+            report.update(backup_path=str(backup),backup_sha256=digest.hexdigest())
+            if resume and orphan_cleared(root,state,proc_root,own_marker=Path(proof['attempt_marker']))!=proof:
+                raise RuntimeError('Orphan runtime changed after backup and guard; no start attempted')
+            report['status']='repair_attempt_started'
             receipt.write_text(json.dumps(report,indent=2))
             if resume: repair_process(state,start=True,resume=True)
             elif start: repair_process(state,start=True)
