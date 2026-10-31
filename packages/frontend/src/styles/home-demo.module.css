@@ -60,6 +60,10 @@
   background: #f9fbfd;
   font-size: 14px;
 }
+.search input::placeholder {
+  color: var(--muted);
+  opacity: 1;
+}
 .search label {
   font-size: 12px;
   font-weight: 600;
