@@ -7,6 +7,8 @@ from pathlib import Path
 import subprocess
 import tarfile
 import io
+import errno
+import types
 import sys
 import tempfile
 import unittest
@@ -192,8 +194,13 @@ class StoreRecoveryTests(unittest.TestCase):
         receipt=self.root/'.deploy/receipts/account-store-20261031.json';record=json.loads(receipt.read_text())
         record.update(action='resume-apply',status='requires_attention',reconciled_orphan={'orphan_receipt':orphan.name});receipt.write_text(json.dumps(record))
         value={'id':state['id'],'status':'stopped','pid':0,'bundle':str(bundle)}
+        retained=oci/state['id'];retained.mkdir(parents=True)
+        group_path='/sys/fs/cgroup/docker/'+state['id']
+        persisted={'id':state['id'],'config':{'rootfs':str(bundle/'rootfs'),'cgroups':{'path':'/docker/'+state['id']},
+            'namespaces':[{'type':'NEWPID','path':''},{'type':'NEWNS','path':''}],'Hooks':{}},'cgroup_paths':{'':group_path}}
+        (retained/'state.json').write_text(json.dumps(persisted))
         tools=patch.object(store,'trusted_runc',return_value='/usr/bin/runc');tools.start();self.addCleanup(tools.stop)
-        groups=patch.object(store,'empty_redis_cgroup');groups.start();self.addCleanup(groups.stop)
+        groups=patch.object(store,'empty_redis_cgroup',return_value=group_path);groups.start();self.addCleanup(groups.stop)
         namespace=patch.object(store,'host_mount_namespace',return_value='host-mnt');namespace.start();self.addCleanup(namespace.stop)
         mounts=patch.object(store,'business_mounts',return_value={'business':'mount-hash'});mounts.start();self.addCleanup(mounts.stop)
         with patch.object(store,'command',side_effect=self.resume_commands(tasks)),patch.object(store.subprocess,'run',return_value=subprocess.CompletedProcess([],0,stdout=json.dumps(value))):
@@ -202,6 +209,13 @@ class StoreRecoveryTests(unittest.TestCase):
         for changes in ({'status':'running','pid':456},{'bundle':str(self.root/'other')},{'id':'b'*64}):
             with patch.object(store,'command',side_effect=self.resume_commands(tasks)),patch.object(store.subprocess,'run',return_value=subprocess.CompletedProcess([],0,stdout=json.dumps({**value,**changes}))):
                 with self.assertRaisesRegex(RuntimeError,'OCI instance'):store.bundle_plan(self.root,state,proc,runtime,oci,mountinfo,data)
+        for field,change in [('Hooks',{'poststop':[{'path':'/unrelated-script'}]}),('rootfs',str(self.root/'other-root'))]:
+            modified=copy.deepcopy(persisted);modified['config'][field]=change;(retained/'state.json').write_text(json.dumps(modified))
+            with patch.object(store,'command',side_effect=self.resume_commands(tasks)),patch.object(store.subprocess,'run',return_value=subprocess.CompletedProcess([],0,stdout=json.dumps(value))):
+                with self.assertRaises(RuntimeError):store.bundle_plan(self.root,state,proc,runtime,oci,mountinfo,data)
+        modified=copy.deepcopy(persisted);modified['cgroup_paths']={'':'/sys/fs/cgroup/unrelated'};(retained/'state.json').write_text(json.dumps(modified))
+        with patch.object(store,'command',side_effect=self.resume_commands(tasks)),patch.object(store.subprocess,'run',return_value=subprocess.CompletedProcess([],0,stdout=json.dumps(value))):
+            with self.assertRaisesRegex(RuntimeError,'cgroup ownership'):store.bundle_plan(self.root,state,proc,runtime,oci,mountinfo,data)
 
     def test_bundle_mount_scan_rejects_mounts_outside_selected_rootfs(self):
         bundle=self.root/'bundle';mountinfo=self.root/'mountinfo'
@@ -217,7 +231,8 @@ class StoreRecoveryTests(unittest.TestCase):
         quarantine=self.root/'quarantine';quarantine.mkdir()
         info=bundle.stat();proof={'bundle':str(bundle),'bundle_identity':[info.st_dev,info.st_ino],'rootfs_mount_count':1,
             'oci_root':str(self.root/'oci'),'attempt_marker':str(receipts/'account-bundle-case.json'),
-            'business_mounts_sha256':{'business':'mount-hash'},'host_mount_namespace':'host-mnt','runc_binary':'/usr/bin/runc'}
+            'business_mounts_sha256':{'business':'mount-hash'},'host_mount_namespace':'host-mnt','runc_binary':'/usr/bin/runc',
+            'bundle_config_sha256':hashlib.sha256(configuration.encode()).hexdigest()}
         before=copy.deepcopy(self.before);before[-1][2]=0;after=copy.deepcopy(before);after[-1][2:4]=[456,'new']
         with patch.object(store,'container_rows',side_effect=[before,after]),patch.object(store,'redis_state',return_value=state),patch.object(store,'bundle_plan',return_value=proof),patch.object(store,'runtime_reconciled',return_value=({},None)),patch.object(store,'host_mount_namespace',return_value='host-mnt'),patch.object(store,'business_mounts',return_value={'business':'mount-hash'}),patch.object(store,'empty_redis_cgroup'),patch.object(store,'atomic_runtime_quarantine',side_effect=lambda source,destination:source.rename(destination)),patch.object(store,'guard_public_ports',return_value={'persistent':True}),patch.object(store,'private_runtime_quarantine',return_value=quarantine),patch.object(store,'bundle_mounts',side_effect=[[bundle/'rootfs'],[]]),patch.object(store.os,'geteuid',return_value=0),patch.object(store.subprocess,'run',return_value=subprocess.CompletedProcess([],0)) as run,patch.object(store,'repair_process') as start,patch.object(store,'local_ping',return_value=True):
             report=store.recover_bundle('bundle-apply',self.root)
@@ -232,7 +247,7 @@ class StoreRecoveryTests(unittest.TestCase):
         state={**self.state,'running':False,'status':'exited','pid':0,'exit_code':128}
         receipts=self.root/'.deploy/receipts';receipts.mkdir(parents=True);(self.root/'.deploy/backups').mkdir()
         bundle=self.root/'runtime-bundle';bundle.mkdir();(bundle/'config.json').write_text('{}');info=bundle.stat()
-        proof={'bundle':str(bundle),'bundle_identity':[info.st_dev,info.st_ino],'oci_root':str(self.root/'oci'),'attempt_marker':str(receipts/'account-bundle-case.json'),'business_mounts_sha256':{},'host_mount_namespace':'host-mnt','runc_binary':'/usr/bin/runc'}
+        proof={'bundle':str(bundle),'bundle_identity':[info.st_dev,info.st_ino],'oci_root':str(self.root/'oci'),'attempt_marker':str(receipts/'account-bundle-case.json'),'business_mounts_sha256':{},'host_mount_namespace':'host-mnt','runc_binary':'/usr/bin/runc','bundle_config_sha256':hashlib.sha256(b'{}').hexdigest()}
         with patch.object(store,'container_rows',return_value=self.before),patch.object(store,'redis_state',return_value=state),patch.object(store,'bundle_plan',return_value=proof),patch.object(store,'runtime_reconciled',return_value=({},None)),patch.object(store,'business_mounts',return_value={}),patch.object(store,'host_mount_namespace',return_value='host-mnt'),patch.object(store,'empty_redis_cgroup'),patch.object(store,'guard_public_ports',return_value={'persistent':True}),patch.object(store,'bundle_mounts',side_effect=[[bundle/'rootfs'],[bundle/'rootfs']]),patch.object(store.os,'geteuid',return_value=0),patch.object(store.subprocess,'run',return_value=subprocess.CompletedProcess([],0)) as run,patch.object(store,'repair_process') as start:
             with self.assertRaisesRegex(RuntimeError,'mounts remain'):store.recover_bundle('bundle-apply',self.root)
         start.assert_not_called();self.assertTrue(bundle.exists())
@@ -249,6 +264,28 @@ class StoreRecoveryTests(unittest.TestCase):
         store.empty_redis_cgroup(config,identity,group)
         (path/'cgroup.threads').write_text('1599')
         with self.assertRaisesRegex(RuntimeError,'still contains'):store.empty_redis_cgroup(config,identity,group)
+
+    def test_mount_namespace_must_also_match_both_runtime_daemons(self):
+        proc=self.root/'proc'
+        for name in ('self','1','100','200'):
+            directory=proc/name/'ns';directory.mkdir(parents=True);(directory/'mnt').symlink_to('mnt:[111]')
+        for pid,binary in ((100,'dockerd'),(200,'containerd')):
+            directory=proc/str(pid);(directory/'exe').symlink_to('/usr/bin/'+binary)
+            fields=['S','1']+['0']*18;fields[19]=str(pid)
+            (directory/'stat').write_text(str(pid)+' (daemon) '+' '.join(fields))
+        with patch.object(store,'command',side_effect=lambda *args:'100' if 'docker.service' in args else '200'):
+            self.assertEqual(store.host_mount_namespace(proc)['daemons']['docker.service']['pid'],100)
+            (proc/'200/ns/mnt').unlink();(proc/'200/ns/mnt').symlink_to('mnt:[222]')
+            with self.assertRaisesRegex(RuntimeError,'another mount namespace'):store.host_mount_namespace(proc)
+
+    def test_atomic_quarantine_uses_kernel_no_replace_and_keeps_existing_destination(self):
+        source=self.root/'source';source.mkdir();(source/'metadata').write_text('original')
+        destination=self.root/'destination';destination.mkdir();(destination/'metadata').write_text('retained')
+        rename=unittest.mock.Mock(return_value=-1)
+        with patch.object(store.ctypes,'CDLL',return_value=types.SimpleNamespace(renameat2=rename)),patch.object(store.ctypes,'get_errno',return_value=errno.EEXIST):
+            with self.assertRaises(OSError):store.atomic_runtime_quarantine(source,destination)
+        self.assertEqual(rename.call_args.args[-1],1)
+        self.assertEqual((source/'metadata').read_text(),'original');self.assertEqual((destination/'metadata').read_text(),'retained')
 
     def test_start_guards_public_ports_before_any_container_start(self):
         stopped={**self.state,'running':False,'status':'exited','pid':0,'process_state':'unknown'}

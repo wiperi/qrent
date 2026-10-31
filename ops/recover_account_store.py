@@ -129,7 +129,17 @@ def bundle_mounts(bundle,mountinfo=Path('/proc/self/mountinfo')):
 def host_mount_namespace(proc_root=Path('/proc')):
     current=os.readlink(proc_root/'self/ns/mnt');host=os.readlink(proc_root/'1/ns/mnt')
     if current!=host:raise RuntimeError('Runtime recovery must use the host mount namespace')
-    return current
+    daemons={}
+    for unit,binary in (('docker.service','dockerd'),('containerd.service','containerd')):
+        pid=int(command('systemctl','show',unit,'-p','MainPID','--value'))
+        executable=os.readlink(proc_root/str(pid)/'exe').removesuffix(' (deleted)')
+        if pid<2 or executable not in ('/usr/bin/'+binary,'/usr/local/bin/'+binary):
+            raise RuntimeError('The trusted runtime daemon identity is unavailable')
+        namespace=os.readlink(proc_root/str(pid)/'ns/mnt')
+        if namespace!=current:raise RuntimeError('A runtime daemon uses another mount namespace')
+        fields=(proc_root/str(pid)/'stat').read_text().rpartition(')')[2].split()
+        daemons[unit]={'pid':pid,'started':fields[19],'namespace':namespace}
+    return {'namespace':current,'daemons':daemons}
 
 
 def business_mounts(recovery,proc_root=Path('/proc')):
@@ -152,6 +162,29 @@ def empty_redis_cgroup(config,identity,cgroup_root=Path('/sys/fs/cgroup')):
             if directory.is_symlink():raise RuntimeError('Unexpected cgroup link')
             for name in ('cgroup.procs','cgroup.threads'):
                 if (directory/name).read_text().strip():raise RuntimeError('The Redis cgroup still contains processes')
+    return str(path)
+
+
+def retained_oci_configuration(oci_root,identity,rootfs,requested_cgroup):
+    path=oci_root/identity/'state.json'
+    if path.is_symlink() or path.resolve()!=path:raise RuntimeError('Unexpected retained OCI configuration path')
+    raw=path.read_bytes();state=json.loads(raw);config=state.get('config',{})
+    if state.get('id')!=identity or Path(config.get('rootfs','')).resolve()!=rootfs:
+        raise RuntimeError('Retained OCI rootfs or identity differs')
+    hooks=config.get('Hooks',config.get('hooks',{})) or {}
+    earlier={'prestart','createRuntime','createContainer','startContainer','poststart'}
+    if not isinstance(hooks,dict) or any(value for key,value in hooks.items() if key not in earlier):
+        raise RuntimeError('Retained OCI teardown or unknown hooks are not allowed')
+    namespaces={value.get('type'):value.get('path','') for value in config.get('namespaces',[])}
+    if namespaces.get('NEWPID')!='' or namespaces.get('NEWNS')!='' or config.get('intel_rdt'):
+        raise RuntimeError('Private original PID/mount namespaces without external RDT cleanup are required')
+    group=config.get('cgroups',{});value=group.get('path','')
+    if not value and group.get('name')==identity and group.get('parent')=='system.slice' and group.get('scope_prefix')=='docker' and group.get('Systemd',group.get('systemd')) is True:
+        value='system.slice:docker:'+identity
+    actual=empty_redis_cgroup({'linux':{'cgroupsPath':value}},identity)
+    if actual!=requested_cgroup or state.get('cgroup_paths')!={'':actual}:
+        raise RuntimeError('Retained OCI cgroup ownership differs')
+    return hashlib.sha256(raw).hexdigest()
 
 
 def atomic_runtime_quarantine(source,destination):
@@ -199,10 +232,17 @@ def bundle_plan(root,state,proc_root=Path('/proc'),runtime_root=Path('/run/conta
     if (oci.get('id')!=state['id'] or oci.get('status')!='stopped' or oci.get('pid')!=0
             or Path(oci.get('bundle','')).resolve()!=bundle):
         raise RuntimeError('Only the matching stopped PID-zero OCI instance qualifies')
-    config=json.loads((bundle/'config.json').read_text());rootfs=Path(config.get('root',{}).get('path',''))
+    raw_config=(bundle/'config.json').read_bytes();config=json.loads(raw_config);rootfs=Path(config.get('root',{}).get('path',''))
     if not rootfs.is_absolute():rootfs=bundle/rootfs
-    if rootfs.resolve()!=bundle/'rootfs':raise RuntimeError('Unexpected Redis runtime rootfs')
-    empty_redis_cgroup(config,state['id'])
+    rootfs=rootfs.resolve()
+    if rootfs!=bundle/'rootfs':
+        graph=json.loads(command('docker','inspect','--format','{{json .GraphDriver}}',state['id']))
+        merged=Path(graph.get('Data',{}).get('MergedDir',''))
+        if (graph.get('Name')!='overlay2' or Path('/var/lib/docker/overlay2') not in merged.parents
+                or merged.name!='merged' or merged.resolve()!=merged or rootfs!=merged):
+            raise RuntimeError('Unexpected Redis runtime rootfs')
+    cgroup=empty_redis_cgroup(config,state['id'])
+    retained_hash=retained_oci_configuration(oci_root,state['id'],rootfs,cgroup)
     namespace=host_mount_namespace(proc_root);mount_hashes=business_mounts(recovery,proc_root)
     info=bundle.stat();mounts=bundle_mounts(bundle,mountinfo)
     marker=root/'.deploy/receipts'/('account-bundle-'+str(recovery['shim']['pid'])+'-'+recovery['shim']['started']+'.json')
@@ -214,7 +254,8 @@ def bundle_plan(root,state,proc_root=Path('/proc'),runtime_root=Path('/run/conta
     return {'bundle':str(bundle),'bundle_identity':[info.st_dev,info.st_ino],
         'rootfs_mount_count':len(mounts),'oci_root':str(oci_root),'orphan_receipt':orphan.name,
         'attempt_marker':str(marker),'previous_backup_sha256':previous['backup_sha256'],
-        'host_mount_namespace':namespace,'business_mounts_sha256':mount_hashes,'runc_binary':binary}
+        'host_mount_namespace':namespace,'business_mounts_sha256':mount_hashes,'runc_binary':binary,
+        'retained_oci_sha256':retained_hash,'bundle_config_sha256':hashlib.sha256(raw_config).hexdigest()}
 
 
 def private_runtime_quarantine(device):
@@ -263,6 +304,8 @@ def recover_bundle(action,root,proc_root=Path('/proc')):
             recovery,_=runtime_reconciled(root,state,proc_root)
             if business_mounts(recovery,proc_root)!=proof['business_mounts_sha256'] or host_mount_namespace(proc_root)!=proof['host_mount_namespace']:
                 raise RuntimeError('Business mount or namespace protection requires attention')
+            if hashlib.sha256((bundle/'config.json').read_bytes()).hexdigest()!=proof['bundle_config_sha256']:
+                raise RuntimeError('Runtime bundle configuration changed')
             empty_redis_cgroup(json.loads((bundle/'config.json').read_text()),state['id'])
             if bundle_mounts(bundle):
                 subprocess.run(['/usr/bin/umount','--recursive','--',str(bundle/'rootfs')],capture_output=True,timeout=15,check=True)
