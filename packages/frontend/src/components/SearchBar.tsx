@@ -8,7 +8,11 @@ import { HiAdjustments, HiSearch } from 'react-icons/hi';
 
 // BEDROOM_OPTIONS will be created inside the component to use translations
 
-export default function SearchBar() {
+export default function SearchBar({
+  schoolOptions = Object.values(SCHOOL),
+}: {
+  schoolOptions?: readonly SCHOOL[];
+}) {
   const router = useRouter();
   const pathname = usePathname();
   const searchParams = useSearchParams();
@@ -84,7 +88,7 @@ export default function SearchBar() {
               onChange={e => setTargetSchool(e.target.value)}
               className="rounded-lg border border-slate-200 px-2.5 py-2 text-sm text-slate-700 focus:border-blue-500 focus:ring-1 focus:ring-blue-500 focus:outline-none h-9"
             >
-              {Object.values(SCHOOL).map(school => (
+              {schoolOptions.map(school => (
                 <option key={school} value={school}>
                   {school}
                 </option>

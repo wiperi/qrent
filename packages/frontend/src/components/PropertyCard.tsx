@@ -30,6 +30,7 @@ interface PropertyCardProps {
   thumbnailUrl: string;
   subscribed?: boolean;
   propertyId?: number;
+  imageSizes?: string;
 }
 
 export default function PropertyCard({
@@ -49,6 +50,7 @@ export default function PropertyCard({
   thumbnailUrl,
   subscribed,
   propertyId,
+  imageSizes = '(max-width: 639px) calc(100vw - 40px), (max-width: 1023px) 46vw, (max-width: 1279px) 30vw, 286px',
 }: PropertyCardProps) {
   const [addressFontSize, setAddressFontSize] = useState(18);
   const addressRef = useRef<HTMLHeadingElement>(null);
@@ -289,7 +291,7 @@ export default function PropertyCard({
             alt={generateImageAlt(address, propertyTypeName, bedroomCount)}
             fill
             className="object-cover"
-            sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+            sizes={imageSizes}
           />
 
           {/* Dark gradient overlay at bottom */}

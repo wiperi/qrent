@@ -144,6 +144,7 @@ export default function SearchResults({ searchParams }: { searchParams: SearchPa
               <div className="mt-6 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
                 {properties.map(property => (
                   <PropertyCard
+                    imageSizes="(max-width: 639px) calc(100vw - 40px), (max-width: 1023px) 46vw, (max-width: 1279px) 20vw, 264px"
                     key={property.id}
                     id={property.id}
                     address={property.address}

@@ -1,0 +1,485 @@
+.page {
+  --ink: #172b46;
+  --muted: #526479;
+  --line: #e1e8f0;
+  --accent: #1d4ed8;
+  color: var(--ink);
+  max-width: 1280px;
+  margin: 0 auto;
+  padding: 16px 24px 48px;
+}
+.hero {
+  display: grid;
+  grid-template-columns: 1.15fr 1fr;
+  align-items: center;
+  column-gap: 48px;
+  margin-bottom: 42px;
+}
+.heroText h1 {
+  margin: 0;
+  font-size: clamp(28px, 3.15vw, 42px);
+  line-height: 1.22;
+  font-weight: 650;
+  letter-spacing: -0.045em;
+}
+.heroText p {
+  margin: 16px 0 0;
+  font-size: 15px;
+  color: var(--muted);
+  line-height: 1.65;
+}
+.heroPhoto {
+  position: relative;
+  height: 220px;
+  overflow: hidden;
+  border-radius: 16px;
+  background: #dcebf8;
+}
+.harbour {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center 58%;
+}
+.search {
+  grid-column: 1 / -1;
+  margin-top: 24px;
+}
+.search > form > div {
+  padding: 20px 24px;
+  border-radius: 14px;
+  border: 1px solid var(--line);
+  box-shadow: 0 8px 30px #17345608;
+  --tw-ring-color: transparent;
+}
+.search select,
+.search input {
+  height: 44px;
+  border-radius: 8px;
+  background: #f9fbfd;
+  font-size: 14px;
+}
+.search label {
+  font-size: 12px;
+  font-weight: 600;
+  margin-bottom: 8px;
+}
+.search button {
+  min-height: 44px;
+  white-space: nowrap;
+  border-radius: 8px;
+}
+.search button[type='submit'] {
+  background: var(--accent);
+  padding-inline: 20px;
+}
+.searchSkeleton {
+  height: 112px;
+  border-radius: 14px;
+  background: #f1f5f9;
+}
+@media (max-width: 767px) {
+  .search > form > div > div {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 16px 12px;
+  }
+}
+.sectionHeading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 20px;
+}
+.sectionHeading h2 {
+  margin: 0;
+  font-weight: 650;
+  font-size: 23px;
+  line-height: 1.35;
+  letter-spacing: -0.025em;
+}
+.sectionHeading a,
+.guideIntro > a {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 13px;
+  font-weight: 600;
+  white-space: nowrap;
+  color: var(--accent);
+}
+.schoolTabs {
+  display: flex;
+  gap: 28px;
+  margin-bottom: 24px;
+  border-bottom: 1px solid var(--line);
+}
+.schoolTabs button {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 0 0 14px;
+  border-bottom: 2px solid transparent;
+  margin-bottom: -1px;
+  color: var(--muted);
+  font-weight: 600;
+  min-height: 44px;
+  cursor: pointer;
+}
+.schoolTabs button[aria-pressed='true'] {
+  color: var(--accent);
+  border-bottom-color: var(--accent);
+}
+.schoolTabs span {
+  font-size: 12px;
+  font-weight: 400;
+}
+.cardGrid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 24px;
+}
+.card {
+  overflow: hidden;
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  background: #fff;
+  transition:
+    border-color 0.16s,
+    box-shadow 0.16s;
+}
+.card:hover {
+  border-color: #9fb9e0;
+  box-shadow: 0 6px 20px #1734560a;
+}
+.cardPhoto {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 1.7;
+  background: #eef3f7;
+  overflow: hidden;
+}
+.propertyPhoto {
+  object-fit: cover;
+}
+.cardBody {
+  padding: 18px;
+}
+.priceRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 11px;
+}
+.priceRow p {
+  margin: 0;
+  white-space: nowrap;
+}
+.priceRow strong {
+  font-size: 23px;
+  line-height: 1.2;
+  font-weight: 650;
+  color: var(--ink);
+  letter-spacing: -0.04em;
+}
+.priceRow p span {
+  font-size: 12px;
+  color: var(--muted);
+}
+.source {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 11px;
+  color: var(--muted);
+  white-space: nowrap;
+}
+.card h3 {
+  font-weight: 600;
+  font-size: 15px;
+  line-height: 1.5;
+  margin: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.region {
+  margin: 2px 0 16px;
+  color: var(--muted);
+  font-size: 13px;
+}
+.cardDetails {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  border-top: 1px solid #eef2f7;
+  padding-top: 13px;
+  color: #425972;
+  font-size: 13px;
+}
+.cardDetails > span {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+.cardDetails svg {
+  width: 15px;
+  height: 15px;
+}
+.cardDetails .commute {
+  margin-left: auto;
+  color: var(--accent);
+  font-size: 12px;
+}
+.photoFallback {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  gap: 8px;
+  height: 100%;
+  padding: 20px;
+  color: var(--muted);
+  font-size: 12px;
+}
+.photoFallback svg {
+  width: 26px;
+  height: 26px;
+}
+.empty {
+  padding: 56px 20px;
+  text-align: center;
+  background: #f8fafc;
+  border-radius: 12px;
+  color: var(--muted);
+}
+.empty button,
+.empty a {
+  display: inline-block;
+  color: var(--accent);
+  margin-top: 12px;
+  font-weight: 600;
+  min-height: 44px;
+}
+.skeletonCard {
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  overflow: hidden;
+  padding-bottom: 20px;
+}
+.skeletonCard div {
+  aspect-ratio: 1.7;
+  background: #edf2f7;
+}
+.skeletonCard span {
+  display: block;
+  height: 16px;
+  width: 55%;
+  margin: 20px 18px 0;
+  border-radius: 4px;
+  background: #edf2f7;
+}
+.skeletonCard span:last-child {
+  width: 75%;
+  height: 12px;
+  margin-top: 12px;
+}
+.explore {
+  margin-top: 48px;
+}
+.areaGroups {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 28px;
+  padding-block: 22px;
+  border-top: 1px solid var(--line);
+  border-bottom: 1px solid var(--line);
+}
+.schoolLink {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 14px;
+}
+.schoolLink svg {
+  color: var(--accent);
+}
+.schoolLink span {
+  color: var(--muted);
+  font-size: 12px;
+}
+.areaLinks {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px 16px;
+  margin-top: 14px;
+  padding-left: 22px;
+}
+.areaLinks a {
+  color: var(--muted);
+  font-size: 13px;
+}
+.areaLinks a:hover,
+.schoolLink:hover {
+  color: var(--accent);
+}
+.guide {
+  margin-top: 40px;
+}
+.guideIntro {
+  display: flex;
+  align-items: center;
+  gap: 18px;
+  padding: 26px 0;
+}
+.guideIntro > svg {
+  width: 26px;
+  height: 26px;
+  color: var(--accent);
+  flex-shrink: 0;
+}
+.guideIntro h2 {
+  font-size: 20px;
+  font-weight: 600;
+  letter-spacing: -0.02em;
+  margin: 0;
+}
+.guideIntro p {
+  font-size: 13px;
+  color: var(--muted);
+  margin: 6px 0 0;
+}
+.guideIntro > a {
+  margin-left: auto;
+}
+.dataNote {
+  margin: 32px 0 0;
+  font-size: 12px;
+  line-height: 1.7;
+  color: var(--muted);
+}
+.page a:focus-visible,
+.page button:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 4px;
+}
+@media (min-width: 1280px) {
+  .heroText h1 {
+    white-space: nowrap;
+    font-size: 38px;
+  }
+}
+@media (max-width: 1023px) {
+  .hero {
+    column-gap: 24px;
+  }
+  .heroText h1 {
+    font-size: 30px;
+  }
+  .heroText p {
+    font-size: 14px;
+  }
+  .heroPhoto {
+    height: 200px;
+  }
+  .cardGrid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+  .schoolTabs {
+    gap: 24px;
+  }
+  .schoolTabs span {
+    display: none;
+  }
+  .schoolLink {
+    flex-wrap: wrap;
+  }
+  .schoolLink span {
+    width: 100%;
+    padding-left: 22px;
+  }
+}
+@media (max-width: 767px) {
+  .page {
+    padding: 12px 20px 32px;
+  }
+  .hero {
+    grid-template-columns: 1fr;
+    gap: 0;
+    margin-bottom: 32px;
+  }
+  .heroText h1 {
+    font-size: 28px;
+    letter-spacing: -0.035em;
+  }
+  .heroText p {
+    margin-top: 8px;
+    font-size: 13px;
+  }
+  .heroPhoto {
+    display: none;
+  }
+  .search {
+    margin-top: 20px;
+  }
+  .search > form > div {
+    padding: 16px;
+  }
+  .sectionHeading {
+    align-items: flex-end;
+    gap: 12px;
+  }
+  .sectionHeading h2 {
+    font-size: 19px;
+  }
+  .sectionHeading a {
+    font-size: 12px;
+    gap: 4px;
+  }
+  .areaGroups {
+    grid-template-columns: 1fr;
+    gap: 24px;
+  }
+  .schoolLink span {
+    width: auto;
+    padding: 0;
+  }
+  .explore {
+    margin-top: 36px;
+  }
+  .guideIntro {
+    flex-wrap: wrap;
+    gap: 12px;
+  }
+  .guideIntro h2 {
+    font-size: 18px;
+  }
+  .guideIntro > a {
+    margin-left: 38px;
+  }
+}
+@media (max-width: 639px) {
+  .cardGrid {
+    grid-template-columns: 1fr;
+    gap: 20px;
+  }
+  .cardPhoto {
+    aspect-ratio: 1.7;
+  }
+  .cardBody {
+    padding: 16px;
+  }
+  .schoolTabs {
+    gap: 28px;
+    margin-bottom: 20px;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .card {
+    transition: none;
+  }
+}

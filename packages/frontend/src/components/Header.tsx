@@ -85,7 +85,7 @@ export default function Header() {
               <div className="flex items-center gap-6">
                 <Link href={`/${locale}`} className="flex items-center" aria-label="Qrent home">
                   <Image
-                    src="/qrent-logo.svg"
+                    src="/media/qrent-logo-v1.svg"
                     alt="Qrent"
                     width={80}
                     height={80}
@@ -217,7 +217,7 @@ export default function Header() {
               <div className="flex items-center">
                 <Link href={`/${locale}`} onClick={closeDrawer}>
                   <Image
-                    src="/qrent-logo.svg"
+                    src="/media/qrent-logo-v1.svg"
                     alt="Qrent"
                     width={36}
                     height={36}
