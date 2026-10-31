@@ -170,7 +170,7 @@ export default function HomeDemoPropertyCard({
               src={row.thumbnailUrl}
               alt={`${address}, ${row.region}`}
               fill
-              sizes="(max-width: 639px) calc(100vw - 40px), (max-width: 1023px) 46vw, (max-width: 1279px) 30vw, 390px"
+              sizes="(max-width: 767px) calc(100vw - 40px), (max-width: 1150px) 46vw, (max-width: 1279px) 30vw, 390px"
               className={styles.propertyPhoto}
               onError={() => setPhotoFailed(true)}
             />
