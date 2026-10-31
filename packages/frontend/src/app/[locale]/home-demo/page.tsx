@@ -3,10 +3,7 @@ import Link from 'next/link';
 import { Suspense } from 'react';
 import { setRequestLocale } from 'next-intl/server';
 import { HiArrowRight, HiBookOpen, HiLocationMarker } from 'react-icons/hi';
-import { SCHOOL } from '@qrent/shared/enum';
 import HarbourImage from '@/components/HarbourImage';
-import SearchBar from '@/components/SearchBar';
-import FilterModal from '@/components/FilterModal';
 import HomeDemoListings from '@/components/HomeDemoListings';
 import TodoProgressBar from '@/components/TodoProgressBar';
 import { RENTAL_SCHOOLS, areaName, rentalSearchPath } from '@/lib/rental-schools';
@@ -35,11 +32,11 @@ export default async function HomeDemo({ params }: Props) {
     <main className={styles.page}>
       <section className={styles.hero}>
         <div className={styles.heroText}>
-          <h1>{zh ? '在悉尼，找到合适的家。' : 'Find your place in Sydney.'}</h1>
+          <h1>{zh ? '悉尼找房，每天更新。' : 'Sydney rentals. Updated daily.'}</h1>
           <p>
             {zh
-              ? '对比 Domain 与 Real Estate，按预算和到校通勤选房。'
-              : 'Compare Domain and Real Estate by rent and commute.'}
+              ? 'Domain 与 Real Estate 房源，按预算、入住日期和通勤筛选。'
+              : 'Filter Domain and Real Estate by rent, availability and commute.'}
           </p>
         </div>
         <div className={styles.heroPhoto}>
@@ -52,11 +49,6 @@ export default async function HomeDemo({ params }: Props) {
             sizes="(max-width: 767px) calc(100vw - 40px), (max-width: 1279px) 42vw, 500px"
             className={styles.harbour}
           />
-        </div>
-        <div className={styles.search}>
-          <Suspense fallback={<div className={styles.searchSkeleton} />}>
-            <SearchBar schoolOptions={[SCHOOL.UNSW, SCHOOL.USYD, SCHOOL.UTS]} />
-          </Suspense>
         </div>
       </section>
 
@@ -118,9 +110,6 @@ export default async function HomeDemo({ params }: Props) {
           ? '房源来自现有数据库，价格为澳元周租。通勤仅供参考，申请前请核对源站房源与实际路线。'
           : 'Listings come from the current database. Prices are AUD per week. Confirm availability and your actual journey before applying.'}
       </p>
-      <Suspense fallback={null}>
-        <FilterModal />
-      </Suspense>
     </main>
   );
 }

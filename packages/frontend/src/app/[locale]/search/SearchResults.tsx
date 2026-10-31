@@ -9,6 +9,7 @@ import Link from 'next/link';
 import { useSearchParams } from 'next/navigation';
 import { useMemo, useEffect } from 'react';
 import { HiSearch } from 'react-icons/hi';
+import { demoOrderBy } from '@/lib/home-demo';
 
 type SearchParams = {
   q?: string;
@@ -26,6 +27,7 @@ type SearchParams = {
   rating?: string;
   moveInDate?: string;
   areas?: string;
+  sort?: string;
 };
 
 export default function SearchResults({ searchParams }: { searchParams: SearchParams }) {
@@ -67,11 +69,14 @@ export default function SearchResults({ searchParams }: { searchParams: SearchPa
             return undefined;
           })()
         : undefined,
-      orderBy: [
-        {
-          averageScore: 'desc' as const,
-        },
-      ],
+      orderBy:
+        searchParams.sort && ['recent', 'score', 'price'].includes(searchParams.sort)
+          ? demoOrderBy(searchParams.sort)
+          : [
+              {
+                averageScore: 'desc' as const,
+              },
+            ],
     };
   }, [searchParams, page]);
 
