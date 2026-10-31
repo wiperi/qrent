@@ -81,6 +81,26 @@ def controller():
     return pid,Path(exe),config,args
 
 
+def verify_controller_unit(binary,args):
+    """Reject hooks and stop propagation before touching the controller."""
+    for property_name in ('ExecCondition','ExecStartPre','ExecStartPost','ExecStop','ExecStopPost'):
+        if command('systemctl','show','docker.service','-p',property_name,'--value'):
+            raise RuntimeError('Custom Docker start or stop hooks require separate review')
+    start=command('systemctl','show','docker.service','-p','ExecStart','--value')
+    matched=re.fullmatch(r'\{ path=([^ ;]+) ; argv\[\]=(.+?) ; ignore_errors=no ; [^{}]+ \}',start)
+    current=' '.join(arg.decode() for arg in args if arg)
+    if not matched or matched.group(1)!=str(binary) or matched.group(2)!=current:
+        raise RuntimeError('Systemd must start the verified Docker binary with unchanged arguments')
+    if command('systemctl','show','docker.service','-p','KillMode','--value')!='process':
+        raise RuntimeError('Docker process-only stop behavior is required')
+    for property_name in ('ConsistsOf','RequiredBy','BoundBy','RequisiteOf','PropagatesStopTo','Upholds','OnFailure','OnSuccess'):
+        allowed={'docker.socket'} if property_name in ('ConsistsOf','RequiredBy','BoundBy') else set()
+        if set(command('systemctl','show','docker.service','-p',property_name,'--value').split())-allowed:
+            raise RuntimeError('Other service restart propagation requires separate review')
+    if 'docker.service' in command('systemctl','show','containerd.service','-p','PartOf','--value').split():
+        raise RuntimeError('Containerd must remain independent of the controller restart')
+
+
 def enable_live_restore(root):
     pid,binary,path,args=controller()
     identity=kernel_identity(pid)
@@ -119,7 +139,15 @@ def main(action='plan',root=None,data_root=Path('/var/lib/docker/containers'),pr
             'live_restore_active':info.get('LiveRestoreEnabled') if info else None,
             'restart_allowed':restart_allowed(info,redis),'running_containers_stopped':False,
             'volumes_or_schema_changed':False}
-    if action=='plan':print(json.dumps(report));return report
+    report['runtime_version']=(version or {}).get('Version')
+    if action=='plan':
+        try:
+            _,binary,_,args=controller();verify_controller_unit(binary,args)
+            report['unit_restart_eligible']=True
+        except (OSError,RuntimeError,subprocess.SubprocessError) as error:
+            report['unit_restart_eligible']=False
+            report['unit_gate_reason']=str(error) if isinstance(error,RuntimeError) else type(error).__name__
+        print(json.dumps(report));return report
     directory=root/'.deploy/docker-control';directory.mkdir(parents=True,exist_ok=True)
     with (directory/'control.lock').open('a') as lock:
         fcntl.flock(lock,fcntl.LOCK_EX|fcntl.LOCK_NB)
@@ -132,19 +160,12 @@ def main(action='plan',root=None,data_root=Path('/var/lib/docker/containers'),pr
                 fresh=api('/info');now,current_redis=disk_snapshot(data_root,proc_root)
                 if now!=before or current_redis!=redis or not restart_allowed(fresh,current_redis):
                     raise RuntimeError('Live-restore and stopped-Redis prerequisites are not verified')
-                _,binary,_,_=controller()
+                _,binary,_,args=controller()
                 installed=subprocess.run([str(binary),'--version'],capture_output=True,text=True,timeout=10)
                 runtime_version=(version or {}).get('Version','')
                 if installed.returncode or not re.search(r'\b'+re.escape('.'.join(runtime_version.split('.')[:2]))+r'\.',installed.stdout) or not runtime_version:
                     raise RuntimeError('Controller version compatibility could not be verified')
-                if command('systemctl','show','docker.service','-p','ExecStop','--value') or command('systemctl','show','docker.service','-p','ExecStopPost','--value'):
-                    raise RuntimeError('Custom Docker stop hooks require separate review')
-                if command('systemctl','show','docker.service','-p','KillMode','--value')!='process':
-                    raise RuntimeError('Docker process-only stop behavior is required')
-                if 'docker.service' in command('systemctl','show','containerd.service','-p','PartOf','--value').split():
-                    raise RuntimeError('Containerd must remain independent of the controller restart')
-                if set(command('systemctl','show','docker.service','-p','ConsistsOf','--value').split())-{'docker.socket'}:
-                    raise RuntimeError('Other service restart propagation requires separate review')
+                verify_controller_unit(binary,args)
                 report['status']='controller_restart_attempt_started';receipt.write_text(json.dumps(report,indent=2))
                 result=subprocess.run(['systemctl','restart','docker.service'],capture_output=True,timeout=60)
                 if result.returncode: raise RuntimeError('Controller restart did not complete; no automatic retry')

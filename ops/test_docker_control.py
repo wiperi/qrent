@@ -13,6 +13,12 @@ control=importlib.util.module_from_spec(spec);spec.loader.exec_module(control)
 
 
 class ControlRecoveryTests(unittest.TestCase):
+    @staticmethod
+    def safe_unit(*args):
+        if 'KillMode' in args:return 'process'
+        if 'ExecStart' in args:return '{ path=/usr/bin/dockerd ; argv[]=/usr/bin/dockerd -H fd:// ; ignore_errors=no ; start_time=[n/a] ; pid=123 ; code=(null) ; status=0/0 }'
+        return ''
+
     def setUp(self):
         self.temp=tempfile.TemporaryDirectory();self.root=Path(self.temp.name).resolve()
         quiet=patch('builtins.print');quiet.start();self.addCleanup(quiet.stop)
@@ -47,9 +53,8 @@ class ControlRecoveryTests(unittest.TestCase):
 
     def test_controller_restart_preserves_business_process_fingerprints(self):
         def api(path):return {'LiveRestoreEnabled':True} if path=='/info' else {'Version':'28.5.0'}
-        def command(*args):return 'process' if 'KillMode' in args else ''
         answers=[subprocess.CompletedProcess([],0,stdout='Docker version 28.5.2, build local'),subprocess.CompletedProcess([],0)]
-        with patch.object(control,'disk_snapshot',return_value=(self.before,self.redis)),patch.object(control,'api',side_effect=api),patch.object(control,'controller',return_value=(123,Path('/usr/bin/dockerd'),self.root/'daemon.json',[])),patch.object(control,'command',side_effect=command),patch.object(control.subprocess,'run',side_effect=answers) as run:
+        with patch.object(control,'disk_snapshot',return_value=(self.before,self.redis)),patch.object(control,'api',side_effect=api),patch.object(control,'controller',return_value=(123,Path('/usr/bin/dockerd'),self.root/'daemon.json',[b'/usr/bin/dockerd',b'-H',b'fd://'])),patch.object(control,'command',side_effect=self.safe_unit),patch.object(control.subprocess,'run',side_effect=answers) as run:
             result=control.main('restart-controller',self.root)
             self.assertTrue(result['business_process_identity_preserved'])
             self.assertEqual(run.call_args.args[0],['systemctl','restart','docker.service'])
@@ -57,8 +62,27 @@ class ControlRecoveryTests(unittest.TestCase):
     def test_stop_hook_prevents_controller_restart(self):
         def api(path):return {'LiveRestoreEnabled':True} if path=='/info' else {'Version':'28.5.0'}
         with patch.object(control,'disk_snapshot',return_value=(self.before,self.redis)),patch.object(control,'api',side_effect=api),patch.object(control,'controller',return_value=(123,Path('/usr/bin/dockerd'),self.root/'daemon.json',[])),patch.object(control,'command',return_value='custom stop hook'),patch.object(control.subprocess,'run',return_value=subprocess.CompletedProcess([],0,stdout='Docker version 28.5.2')) as run:
-            with self.assertRaisesRegex(RuntimeError,'stop hooks'):control.main('restart-controller',self.root)
+            with self.assertRaisesRegex(RuntimeError,'start or stop hooks'):control.main('restart-controller',self.root)
             self.assertEqual(run.call_count,1)
+
+    def test_business_dependency_cannot_be_stopped_by_restart(self):
+        for property_name in ('ConsistsOf','RequiredBy','BoundBy','RequisiteOf','PropagatesStopTo','Upholds','OnFailure','OnSuccess'):
+            with self.subTest(property_name=property_name):
+                def command(*args):return 'business.service' if property_name in args else self.safe_unit(*args)
+                with patch.object(control,'command',side_effect=command):
+                    with self.assertRaisesRegex(RuntimeError,'propagation'):
+                        control.verify_controller_unit(Path('/usr/bin/dockerd'),[b'/usr/bin/dockerd',b'-H',b'fd://'])
+
+    def test_start_hooks_and_wrapper_are_rejected(self):
+        for property_name in ('ExecCondition','ExecStartPre','ExecStartPost','ExecStopPost'):
+            with self.subTest(property_name=property_name):
+                def command(*args):return 'docker compose down' if property_name in args else self.safe_unit(*args)
+                with patch.object(control,'command',side_effect=command):
+                    with self.assertRaisesRegex(RuntimeError,'hooks'):
+                        control.verify_controller_unit(Path('/usr/bin/dockerd'),[b'/usr/bin/dockerd',b'-H',b'fd://'])
+        with patch.object(control,'command',side_effect=self.safe_unit):
+            with self.assertRaisesRegex(RuntimeError,'unchanged arguments'):
+                control.verify_controller_unit(Path('/usr/bin/dockerd'),[b'/usr/bin/dockerd',b'--different-config'])
 
     def test_disk_snapshot_keeps_running_business_processes_and_stopped_redis_separate(self):
         data=self.root/'containers';proc=self.root/'proc'
