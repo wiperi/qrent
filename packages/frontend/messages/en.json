@@ -89,7 +89,7 @@
     "getInTouch": "Get in touch",
     "copyEmail": "Copy email address: yyzyfish5@gmail.com",
     "emailCopied": "Copied to clipboard",
-    "copyright": "Copyright © 2025 - All right reserved by Qrent Industries Ltd",
+    "copyright": "Copyright © {year} - All rights reserved by Qrent Industries Ltd",
     "icp": "网页备案号: 粤ICP备2025363367号-1"
   },
   "About": {
@@ -161,7 +161,7 @@
   },
   "Contact": {
     "title": "Get in Touch",
-    "subtitle": "Have questions, feedback, or just want to say hello? We'd love to hear from you. Fill out the form below or reach out through any of our channels.",
+    "subtitle": "Have a question about a listing or the website? Email us directly, or use this form to prepare an email draft.",
     "form": {
       "title": "Send us a message",
       "name": "Name",
@@ -172,27 +172,17 @@
       "subjectPlaceholder": "What's this about?",
       "message": "Message",
       "messagePlaceholder": "Tell us more...",
-      "submitButton": "Send Message",
-      "successTitle": "Message Sent!",
-      "successMessage": "We'll get back to you as soon as possible."
+      "submitButton": "Open email draft",
+      "successTitle": "Send the draft in your email app",
+      "successMessage": "This form prepares a draft and does not send automatically. If your email app did not open, email yyzyfish5@gmail.com directly.",
+      "editDraft": "Edit draft"
     },
     "contactInfo": {
       "title": "Contact Information",
-      "email": "Email",
-      "office": "Office",
-      "officeAddress": "Ping An Finance Centre<br />Building A, 35th Floor<br />Shenzhen, Guangdong 518000"
+      "email": "Email"
     },
     "followUs": {
       "title": "Follow Us"
-    },
-    "officeHours": {
-      "title": "Office Hours",
-      "weekdays": "Monday - Friday:",
-      "weekdaysTime": "9:00 AM - 6:00 PM",
-      "saturday": "Saturday:",
-      "saturdayTime": "10:00 AM - 4:00 PM",
-      "sunday": "Sunday:",
-      "sundayTime": "Closed"
     }
   },
   "Blog": {
