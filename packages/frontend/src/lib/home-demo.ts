@@ -277,8 +277,8 @@ export function availabilityLabel(
     label:
       day <= today
         ? zh
-          ? '可入住日期已到 · 待源站确认'
-          : 'Available date reached · confirm with agent'
+          ? `${date}起（日期已到，待确认）`
+          : `From ${date} · confirm with agent`
         : zh
           ? `${date}起可入住`
           : `Available from ${date}`,
@@ -288,9 +288,11 @@ export function availabilityLabel(
 
 export function displayRentalAddress(value: string) {
   // Preserve unit separators and numeric street ranges; never infer a unit number.
-  return value
-    .trim()
-    .replace(/-(?=[a-z])/gi, ' ')
-    .replace(/(?<=[a-z])-/gi, ' ')
-    .replace(/\b[a-z]+\b/gi, word => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase());
+  let text = value.trim();
+  if (!/[\s/]/.test(text) && /[a-z]+-[a-z]+/i.test(text))
+    text = text.replace(/-(?=[a-z])/gi, ' ').replace(/(?<=[a-z])-/gi, ' ');
+  return text.replace(
+    /\b[a-z]+\b/gi,
+    word => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase()
+  );
 }
