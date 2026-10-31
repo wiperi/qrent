@@ -5,6 +5,7 @@ import Link from 'next/link';
 import { useCategory } from '@/components/CategoryContext';
 import { LOCALE } from '@qrent/shared/enum';
 import { type BlogPost as NotionBlogPost } from '@/lib/notion';
+import { filterBlogPosts } from '@/lib/blog-search';
 
 interface FilteredBlogListProps {
   posts: NotionBlogPost[];
@@ -12,23 +13,19 @@ interface FilteredBlogListProps {
 }
 
 export default function FilteredBlogList({ posts, locale }: FilteredBlogListProps) {
-  const { selectedCategories } = useCategory();
+  const { query, setQuery, selectedCategories, clearCategories } = useCategory();
   const [currentPage, setCurrentPage] = useState(1);
   const POSTS_PER_PAGE = 20;
 
-  // 根据选择的分类筛选文章
-  const filteredPosts = useMemo(() => {
-    if (selectedCategories.length === 0) {
-      return posts;
-    }
-
-    return posts.filter(post => {
-      // 检查文章是否包含所有选择的分类（多选是AND关系）
-      return selectedCategories.every(category =>
-        post.keywords.some((keyword: string) => keyword.toLowerCase() === category.toLowerCase())
-      );
-    });
-  }, [posts, selectedCategories]);
+  const filteredPosts = useMemo(
+    () => filterBlogPosts(posts, query, selectedCategories),
+    [posts, query, selectedCategories]
+  );
+  const zh = locale === LOCALE.ZH;
+  const resetFilters = () => {
+    setQuery('');
+    clearCategories();
+  };
 
   // Derive the first page during SSR so crawlers and no-JS users see articles.
   const displayPosts = useMemo(
@@ -56,31 +53,40 @@ export default function FilteredBlogList({ posts, locale }: FilteredBlogListProp
   // 当筛选条件改变时重置页码
   useEffect(() => {
     setCurrentPage(1);
-  }, [selectedCategories]);
+  }, [query, selectedCategories]);
 
   if (displayPosts.length === 0) {
     return (
-      <div className="text-center py-12">
-        <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-8 max-w-md mx-auto">
-          <h3 className="text-lg font-semibold text-yellow-800 mb-2">
-            {locale === LOCALE.ZH ? '暂无文章' : 'No Posts Found'}
-          </h3>
-          <p className="text-yellow-700 mb-4">
-            {selectedCategories.length > 0
-              ? locale === LOCALE.ZH
-                ? '没有找到符合所选分类的文章，请尝试其他分类。'
-                : 'No posts found matching the selected categories. Try different categories.'
-              : locale === LOCALE.ZH
-                ? '这可能是我们的问题，请联系我们的开发人员。'
-                : 'This may be our problem, please contact our development team.'}
-          </p>
-        </div>
-      </div>
+      <section
+        id="blog-results"
+        className="border-t border-slate-200 py-8 text-sm leading-relaxed text-slate-600"
+        aria-label={zh ? '攻略列表' : 'Guide list'}
+      >
+        <p role="status">{zh ? '找到 0 篇攻略' : '0 guides found'}</p>
+        <h2 className="mb-2 text-lg font-semibold text-slate-900">
+          {zh ? '未找到相关攻略' : 'No matching guides'}
+        </h2>
+        <p>
+          {zh
+            ? '可以换个关键词，或清除筛选后浏览全部攻略。'
+            : 'Try another keyword, or clear the filters to browse every guide.'}
+        </p>
+        <button
+          className="min-h-11 cursor-pointer text-blue-700 underline underline-offset-4 focus-visible:outline-2 focus-visible:outline-blue-600"
+          type="button"
+          onClick={resetFilters}
+        >
+          {zh ? '清除筛选' : 'Clear filters'}
+        </button>
+      </section>
     );
   }
 
   return (
-    <div className="space-y-6">
+    <section id="blog-results" className="space-y-6" aria-label={zh ? '攻略列表' : 'Guide list'}>
+      <p role="status" className="mb-3 text-sm leading-relaxed text-slate-600">
+        {zh ? `找到 ${filteredPosts.length} 篇攻略` : `${filteredPosts.length} guides found`}
+      </p>
       <div className="border-t border-slate-200">
         {displayPosts.map(post => (
           <Link
@@ -114,6 +120,6 @@ export default function FilteredBlogList({ posts, locale }: FilteredBlogListProp
           </div>
         </div>
       )}
-    </div>
+    </section>
   );
 }

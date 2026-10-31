@@ -3,6 +3,8 @@
 import React, { createContext, useContext, useState, useCallback } from 'react';
 
 interface CategoryContextType {
+  query: string;
+  setQuery: (query: string) => void;
   selectedCategories: string[];
   setSelectedCategories: (categories: string[]) => void;
   toggleCategory: (category: string) => void;
@@ -12,6 +14,7 @@ interface CategoryContextType {
 const CategoryContext = createContext<CategoryContextType | undefined>(undefined);
 
 export function CategoryProvider({ children }: { children: React.ReactNode }) {
+  const [query, setQuery] = useState('');
   const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
 
   const toggleCategory = useCallback((category: string) => {
@@ -31,6 +34,8 @@ export function CategoryProvider({ children }: { children: React.ReactNode }) {
   return (
     <CategoryContext.Provider
       value={{
+        query,
+        setQuery,
         selectedCategories,
         setSelectedCategories,
         toggleCategory,
