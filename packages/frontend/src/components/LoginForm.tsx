@@ -36,9 +36,7 @@ export default function LoginForm({ onSuccess, onSwitchToSignup }: LoginFormProp
   return (
     <div className="w-full max-w-md mx-auto">
       <div className="bg-white rounded-lg shadow-md p-6">
-        <h2 className="text-2xl font-bold text-center text-gray-900 mb-6">
-          {t('loginTitle')}
-        </h2>
+        <h2 className="text-2xl font-bold text-center text-gray-900 mb-6">{t('loginTitle')}</h2>
 
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>
@@ -48,8 +46,10 @@ export default function LoginForm({ onSuccess, onSwitchToSignup }: LoginFormProp
             <input
               id="email"
               type="email"
+              autoComplete="email"
+              maxLength={50}
               value={email}
-              onChange={(e) => setEmail(e.target.value)}
+              onChange={e => setEmail(e.target.value)}
               required
               className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
               placeholder={t('email')}
@@ -63,8 +63,9 @@ export default function LoginForm({ onSuccess, onSwitchToSignup }: LoginFormProp
             <input
               id="password"
               type="password"
+              autoComplete="current-password"
               value={password}
-              onChange={(e) => setPassword(e.target.value)}
+              onChange={e => setPassword(e.target.value)}
               required
               className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
               placeholder={t('password')}
@@ -72,7 +73,7 @@ export default function LoginForm({ onSuccess, onSwitchToSignup }: LoginFormProp
           </div>
 
           {error && (
-            <div className="text-red-600 text-sm bg-red-50 p-2 rounded-md">
+            <div role="alert" className="text-red-600 text-sm bg-red-50 p-2 rounded-md">
               {error}
             </div>
           )}
@@ -82,7 +83,7 @@ export default function LoginForm({ onSuccess, onSwitchToSignup }: LoginFormProp
             disabled={isLoading}
             className="w-full bg-blue-600 text-white py-2 px-4 rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed"
           >
-            {isLoading ? 'Loading...' : t('loginButton')}
+            {isLoading ? t('loading') : t('loginButton')}
           </button>
         </form>
 

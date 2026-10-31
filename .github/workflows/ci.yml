@@ -210,6 +210,10 @@ jobs:
         env:
           TSX_TSCONFIG_PATH: packages/frontend/tsconfig.json
         run: node --import tsx --test packages/frontend/test/seo/*.test.ts packages/frontend/test/seo/*.test.tsx
+      - name: Account storage and request isolation
+        env:
+          TSX_TSCONFIG_PATH: packages/frontend/tsconfig.json
+        run: node --import tsx --test packages/frontend/test/auth/*.test.ts
 
   # Type checking
   typecheck:

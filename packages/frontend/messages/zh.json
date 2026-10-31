@@ -9,7 +9,8 @@
     "notFoundError": "收藏列表不存在",
     "networkError": "网络连接失败，请检查网络连接",
     "serverError": "服务器错误，请稍后重试",
-    "goToLogin": "前往登录"
+    "goToLogin": "前往登录",
+    "retrySession": "重新加载登录状态"
   },
   "Header": {
     "login": "登录",
@@ -22,7 +23,11 @@
     "documentPreparation": "文件准备",
     "rentalBlog": "租房攻略",
     "favorite": "我的收藏",
-    "homepage": "首页"
+    "homepage": "首页",
+    "account": "账户设置",
+    "loadingSession": "正在确认登录…",
+    "retrySession": "重新加载登录状态",
+    "signoutFailed": "退出未完成，请检查网络后重试。"
   },
   "SearchBar": {
     "placeholder": "按城市、地址或学校搜索...",
@@ -80,8 +85,11 @@
     "showPassword": "显示密码",
     "hidePassword": "隐藏密码",
     "invalidEmail": "邮箱格式无效",
-    "passwordMinLength": "密码至少需要6个字符",
-    "passwordsDontMatch": "两次输入的密码不匹配"
+    "passwordMinLength": "新密码至少需要 8 个字符",
+    "passwordsDontMatch": "两次输入的密码不匹配",
+    "passwordMaxLength": "密码最多为 72 个 UTF-8 字节",
+    "loading": "正在登录…",
+    "close": "关闭"
   },
   "Footer": {
     "about": "关于",
@@ -354,5 +362,32 @@
   "NotificationBar": {
     "label": "更新通知",
     "message": "房源已恢复更新，现支持 Real Estate 和 Domain 两个平台的租金信息。"
+  },
+  "Account": {
+    "title": "账户设置",
+    "description": "管理您的登录账户和邮箱验证状态。",
+    "loading": "正在加载…",
+    "sessionFailed": "暂时无法确认登录状态，请重试。",
+    "retry": "重试",
+    "loginRequired": "请先登录后查看账户。",
+    "login": "登录",
+    "name": "姓名",
+    "email": "邮箱",
+    "status": "邮箱状态",
+    "verified": "已验证",
+    "unverified": "未验证",
+    "verifyTitle": "验证邮箱",
+    "verifyDescription": "我们会发送 6 位验证码，有效期 30 分钟。请勿将验证码提供给他人。",
+    "mailUnavailable": "暂时无法发送新的验证码邮件。已收到且未过期的验证码仍可在下方提交；普通登录和收藏不受影响。",
+    "sendCode": "发送验证码",
+    "sending": "正在发送…",
+    "resendIn": "{seconds} 秒后可重发",
+    "code": "6 位验证码",
+    "verify": "验证邮箱",
+    "verifying": "正在验证…",
+    "sent": "验证码邮件已提交发送，请检查收件箱和垃圾邮件。",
+    "verifiedSuccess": "邮箱验证成功。",
+    "sendFailed": "邮件未能发送。请稍后重试；同一账户每分钟最多发送一次。",
+    "verifyFailed": "验证码不正确、已过期或尝试过于频繁，请稍后重试。"
   }
 }

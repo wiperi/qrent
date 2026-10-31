@@ -2,7 +2,14 @@
 
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
-import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
 import { useAuth } from '@/hooks/use-auth';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -30,35 +37,46 @@ export default function SignupForm({ onSuccess, onSwitchToLogin }: SignupFormPro
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const t = useTranslations('Auth');
 
-  const formSchema = z.object({
-    name: z.string().optional(),
-    email: z.string().email({ message: t('invalidEmail') }),
-    password: z.string().min(6, { message: t('passwordMinLength') }),
-    confirmPassword: z.string().min(6, { message: t('passwordMinLength') }),
-  }).refine((data) => data.password === data.confirmPassword, {
-    message: t('passwordsDontMatch'),
-    path: ["confirmPassword"],
-  });
+  const formSchema = z
+    .object({
+      name: z.string().max(50).optional(),
+      email: z
+        .string()
+        .trim()
+        .email({ message: t('invalidEmail') })
+        .max(50),
+      password: z
+        .string()
+        .min(8, { message: t('passwordMinLength') })
+        .refine(value => new TextEncoder().encode(value).length <= 72, {
+          message: t('passwordMaxLength'),
+        }),
+      confirmPassword: z.string().min(8, { message: t('passwordMinLength') }),
+    })
+    .refine(data => data.password === data.confirmPassword, {
+      message: t('passwordsDontMatch'),
+      path: ['confirmPassword'],
+    });
 
   const form = useForm<FormData>({
     resolver: zodResolver(formSchema),
-    mode: "onChange", // Enable real-time validation
+    mode: 'onChange', // Enable real-time validation
     defaultValues: {
-      name: "",
-      email: "",
-      password: "",
-      confirmPassword: "",
+      name: '',
+      email: '',
+      password: '',
+      confirmPassword: '',
     },
   });
 
   const onSubmit = async (data: FormData) => {
     try {
-      await register(data.email, data.password, data.name || undefined);
+      await register(data.email, data.password, data.name?.trim() || undefined);
       onSuccess?.();
     } catch (err: unknown) {
-      form.setError("root", {
-        type: "manual",
-        message: err instanceof Error ? err.message : 'Registration failed'
+      form.setError('root', {
+        type: 'manual',
+        message: err instanceof Error ? err.message : 'Registration failed',
       });
     }
   };
@@ -80,7 +98,12 @@ export default function SignupForm({ onSuccess, onSwitchToLogin }: SignupFormPro
                   <FormItem>
                     <FormLabel>{t('name')}</FormLabel>
                     <FormControl>
-                      <Input placeholder={t('name')} {...field} />
+                      <Input
+                        autoComplete="name"
+                        maxLength={50}
+                        placeholder={t('name')}
+                        {...field}
+                      />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -94,7 +117,13 @@ export default function SignupForm({ onSuccess, onSwitchToLogin }: SignupFormPro
                   <FormItem>
                     <FormLabel>{t('email')}</FormLabel>
                     <FormControl>
-                      <Input type="email" placeholder={t('email')} {...field} />
+                      <Input
+                        type="email"
+                        autoComplete="email"
+                        maxLength={50}
+                        placeholder={t('email')}
+                        {...field}
+                      />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -110,7 +139,8 @@ export default function SignupForm({ onSuccess, onSwitchToLogin }: SignupFormPro
                     <FormControl>
                       <div className="relative">
                         <Input
-                          type={showPassword ? "text" : "password"}
+                          type={showPassword ? 'text' : 'password'}
+                          autoComplete="new-password"
                           placeholder={t('password')}
                           {...field}
                         />
@@ -120,7 +150,11 @@ export default function SignupForm({ onSuccess, onSwitchToLogin }: SignupFormPro
                           className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600"
                           title={showPassword ? t('hidePassword') : t('showPassword')}
                         >
-                          {showPassword ? <HiEyeOff className="h-5 w-5" /> : <HiEye className="h-5 w-5" />}
+                          {showPassword ? (
+                            <HiEyeOff className="h-5 w-5" />
+                          ) : (
+                            <HiEye className="h-5 w-5" />
+                          )}
                         </button>
                       </div>
                     </FormControl>
@@ -138,7 +172,8 @@ export default function SignupForm({ onSuccess, onSwitchToLogin }: SignupFormPro
                     <FormControl>
                       <div className="relative">
                         <Input
-                          type={showConfirmPassword ? "text" : "password"}
+                          type={showConfirmPassword ? 'text' : 'password'}
+                          autoComplete="new-password"
                           placeholder={t('confirmPassword')}
                           {...field}
                         />
@@ -148,7 +183,11 @@ export default function SignupForm({ onSuccess, onSwitchToLogin }: SignupFormPro
                           className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600"
                           title={showConfirmPassword ? t('hidePassword') : t('showPassword')}
                         >
-                          {showConfirmPassword ? <HiEyeOff className="h-5 w-5" /> : <HiEye className="h-5 w-5" />}
+                          {showConfirmPassword ? (
+                            <HiEyeOff className="h-5 w-5" />
+                          ) : (
+                            <HiEye className="h-5 w-5" />
+                          )}
                         </button>
                       </div>
                     </FormControl>

@@ -5,7 +5,7 @@ import { useAuthModalEvents } from '@/lib/auth-events';
 import { useLocale, useTranslations } from 'next-intl';
 import Image from 'next/image';
 import Link from 'next/link';
-import { useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { HiLogout, HiMenu, HiUser, HiX } from 'react-icons/hi';
 import AuthModal from './AuthModal';
 import LanguageSwitcher from './LanguageSwitcher';
@@ -17,7 +17,10 @@ export default function Header() {
   const [userMenuOpen, setUserMenuOpen] = useState(false);
   const userMenuRef = useRef<HTMLDivElement>(null);
 
-  const { user, logout } = useAuth();
+  const { user, logout, isLoading, hasSessionError, refreshUser } = useAuth();
+  const [isLoggingOut, setIsLoggingOut] = useState(false);
+  const [logoutError, setLogoutError] = useState('');
+  const closeAuthModal = useCallback(() => setAuthModalOpen(false), []);
   const t = useTranslations('Header');
   const locale = useLocale();
 
@@ -42,9 +45,18 @@ export default function Header() {
     setAuthModalOpen(true);
   };
 
-  const handleLogout = () => {
-    logout();
-    setUserMenuOpen(false);
+  const handleLogout = async () => {
+    setIsLoggingOut(true);
+    setLogoutError('');
+    try {
+      await logout();
+      setUserMenuOpen(false);
+      closeDrawer();
+    } catch {
+      setLogoutError(t('signoutFailed'));
+    } finally {
+      setIsLoggingOut(false);
+    }
   };
 
   useEffect(() => {
@@ -104,7 +116,17 @@ export default function Header() {
               {/* Right: actions */}
               <div className="hidden md:flex items-center gap-3">
                 <LanguageSwitcher />
-                {!user ? (
+                {isLoading || hasSessionError ? (
+                  <button
+                    type="button"
+                    disabled={isLoading}
+                    onClick={() => void refreshUser()}
+                    className="px-3 py-2 text-sm text-slate-600"
+                    aria-live="polite"
+                  >
+                    {t(isLoading ? 'loadingSession' : 'retrySession')}
+                  </button>
+                ) : !user ? (
                   <>
                     <button
                       onClick={() => openAuthModal('login')}
@@ -123,30 +145,42 @@ export default function Header() {
                   <div className="relative" ref={userMenuRef}>
                     <button
                       onClick={() => setUserMenuOpen(!userMenuOpen)}
+                      aria-expanded={userMenuOpen}
+                      aria-controls="account-menu"
                       className="ml-1 inline-flex h-9 w-9 items-center justify-center rounded-full ring-1 ring-slate-200 hover:ring-blue-300 focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-600"
                     >
                       <span className="sr-only">{t('userMenu')}</span>
                       {user.name ? (
-                        <Image
-                          alt="avatar"
-                          src={`https://api.dicebear.com/7.x/initials/svg?seed=${user.name}`}
-                          width={32}
-                          height={32}
-                          className="h-8 w-8 rounded-full"
-                        />
+                        <span
+                          className="flex h-8 w-8 items-center justify-center rounded-full bg-blue-50 font-semibold text-blue-700"
+                          aria-hidden="true"
+                        >
+                          {Array.from(user.name)[0]?.toUpperCase()}
+                        </span>
                       ) : (
                         <HiUser className="h-5 w-5 text-slate-600" />
                       )}
                     </button>
 
                     {userMenuOpen && (
-                      <div className="absolute right-0 mt-2 w-48 bg-white rounded-md shadow-xl border border-gray-200 py-1 z-[9999]">
+                      <div
+                        id="account-menu"
+                        className="absolute right-0 mt-2 w-64 bg-white rounded-md shadow-xl border border-gray-200 py-1 z-[9999]"
+                      >
                         <div className="px-4 py-2 text-sm text-gray-700 border-b border-gray-200">
                           {user.name && <div className="font-medium">{user.name}</div>}
-                          <div className="text-gray-500">{user.email}</div>
+                          <div className="break-all text-gray-500">{user.email}</div>
                         </div>
+                        <Link
+                          href={`/${locale}/account`}
+                          onClick={() => setUserMenuOpen(false)}
+                          className="block px-4 py-2 text-sm text-gray-700 hover:bg-slate-50"
+                        >
+                          {t('account')}
+                        </Link>
                         <button
                           onClick={handleLogout}
+                          disabled={isLoggingOut}
                           className="flex items-center w-full px-4 py-2 text-sm text-gray-700 hover:bg-red-50 hover:text-red-600 transition-colors"
                         >
                           <HiLogout className="mr-2 h-4 w-4" />
@@ -224,7 +258,17 @@ export default function Header() {
                 {t('favorite')}
               </Link>
               <div className="my-3 h-px bg-slate-200"></div>
-              {!user ? (
+              {isLoading || hasSessionError ? (
+                <button
+                  type="button"
+                  disabled={isLoading}
+                  onClick={() => void refreshUser()}
+                  className="px-3 py-2 text-left text-sm text-slate-600"
+                  aria-live="polite"
+                >
+                  {t(isLoading ? 'loadingSession' : 'retrySession')}
+                </button>
+              ) : !user ? (
                 <>
                   <button
                     onClick={() => {
@@ -251,11 +295,16 @@ export default function Header() {
                     {user.name && <div className="font-medium">{user.name}</div>}
                     <div className="text-gray-500">{user.email}</div>
                   </div>
+                  <Link
+                    href={`/${locale}/account`}
+                    onClick={closeDrawer}
+                    className="block rounded-md px-3 py-2 text-slate-700 hover:bg-slate-100"
+                  >
+                    {t('account')}
+                  </Link>
                   <button
-                    onClick={() => {
-                      handleLogout();
-                      closeDrawer();
-                    }}
+                    onClick={handleLogout}
+                    disabled={isLoggingOut}
                     className="flex items-center w-full rounded-md px-3 py-2 text-slate-700 hover:bg-slate-100 hover:text-blue-600"
                   >
                     <HiLogout className="mr-2 h-4 w-4" />
@@ -268,11 +317,15 @@ export default function Header() {
         </>
       )}
 
-      <AuthModal
-        isOpen={authModalOpen}
-        onClose={() => setAuthModalOpen(false)}
-        initialMode={authMode}
-      />
+      <AuthModal isOpen={authModalOpen} onClose={closeAuthModal} initialMode={authMode} />
+      {logoutError && (
+        <p
+          role="alert"
+          className="fixed bottom-4 left-4 right-4 z-[10000] mx-auto max-w-md rounded-lg border border-red-200 bg-white p-4 text-sm text-red-700 shadow-lg"
+        >
+          {logoutError}
+        </p>
+      )}
     </>
   );
 }
