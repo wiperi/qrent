@@ -1,5 +1,6 @@
 """Repair only a stopped/exited existing Redis process; preserve its container and data."""
 from datetime import datetime, timezone
+import ctypes
 import fcntl
 import gzip
 import hashlib
@@ -58,7 +59,7 @@ def eligible_resume(state):
     return state['running'] is False and state['status']=='exited' and state['pid']==0 and state['exit_code']==128
 
 
-def orphan_cleared(root,state,proc_root=Path('/proc'),own_marker=None):
+def runtime_reconciled(root,state,proc_root=Path('/proc')):
     paths=sorted((root/'.deploy/receipts').glob('account-orphan-*.json'),key=lambda path:path.stat().st_mtime_ns,reverse=True)
     if not paths:raise RuntimeError('A verified orphan recovery receipt is required')
     recovery=json.loads(paths[0].read_text())
@@ -90,6 +91,11 @@ def orphan_cleared(root,state,proc_root=Path('/proc'),own_marker=None):
     if (service.get('ActiveState') not in ('inactive','failed') or service.get('SubState') not in ('dead','failed')
             or service.get('MainPID')!='0' or service.get('Job') not in ('','0')):
         raise RuntimeError('An existing account-store start producer is not quiescent')
+    return recovery,paths[0]
+
+
+def orphan_cleared(root,state,proc_root=Path('/proc'),own_marker=None):
+    recovery,path=runtime_reconciled(root,state,proc_root)
     backups=sorted((root/'.deploy/receipts').glob('account-store-*.json'),reverse=True)
     previous=json.loads(backups[0].read_text());backup=Path(previous.get('backup_path',''))
     if (previous['candidate']['id']!=state['id'] or previous['candidate'].get('data_source')!=state['data_source']
@@ -100,10 +106,239 @@ def orphan_cleared(root,state,proc_root=Path('/proc'),own_marker=None):
     if marker.exists():
         value=json.loads(marker.read_text())
         if (own_marker!=marker or value.get('status')!='resume_attempt_started'
-                or value.get('original_store_id')!=state['id'] or value.get('orphan_receipt')!=paths[0].name):
+                or value.get('original_store_id')!=state['id'] or value.get('orphan_receipt')!=path.name):
             raise RuntimeError('This reconciled orphan already has a resume attempt; do not repeat')
     elif own_marker is not None:raise RuntimeError('The current resume marker disappeared')
-    return {'orphan_receipt':paths[0].name,'attempt_marker':str(marker),'runtime_task_absent':True}
+    return {'orphan_receipt':path.name,'attempt_marker':str(marker),'runtime_task_absent':True}
+
+
+def bundle_mounts(bundle,mountinfo=Path('/proc/self/mountinfo')):
+    mounts=[]
+    for line in mountinfo.read_text().splitlines():
+        values=line.split();path=Path(re.sub(r'\\([0-7]{3})',lambda match:chr(int(match[1],8)),values[4]))
+        if path==bundle or bundle in path.parents:
+            if any(value.startswith(('shared:','master:','propagate_from:')) for value in values[6:values.index('-')]):
+                raise RuntimeError('A shared or propagated Redis runtime mount is unsafe')
+            mounts.append(path)
+    rootfs=bundle/'rootfs'
+    if any(path!=rootfs and rootfs not in path.parents for path in mounts):
+        raise RuntimeError('Unexpected mount outside the stopped Redis rootfs')
+    return sorted(mounts,key=str)
+
+
+def host_mount_namespace(proc_root=Path('/proc')):
+    current=os.readlink(proc_root/'self/ns/mnt');host=os.readlink(proc_root/'1/ns/mnt')
+    if current!=host:raise RuntimeError('Runtime recovery must use the host mount namespace')
+    daemons={}
+    for unit,binary in (('docker.service','dockerd'),('containerd.service','containerd')):
+        pid=int(command('systemctl','show',unit,'-p','MainPID','--value'))
+        executable=os.readlink(proc_root/str(pid)/'exe').removesuffix(' (deleted)')
+        if pid<2 or executable not in ('/usr/bin/'+binary,'/usr/local/bin/'+binary):
+            raise RuntimeError('The trusted runtime daemon identity is unavailable')
+        namespace=os.readlink(proc_root/str(pid)/'ns/mnt')
+        if namespace!=current:raise RuntimeError('A runtime daemon uses another mount namespace')
+        fields=(proc_root/str(pid)/'stat').read_text().rpartition(')')[2].split()
+        daemons[unit]={'pid':pid,'started':fields[19],'namespace':namespace}
+    return {'namespace':current,'daemons':daemons}
+
+
+def business_mounts(recovery,proc_root=Path('/proc')):
+    return {identity:hashlib.sha256((proc_root/str(value['init']['pid'])/'mountinfo').read_bytes()).hexdigest()
+            for identity,value in recovery['business_processes'].items()}
+
+
+def empty_redis_cgroup(config,identity,cgroup_root=Path('/sys/fs/cgroup')):
+    if not (cgroup_root/'cgroup.controllers').exists():raise RuntimeError('Unified cgroup identity is required')
+    value=config.get('linux',{}).get('cgroupsPath','')
+    if value=='system.slice:docker:'+identity:path=cgroup_root/'system.slice'/('docker-'+identity+'.scope')
+    elif value in ('/docker/'+identity,'/system.slice/docker-'+identity+'.scope'):
+        path=cgroup_root/value.lstrip('/')
+    else:raise RuntimeError('Unrecognized original Redis cgroup identity')
+    if path.resolve()!=path or path.is_symlink():raise RuntimeError('Unexpected cgroup path')
+    if path.exists():
+        directories=[path,*[child for child in path.rglob('*') if child.is_dir()]]
+        if len(directories)>128:raise RuntimeError('Unexpected cgroup subtree size')
+        for directory in directories:
+            if directory.is_symlink():raise RuntimeError('Unexpected cgroup link')
+            for name in ('cgroup.procs','cgroup.threads'):
+                if (directory/name).read_text().strip():raise RuntimeError('The Redis cgroup still contains processes')
+    return str(path)
+
+
+def retained_oci_configuration(oci_root,identity,rootfs,requested_cgroup):
+    path=oci_root/identity/'state.json'
+    if path.is_symlink() or path.resolve()!=path:raise RuntimeError('Unexpected retained OCI configuration path')
+    raw=path.read_bytes();state=json.loads(raw);config=state.get('config',{})
+    if state.get('id')!=identity or Path(config.get('rootfs','')).resolve()!=rootfs:
+        raise RuntimeError('Retained OCI rootfs or identity differs')
+    hooks=config.get('Hooks',config.get('hooks',{})) or {}
+    earlier={'prestart','createRuntime','createContainer','startContainer','poststart'}
+    if not isinstance(hooks,dict) or any(value for key,value in hooks.items() if key not in earlier):
+        raise RuntimeError('Retained OCI teardown or unknown hooks are not allowed')
+    namespaces={value.get('type'):value.get('path','') for value in config.get('namespaces',[])}
+    if namespaces.get('NEWPID')!='' or namespaces.get('NEWNS')!='' or config.get('intel_rdt'):
+        raise RuntimeError('Private original PID/mount namespaces without external RDT cleanup are required')
+    group=config.get('cgroups',{});value=group.get('path','')
+    if not value and group.get('name')==identity and group.get('parent')=='system.slice' and group.get('scope_prefix')=='docker' and group.get('Systemd',group.get('systemd')) is True:
+        value='system.slice:docker:'+identity
+    actual=empty_redis_cgroup({'linux':{'cgroupsPath':value}},identity)
+    if actual!=requested_cgroup or state.get('cgroup_paths')!={'':actual}:
+        raise RuntimeError('Retained OCI cgroup ownership differs')
+    return hashlib.sha256(raw).hexdigest()
+
+
+def atomic_runtime_quarantine(source,destination):
+    library=ctypes.CDLL(None,use_errno=True)
+    if not hasattr(library,'renameat2'):raise RuntimeError('Atomic non-overwriting quarantine is unavailable')
+    function=library.renameat2;function.argtypes=[ctypes.c_int,ctypes.c_char_p,ctypes.c_int,ctypes.c_char_p,ctypes.c_uint];function.restype=ctypes.c_int
+    if function(-100,os.fsencode(source),-100,os.fsencode(destination),1):
+        raise OSError(ctypes.get_errno(),'Atomic runtime quarantine refused')
+
+
+def trusted_runc():
+    path=Path(shutil.which('runc') or '/missing-runc').resolve();info=path.stat()
+    if str(path) not in ('/usr/bin/runc','/usr/sbin/runc','/usr/local/sbin/runc') or info.st_uid!=0 or info.st_mode&0o022:
+        raise RuntimeError('A trusted root-owned OCI runtime is required')
+    return str(path)
+
+
+def bundle_plan(root,state,proc_root=Path('/proc'),runtime_root=Path('/run/containerd/io.containerd.runtime.v2.task/moby'),oci_root=Path('/run/docker/runtime-runc/moby'),mountinfo=Path('/proc/self/mountinfo'),data_root=Path('/var/lib/docker/containers'),own_marker=None):
+    if not eligible_resume(state) or not re.fullmatch('[a-f0-9]{64}',state['id']):
+        raise RuntimeError('Only the stopped original store with failed startup qualifies')
+    recovery,orphan=runtime_reconciled(root,state,proc_root)
+    receipts=sorted((root/'.deploy/receipts').glob('account-store-*.json'),reverse=True)
+    previous=json.loads(receipts[0].read_text());backup=Path(previous.get('backup_path',''))
+    if (previous.get('action')!='resume-apply' or previous.get('status')!='requires_attention'
+            or previous['candidate']['id']!=state['id'] or previous['candidate'].get('data_source')!=state['data_source']
+            or previous.get('reconciled_orphan',{}).get('orphan_receipt')!=orphan.name
+            or backup.is_symlink() or root/'.deploy/backups' not in backup.resolve().parents
+            or hashlib.sha256(backup.read_bytes()).hexdigest()!=previous.get('backup_sha256')):
+        raise RuntimeError('The failed bounded resume and its private backup are required')
+    bundle=runtime_root/state['id']
+    if not bundle.is_dir() or bundle.is_symlink() or bundle.resolve()!=bundle:
+        raise RuntimeError('Unexpected runtime bundle path')
+    metadata=data_root/state['id']/'config.v2.json';original=json.loads(metadata.read_text())
+    host=json.loads((metadata.parent/'hostconfig.json').read_text())
+    if (host.get('AutoRemove') is not False or host.get('RestartPolicy',{}).get('Name')!='no'
+            or original.get('Config',{}).get('Image')!='redis:7.4.2-alpine'
+            or original.get('Image')!=recovery.get('target_image')):
+        raise RuntimeError('Original Redis retention/image policy changed')
+    error=original.get('State',{}).get('Error','')
+    if 'mkdir '+str(bundle)+': file exists' not in error:
+        raise RuntimeError('The exact stale-bundle startup error is required')
+    binary=trusted_runc()
+    answer=subprocess.run([binary,'--root',str(oci_root),'state',state['id']],capture_output=True,text=True,timeout=5,check=True)
+    oci=json.loads(answer.stdout)
+    if (oci.get('id')!=state['id'] or oci.get('status')!='stopped' or oci.get('pid')!=0
+            or Path(oci.get('bundle','')).resolve()!=bundle):
+        raise RuntimeError('Only the matching stopped PID-zero OCI instance qualifies')
+    raw_config=(bundle/'config.json').read_bytes();config=json.loads(raw_config);rootfs=Path(config.get('root',{}).get('path',''))
+    if not rootfs.is_absolute():rootfs=bundle/rootfs
+    rootfs=rootfs.resolve()
+    if rootfs!=bundle/'rootfs':
+        graph=json.loads(command('docker','inspect','--format','{{json .GraphDriver}}',state['id']))
+        merged=Path(graph.get('Data',{}).get('MergedDir',''))
+        if (graph.get('Name')!='overlay2' or Path('/var/lib/docker/overlay2') not in merged.parents
+                or merged.name!='merged' or merged.resolve()!=merged or rootfs!=merged):
+            raise RuntimeError('Unexpected Redis runtime rootfs')
+    cgroup=empty_redis_cgroup(config,state['id'])
+    retained_hash=retained_oci_configuration(oci_root,state['id'],rootfs,cgroup)
+    namespace=host_mount_namespace(proc_root);mount_hashes=business_mounts(recovery,proc_root)
+    info=bundle.stat();mounts=bundle_mounts(bundle,mountinfo)
+    marker=root/'.deploy/receipts'/('account-bundle-'+str(recovery['shim']['pid'])+'-'+recovery['shim']['started']+'.json')
+    if marker.exists():
+        value=json.loads(marker.read_text())
+        if own_marker!=marker or value.get('status')!='bundle_repair_attempt_started' or value.get('candidate',{}).get('id')!=state['id']:
+            raise RuntimeError('This runtime bundle already has a repair attempt; do not repeat')
+    elif own_marker is not None:raise RuntimeError('The runtime repair marker disappeared')
+    return {'bundle':str(bundle),'bundle_identity':[info.st_dev,info.st_ino],
+        'rootfs_mount_count':len(mounts),'oci_root':str(oci_root),'orphan_receipt':orphan.name,
+        'attempt_marker':str(marker),'previous_backup_sha256':previous['backup_sha256'],
+        'host_mount_namespace':namespace,'business_mounts_sha256':mount_hashes,'runc_binary':binary,
+        'retained_oci_sha256':retained_hash,'bundle_config_sha256':hashlib.sha256(raw_config).hexdigest()}
+
+
+def private_runtime_quarantine(device):
+    path=Path('/run/qrent-private-runtime-quarantine');path.mkdir(mode=0o700,exist_ok=True)
+    if path.is_symlink() or path.resolve()!=path or path.stat().st_dev!=device or path.stat().st_uid!=0:
+        raise RuntimeError('A private same-filesystem quarantine is required')
+    path.chmod(0o700);return path
+
+
+def recover_bundle(action,root,proc_root=Path('/proc')):
+    os.umask(0o077);before=container_rows();state=redis_state(proc_root)
+    proof=bundle_plan(root,state,proc_root);report={'action':action,'status':'planned','candidate':state,**proof,
+        'original_docker_container_deleted':False,'volume_or_schema_changed':False,'other_containers_restarted':False}
+    if action=='bundle-plan':print(json.dumps(report));return report
+    if os.geteuid()!=0:raise RuntimeError('Root-owned runtime recovery is required')
+    protected={path:hashlib.sha256(path.read_bytes()).digest() for path in (root/'.env',root/'docker-compose.yml')}
+    with (root/'.deploy/backend.lock').open('a') as lock:
+        fcntl.flock(lock,fcntl.LOCK_EX|fcntl.LOCK_NB)
+        if bundle_plan(root,redis_state(proc_root),proc_root)!=proof:raise RuntimeError('Runtime bundle changed before repair')
+        receipt=Path(proof['attempt_marker'])
+        with receipt.open('x') as stream:
+            json.dump({**report,'status':'bundle_repair_attempt_started'},stream);stream.flush();os.fsync(stream.fileno())
+        directory=os.open(receipt.parent,os.O_RDONLY|os.O_DIRECTORY)
+        try:os.fsync(directory)
+        finally:os.close(directory)
+        try:
+            stamp=datetime.now(timezone.utc).strftime('%Y%m%dT%H%M%S%fZ')
+            source=Path(state['data_source']);signature=volume_signature(source);size=sum(value[0] for value in signature.values())
+            if size>256*1024**2 or shutil.disk_usage(root).free<2*size+512*1024**2:
+                raise RuntimeError('Insufficient capacity for a fresh private data backup')
+            backup=root/'.deploy/backups'/('redis-before-bundle-'+stamp+'.tar.gz')
+            with tarfile.open(backup,'w:gz') as archive:archive.add(source,arcname='redis-data')
+            with gzip.open(backup,'rb') as archive:
+                while archive.read(1024**2):pass
+            if volume_signature(source)!=signature:raise RuntimeError('Redis data changed during backup')
+            report.update(backup_path=str(backup),backup_sha256=hashlib.sha256(backup.read_bytes()).hexdigest())
+            report['public_port_guard']=guard_public_ports(root,state)
+            if bundle_plan(root,state,proc_root,own_marker=receipt)!=proof:
+                raise RuntimeError('Runtime proof changed after backup or guard')
+            if redis_state(proc_root)!=state:raise RuntimeError('Redis changed before OCI cleanup')
+            bundle=Path(proof['bundle']);info=bundle.stat()
+            if bundle.is_symlink() or bundle.resolve()!=bundle or [info.st_dev,info.st_ino]!=proof['bundle_identity']:
+                raise RuntimeError('Runtime bundle identity changed')
+            # Normal stopped-instance cleanup, without force/lazy deletion.
+            subprocess.run([proof['runc_binary'],'--root',proof['oci_root'],'delete',state['id']],capture_output=True,timeout=15,check=True)
+            recovery,_=runtime_reconciled(root,state,proc_root)
+            if business_mounts(recovery,proc_root)!=proof['business_mounts_sha256'] or host_mount_namespace(proc_root)!=proof['host_mount_namespace']:
+                raise RuntimeError('Business mount or namespace protection requires attention')
+            if hashlib.sha256((bundle/'config.json').read_bytes()).hexdigest()!=proof['bundle_config_sha256']:
+                raise RuntimeError('Runtime bundle configuration changed')
+            empty_redis_cgroup(json.loads((bundle/'config.json').read_text()),state['id'])
+            if bundle_mounts(bundle):
+                subprocess.run(['/usr/bin/umount','--recursive','--',str(bundle/'rootfs')],capture_output=True,timeout=15,check=True)
+            if bundle_mounts(bundle):raise RuntimeError('Redis runtime mounts remain; bundle kept')
+            recovery,_=runtime_reconciled(root,state,proc_root)
+            if business_mounts(recovery,proc_root)!=proof['business_mounts_sha256']:
+                raise RuntimeError('Business mount identities changed after the scoped unmount')
+            if redis_state(proc_root)!=state:raise RuntimeError('Redis changed before runtime quarantine')
+            quarantine=private_runtime_quarantine(info.st_dev);destination=quarantine/(stamp+'-'+state['id'])
+            if destination.exists():raise RuntimeError('Quarantine destination already exists')
+            current=bundle.stat()
+            if [current.st_dev,current.st_ino]!=proof['bundle_identity']:raise RuntimeError('Runtime bundle changed before quarantine')
+            atomic_runtime_quarantine(bundle,destination);report['runtime_quarantine']=str(destination)
+            report['public_port_guard']=guard_public_ports(root,state)
+            recovery,_=runtime_reconciled(root,state,proc_root)
+            if (business_mounts(recovery,proc_root)!=proof['business_mounts_sha256']
+                    or host_mount_namespace(proc_root)!=proof['host_mount_namespace']):
+                raise RuntimeError('Final business mount/namespace verification failed')
+            repair_process(state,start=True,resume=True)
+            for attempt in range(6):
+                if local_ping(state['id']):break
+                time.sleep(1)
+            else:raise RuntimeError('Original Redis did not respond after bundle repair; no automatic retry')
+            if (not preserve_rows(before,container_rows(),state['id'])
+                    or not all(hashlib.sha256(path.read_bytes()).digest()==digest for path,digest in protected.items())
+                    or business_mounts(recovery,proc_root)!=proof['business_mounts_sha256']):
+                raise RuntimeError('Original business/image/mount/environment preservation requires attention')
+            report.update(status='verified',local_ping=True,container_image_and_mounts_preserved=True,environment_and_compose_preserved=True)
+        except Exception as error:
+            report.update(status='requires_attention',error=type(error).__name__);raise
+        finally:
+            report['finished_at']=datetime.now(timezone.utc).isoformat();receipt.write_text(json.dumps(report,indent=2));print(json.dumps(report))
+    return report
 
 
 def public_port_rules(ports,interfaces):
@@ -232,6 +467,7 @@ def volume_signature(source):
 
 
 def main(action='plan',root=None,proc_root=Path('/proc')):
+    if action in ('bundle-plan','bundle-apply'):return recover_bundle(action,root or Path.home()/'qrent',proc_root)
     if action not in ('plan','apply','start-plan','start-apply','resume-plan','resume-apply'): raise ValueError('Invalid account-store recovery action')
     resume=action.startswith('resume-');start=action.startswith('start-') or resume
     os.umask(0o077)
