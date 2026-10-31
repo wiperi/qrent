@@ -2,6 +2,7 @@ import manifest from '../content/guides/manifest.json';
 import type { BlogPost } from './notion';
 import type { NotionBlock } from '@/types/blog';
 import { mainGuideBody } from './guide-body';
+import { guideReviewedAt, reviewedGuideBody, reviewedGuideExcerpt } from './guide-review';
 import zh0 from '../content/guides/zh/shared-vs-private-renting.json';
 import en0 from '../content/guides/en/shared-vs-private-renting.json';
 import zh1 from '../content/guides/zh/rental-application-australia.json';
@@ -47,13 +48,13 @@ export const pairedGuides = manifest
         slug: source.slug,
         title: document.zh.title,
         title_en: document.en.title,
-        excerpt_zh: document.zh.excerpt,
-        excerpt_en: document.en.excerpt,
+        excerpt_zh: reviewedGuideExcerpt(source.slug, 'zh', document.zh.excerpt),
+        excerpt_en: reviewedGuideExcerpt(source.slug, 'en', document.en.excerpt),
         language,
         keywords: language === 'en' ? document.en.keywords : source.keywords,
         published_at: source.publishedAt,
         created_time: source.createdAt,
-        last_edited_time: source.reviewedAt,
+        last_edited_time: guideReviewedAt(source.slug) ?? source.reviewedAt,
         status: 'Published',
         url: `https://www.notion.so/${source.id.replaceAll('-', '')}`,
       } satisfies BlogPost & { translation_group: string },
@@ -62,7 +63,9 @@ export const pairedGuides = manifest
           id: `${source.id}:${language}:body`,
           type: 'markdown',
           has_children: false,
-          content: mainGuideBody(document[language].content),
+          content: mainGuideBody(
+            reviewedGuideBody(source.slug, language, source.sourceHash, document[language].content)
+          ),
         },
       ] satisfies NotionBlock[],
     }));

@@ -1,0 +1,972 @@
+{
+  "reviewedAt": "2026-10-31T12:59:50+08:00",
+  "scope": "Verified current QRent functionality, historical estimates and state-specific tenancy guidance; original source snapshots and publication dates remain unchanged.",
+  "reviews": {
+    "rental-application-australia": {
+      "sourceHash": "3cb3fdef65d32a3a4cf33bbe03b5dedffe2b6b609caaa5cbdbf0b1ba5b6192d3",
+      "zh": [
+        {
+          "before": "Qrent 团队整理了澳洲主要中介机构（Domain、Realestate、LJ Hooker 等）的筛选标准，",
+          "after": "本篇整理常见的申请准备事项；Domain 和 Realestate 是房源平台，实际审核由房东、中介或住宿运营方处理。"
+        },
+        {
+          "before": "结合平台用户数据，总结出一份留学生实用指南：",
+          "after": "以下是经验性建议，不是统一审核标准或通过率统计："
+        },
+        {
+          "before": "Qrent 平台提供更精准的数据支持，让申请更有方向感：",
+          "after": "QRent 当前可用于比较限定学校周边范围的房源；AI 分数是房源参考，不预测获批概率。"
+        },
+        {
+          "before": "| 功能模块 | 作用 | 使用场景 |\n| --- | --- | --- |\n| AI 房源打分 | 自动评估性价比与竞争程度 | 判断房源是否值得申请 |\n| 区域均价分析 | 展示周租金中位数与浮动区间 | 制定合理报价策略 |\n| 申请材料助手 | 根据房源类型推荐必备文件 | 避免资料缺漏被拒 |\n| 实时状态标记 | 标注“高竞争房源” | 优先筛选通过率高的房源 |",
+          "after": "| 功能模块 | 当前作用 | 使用边界 |\n| --- | --- | --- |\n| AI 房源评分 | 比较已记录的房源分数 | 不表示真实性认证或申请通过率 |\n| 价格与来源 | 查看周租及 Domain / Real Estate 原链接 | 以源站和中介确认的条件为准 |\n| 学校与通勤筛选 | 按学校、预算和已记录的公交时间筛选 | 不等于实时交通预测 |\n| 登录后收藏 | 保存候选房源供后续比较 | 不代投申请或自动追踪审批 |"
+        },
+        {
+          "before": "- 使用 Qrent 工具分析区域均价与竞争程度，做出更理性的选择。",
+          "after": "- 使用 QRent 比较实际房源、周租和通勤，申请条件向中介核实。"
+        },
+        {
+          "before": "热门房源常在 24 小时内收到上百份申请。",
+          "after": "热门房源的受理窗口可能较短，及时核对广告状态和中介要求。"
+        },
+        {
+          "before": "1. **尽早投递**：热门房源发布后 24 小时内申请通过率最高。",
+          "after": "1. **尽早确认窗口**：材料准备完整后按中介要求及时提交，不把固定的 24 小时当作通过率保证。"
+        },
+        {
+          "before": "- 附上简短申请信可显著提高通过率；",
+          "after": "- 简短、真实的申请信可辅助说明情况，是否需要以申请方清单为准；"
+        }
+      ],
+      "en": [
+        {
+          "before": "The Qrent team has compiled the screening criteria of major Australian agencies (Domain, Realestate, LJ Hooker, etc.),",
+          "after": "This guide covers common application preparation. Domain and Realestate are listing platforms; the landlord, agent or accommodation provider assesses the application."
+        },
+        {
+          "before": "combined them with platform user data, and put together a practical guide for international students:",
+          "after": "The following are practical suggestions, not universal criteria or measured approval-rate statistics:"
+        },
+        {
+          "before": "The Qrent platform offers more precise data support to give your application a clearer direction:",
+          "after": "QRent helps compare listings within its existing school-area scope. Its AI scores describe properties and do not predict application approval."
+        },
+        {
+          "before": "| Feature module | Purpose | When to use it |\n| --- | --- | --- |\n| AI listing scores | Automatically assess value for money and the level of competition | Decide whether a property is worth applying for |\n| Area average-price analysis | Show median weekly rents and their range of variation | Develop a reasonable rental-offer strategy |\n| Application document assistant | Recommend essential documents for the property type | Avoid rejection because of missing documents |\n| Real-time status markers | Identify \"high-competition properties\" | Prioritise properties with a higher chance of approval |",
+          "after": "| Feature | Available use | Limits |\n| --- | --- | --- |\n| AI property scores | Compare recorded property scores | No authenticity certification or approval probability |\n| Price and source | View weekly rent and the Domain / Real Estate link | Confirm terms with the source and agent |\n| School and commute filters | Filter by campus, budget and recorded transit time | Not a live traffic prediction |\n| Signed-in favourites | Save candidate properties for comparison | No application submission or automatic approval tracking |"
+        },
+        {
+          "before": "- Use Qrent's tools to analyse area average prices and competition, and make more rational choices.",
+          "after": "- Compare actual listings, weekly rents and commutes in QRent; confirm application requirements with the agent."
+        },
+        {
+          "before": "when popular properties often receive over a hundred applications within 24 hours.",
+          "after": "Popular listings may have short application windows; promptly check the advertisement and agent requirements."
+        },
+        {
+          "before": "1. **Apply early**: The chances of approval for popular listings are highest when applying within 24 hours of publication.",
+          "after": "1. **Confirm the window early**: Submit complete documents in time for the agent’s process, without treating a fixed 24-hour window as an approval guarantee."
+        },
+        {
+          "before": "- Including a short application letter can significantly improve your chances of approval;",
+          "after": "- A brief, truthful application letter can explain your circumstances; follow the actual checklist on whether one is needed;"
+        }
+      ],
+      "excerpts": {
+        "zh": "按实际申请方要求准备身份、资金和居住证明，整理真实材料、申请信与备选房源，不把房源评分当作获批概率。",
+        "en": "Prepare genuine identity, funding and residential evidence for the actual application checklist. Organise your letter and alternatives without treating property scores as approval probabilities."
+      }
+    },
+    "rental-application-results": {
+      "sourceHash": "53844ffe5ba119369afdc975a02a7f2039b3721108d8986ddb22016da640061c",
+      "zh": [
+        {
+          "before": "根据 Qrent 平台与澳洲主要中介（Ray White、LJ Hooker、PRD、Belle Property）合作数据统计，",
+          "after": "审核时间取决于中介与房东的流程、申请数量和材料完整性。"
+        },
+        {
+          "before": "多数租房申请会在 **2–5 个工作日** 内得到反馈。",
+          "after": "申请可能在数日内收到回复，也可能更久。下表用于理解影响进度的因素，不是平均值或回复承诺。"
+        },
+        {
+          "before": "| 情况 | 平均回复时间 | 说明 |\n| --- | --- | --- |\n| 普通房源 | 2–3 个工作日 | 房东直接审核，进度较快 |\n| 高竞争房源（多人申请） | 3–5 个工作日 | 中介需统一整理材料后提交房东 |\n| 学生公寓或新楼盘 | 5–7 个工作日 | 通常由总部集中审核，流程更慢 |",
+          "after": "| 情况 | 可能影响进度的因素 | 建议确认 |\n| --- | --- | --- |\n| 普通房源 | 房东与中介的审核安排 | 预计回复日和缺少材料 |\n| 多人申请 | 材料整理与房东选择 | 是否仍受理申请 |\n| 学生公寓或新楼盘 | 运营方审核流程 | 官方平台状态和联系人 |"
+        },
+        {
+          "before": "> 若该房源在 Qrent 或 Domain 上浏览量高，中介需先筛选资料再汇总推荐。",
+          "after": "> 多人申请时可能需要更长整理时间；QRent 没有可核验的申请人数或竞争度标签。"
+        },
+        {
+          "before": "📎 Qrent 系统的 “申请追踪功能” 会在房东查看申请或做出初步决定时自动更新状态提示（例如：Under Review / Shortlisted / Declined）。",
+          "after": "申请状态应通过中介或其指定的申请平台查看。QRent 当前没有自动读取 Under Review / Shortlisted / Declined 的审批追踪功能。"
+        },
+        {
+          "before": "选择竞争度较低的区域或房型（Qrent 会标注“低竞争房源”）",
+          "after": "结合实际预算、房型和通勤扩大候选，向中介核实受理情况"
+        },
+        {
+          "before": "使用「AI 房源打分 + 区域竞争分析」模块，",
+          "after": "可以用已有的房源评分、预算和通勤筛选整理备选清单，"
+        },
+        {
+          "before": "可在申请前预测房源热度，选择更易获批的目标。",
+          "after": "但评分不是热度或获批概率预测；决定由房东或运营方作出。"
+        },
+        {
+          "before": "- 使用 Qrent 工具，可追踪申请状态并锁定更高通过率房源。",
+          "after": "- QRent 收藏用于管理备选房源，审批进度仍需向中介核实。"
+        },
+        {
+          "before": "> 若你希望 12 月入住，但房东希望 11 月交房，系统会自动延后处理。",
+          "after": "> 起租日与计划不匹配可能影响审核结果，应直接向中介确认，不假定任何系统会自动延后处理。"
+        },
+        {
+          "before": "澳洲并不存在“租房黑名单”或系统性限制，",
+          "after": "澳洲存在受规则约束的租赁数据库；不能写成“没有黑名单”。在 NSW，列入条件、通知及更正程序都有要求，见 [NSW 租赁数据库说明](https://www.nsw.gov.au/housing-and-construction/rules/tenancy-databases)。"
+        },
+        {
+          "before": "- 一般 2–5 个工作日可获结果，学生公寓或新盘可能更久；",
+          "after": "- 回复时间因中介、房东、材料和假期而异，向实际受理方确认预计时间；"
+        },
+        {
+          "before": "- 被拒后可立即申请其他房源，不会影响信用；",
+          "after": "- 一次申请被拒不等于被列入租赁数据库；需要时按本州规则查询或更正记录；"
+        }
+      ],
+      "en": [
+        {
+          "before": "According to statistics from cooperation data between the Qrent platform and major Australian agencies (Ray White, LJ Hooker, PRD and Belle Property),",
+          "after": "Review timing depends on the agent and landlord’s process, application volume and document completeness."
+        },
+        {
+          "before": "most rental applications receive feedback within **2–5 business days**.",
+          "after": "A response may take several days or longer. The table explains factors affecting timing, not measured averages or a response guarantee."
+        },
+        {
+          "before": "| Situation | Average Response Time | Explanation |\n| --- | --- | --- |\n| Standard property | 2–3 business days | The landlord reviews it directly, so progress is faster |\n| Highly competitive property (multiple applicants) | 3–5 business days | The agent needs to collate the documents before submitting them to the landlord |\n| Student accommodation or a new development | 5–7 business days | Applications are usually reviewed centrally by head office, making the process slower |",
+          "after": "| Situation | Factors affecting timing | Confirm |\n| --- | --- | --- |\n| Standard listing | Agent and landlord review arrangements | Expected reply date and missing documents |\n| Multiple applicants | Document processing and the landlord’s decision | Whether applications remain open |\n| Student housing or new development | Provider review process | Official application status and contact |"
+        },
+        {
+          "before": "> If a property has a high number of views on Qrent or Domain, the agent needs to screen the documents before compiling recommendations.",
+          "after": "> Multiple applications may take longer to process. QRent does not provide verified applicant counts or competition labels."
+        },
+        {
+          "before": "📎 The Qrent system's “application tracking feature” automatically updates the status notification when the landlord views an application or makes a preliminary decision (for example: Under Review / Shortlisted / Declined).",
+          "after": "Check application status with the agent or the agent’s application platform. QRent does not automatically track Under Review / Shortlisted / Declined decisions."
+        },
+        {
+          "before": "Choose an area or property type with less competition (Qrent marks “low-competition properties”)",
+          "after": "Broaden options within your budget, housing needs and commute; ask the agent whether applications remain open"
+        },
+        {
+          "before": "Use the “AI property scoring + area competition analysis” module",
+          "after": "Use existing property scores, budget and commute filters to build a shortlist,"
+        },
+        {
+          "before": "to predict a property's popularity before applying and choose options that are easier to get approved for.",
+          "after": "but scores do not predict popularity or approval; the landlord or provider decides."
+        },
+        {
+          "before": "- Qrent tools can help track application status and identify properties with a higher chance of approval.",
+          "after": "- QRent favourites help organise alternatives; confirm application progress with the agent."
+        },
+        {
+          "before": "> If you want to move in in December (month 12), but the landlord wants to hand over the property in November (month 11), the system will automatically delay processing.",
+          "after": "> A start date that does not fit your plans may affect the decision. Ask the agent rather than assuming a system automatically delays processing."
+        },
+        {
+          "before": "Australia does not have a “rental blacklist” or systematic restrictions,",
+          "after": "Regulated tenancy databases exist in Australia; it is incorrect to say there are no blacklists. NSW has rules on eligibility, notice and corrections; see [NSW tenancy databases](https://www.nsw.gov.au/housing-and-construction/rules/tenancy-databases)."
+        },
+        {
+          "before": "- Results are generally available within 2–5 business days; student accommodation or new developments may take longer;",
+          "after": "- Response times vary with the agent, landlord, documents and holidays; ask the actual provider for its expected timing;"
+        },
+        {
+          "before": "- You can apply for other properties immediately after a rejection, and it will not affect your credit;",
+          "after": "- A rejected application is not the same as a tenancy database listing; use state rules to check or correct a record if needed;"
+        }
+      ]
+    },
+    "rental-history-guarantor": {
+      "sourceHash": "c3722a899c6e8500864bb8f7229718211b1af9fcaa566ff2505a5f45ee2210d2",
+      "zh": [
+        {
+          "before": "当中介或房东要求担保人时，**最常见、也最被接受的方式**是提交一封",
+          "after": "父母经济支持信可以说明资金来源，但不自动等于法律上的担保协议。是否接受、需要谁担保及具体责任，应向中介核实。"
+        },
+        {
+          "before": "- 预付租金意愿（如提前支付 6 个月租金）；",
+          "after": "- 核对实际资金支持方式，不把大额预付租金作为默认申请策略；"
+        },
+        {
+          "before": "- 连带责任声明：",
+          "after": "- 如对方提出担保协议："
+        },
+        {
+          "before": "若申请人未能履行租约，担保人愿意承担相应责任。",
+          "after": "先确认责任、金额、期限及适用州规则，不直接照抄无限或连带责任承诺。"
+        },
+        {
+          "before": "- 与中介协商 **预付 2–3 个月租金** 作为替代。",
+          "after": "- 向中介确认可接受的替代证明，不用额外预付租金代替文件要求。"
+        },
+        {
+          "before": "预付租金 ≠ 押金（Bond），两者需分开计算，",
+          "after": "预付租金与押金用途不同。在 NSW 普通住宅租赁中，房东或中介不得要求超过两周预付租金，押金上限为四周；其他州或住宿类型需另查规则。见 [NSW 起租费用](https://www.nsw.gov.au/housing-and-construction/rules/costs-at-start-of-a-residential-tenancy)。"
+        },
+        {
+          "before": "Qrent 针对“无租房记录”的留学生，提供以下支持：",
+          "after": "QRent 当前的可用入口包括："
+        },
+        {
+          "before": "| 功能 | 作用 |\n| --- | --- |\n| 租房材料清单生成 | 避免遗漏关键文件 |\n| Cover Letter 模板 | 含学生版与担保人说明 |\n| AI 房源打分 | 判断竞争度与通过率 |",
+          "after": "| 入口 | 当前作用 |\n| --- | --- |\n| 全流程攻略 | 阅读申请材料清单和准备建议 |\n| 本篇信件示例 | 按真实情况整理说明，并核对中介要求 |\n| AI 房源评分与收藏 | 比较房源、保存备选，不预测通过率 |"
+        },
+        {
+          "before": "- 父母担保信是最常见、最被接受的 Guarantor 方案；",
+          "after": "- 经济支持信是否被接受，以中介或运营方要求为准；"
+        },
+        {
+          "before": "需要清楚说明担保责任范围，包括：",
+          "after": "如实说明经济支持范围，包括金额、频率和期限；这些是信件示例，不是必需门槛或自动成立的担保责任。"
+        },
+        {
+          "before": "全额承担申请人在澳期间的房租及生活费用",
+          "after": "按实际能力和双方意愿说明将提供哪些支持，不承诺自己不理解或无法履行的责任"
+        },
+        {
+          "before": "- 提前准备完整材料，能显著提高通过率。",
+          "after": "- 如实准备完整材料，有助于说明情况，但不保证申请通过。"
+        }
+      ],
+      "en": [
+        {
+          "before": "When an agent or landlord requires a guarantor, **the most common and most widely accepted approach** is to submit a",
+          "after": "A parental support letter can explain funding but is not automatically a legally binding guarantee. Ask the agent what is accepted, who may guarantee and what obligations apply."
+        },
+        {
+          "before": "- Willingness to pay rent in advance (such as paying 6 months' rent ahead);",
+          "after": "- Confirm the actual funding arrangement rather than treating a large advance rent payment as the default application strategy;"
+        },
+        {
+          "before": "- A statement of joint liability:",
+          "after": "- If a guarantee agreement is proposed:"
+        },
+        {
+          "before": "If the applicant fails to fulfil the lease, the guarantor is willing to take on the corresponding responsibility.",
+          "after": "Check the obligations, amount, duration and state rules before accepting terms; do not copy an unlimited or joint-liability promise without understanding it."
+        },
+        {
+          "before": "- Negotiate with the agent to use **2–3 months' rent paid in advance** as an alternative.",
+          "after": "- Ask which alternative evidence is accepted; do not substitute extra rent in advance for the required documents."
+        },
+        {
+          "before": "Rent paid in advance ≠ Bond; the two must be calculated separately,",
+          "after": "Advance rent and a bond serve different purposes. For ordinary NSW residential tenancies, the landlord or agent cannot require more than two weeks’ advance rent, and the bond is capped at four weeks. Check other states and agreement types separately. See [NSW starting costs](https://www.nsw.gov.au/housing-and-construction/rules/costs-at-start-of-a-residential-tenancy)."
+        },
+        {
+          "before": "Qrent provides the following support for international students with “no rental history”:",
+          "after": "QRent currently offers these practical starting points:"
+        },
+        {
+          "before": "| Feature | Purpose |\n| --- | --- |\n| Rental document checklist generation | Avoids missing key documents |\n| Cover Letter templates | Includes student versions and guarantor explanations |\n| AI property scoring | Assesses competition and the chance of approval |",
+          "after": "| Entry point | Available use |\n| --- | --- |\n| Rental handbook | Read document checklists and preparation guidance |\n| Letter examples in this article | Explain your real circumstances and check agent requirements |\n| AI property scores and favourites | Compare and save properties, not predict approval |"
+        },
+        {
+          "before": "- A parental guarantee letter is the most common and most widely accepted Guarantor solution;",
+          "after": "- Acceptance of a financial support letter depends on the agent or provider;"
+        },
+        {
+          "before": "Clearly explain the scope of the guarantee, including:",
+          "after": "Truthfully explain the amount, frequency and duration of financial support. These are letter examples, not mandatory thresholds or an automatically binding guarantee."
+        },
+        {
+          "before": "Covering all rent and living expenses for the applicant while in Australia",
+          "after": "Describe support that reflects the actual ability and intention of the parties; do not promise obligations you do not understand or cannot fulfil"
+        },
+        {
+          "before": "- Preparing complete documents in advance can significantly improve your chances of approval.",
+          "after": "- Truthful, complete documents help explain your circumstances but do not guarantee approval."
+        }
+      ]
+    },
+    "rental-inspection": {
+      "sourceHash": "31263e34529ae6be172a7b9a3fc79059809ccda774018d84c090258c4d5610bf",
+      "zh": [
+        {
+          "before": "通过 Qrent 合作伙伴代看",
+          "after": "请可信的人代看并先确认中介要求"
+        },
+        {
+          "before": "若你在国内无法亲自参加看房，可联系 Qrent（官网或者小红书账号） ，获取代看帮助。工作人员会协助核实房源、录制视频、记录关键房况并反馈报告。",
+          "after": "可请可信朋友或自行核实的服务方代看，事前确认中介是否接受及需要的授权。QRent 当前不提供已上线的代看下单或履约服务。"
+        },
+        {
+          "before": "在澳洲主流平台（如 Realestate、Domain）上，**绝大多数房源都是真实存在的**，因为这些平台只允许注册中介发布信息，且必须有州政府执照。",
+          "after": "Realestate、Domain 等平台可帮助查找房源，但出现在平台上不等于真实性、出租权限或当前可租状态已经获得保证。仍需独立核对地址、发布方身份、授权和合同。"
+        },
+        {
+          "before": "**比对多个平台信息**——若一套房只在社交媒体出现，很可能不安全。",
+          "after": "**比对多个来源**——只有社交媒体广告时更要核实，但不能只靠发布渠道判断真伪。"
+        },
+        {
+          "before": "**警惕低价陷阱**——悉尼市区若标价低于 350AUD/周，多半不真实。",
+          "after": "**核对低价原因**——区分床位、单间和整套、计价周期及含账单范围；没有适用于所有房型的真假价格门槛。"
+        },
+        {
+          "before": "**拒绝个人转账**——中介通常会要求通过公司账户或房产信托账户支付押金（Bond）。",
+          "after": "**独立核实收款方式**——确认收款方与费用用途；NSW 的 RBO、其他州的押金机构及合法私房东可能使用不同流程，不能只凭账户名称判断。"
+        },
+        {
+          "before": "所有费用（包括押金、定金）应在签署正式租赁合同后再支付。",
+          "after": "不要向未经核实的收款方付款。NSW 的合法 holding fee 可以在申请获批、签约前收取，上限一周租金；押金与预付租金另有规则。先区分用途并索取收据，见 [NSW 起租费用](https://www.nsw.gov.au/housing-and-construction/rules/costs-at-start-of-a-residential-tenancy)。"
+        },
+        {
+          "before": "优先选择 Realestate、Domain、Qrent 等经过验证的平台，避免通过私人信息交易。",
+          "after": "可通过 Realestate、Domain 或 QRent 找到线索，但每套房的出租权限、条款和收款方仍需单独核实。"
+        },
+        {
+          "before": "**提前了解市场行情**：悉尼市区平均租金 450–550AUD/周，学区房源竞争激烈。",
+          "after": "**比较当前报价**：按同区域、同房型、整套或人均口径比较实际广告。本篇旧金额不是当前悉尼均价。"
+        },
+        {
+          "before": "**合理预算**：除租金外，每人平均还需支付约 30AUD/周的水电网费（Bills），若不带家具，初期家具投入约 2000AUD 左右。",
+          "after": "**合理预算**：按实际账单、含租项目和家具清单估算。原文每人 30AUD/周 bills 和 2000AUD 家具是旧示例，不能视为现价或通用预算。"
+        },
+        {
+          "before": "可先在 Qrent 平台了解市场均价、筛选房型",
+          "after": "可先在 QRent 比较具体广告周租、筛选房型"
+        },
+        {
+          "before": "### **一、看房必须本人去吗？可以找人代看吗？**",
+          "after": "## **一、看房必须本人去吗？可以找人代看吗？**"
+        },
+        {
+          "before": "### **二、open inspection 是什么意思？怎么预约？**",
+          "after": "## **二、open inspection 是什么意思？怎么预约？**"
+        },
+        {
+          "before": "### **三、房源信息真实吗？**",
+          "after": "## **三、房源信息真实吗？**"
+        },
+        {
+          "before": "### **四、如何避免被骗？**",
+          "after": "## **四、如何避免被骗？**"
+        },
+        {
+          "before": "### **五、Qrent 建议**",
+          "after": "## **五、Qrent 建议**"
+        },
+        {
+          "before": "**不要提前打钱**",
+          "after": "**先核实收款与费用用途**"
+        }
+      ],
+      "en": [
+        {
+          "before": "Arrange an Inspection Through Qrent Partners",
+          "after": "Arrange a Trusted Representative and Confirm Agent Requirements"
+        },
+        {
+          "before": "If you are in China and cannot attend an inspection yourself, you can contact Qrent (through the official website or Xiaohongshu account) for help with a representative inspection. Staff will help verify the listing, record a video, note key property conditions and provide a report.",
+          "after": "Ask a trusted friend or independently checked provider to inspect, confirming the agent’s permission and authorisation requirements first. QRent does not currently offer an active inspection-booking or fulfilment service."
+        },
+        {
+          "before": "On mainstream Australian platforms (such as Realestate and Domain), **the vast majority of listings genuinely exist**, because these platforms only allow registered agencies to publish information, and those agencies must hold a state government licence.",
+          "after": "Realestate and Domain help locate properties, but appearing on a platform does not guarantee authenticity, the right to let, or current availability. Independently check the address, advertiser, authority and agreement."
+        },
+        {
+          "before": "**Compare Information Across Multiple Platforms**—If a property appears only on social media, it is very likely to be unsafe.",
+          "after": "**Compare Multiple Sources**—A social-only advertisement needs checking; the channel alone cannot establish authenticity."
+        },
+        {
+          "before": "**Beware of Low-Price Traps**—A listing in central Sydney priced below 350AUD/week is most likely not genuine.",
+          "after": "**Check Why a Price Is Low**—Distinguish a bed, room and whole property, the billing period and included bills. There is no universal price threshold for authenticity."
+        },
+        {
+          "before": "**Refuse Transfers to Personal Accounts**—Agencies usually require the Bond to be paid through a company account or a property trust account.",
+          "after": "**Independently Verify Payment Instructions**—Confirm the recipient and purpose. NSW RBO, other state bond authorities and legitimate private landlords may use different processes; an account name alone is not proof."
+        },
+        {
+          "before": "All fees (including the Bond and Holding Deposit) should be paid only after signing a formal rental agreement.",
+          "after": "Do not pay an unverified recipient. A lawful NSW holding fee may be requested after application approval and before signing, capped at one week’s rent. Bonds and advance rent have separate rules. Confirm the purpose and retain a receipt; see [NSW starting costs](https://www.nsw.gov.au/housing-and-construction/rules/costs-at-start-of-a-residential-tenancy)."
+        },
+        {
+          "before": "Give priority to verified platforms such as Realestate, Domain and Qrent, and avoid transactions through private messages.",
+          "after": "Realestate, Domain and QRent can provide leads; independently verify each property’s right to let, terms and payment recipient."
+        },
+        {
+          "before": "**Understand Market Conditions in Advance**: Average rents in central Sydney are 450–550AUD/week, and competition for properties around schools is intense.",
+          "after": "**Compare Current Advertisements**: Compare like-for-like areas, housing types and whole-property or per-person prices. Old figures in this article are not current Sydney averages."
+        },
+        {
+          "before": "**Budget Sensibly**: In addition to rent, each person needs to pay an average of about 30AUD/week for water, electricity and Internet (Bills). If the property is unfurnished, the initial furniture outlay is around 2000AUD.",
+          "after": "**Budget Sensibly**: Use actual bills, inclusions and furnishing needs. The source’s 30AUD/week bills and 2000AUD furniture figures are historical examples, not current or universal budgets."
+        },
+        {
+          "before": "you can first use the Qrent platform to understand average market rents and shortlist property types",
+          "after": "you can first compare individual advertised prices and shortlist housing types in QRent"
+        },
+        {
+          "before": "### **I. Must You Attend an Inspection Yourself? Can Someone Attend on Your Behalf?**",
+          "after": "## **I. Must You Attend an Inspection Yourself? Can Someone Attend on Your Behalf?**"
+        },
+        {
+          "before": "### **II. What Does open inspection Mean? How Do You Book One?**",
+          "after": "## **II. What Does open inspection Mean? How Do You Book One?**"
+        },
+        {
+          "before": "### **III. Is the Listing Information Genuine?**",
+          "after": "## **III. Is the Listing Information Genuine?**"
+        },
+        {
+          "before": "### **IV. How Can You Avoid Scams?**",
+          "after": "## **IV. How Can You Avoid Scams?**"
+        },
+        {
+          "before": "### **V. Qrent's Suggestions**",
+          "after": "## **V. Qrent's Suggestions**"
+        },
+        {
+          "before": "**Do Not Send Money in Advance**",
+          "after": "**Verify the Recipient and Payment Purpose First**"
+        }
+      ]
+    },
+    "rental-platforms-from-overseas": {
+      "sourceHash": "3722f9913f4759ad05297d3c05f8087daac7561ae00bac698762a53f7f0df465",
+      "zh": [
+        {
+          "before": "为此，Qrent（[www.qrent.rent](https://www.qrent.rent/)）通过整合 **Domain 全量房源与 Realestate 部分数据**，并以 AI 算法进行筛选、比价与评分，帮助留学生快速判断房源真伪与性价比，降低租房信息差。",
+          "after": "Qrent（[www.qrent.rent](https://www.qrent.rent/)）每日更新悉尼既有学校周边范围内的 Domain 和 Real Estate 房源，提供价格、通勤和评分参考；不覆盖两平台全量，也不认证房源真伪或保证仍可租。"
+        },
+        {
+          "before": "### **Qrent 代看服务 + 远程签约**",
+          "after": "### **可信代看与远程沟通**"
+        },
+        {
+          "before": "若通过 Qrent 平台找到心仪房源，可选择由当地合作伙伴代看并出具视频报告，再由正规中介远程签约。",
+          "after": "可请可信朋友或自行核实的服务方代看，先确认中介授权和交付内容；QRent 当前没有已上线的代看下单、申请代投或远程签约服务。"
+        },
+        {
+          "before": "房源真实、流程规范",
+          "after": "可查看广告及发布方信息，仍需核实"
+        },
+        {
+          "before": "安全、手续简易",
+          "after": "集中管理，具体合同及安全条件仍需核实"
+        }
+      ],
+      "en": [
+        {
+          "before": "To address this, Qrent ([www.qrent.rent](https://www.qrent.rent/)) combines **all Domain listings and partial Realestate data** and uses AI algorithms to filter, compare prices and score properties, helping international students quickly assess whether listings are genuine and good value, and reducing gaps in rental information.",
+          "after": "Qrent ([www.qrent.rent](https://www.qrent.rent/)) updates Domain and Real Estate listings daily within its existing Sydney school-area scope, with price, commute and score references. It does not cover either platform’s whole market or certify authenticity or availability."
+        },
+        {
+          "before": "### **Qrent Inspection-on-Your-Behalf Service + Remote Signing**",
+          "after": "### **Trusted Representative Inspections and Remote Communication**"
+        },
+        {
+          "before": "If you find a property you like through Qrent, you can have a local partner inspect it on your behalf and provide a video report, then sign remotely through a legitimate agent.",
+          "after": "A trusted friend or independently checked provider may inspect with the agent’s permission and agreed deliverables. QRent does not currently provide inspection ordering, application submission or remote-signing services."
+        },
+        {
+          "before": "Genuine listings and standardised processes",
+          "after": "Listing and advertiser details are available; independent checks remain necessary"
+        },
+        {
+          "before": "Secure and simple procedures",
+          "after": "Central management; still check the agreement and safety conditions"
+        }
+      ]
+    },
+    "rental-suburbs-platforms": {
+      "sourceHash": "4f666bbc42924f316e293272a656286a1b9407cef9edf3b6266ffa283cd6e4eb",
+      "zh": [
+        {
+          "before": "- **通勤特点**：暂无直达火车站，通常需乘免费接驳巴士至 Rhodes，通勤时间增加约 10 分钟。",
+          "after": "- **通勤特点**：按具体门牌核对车站、巴士或渡轮、班次与步行；接驳服务是否运营、是否免费及所需时间，以当天官方信息为准。"
+        },
+        {
+          "before": "> 想横向比较不同区域的均价与通勤，可使用",
+          "after": "> 可通过 QRent 的具体房源、周租和学校通勤进行比较；当前没有已上线的区域均价或竞争度面板。"
+        },
+        {
+          "before": "- 区域均价参考；",
+          "after": "- 原广告周租和来源链接，便于逐套比价；"
+        },
+        {
+          "before": "- **优点**：流程规范、合同清晰、押金合规。",
+          "after": "- **使用方式**：查看发布方与原广告，独立核对出租权限、合同和本州押金交存要求。"
+        }
+      ],
+      "en": [
+        {
+          "before": "- **Commuting characteristics**: No direct train station at present; a free shuttle bus to Rhodes is usually needed, adding approximately 10 minutes to the commute.",
+          "after": "- **Commuting**: Check stations, buses or ferries, service times and walking from the actual address. Confirm whether a shuttle operates, its fare and journey time using current official information."
+        },
+        {
+          "before": "> To compare average prices and commutes across different areas side by side, you can use",
+          "after": "> Compare individual listings, weekly rents and campus commutes in QRent. An area-average or competition dashboard is not currently available."
+        },
+        {
+          "before": "- Reference area average prices;",
+          "after": "- Advertised weekly prices and source links for property-by-property comparisons;"
+        },
+        {
+          "before": "- **Advantages**: Standardised processes, clear agreements and compliant bonds.",
+          "after": "- **How to use them**: Inspect the advertiser and original listing, then independently check the right to let, agreement and state bond-lodgement requirements."
+        }
+      ]
+    },
+    "shared-vs-private-renting": {
+      "sourceHash": "207d48c014300c1ac11f0238b103aeeaec8644da880e19c359b528c3ffff51ae",
+      "zh": [
+        {
+          "before": "Qrent 根据近两年用户数据整理出以下建议：",
+          "after": "下表保留原文的历史预算示例。先分清整套、人均和账单口径，再用当前广告重算自己的预算。"
+        },
+        {
+          "before": "平均租金（AUD/周）",
+          "after": "历史租金示例（AUD/周）"
+        },
+        {
+          "before": "- 押金（Bond） = 4 周租金。",
+          "after": "- 押金按州和合同核对：NSW 普通住宅租赁的上限为四周租金，不是所有合同必须收四周，也不是全澳统一规定。"
+        },
+        {
+          "before": "Qrent 提供 AI 房源筛选与租金比对功能，可直接查看“含 Bills / 不含 Bills”、“整租 / 合租”及通勤时间评分，帮助留学生在预算范围内找到最优选项。",
+          "after": "QRent 可按学校、周租和公交时间筛选，展示已有房源评分并支持登录后收藏。Bills 是否包含、房型细节及可租状态仍需向源站和中介确认。"
+        },
+        {
+          "before": "- 前期成本高（押金+首月租金约 3000–4000 AUD）。",
+          "after": "- 前期现金需求包括押金及合规预付租金；原文 3000–4000 AUD 是旧示例，实际金额按周租、州规则和合同核对。"
+        },
+        {
+          "before": "- **预算参考**：悉尼建议留学生预留 2000–3000 AUD/月（含房租与生活费）。",
+          "after": "- **预算参考**：原文 2000–3000 AUD/月是历史示例，不是当前悉尼生活成本建议；按实际房型、人数、账单和租期重算。"
+        },
+        {
+          "before": "- **成本最低**：单人每周 200–350 AUD；",
+          "after": "- **费用口径**：原文每人 200–350 AUD/周是历史示例，按当前房间、人数与含账单范围重算；"
+        },
+        {
+          "before": "- 租金高（悉尼市区 550–750 AUD/周）；",
+          "after": "- 原文悉尼市区 550–750 AUD/周是历史报价示例，不是当前整租均价；"
+        },
+        {
+          "before": "- 水电网 ≈ 100 – 150 AUD（如不含 Bills）；",
+          "after": "- 水电网：原文 100–150 AUD 是旧示例；计费周期、个人分摊及含租项目按实际账单确认；"
+        },
+        {
+          "before": "- 家具购置（一次性） ≈ 1500 – 2000 AUD；",
+          "after": "- 家具购置：原文一次性 1500–2000 AUD 是历史示例，按实际缺少的物品和当前价格估算；"
+        },
+        {
+          "before": "若月预算低于 1500 AUD，建议优先考虑合租；",
+          "after": "预算紧张时，可先比较合租的实际人均总支出；"
+        },
+        {
+          "before": "若预算 > 2500 AUD，可考虑整租 Studio 或 1B Apartment。",
+          "after": "希望独住时，把当前 Studio / 1B 周租、账单和前期现金需求一起核算，不用旧月预算作准入门槛。"
+        }
+      ],
+      "en": [
+        {
+          "before": "Qrent has compiled the following suggestions from user data collected over the past two years:",
+          "after": "The following retains historical budgeting examples. Separate whole-property, per-person and bills-inclusive prices, then recalculate your budget using current advertisements."
+        },
+        {
+          "before": "Average rent (AUD/week)",
+          "after": "Historical rent example (AUD/week)"
+        },
+        {
+          "before": "- Bond = 4 weeks' rent.",
+          "after": "- Check the state and agreement: an ordinary NSW residential tenancy has a bond cap of four weeks, not a mandatory four-week charge or an Australia-wide rule."
+        },
+        {
+          "before": "Qrent provides AI listing filters and rental-price comparisons. You can directly view \"Bills included / Bills excluded\", \"whole-property renting / shared renting\" and commute-time scores to help international students find the best option within their budget.",
+          "after": "QRent supports school, weekly-rent and transit-time filters, recorded property scores and signed-in favourites. Confirm bills, housing details and availability with the source and agent."
+        },
+        {
+          "before": "- High upfront costs (the bond plus the first month's rent total approximately 3000–4000 AUD).",
+          "after": "- Upfront cash includes the bond and permitted advance rent. The source’s 3000–4000 AUD is a historical example; check weekly rent, state rules and the agreement."
+        },
+        {
+          "before": "- **Budget reference**: International students in Sydney are advised to set aside 2000–3000 AUD/month (including rent and living expenses).",
+          "after": "- **Budget reference**: The source’s 2000–3000 AUD/month is a historical example, not current Sydney cost advice. Recalculate for the actual housing type, occupancy, bills and lease length."
+        },
+        {
+          "before": "- **Lowest cost**: 200–350 AUD per person per week;",
+          "after": "- **Cost basis**: The source’s 200–350 AUD per-person weekly range is historical. Recalculate using the actual room, occupancy and bills included;"
+        },
+        {
+          "before": "- High rent (550–750 AUD/week in central Sydney);",
+          "after": "- The source’s central-Sydney 550–750 AUD/week range is historical, not a current whole-property average;"
+        },
+        {
+          "before": "- Water, electricity and internet ≈ 100 – 150 AUD (if Bills are not included);",
+          "after": "- Utilities: The source’s 100–150 AUD is a historical example. Confirm the billing period, personal share and rent inclusions from actual bills;"
+        },
+        {
+          "before": "- Furniture purchases (one-off) ≈ 1500 – 2000 AUD;",
+          "after": "- Furniture: The source’s one-off 1500–2000 AUD is historical. Estimate what is actually missing using current prices;"
+        },
+        {
+          "before": "If your monthly budget is below 1500 AUD, consider shared renting first;",
+          "after": "With a tighter budget, first compare the actual total cost per person of shared options;"
+        },
+        {
+          "before": "If your budget is > 2500 AUD, you can consider renting an entire Studio or 1B Apartment.",
+          "after": "For independent living, calculate current studio/1B rent, bills and upfront cash together rather than treating an old monthly budget as an eligibility threshold."
+        }
+      ],
+      "excerpts": {
+        "zh": "从租金、隐私、灵活性和前期现金需求比较合租与整租。区分历史预算示例、当前广告与各州押金规则。",
+        "en": "Compare shared and whole-property renting by privacy, flexibility and upfront cash. Distinguish historical budgets, current listings and state bond rules."
+      }
+    },
+    "types-of-apartments": {
+      "sourceHash": "b66f9618f75174a8a83405516dac160e3dc5192465e8e5b79a140697e05d2607",
+      "zh": [
+        {
+          "before": "租金高（悉尼单人 Studio 平均 $600–750/周）；",
+          "after": "原文曾以悉尼单人 Studio $600–750/周举例，这是历史报价示例，不是当前均价；"
+        },
+        {
+          "before": "**平均价格（悉尼市区）：**",
+          "after": "**原文历史价格示例（悉尼；非当前均价）：**"
+        },
+        {
+          "before": "| 安全保障 | ★★★★★ | ★★★★☆ | ★★☆☆☆ |",
+          "after": "| 安全核对 | 核对门禁与运营方 | 核对房况与出租权限 | 核对住户、权限与书面约定 |"
+        },
+        {
+          "before": "| 平均租金（悉尼） |",
+          "after": "| 历史租金示例（悉尼） |"
+        },
+        {
+          "before": "所有房源选择都应通过正规平台（如 Qrent、Domain、Realestate）完成，确保合同合法、押金安全。",
+          "after": "平台名称本身不能保证合同合法或押金安全。核对出租权限、适用合同与本州押金交存要求，再决定是否交易。"
+        },
+        {
+          "before": "| 是否包家具 |  是 | 部分 |  是 |",
+          "after": "| 是否包家具 | 核对房型清单 | 核对广告与合同 | 核对房间与公共家具 |"
+        },
+        {
+          "before": "| 是否包 Bills |  是 | 否（需自付） | 多数是  |",
+          "after": "| 是否包 Bills | 核对项目和用量限制 | 核对合同和开户责任 | 核对项目与分摊方式 |"
+        },
+        {
+          "before": "此类公寓通常位于大学周边（如 UNSW Kensington、USYD Darlington、墨尔本市中心 Swanston St 一带），租金包含家具、网络及所有 Bills（水电煤网）。",
+          "after": "学生公寓通常面向某些校区，广告距离仍需按自己的教学楼核对。家具、网络与水电燃气的包含范围及用量限制，逐项查看具体房型和合同。"
+        },
+        {
+          "before": "**拎包入住**：家具齐全，水电网全包；",
+          "after": "**入住准备**：确认家具清单、账单范围及钥匙交接条件；"
+        },
+        {
+          "before": "**安全专业**：24 小时前台与安保系统；",
+          "after": "**管理与安保**：核对前台开放时间、门禁和紧急联系渠道，不假定都有 24 小时前台；"
+        },
+        {
+          "before": "**租金最低**：通常 $200–350/周；",
+          "after": "**费用参考**：原文 $200–350/周为历史示例，当前报价需确认是床位、单间还是整套；"
+        },
+        {
+          "before": "**风险较高**：部分房东未注册中介执照，合同不规范；",
+          "after": "**核对出租权限**：房东可以自行管理，不能因没有中介牌照就判定违规；先确认业主或转租授权，代管中介再核查相应资质。"
+        }
+      ],
+      "en": [
+        {
+          "before": "High rent (a single-occupancy Studio in Sydney averages $600–750/week);",
+          "after": "The source used $600–750/week for a Sydney single-occupancy studio as a historical example, not a current average;"
+        },
+        {
+          "before": "**Average prices (central Sydney):**",
+          "after": "**Historical Sydney price examples from the source, not current averages:**"
+        },
+        {
+          "before": "| Security | ★★★★★ | ★★★★☆ | ★★☆☆☆ |",
+          "after": "| Safety checks | Check access and provider | Check condition and right to let | Check occupants, authority and written terms |"
+        },
+        {
+          "before": "| Average rent (Sydney) |",
+          "after": "| Historical rent examples (Sydney) |"
+        },
+        {
+          "before": "All property choices should be made through legitimate platforms (such as Qrent, Domain and Realestate) to ensure a lawful agreement and a safe bond.",
+          "after": "A platform name does not guarantee a lawful agreement or safe bond. Verify the right to let, applicable agreement and state bond-lodgement process before committing."
+        },
+        {
+          "before": "| Furniture included? | Yes | Sometimes | Yes |",
+          "after": "| Furniture included? | Check room inventory | Check listing and agreement | Check room and common-area inventory |"
+        },
+        {
+          "before": "| Bills included? | Yes | No (paid separately) | Usually yes |",
+          "after": "| Bills included? | Check inclusions and usage caps | Check agreement and account responsibility | Check inclusions and cost sharing |"
+        },
+        {
+          "before": "These apartments are usually near universities (such as UNSW Kensington, USYD Darlington and the Swanston St area in central Melbourne). Rent includes furniture, internet and all Bills (water, electricity, gas and internet).",
+          "after": "Student accommodation commonly serves particular campuses; check the journey to your actual teaching building. Confirm furnishings, internet, energy/water inclusions and usage limits for the room and agreement."
+        },
+        {
+          "before": "**Ready to move into**: Fully furnished, with water, electricity and internet included;",
+          "after": "**Move-in preparation**: Confirm furniture, bill inclusions and key-handover conditions;"
+        },
+        {
+          "before": "**Professional security**: A 24-hour reception desk and security systems;",
+          "after": "**Management and security**: Check reception hours, access and emergency contacts rather than assuming a 24-hour desk;"
+        },
+        {
+          "before": "**Lowest rent**: Usually $200–350/week;",
+          "after": "**Cost reference**: The source’s $200–350/week is historical; check whether a current price is for a bed, room or whole property;"
+        },
+        {
+          "before": "**Higher risk**: Some landlords do not have registered real estate agent licences, and agreements may be non-standard;",
+          "after": "**Check the right to let**: Landlords may self-manage, so lacking an agent’s licence alone does not make a private letting unlawful. Verify ownership or subletting authority and check credentials for an appointed agent."
+        }
+      ]
+    },
+    "when-to-start-rental-search": {
+      "sourceHash": "4b85877b4cb4e17a31590b00fc46dcf79607a7faed076ce2a0524db2178a8f2d",
+      "zh": [
+        {
+          "before": "Qrent 团队根据 2024–2025 学年的市场数据与平台用户行为，总结出一个黄金时间线：",
+          "after": "下列时间线沿用原文的准备顺序；具体安排应结合抵达日期、房型和中介或运营方的申请窗口调整："
+        },
+        {
+          "before": "1. **锁定更多优质房源**：提前看市场，能比他人早两周看到房东挂牌；",
+          "after": "1. **留出比较时间**：提前了解区域和报价，有助于安排备选；不能因此提前看到尚未公开的挂牌。"
+        },
+        {
+          "before": "- Domain 与 Realestate 平均每周三、周六房源更新最多；",
+          "after": "- 房源可在不同日期发布或更新，不依赖固定的周三、周六规律；"
+        },
+        {
+          "before": "- Qrent 系统会标注「预计空房日期」，方便你判断最佳申请时机。",
+          "after": "- 原广告的可入住日期和房源记录日期含义不同，已过日期不代表仍可租，需向中介确认。"
+        },
+        {
+          "before": "- **区域均价分析**：查看目标区域房租中位数与涨幅趋势；",
+          "after": "- **逐套比价**：按同区域、同房型和整套/人均口径比较当前周租；"
+        },
+        {
+          "before": "- **申请成功率预测**：根据竞争度与房源类型智能推荐申请顺序。",
+          "after": "- **候选管理**：收藏适合预算和通勤的房源，申请进度向中介核实；QRent 不预测获批概率。"
+        },
+        {
+          "before": "| 城市 | 市场特点 | Qrent 建议准备时间 |\n| --- | --- | --- |\n| 悉尼 Sydney | 开学季竞争最激烈，内城区房源周转快 | 提前 6–8 周 |\n| 墨尔本 Melbourne | 市场供应量较大，但CBD房源涨价快 | 提前 5–7 周 |\n| 布里斯班 Brisbane | 租金相对平稳，合租需求多 | 提前 4–6 周 |\n| 阿德莱德 / 堪培拉 | 学区集中，学生公寓为主 | 提前 6 周左右 |",
+          "after": "| 城市 | 规划时核对 | 原文建议准备时间（非统一要求） |\n| --- | --- | --- |\n| 悉尼 Sydney | 实际校区、抵达日期、当前房源 | 提前 6–8 周 |\n| 墨尔本 Melbourne | 校区距离、房型、运营方开放时间 | 提前 5–7 周 |\n| 布里斯班 Brisbane | 当前房源和短住备选 | 提前 4–6 周 |\n| 阿德莱德 / 堪培拉 | 校区、房型和实际申请窗口 | 提前 6 周左右 |"
+        },
+        {
+          "before": "- 使用 Qrent 平台的「AI 房源打分」「区域均价面板」「申请提醒」功能，",
+          "after": "- 使用现有房源评分、周租和通勤筛选、登录后收藏来整理备选；自动邮件订阅仍未开通，"
+        },
+        {
+          "before": "提前六周开始规划，你就已经领先一半人。\n",
+          "after": "提前规划有助于准备材料和备选，但不保证优先看房、获批或租到特定价格。"
+        },
+        {
+          "before": "尤其在悉尼、墨尔本等留学生密集城市，热门房源往往在发布后 24 小时内被申请完。",
+          "after": "悉尼、墨尔本等地的受欢迎房源可能很快停止受理；以具体广告和中介确认的窗口为准。"
+        },
+        {
+          "before": "- [ ] 支付押金与定金（按中介指引）",
+          "after": "- [ ] 核对合规押金、预付租金及收据；如已付 holding fee，确认签约后抵入租金，不把它当额外必付费用"
+        },
+        {
+          "before": "- [ ] 办理水、电、燃气账户",
+          "after": "- [ ] 核对电、燃气和网络开户；NSW 供水账户通常由房东持有，用水费用承担按独立计量、节水及账单规则确认"
+        }
+      ],
+      "en": [
+        {
+          "before": "Based on market data and platform user behaviour for the 2024–2025 academic year, the Qrent team has summarised a golden timeline:",
+          "after": "This timeline follows the source’s preparation sequence; adjust it to your arrival date, housing type and the agent or provider’s actual application window:"
+        },
+        {
+          "before": "1. **Securing more quality listings**: By watching the market in advance, you can see landlords' listings two weeks earlier than others;",
+          "after": "1. **Allow time to compare**: Learn about areas and advertised prices and prepare alternatives; planning does not reveal listings before they are published."
+        },
+        {
+          "before": "- On average, Domain and Realestate have the most listing updates on Wednesdays and Saturdays;",
+          "after": "- Listings may be published or updated on different days; do not rely on a fixed Wednesday/Saturday pattern;"
+        },
+        {
+          "before": "- The Qrent system marks the “estimated vacancy date” to help you judge the best time to apply.",
+          "after": "- Advertised availability and the listing record date have different meanings; a past date does not establish current availability, so confirm with the agent."
+        },
+        {
+          "before": "- **Area average rent analysis**: View the median rent and rent increase trends in your target area;",
+          "after": "- **Compare individual listings**: Match area, housing type and whole-property/per-person pricing;"
+        },
+        {
+          "before": "- **Application success prediction**: Intelligently recommend the order in which to apply based on competition and property type.",
+          "after": "- **Manage alternatives**: Save options matching your budget and commute, and check progress with the agent. QRent does not predict approval probability."
+        },
+        {
+          "before": "| City | Market Characteristics | Qrent's Recommended Preparation Time |\n| --- | --- | --- |\n| Sydney | Competition is strongest at the start of term, and inner-city properties turn over quickly | 6–8 weeks ahead |\n| Melbourne | A larger market supply, but CBD rents rise quickly | 5–7 weeks ahead |\n| Brisbane | Relatively stable rents, with strong demand for shared accommodation | 4–6 weeks ahead |\n| Adelaide / Canberra | Concentrated school catchments, mainly student accommodation | Around 6 weeks ahead |",
+          "after": "| City | Check when planning | Source preparation example, not a universal rule |\n| --- | --- | --- |\n| Sydney | Campus, arrival date and current listings | 6–8 weeks ahead |\n| Melbourne | Campus distance, housing type and provider opening dates | 5–7 weeks ahead |\n| Brisbane | Current options and temporary accommodation | 4–6 weeks ahead |\n| Adelaide / Canberra | Campus, housing type and actual application windows | Around 6 weeks ahead |"
+        },
+        {
+          "before": "- Use the Qrent platform's “AI property scoring”, “area average rent dashboard” and “application reminders” features,",
+          "after": "- Use existing property scores, weekly-rent and commute filters and signed-in favourites. Automatic email subscriptions are not yet active,"
+        },
+        {
+          "before": "Start planning six weeks ahead, and you are already ahead of half the people.\n",
+          "after": "Planning helps organise documents and alternatives, but does not guarantee priority inspections, approval or a particular price.\n"
+        },
+        {
+          "before": "Especially in cities with large international student populations, such as Sydney and Melbourne, popular properties often receive all their applications within 24 hours of being listed.",
+          "after": "Popular listings in cities such as Sydney and Melbourne may close quickly; confirm the actual application window with the listing and agent."
+        },
+        {
+          "before": "- [ ] Pay the Bond and Holding Deposit (as instructed by the agent)",
+          "after": "- [ ] Check the lawful bond, advance rent and receipts. If a holding fee was paid, confirm it is credited to rent on signing rather than treated as an extra mandatory charge"
+        },
+        {
+          "before": "- [ ] Set up water, electricity and gas accounts",
+          "after": "- [ ] Arrange electricity, gas and internet as needed. In NSW the water account is generally held by the landlord; check metering, efficiency and billing rules for usage charges"
+        }
+      ]
+    },
+    "available-date-rental-cover-letter": {
+      "sourceHash": "7036c9acd79b3a3ef75b71d1b0c88c6743b370e1a05fdb1e35fc31939c0bc1cd",
+      "zh": [
+        {
+          "before": "| 已显示 available date | 可立即提交申请，多数房东希望提前 2–3 周确定租客 |",
+          "after": "| 已显示 available date | 核对是否仍受理、可入住日与自己的计划，再按中介要求申请 |"
+        },
+        {
+          "before": "| 距离 available date 超过 1 个月 | 可先收藏并设置提醒 |",
+          "after": "| 距离 available date 超过 1 个月 | 可先收藏并自行记录日期；自动邮件提醒尚未开通 |"
+        },
+        {
+          "before": "| available date 已过 | 通常为已空置房源，可随时申请 |",
+          "after": "| available date 已过 | 不能据此判断仍空置或可申请，先联系中介确认状态 |"
+        },
+        {
+          "before": "## 三、为什么租房申请一定要写 Cover Letter？",
+          "after": "## 三、什么时候需要 Cover Letter？"
+        },
+        {
+          "before": "在澳洲租房流程中，**Cover Letter（租房自荐信）并非形式性材料**。",
+          "after": "Cover Letter 可以帮助解释情况，但并非所有平台或中介都要求；以实际申请清单为准。"
+        },
+        {
+          "before": "建议长度控制在 **100–150 字**，语言自然即可。",
+          "after": "篇幅按申请栏目的限制，用简短、真实的语言说明即可；没有统一字数要求。"
+        },
+        {
+          "before": "需要填写**过去两年的居住地址**。",
+          "after": "按实际申请表要求填写真实居住历史；所需年限可能不同。"
+        },
+        {
+          "before": "- 房东联系方式可填写父母信息，并由自己完成调查表",
+          "after": "- 如实说明曾与父母同住，先问中介接受什么证明；推荐人调查应由真实证明人独立完成，不冒充房东或替自己填写"
+        },
+        {
+          "before": "## 七、申请材料评分体系说明（平台通用逻辑）",
+          "after": "## 七、材料积分示例（不是统一门槛）"
+        },
+        {
+          "before": "多数平台采用**积分制材料审核**，常见结构如下：",
+          "after": "以下是原资料中的积分示例，不代表各平台目前的要求；实际分类、积分与必需文件以申请方清单为准。它也不是 QRent 的房源评分。"
+        },
+        {
+          "before": "### A 类主要文件（需至少 40 分）",
+          "after": "### A 类主要文件（原示例 40 分）"
+        },
+        {
+          "before": "### B 类辅助文件（需至少 40 分）",
+          "after": "### B 类辅助文件（原示例 40 分）"
+        },
+        {
+          "before": "### 收入证明（需至少 20 分）",
+          "after": "### 收入证明（原示例 20 分）"
+        },
+        {
+          "before": "第一次租房没有水电账单是常见情况，**只要在该类别内凑够分数即可，不必强行补齐某一项**。",
+          "after": "第一次租房可能没有水电账单；向中介确认真实可接受的替代材料，不假定凑够示例积分就能满足所有要求。"
+        },
+        {
+          "before": "Qrent 提供以下支持，帮助留学生更高效完成申请：\n\n- 可编辑的英文 Cover Letter 模板\n\n- available date 与申请时机提示\n\n- 区域均价分析，判断报价是否合理\n\n- AI 房源打分，评估竞争度与性价比",
+          "after": "QRent 当前可按学校、周租和通勤筛选，显示来源链接和已记录评分，并支持登录后收藏。本文的写信示例供参考；自动模板生成、区域均价面板、申请成功率预测及自动邮件提醒尚未开通。"
+        },
+        {
+          "before": "- 第一次租房不必焦虑材料不全，只需满足评分逻辑",
+          "after": "- 第一次租房可询问替代证明，以真实清单为准，不以示例积分推断获批"
+        }
+      ],
+      "en": [
+        {
+          "before": "| An available date is shown | You can submit an application immediately; most landlords want to confirm a tenant 2–3 weeks in advance |",
+          "after": "| An available date is shown | Check that applications remain open and the date suits you, then follow the agent’s process |"
+        },
+        {
+          "before": "| The available date is more than 1 month away | You can save the property and set a reminder first |",
+          "after": "| The available date is more than 1 month away | Save the listing and record the date yourself; automatic email alerts are not active |"
+        },
+        {
+          "before": "| The available date has passed | The property is usually already vacant, and you can apply at any time |",
+          "after": "| The available date has passed | A past date does not prove vacancy or availability; ask the agent to confirm |"
+        },
+        {
+          "before": "## III. Why Must You Write a Cover Letter for a Rental Application?",
+          "after": "## III. When Is a Cover Letter Needed?"
+        },
+        {
+          "before": "In the Australian rental process, **a Cover Letter (a rental introduction letter) is not merely a formality**.",
+          "after": "A cover letter can explain your circumstances, but not every platform or agent requires one. Follow the actual application checklist."
+        },
+        {
+          "before": "The recommended length is **100–150 characters**, using natural language.",
+          "after": "Use a short, truthful explanation within the application field’s limit; there is no universal word or character count."
+        },
+        {
+          "before": "You need to enter **your residential addresses for the past two years**.",
+          "after": "Provide truthful residential history for the period requested by the actual form; requirements vary."
+        },
+        {
+          "before": "- For the landlord's contact details, you can enter your parents' information and complete the questionnaire yourself",
+          "after": "- Explain truthfully that you lived with family and ask what evidence is accepted. A genuine referee should complete their own reference; do not pose as a landlord or write your own reference"
+        },
+        {
+          "before": "## VII. Explanation of the Application Document Scoring System (Common Platform Approach)",
+          "after": "## VII. Document Point Examples, Not Universal Thresholds"
+        },
+        {
+          "before": "Most platforms use **a points-based document review system**, commonly structured as follows:",
+          "after": "The following are point examples from the source, not current requirements across platforms. Check the actual checklist for categories, points and mandatory documents. These are separate from QRent’s property scores."
+        },
+        {
+          "before": "### Category A Primary Documents (At Least 40 Points Required)",
+          "after": "### Category A Primary Documents (Source Example: 40 Points)"
+        },
+        {
+          "before": "### Category B Supporting Documents (At Least 40 Points Required)",
+          "after": "### Category B Supporting Documents (Source Example: 40 Points)"
+        },
+        {
+          "before": "### Proof of Income (At Least 20 Points Required)",
+          "after": "### Proof of Income (Source Example: 20 Points)"
+        },
+        {
+          "before": "It is common not to have utility bills when renting for the first time. **As long as you reach the required points within that category, you do not need to force yourself to provide a particular item**.",
+          "after": "First-time renters may lack utility bills. Ask which genuine alternatives are accepted; meeting an example point total does not necessarily satisfy every requirement."
+        },
+        {
+          "before": "Qrent provides the following support to help international students complete applications more efficiently:\n\n- Editable English Cover Letter templates\n\n- Available date and application timing tips\n\n- Area average rent analysis to assess whether the asking price is reasonable\n\n- AI property scoring to assess competition and value for money",
+          "after": "QRent currently supports school, weekly-rent and commute filters, source links, recorded scores and signed-in favourites. Letter examples are reference material. Automatic template generation, an area-average dashboard, approval prediction and automatic email alerts are not active."
+        },
+        {
+          "before": "- First-time renters do not need to worry about not having every document; they only need to satisfy the scoring criteria",
+          "after": "- First-time renters can ask about alternative evidence; follow the actual checklist rather than inferring approval from example points"
+        }
+      ]
+    }
+  }
+}
