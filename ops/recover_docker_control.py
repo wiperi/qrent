@@ -50,7 +50,8 @@ def disk_snapshot(data_root=Path('/var/lib/docker/containers'),proc_root=Path('/
             host=json.loads((path.parent/'hostconfig.json').read_text())
             redis={'id':row.get('ID'),'running':state.get('Running'),
                    'manually_stopped':row.get('HasBeenManuallyStopped'),
-                   'restart_policy':host.get('RestartPolicy',{}).get('Name')}
+                   'restart_policy':host.get('RestartPolicy',{}).get('Name'),
+                   'start_error':redact_runtime_error(state.get('Error',''))}
             continue
         if state.get('Running'):
             identity=kernel_identity(state['Pid'],proc_root)
@@ -62,6 +63,16 @@ def disk_snapshot(data_root=Path('/var/lib/docker/containers'),proc_root=Path('/
     if not {'qrent-backend-1','qrent-db-1','n8n-n8n-1'}.issubset(names) or not redis:
         raise RuntimeError('The existing backend, database, n8n and Redis records are required')
     return rows,redis
+
+
+def redact_runtime_error(value):
+    value=re.sub(r'[a-zA-Z][a-zA-Z0-9+.-]*://\S+','[url]',str(value))
+    # Startup errors are diagnostic only. Discard the entire remaining message
+    # at a credential boundary, including schemes, spaces and multiline values.
+    sensitive=re.search(r'''(?i)(?:["']?)(?:password|requirepass|token|secret|authorization|api[\s_-]?key)(?:["']?)[\s=:]+|\bbearer\s+''',value)
+    if sensitive:value=value[:sensitive.end()]+'[redacted]'
+    value=re.sub(r'\b(?:sk-|SG\.)[A-Za-z0-9_.-]+','[redacted]',value)
+    return value[:1600]
 
 
 def restart_allowed(info,redis):
@@ -101,7 +112,7 @@ def verify_controller_unit(binary,args):
         raise RuntimeError('Containerd must remain independent of the controller restart')
 
 
-def runtime_diagnostics(proc_root=Path('/proc')):
+def runtime_diagnostics(proc_root=Path('/proc'),redis_id=None):
     """Read runtime ownership and service state without waiting on Docker locks."""
     report={'shims':[]}
     for process in proc_root.iterdir():
@@ -134,6 +145,21 @@ def runtime_diagnostics(proc_root=Path('/proc')):
             if len(parts)==3 and re.fullmatch('[a-f0-9]{64}',parts[0]) and parts[1].isdigit()
             and parts[2] in ('RUNNING','STOPPED','PAUSED','UNKNOWN','CREATED','PAUSING')]
     except (OSError,subprocess.SubprocessError):report['containerd_task_query_unavailable']=True
+    if re.fullmatch('[a-f0-9]{64}',redis_id or ''):
+        report['oci_states']=[]
+        for root in ('/run/docker/runtime-runc/moby','/run/runc'):
+            try:
+                answer=subprocess.run(['runc','--root',root,'state',redis_id],capture_output=True,text=True,timeout=5)
+                state=json.loads(answer.stdout) if answer.returncode==0 else {}
+                report['oci_states'].append({'root':root,'exit':answer.returncode,
+                    'status':state.get('status') if state.get('status') in ('created','creating','running','stopped','paused') else None,
+                    'pid':state.get('pid') if isinstance(state.get('pid'),int) else None})
+            except (OSError,ValueError,subprocess.SubprocessError):report['oci_states'].append({'root':root,'unavailable':True})
+        try:
+            answer=subprocess.run(['journalctl','-u','qrent-account-store.service','-n','15','--no-pager','--output=json'],capture_output=True,text=True,timeout=5,check=True)
+            messages=[json.loads(line).get('MESSAGE','') for line in answer.stdout.splitlines()]
+            report['start_errors']=[redact_runtime_error(message) for message in messages if str(message).startswith('Error response from daemon:')][-3:]
+        except (OSError,ValueError,subprocess.SubprocessError):report['start_error_log_unavailable']=True
     return report
 
 
@@ -177,7 +203,7 @@ def main(action='plan',root=None,data_root=Path('/var/lib/docker/containers'),pr
             'volumes_or_schema_changed':False}
     report['runtime_version']=(version or {}).get('Version')
     if action=='plan':
-        report['runtime']=runtime_diagnostics(proc_root)
+        report['runtime']=runtime_diagnostics(proc_root,redis['id'])
         try:
             _,binary,_,args=controller();verify_controller_unit(binary,args)
             report['unit_restart_eligible']=True

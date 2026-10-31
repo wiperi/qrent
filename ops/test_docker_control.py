@@ -33,6 +33,12 @@ class ControlRecoveryTests(unittest.TestCase):
         for changes in ({'running':True},{'manually_stopped':False},{'restart_policy':'always'}):
             self.assertFalse(control.restart_allowed({'LiveRestoreEnabled':True},{**self.redis,**changes}))
 
+    def test_runtime_error_redacts_urls_and_quoted_or_cli_credentials(self):
+        value=control.redact_runtime_error('failed redis://user:private-url@host "api_key": "private-key", --requirepass private-pass token=private-token sk-privatekey')
+        self.assertNotIn('private-',value);self.assertIn('failed',value)
+        for message in ('Authorization: Bearer example-token','--requirepass "example secret with spaces"','"password": "example secret,semicolon;still secret"','token: "example\nsecond line secret"'):
+            self.assertNotIn('example',control.redact_runtime_error(message));self.assertNotIn('secret',control.redact_runtime_error(message))
+
     def test_enable_preserves_all_other_daemon_options_and_sends_only_hup(self):
         config=self.root/'daemon.json';config.write_text(json.dumps({'log-driver':'json-file','unrelated':'retained'}))
         with patch.object(control,'controller',return_value=(123,Path('/usr/bin/dockerd'),config,[])),patch.object(control,'kernel_identity',return_value={'pid':123,'started':'same'}),patch.object(control.subprocess,'run',return_value=subprocess.CompletedProcess([],0)),patch.object(control.os,'pidfd_open',return_value=999,create=True),patch.object(control.os,'close'),patch.object(control.signal,'pidfd_send_signal',create=True) as send,patch.object(control,'api',return_value={'LiveRestoreEnabled':True}):
