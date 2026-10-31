@@ -49,14 +49,14 @@ the existing managed worktree and release through the original GitHub CI/CD.
 - [x] Frontend: unify token storage/hydration/cross-tab events and account cache
       invalidation. Add a basic account page for existing email verification and a
       capability check that disables mail-dependent actions when unavailable.
-- [ ] Offline verification: mock Prisma, Redis and mail; test mass assignment,
+- [x] Offline verification: mock Prisma, Redis and mail; test mass assignment,
       profile output, revoked/expired sessions, rate caps, wrong/expired/reused codes,
       storage hydration and switching accounts. Run scoped regressions, type checks,
       build and phone/desktop interactions. No production test database operations.
-- [ ] Domain: capture public authoritative NS, A/CNAME, MX/SPF/DMARC, HTTPS and
+- [x] Domain: capture public authoritative NS, A/CNAME, MX/SPF/DMARC, HTTPS and
       registrar expiry evidence. Document Cloudflare as current DNS authority and
       mail authentication/OAuth callback requirements for a later template migration.
-- [ ] Release through a GitHub PR, required CI and production deployment receipts;
+- [x] Release through a GitHub PR, required CI and production deployment receipts;
       verify public pages, anonymous authorization and account capability endpoints.
       Check the already-running crawler independently without restarting it.
 
@@ -68,3 +68,11 @@ Redis/mail must fail without false success or production data loss.
 
 ShipAny reference (read-only):
 `/Users/zhiyang/Desktop/新项目集合/shipany-账户支付模板/shipany-tanstack/src/core/auth/`.
+
+
+Production acceptance completed: backend API checks (22) and isolated browser
+login/reload/logout passed. Frontend PR #306 production deployment 7452571824 and
+main CI 41156712959 passed. New verification email remains intentionally disabled
+because no valid included quota was established; no real email, model/maps call
+or paid service was used. See the matching maintenance report for exact boundaries
+and preserved Redis recovery receipts.

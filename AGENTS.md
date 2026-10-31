@@ -14,3 +14,22 @@ Frontend changes also go through the original GitHub repository. Verify the orig
 SEO regressions live in `packages/frontend/test/seo/`; they are isolated from the older Vitest setup that uses a database. `seo-gate.config.json` configures the owner's `fisher-byte/site-audit-zyppy` toolkit. Audit canonical URLs on `https://www.qrent.rent`, actual published-language articles, and the link graph. Keep fixed school discovery paths separate from noindex filter/search URLs. Dynamic blog 404 initial HTML has a known upstream Next.js limitation (issue #100596); verify HTTP 404/noindex and real browser recovery separately, and do not claim a no-JS article-error page passed.
 
 Published guides are versioned Chinese/English pairs in `packages/frontend/src/content/guides/`, exported from the ten public Notion source pages. Guide updates now require both full bodies in the same PR; Notion edits do not hot-publish to the website. Keep source IDs, body hashes and original publication dates; record the paired publication review time separately. CI checks pair coverage, body identity and stale translations. No request-time translation or paid model calls belong in the guide reader.
+
+The original Redis container is now supervised by `qrent-account-store.service`.
+Its Docker restart policy is `no`; the unit verifies the private Redis port guard
+before attaching to the existing container. Use that service for Redis lifecycle
+operations so the guard runs before startup. MySQL/n8n/Docker startup do not depend
+on this Qrent guard. Its current rules cover the fixed host addresses; regenerate
+and verify them before any future host-address change. Never expose port 6379 to
+the public network.
+
+Production recovery entry points are the manually dispatched
+`account-store-recovery.yml`, `backend-control-recovery.yml`, `backend-inspect.yml`
+and `backend-capacity.yml`, using the existing original-repository environment
+Secrets. Start with their read-only plans. Keep permanent attempt markers and
+private backup receipts; never replay an uncertain process/runtime repair. The
+2026-10-31 stale runtime bundle is retained in the private `/run` quarantine; this
+is temporary OCI metadata, separate from the original preserved Redis data volume.
+Do not follow its `work` symlink or remove a runtime path containing active mounts.
+Docker live restore is enabled; that alone never authorizes restarting Docker or
+any business container without the checked recovery prerequisites.
