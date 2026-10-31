@@ -1,5 +1,6 @@
 """Exercise account-store repair against private temporary files, never Docker/network."""
 import copy
+import hashlib
 import importlib.util
 import json
 from pathlib import Path
@@ -116,6 +117,52 @@ class StoreRecoveryTests(unittest.TestCase):
         with patch.object(store.subprocess,'run',return_value=subprocess.CompletedProcess([],0)) as run:
             store.repair_process(stopped,start=True)
             self.assertEqual(run.call_args.args[0],['systemctl','start','qrent-account-store.service'])
+
+    def setup_reconciled_orphan(self):
+        deploy=self.root/'.deploy';(deploy/'receipts').mkdir(parents=True);(deploy/'backups').mkdir()
+        identity='a'*64;backup=deploy/'backups/original.tar.gz';backup.write_bytes(b'original private backup')
+        digest=hashlib.sha256(backup.read_bytes()).hexdigest();proc=self.root/'proc';business={};tasks=[]
+        for index in range(3):
+            key=chr(ord('b')+index)*64;pid=11+index;parent=501+index;started=str(100+index)
+            directory=proc/str(pid);directory.mkdir(parents=True);fields=['S',str(parent)]+['0']*18;fields[19]=started
+            (directory/'stat').write_text(str(pid)+' (business) '+' '.join(fields))
+            business[key]={'init':{'pid':pid,'parent':parent,'started':started}};tasks.append(key+' '+str(pid)+' RUNNING')
+        (deploy/'receipts/account-store-20261031.json').write_text(json.dumps({'candidate':{'id':identity,'data_source':str(self.volume)},'backup_path':str(backup),'backup_sha256':digest}))
+        (deploy/'receipts/account-orphan-100-1000.json').write_text(json.dumps({'original_store_id':identity,
+            'status':'signal_sent_requires_service_verification','shim_frozen_before_termination':True,
+            'business_processes_preserved_before_signal':True,'shim':{'pid':100,'started':'1000'},
+            'init':{'pid':123,'started':'1230'},'business_processes':business,'backup_sha256':digest}))
+        state={**self.state,'id':identity,'running':False,'status':'exited','pid':0,'exit_code':128,'process_state':'unknown'}
+        return state,proc,'TASK PID STATUS\n'+'\n'.join(tasks)
+
+    def test_exit_128_resume_requires_orphan_absence_and_preserved_business_tasks(self):
+        state,proc,tasks=self.setup_reconciled_orphan()
+        self.assertFalse(store.eligible_start(state));self.assertTrue(store.eligible_resume(state))
+        with patch.object(store,'command',return_value=tasks):
+            proof=store.orphan_cleared(self.root,state,proc)
+        self.assertTrue(proof['runtime_task_absent'])
+        with patch.object(store,'command',return_value=tasks+'\n'+state['id']+' 123 RUNNING'):
+            with self.assertRaisesRegex(RuntimeError,'Unexpected runtime'):store.orphan_cleared(self.root,state,proc)
+
+    def test_uncertain_old_process_or_prior_resume_marker_blocks_replay(self):
+        state,proc,tasks=self.setup_reconciled_orphan();directory=proc/'100';directory.mkdir()
+        fields=['S','1']+['0']*18;fields[19]='1000';(directory/'stat').write_text('100 (old shim) '+' '.join(fields))
+        with patch.object(store,'command',return_value=tasks):
+            with self.assertRaisesRegex(RuntimeError,'still present'):store.orphan_cleared(self.root,state,proc)
+            (directory/'stat').unlink();proof=store.orphan_cleared(self.root,state,proc)
+            Path(proof['attempt_marker']).write_text('{}')
+            with self.assertRaisesRegex(RuntimeError,'do not repeat'):store.orphan_cleared(self.root,state,proc)
+
+    def test_resume_applies_once_with_a_new_backup_and_same_guarded_service(self):
+        state,proc,tasks=self.setup_reconciled_orphan()
+        with patch.object(store,'command',return_value=tasks):proof=store.orphan_cleared(self.root,state,proc)
+        before=copy.deepcopy(self.before);before[-1][0]=state['id'];before[-1][2]=0
+        after=copy.deepcopy(before);after[-1][2:4]=[456,'new']
+        with patch.object(store,'container_rows',side_effect=[before,after]),patch.object(store,'redis_state',return_value=state),patch.object(store,'orphan_cleared',return_value=proof),patch.object(store,'guard_public_ports',return_value={'persistent':True}),patch.object(store,'repair_process') as repair,patch.object(store,'local_ping',return_value=True):
+            report=store.main('resume-apply',self.root,proc)
+        repair.assert_called_once_with(state,start=True,resume=True)
+        self.assertEqual(report['status'],'verified');self.assertTrue(Path(proof['attempt_marker']).exists())
+        self.assertEqual((self.volume/'dump.rdb').read_bytes(),b'original-redis-state')
 
     def test_start_guards_public_ports_before_any_container_start(self):
         stopped={**self.state,'running':False,'status':'exited','pid':0,'process_state':'unknown'}

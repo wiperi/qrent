@@ -54,6 +54,48 @@ def eligible_start(state):
     return state['running'] is False and state['status']=='exited' and state['pid']==0 and state['exit_code']==0
 
 
+def eligible_resume(state):
+    return state['running'] is False and state['status']=='exited' and state['pid']==0 and state['exit_code']==128
+
+
+def orphan_cleared(root,state,proc_root=Path('/proc')):
+    paths=sorted((root/'.deploy/receipts').glob('account-orphan-*.json'),key=lambda path:path.stat().st_mtime_ns,reverse=True)
+    if not paths:raise RuntimeError('A verified orphan recovery receipt is required')
+    recovery=json.loads(paths[0].read_text())
+    if (recovery.get('original_store_id')!=state['id'] or recovery.get('status')!='signal_sent_requires_service_verification'
+            or recovery.get('shim_frozen_before_termination') is not True
+            or recovery.get('business_processes_preserved_before_signal') is not True):
+        raise RuntimeError('Original orphan recovery is not verified')
+    for name in ('init','shim'):
+        previous=recovery[name];path=proc_root/str(previous['pid'])/'stat'
+        if path.exists() and path.read_text().rpartition(')')[2].split()[19]==previous['started']:
+            raise RuntimeError('The old orphan process is still present')
+    tasks=command('ctr','--address','/run/containerd/containerd.sock','--namespace','moby','tasks','list')
+    ids=set()
+    for line in tasks.splitlines():
+        values=line.split()
+        if values and values[0]=='TASK':continue
+        if len(values)!=3 or not re.fullmatch('[a-f0-9]{64}',values[0]) or not values[1].isdigit() or values[2]!='RUNNING':
+            raise RuntimeError('Runtime task inventory is uncertain')
+        identity=values[0];ids.add(identity)
+        if identity not in recovery['business_processes']:raise RuntimeError('Unexpected runtime task after orphan recovery')
+        previous=recovery['business_processes'][identity]['init']
+        fields=(proc_root/values[1]/'stat').read_text().rpartition(')')[2].split()
+        if (int(values[1])!=previous['pid'] or int(fields[1])!=previous['parent']
+                or fields[19]!=previous['started'] or fields[0] not in ('S','R','D','I')):
+            raise RuntimeError('A business process changed since orphan recovery')
+    if ids!=set(recovery['business_processes']):raise RuntimeError('Runtime tasks have not fully reconciled')
+    backups=sorted((root/'.deploy/receipts').glob('account-store-*.json'),reverse=True)
+    previous=json.loads(backups[0].read_text());backup=Path(previous.get('backup_path',''))
+    if (previous['candidate']['id']!=state['id'] or previous['candidate'].get('data_source')!=state['data_source']
+            or backup.is_symlink() or root/'.deploy/backups' not in backup.resolve().parents
+            or hashlib.sha256(backup.read_bytes()).hexdigest()!=recovery.get('backup_sha256')):
+        raise RuntimeError('Original pre-orphan backup differs')
+    marker=root/'.deploy/receipts'/('account-resume-'+str(recovery['shim']['pid'])+'-'+recovery['shim']['started']+'.json')
+    if marker.exists():raise RuntimeError('This reconciled orphan already has a resume attempt; do not repeat')
+    return {'orphan_receipt':paths[0].name,'attempt_marker':str(marker),'runtime_task_absent':True}
+
+
 def public_port_rules(ports,interfaces):
     addresses=[]
     for interface in interfaces:
@@ -150,8 +192,8 @@ def preserve_rows(before,after,identity):
     return normalized(before)==normalized(after)
 
 
-def repair_process(state,start=False):
-    if not (eligible_start(state) if start else eligible(state)):
+def repair_process(state,start=False,resume=False):
+    if not (eligible_resume(state) if resume else eligible_start(state) if start else eligible(state)):
         raise RuntimeError('Only a confirmed stopped/exited Redis process is eligible')
     args=(['systemctl','start','qrent-account-store.service'] if start else
           ['docker','kill','--signal','CONT',state['id']] if state['process_state']=='T'
@@ -180,21 +222,31 @@ def volume_signature(source):
 
 
 def main(action='plan',root=None,proc_root=Path('/proc')):
-    if action not in ('plan','apply','start-plan','start-apply'): raise ValueError('Invalid account-store recovery action')
-    start=action.startswith('start-')
+    if action not in ('plan','apply','start-plan','start-apply','resume-plan','resume-apply'): raise ValueError('Invalid account-store recovery action')
+    resume=action.startswith('resume-');start=action.startswith('start-') or resume
     os.umask(0o077)
     root=root or Path.home()/'qrent'
     protected={p:hashlib.sha256(p.read_bytes()).digest() for p in (root/'.env',root/'docker-compose.yml')}
     before=container_rows(); state=redis_state(proc_root)
-    qualified=eligible_start(state) if start else eligible(state)
+    proof=orphan_cleared(root,state,proc_root) if resume else None
+    qualified=eligible_resume(state) if resume else eligible_start(state) if start else eligible(state)
     report={'action':action,'status':'planned','candidate':state,'eligible':qualified,
             'database_schema_changed':False,'data_deleted':False,'other_containers_restarted':False}
+    if resume:report['reconciled_orphan']=proof
     if action.endswith('plan'): print(json.dumps(report)); return report
     if not qualified: raise RuntimeError('Redis process does not meet the bounded repair condition')
     (root/'.deploy/receipts').mkdir(parents=True,exist_ok=True)
     with (root/'.deploy/backend.lock').open('a') as lock:
         fcntl.flock(lock,fcntl.LOCK_EX|fcntl.LOCK_NB)
         if redis_state(proc_root)!=state: raise RuntimeError('Account-store state changed; inspect again')
+        if resume:
+            if orphan_cleared(root,state,proc_root)!=proof:raise RuntimeError('Orphan reconciliation changed before resume')
+            with Path(proof['attempt_marker']).open('x') as stream:
+                json.dump({'status':'resume_attempt_started','original_store_id':state['id'],**proof},stream)
+                stream.flush();os.fsync(stream.fileno())
+            directory=os.open(Path(proof['attempt_marker']).parent,os.O_RDONLY|os.O_DIRECTORY)
+            try:os.fsync(directory)
+            finally:os.close(directory)
         stamp=datetime.now(timezone.utc).strftime('%Y%m%dT%H%M%S%fZ')
         receipt=root/'.deploy/receipts'/('account-store-'+stamp+'.json')
         try:
@@ -221,7 +273,8 @@ def main(action='plan',root=None,proc_root=Path('/proc')):
             report.update(backup_path=str(backup),backup_sha256=digest.hexdigest(),
                           status='repair_attempt_started')
             receipt.write_text(json.dumps(report,indent=2))
-            if start: repair_process(state,start=True)
+            if resume: repair_process(state,start=True,resume=True)
+            elif start: repair_process(state,start=True)
             else: repair_process(state)  # Exactly one scoped action; never recreate the container.
             for attempt in range(6):
                 if local_ping(state['id']): break
