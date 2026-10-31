@@ -13,6 +13,7 @@ import { isLocale } from '@qrent/shared/utils/helper';
 import { setRequestLocale } from 'next-intl/server';
 import { notFound, permanentRedirect } from 'next/navigation';
 import { canonicalGuideSlug } from '@/lib/guide-routes';
+import { guideReviewedAt } from '@/lib/guide-review';
 
 interface PageProps {
   params: Promise<{ locale: string; slug: string }>;
@@ -64,6 +65,7 @@ export default async function BlogPostPage({ params }: PageProps) {
         post={result.post as NotionBlogPost}
         blocks={result.blocks as NotionBlock[]}
         relatedPosts={relatedPosts as NotionBlogPost[]}
+        reviewedAt={guideReviewedAt(slug)}
       />
       <RentalLinks locale={locale} compact />
       <script

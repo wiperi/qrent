@@ -10,6 +10,7 @@ import { canonicalGuideSlug, translatedGuidePath } from '../../src/lib/guide-rou
 import { sitemapEntries } from '../../src/lib/seo';
 import MarkdownGuide from '../../src/components/MarkdownGuide';
 import { mainGuideBody } from '../../src/lib/guide-body';
+import { reviewedGuideBody } from '../../src/lib/guide-review';
 
 const root = new URL('../../src/content/guides/', import.meta.url);
 
@@ -57,7 +58,14 @@ test('every source has exactly one complete Chinese body and its reviewed Englis
       assert.equal(entry.post.title_en, en.title);
       assert.equal(
         entry.blocks[0].content,
-        mainGuideBody(language === 'zh' ? zh.content : en.content)
+        mainGuideBody(
+          reviewedGuideBody(
+            source.slug,
+            language as 'zh' | 'en',
+            source.sourceHash,
+            language === 'zh' ? zh.content : en.content
+          )
+        )
       );
       const html = renderToStaticMarkup(<MarkdownGuide content={entry.blocks[0].content} />);
       assert.ok(html.length > 1000);

@@ -13,12 +13,14 @@ interface NotionBlogContentProps {
   post: NotionBlogPost;
   blocks: NotionBlock[];
   relatedPosts?: NotionBlogPost[];
+  reviewedAt?: string;
 }
 
 export default function NotionBlogContent({
   post,
   blocks,
   relatedPosts = [],
+  reviewedAt,
 }: NotionBlogContentProps) {
   const locale = useLocale();
   const t = useTranslations('Blog');
@@ -59,6 +61,12 @@ export default function NotionBlogContent({
             <div className="flex items-center">
               <span className="text-slate-500">{t('author')}</span>
             </div>
+            {reviewedAt && (
+              <p className="text-sm text-slate-500">
+                {locale === LOCALE.ZH ? '内容核对：' : 'Content reviewed: '}
+                <time dateTime={reviewedAt}>{formatDate(reviewedAt)}</time>
+              </p>
+            )}
           </div>
 
           {/* 关键词标签 */}
