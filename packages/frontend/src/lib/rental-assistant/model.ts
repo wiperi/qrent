@@ -4,9 +4,18 @@ import { createOpenAICompatible } from '@ai-sdk/openai-compatible';
 import ipaddr from 'ipaddr.js';
 import { Agent } from 'undici';
 import { z } from 'zod';
+import { modelPresets, modelProviders } from './presets';
+
+const apiKey = z
+  .string()
+  .trim()
+  .min(1)
+  .max(1024)
+  .regex(/^[\x21-\x7e]+$/);
 
 export const modelConnection = z.discriminatedUnion('type', [
   z.object({ type: z.literal('local') }),
+  z.object({ type: z.literal('preset'), provider: z.enum(modelProviders), apiKey }),
   z.object({
     type: z.literal('compatible'),
     baseUrl: z.string().trim().max(400).url(),
@@ -16,12 +25,7 @@ export const modelConnection = z.discriminatedUnion('type', [
       .min(1)
       .max(150)
       .regex(/^[\w.:/@-]+$/),
-    apiKey: z
-      .string()
-      .trim()
-      .min(1)
-      .max(1024)
-      .regex(/^[\x21-\x7e]+$/),
+    apiKey,
   }),
 ]);
 
@@ -29,8 +33,10 @@ export class ModelConnectionError extends Error {}
 
 export async function connectModel(connection: z.infer<typeof modelConnection>) {
   const local = connection.type === 'local';
-  const rawUrl = local ? process.env.QRENT_LOCAL_MODEL_URL : connection.baseUrl;
-  const modelId = local ? process.env.QRENT_LOCAL_MODEL_NAME : connection.model;
+  const preset = connection.type === 'preset' ? modelPresets[connection.provider] : undefined;
+  const configured = connection.type === 'compatible' ? connection : preset;
+  const rawUrl = local ? process.env.QRENT_LOCAL_MODEL_URL : configured?.baseUrl;
+  const modelId = local ? process.env.QRENT_LOCAL_MODEL_NAME : configured?.model;
   const url = rawUrl && URL.canParse(rawUrl) ? new URL(rawUrl) : undefined;
   if (!url || !modelId || url.username || url.password || url.search || url.hash)
     throw new ModelConnectionError();
@@ -84,6 +90,7 @@ export async function connectModel(connection: z.infer<typeof modelConnection>) 
       return fetch(input, options);
     },
     transformRequestBody: body => {
+      if (preset) return { ...body, ...preset.options };
       if (url.hostname !== 'api.openai.com' || !('max_tokens' in body)) return body;
       const { max_tokens, ...rest } = body;
       return { ...rest, max_completion_tokens: max_tokens };

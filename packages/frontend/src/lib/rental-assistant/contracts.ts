@@ -1,3 +1,5 @@
+import type { ModelProvider } from './presets';
+
 export type ListingExample = {
   id: number;
   address: string;
@@ -36,6 +38,7 @@ export type AssistantEvidence =
 
 export type ModelConnection =
   | { type: 'local' }
+  | { type: 'preset'; provider: ModelProvider; apiKey: string }
   | { type: 'compatible'; baseUrl: string; model: string; apiKey: string };
 
 export type ChatReply = { answer: string; evidence: AssistantEvidence[] };

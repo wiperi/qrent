@@ -74,7 +74,7 @@
   gap: 7px;
 }
 .emailFields input,
-.settings :is(input, select) {
+.modelKey input {
   width: 100%;
   min-width: 0;
   min-height: 42px;
@@ -86,7 +86,7 @@
   font-size: 16px;
 }
 .emailFields input::placeholder,
-.settings input::placeholder,
+.modelKey input::placeholder,
 .composer textarea::placeholder {
   color: var(--muted);
   opacity: 1;
@@ -233,20 +233,56 @@
 .settings h2 {
   font-weight: 650;
 }
-.settings label {
+.providerOptions {
   display: grid;
-  gap: 5px;
+  grid-template-columns: repeat(auto-fit, minmax(90px, 1fr));
+  gap: 8px;
+}
+.providerOption {
+  position: relative;
   min-width: 0;
+}
+.providerOption input {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  opacity: 0;
+}
+.providerOption span {
+  display: grid;
+  place-items: center;
+  min-height: 44px;
+  padding: 5px 8px;
+  border: 1px solid #cbd5e1;
+  border-radius: 8px;
+  background: #fff;
+  color: #244780;
+  font-size: 13px;
+  font-weight: 600;
+  text-align: center;
+  cursor: pointer;
+}
+.providerOption input:checked + span {
+  border-color: var(--blue);
+  background: #eaf2ff;
+  color: #1e40af;
+}
+.providerOption input:focus-visible + span {
+  outline: 2px solid var(--blue);
+  outline-offset: 2px;
+}
+.providerOption input:disabled + span {
+  opacity: 0.65;
+  cursor: default;
+}
+.modelKey {
+  display: grid;
+  gap: 6px;
   font-size: 13px;
   font-weight: 600;
 }
-.settings > label {
-  width: min(100%, 310px);
-}
-.settingsFields {
-  display: grid;
-  grid-template-columns: 1.25fr 1fr 1fr;
-  gap: 12px;
+.settings > .primary {
+  justify-self: start;
 }
 .settingsFoot {
   display: flex;
@@ -254,6 +290,12 @@
   gap: 8px 14px;
   align-items: center;
   justify-content: space-between;
+}
+.settingsFoot a {
+  color: #1e40af;
+  font-size: 13px;
+  text-underline-offset: 3px;
+  text-decoration: underline;
 }
 .settingsFoot p {
   color: var(--muted);
@@ -570,9 +612,6 @@ a.sourceTitle:hover,
   .assistantHeader p {
     font-size: 14px;
   }
-  .settingsFields {
-    grid-template-columns: 1fr;
-  }
   .conversation {
     min-height: 278px;
     max-height: max(292px, 55vh);
@@ -607,7 +646,11 @@ a.sourceTitle:hover,
   font-weight: 650;
   cursor: pointer;
 }
-.floatingLauncher:hover {
+.floatingLauncher:disabled,
+.assistantLink:disabled {
+  cursor: wait;
+}
+.floatingLauncher:hover:enabled {
   background: var(--color-blue-700, #1447e6);
 }
 .floatingLauncher:focus-visible {
@@ -684,19 +727,14 @@ a.sourceTitle:hover,
   min-height: 40px;
 }
 .assistantWindow .settings {
-  flex-shrink: 1;
+  flex: 1;
+  align-content: start;
   min-height: 0;
-  max-height: 53%;
   overflow: auto;
   margin: 0;
   border: 0;
-  border-bottom: 1px solid var(--line);
   border-radius: 0;
-  padding: 12px 14px;
-}
-.assistantWindow .settingsFields {
-  grid-template-columns: 1fr;
-  gap: 8px;
+  padding: 16px;
 }
 .assistantWindow .chat {
   display: flex;

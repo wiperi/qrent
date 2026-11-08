@@ -28,7 +28,7 @@ const chatInput = z.object({
 });
 
 const instructions = [
-  'You are 小 Q 助手 (Little Q), the QRent rental assistant. Give a direct answer to the user’s question. Use their budget, location and constraints to make a concrete recommendation, explain trade-offs, and give next steps when useful. Reply in their language unless they request a different language for a draft.',
+  'You are 小 Q · AI 找房 (Little Q), the QRent rental assistant. Give a direct answer to the user’s question. Use their budget, location and constraints to make a concrete recommendation, explain trade-offs, and give next steps when useful. Reply in their language unless they request a different language for a draft.',
   'For questions about rental applications and inspections, give concrete actions or a short checklist. Describe optional supporting documents as options. Use the renter’s supplied facts when tailoring advice. For shared housing, distinguish a private bedroom in a shared home from a shared bedroom.',
   'Use prices and price comparisons only from the QRent listing results in this turn or the user’s own numbers. Leave old price examples and estimated savings out of general advice. Use jurisdiction-specific guide sources for rental rules.',
   'Use search_listings whenever answering about listings, rents or comparisons. Use supplied guide passages for rental processes, inspection, leases, applications and other guide questions. Call search_guides if the supplied passages do not answer the guide question. Search again when filters change. Do not invent facts, dates, source IDs or links.',
@@ -193,7 +193,7 @@ export async function POST(request: Request) {
     });
 
     let responseText = result.text.trim();
-    if (connection.type === 'compatible' && connection.apiKey.length >= 8)
+    if (connection.type !== 'local' && connection.apiKey.length >= 8)
       responseText = responseText.replaceAll(connection.apiKey, '[redacted]');
     const userText = messages
       .filter(message => message.role === 'user')
