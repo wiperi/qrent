@@ -19,6 +19,7 @@ import type { ChatReply } from '@/lib/rental-assistant/contracts';
 import { modelPresets, modelProviders } from '@/lib/rental-assistant/presets';
 import { useRentalSession, type RentalTurn } from '@/lib/rental-assistant/session';
 import RentalAssistantSources from './RentalAssistantSources';
+import RentalReplyActions from './RentalReplyActions';
 import styles from '@/styles/rental-tools.module.css';
 
 function latestSearch(turns: RentalTurn[]) {
@@ -54,6 +55,10 @@ const errorMessages: Record<string, [string, string]> = {
   ],
   rate_limit: ['请求较多，请稍后再试。', 'Too many requests. Try again in a moment.'],
   invalid_key: ['请输入完整的 API Key。', 'Enter a valid API key.'],
+  history_unavailable: [
+    '暂时无法保存这条对话。请稍后再试。',
+    'This conversation could not be saved. Try again later.',
+  ],
   provider_limit: [
     '模型服务达到请求或额度上限，请稍后重试。',
     'Your provider reached a request or quota limit. Try again later.',
@@ -189,8 +194,9 @@ export default function RentalAssistant({
       showSettings(true);
       return;
     }
-    const controller = beginTurn(question);
-    if (!controller) return;
+    const turn = beginTurn(question);
+    if (!turn) return;
+    const { controller, sessionId } = turn;
     try {
       const messages = turns
         .slice(-3)
@@ -199,10 +205,21 @@ export default function RentalAssistant({
           ...(reply.answer ? [{ role: 'assistant', content: reply.answer }] : []),
         ]);
       messages.push({ role: 'user', content: question });
+      const { apiKey, ...model } =
+        connection.type === 'local' ? { ...connection, apiKey: undefined } : connection;
       const response = await fetch('/api/rental-assistant/chat', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ locale, connection, messages, previousSearch: latestSearch(turns) }),
+        headers: {
+          'Content-Type': 'application/json',
+          ...(apiKey ? { Authorization: 'Bearer ' + apiKey } : {}),
+        },
+        body: JSON.stringify({
+          locale,
+          sessionId,
+          connection: model,
+          messages,
+          previousSearch: latestSearch(turns),
+        }),
         signal: controller.signal,
       });
       const result = await response.json();
@@ -211,7 +228,7 @@ export default function RentalAssistant({
         setDraft(question);
         return;
       }
-      addTurn({ question, reply: result });
+      addTurn({ id: result.reviewId ?? crypto.randomUUID(), question, reply: result });
     } catch {
       if (!controller.signal.aborted) setError('model_unavailable');
       setDraft(question);
@@ -261,6 +278,7 @@ export default function RentalAssistant({
         {!!reply.evidence.length && (
           <RentalAssistantSources sources={reply.evidence} anchor={anchor} locale={locale} />
         )}
+        <RentalReplyActions reply={reply} zh={zh} />
       </div>
     );
   }
@@ -445,7 +463,7 @@ export default function RentalAssistant({
             ) : (
               <ol className={styles.thread}>
                 {turns.map((turn, index) => (
-                  <li key={index}>
+                  <li key={turn.id}>
                     <p className={styles.userQuestion}>{turn.question}</p>
                     {showReply(turn.reply, index)}
                   </li>
@@ -469,10 +487,28 @@ export default function RentalAssistant({
               void send(draft);
             }}
           >
+            <p className={styles.historyNotice}>
+              {zh
+                ? '问答经脱敏后用于排查回答质量，在线记录最多保留 30 天。API Key 仅用于当前标签页的模型连接。'
+                : 'Redacted chats are kept online for up to 30 days for quality review. Your API key is used for model requests in this tab.'}
+            </p>
             {error && (
-              <p role="alert" className={styles.chatError}>
-                {(errorMessages[error] ?? errorMessages.model_unavailable)[zh ? 0 : 1]}
-              </p>
+              <div className={styles.composerError}>
+                <p role="alert" className={styles.chatError}>
+                  {(errorMessages[error] ?? errorMessages.model_unavailable)[zh ? 0 : 1]}
+                </p>
+                {['timeout', 'model_unavailable', 'empty_answer'].includes(error) &&
+                  draft.trim() && (
+                    <button type="button" onClick={() => void send(draft)}>
+                      {zh ? '重试' : 'Retry'}
+                    </button>
+                  )}
+                {['provider_key', 'provider_model', 'invalid_connection'].includes(error) && (
+                  <button type="button" onClick={() => showSettings(true)}>
+                    {zh ? '检查模型设置' : 'Check model settings'}
+                  </button>
+                )}
+              </div>
             )}
             <div className={styles.composerInput}>
               <textarea

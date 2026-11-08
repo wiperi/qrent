@@ -46,4 +46,5 @@ export type ChatReply = {
   answer: string;
   evidence: AssistantEvidence[];
   search?: ListingInput;
+  reviewId?: string;
 };
