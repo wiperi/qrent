@@ -64,6 +64,7 @@ app.use(morgan('dev'));
 /////////////////////////////////////////////////////////////////////
 
 import rentalLetterRoutes from './routes/rentalLetter';
+import rentalAlertRoutes from './routes/rentalAlerts';
 
 // Mount tRPC before global authenticate so public procedures can be accessed
 app.use(
@@ -74,6 +75,7 @@ app.use(
   })
 );
 
+app.use('/api/rental-alerts', rentalAlertRoutes);
 app.use(authenticate);
 app.use('/api/generate-rental-letter', rentalLetterRoutes);
 app.use('/', router);
