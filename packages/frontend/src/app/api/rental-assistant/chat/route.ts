@@ -7,7 +7,7 @@ import { explicitRentCeiling, listingInput, searchListings } from '@/lib/rental-
 import { connectModel, modelConnection, ModelConnectionError } from '@/lib/rental-assistant/model';
 import { rentalLocale, rentalPostError, readRentalJson } from '@/lib/rental-request';
 import { reserveAssistantTurn } from '@/lib/rental-assistant/traffic';
-import { RENTAL_SCHOOLS } from '@/lib/rental-schools';
+import { areaName, RENTAL_SCHOOLS } from '@/lib/rental-schools';
 
 export const maxDuration = 60;
 
@@ -90,10 +90,15 @@ export async function POST(request: Request) {
   const commuteRequested =
     /通勤|公交|公共交通|地铁|火车|\b(?:commute|transit|transport|bus|train)\b/i.test(question);
   const rentCeiling = explicitRentCeiling(question);
-  const followUp = !intent.guideQuery && filterChange.test(question);
+  const followUp = !intent.guideQuery && (filterChange.test(question) || rentCeiling !== undefined);
   const prior = followUp ? previousSearch : undefined;
   const { guideQuery } = intent;
   const requireListings = intent.requireListings || Boolean(prior);
+  const listingLookup = {
+    requested: requireListings,
+    failed: false,
+    failedAreas: [] as string[],
+  };
   const deadline = AbortSignal.timeout(connection.type === 'local' ? 110_000 : 52_000);
   const signal = AbortSignal.any([request.signal, deadline]);
   function lookupGuides(query: string) {
@@ -115,6 +120,7 @@ export async function POST(request: Request) {
   const release = reserveAssistantTurn(request);
   if (!release) return errorResponse('rate_limit', 429);
   let listingCalls = 0;
+  let search: ChatReply['search'];
   let guideCalls = 0;
   let model: Awaited<ReturnType<typeof connectModel>> | undefined;
   try {
@@ -156,12 +162,23 @@ export async function POST(request: Request) {
           inputSchema: listingInput,
           execute: async input => {
             if (++listingCalls > 1) return { error: 'Use the first listing search result.' };
+            listingLookup.requested = true;
             const effective = { ...prior, ...input };
             if (rentCeiling !== undefined) effective.maxRent = rentCeiling;
             const found = await searchListings(effective, locale, signal);
-            if ('error' in found) return found;
+            if ('error' in found) {
+              listingLookup.failed = true;
+              return found;
+            }
+            search = effective;
             return found.regions.map(region => {
-              if ('error' in region) return region;
+              if ('error' in region) {
+                listingLookup.failed = true;
+                if (region.suburb) listingLookup.failedAreas.push(areaName(region.suburb));
+                else if ('school' in region && region.school)
+                  listingLookup.failedAreas.push(region.school);
+                return region;
+              }
               const id = 'R' + (1 + evidence.filter(item => item.kind === 'listings').length);
               evidence.push({ ...region, id, kind: 'listings' });
               return {
@@ -199,9 +216,9 @@ export async function POST(request: Request) {
       .filter(message => message.role === 'user')
       .map(message => message.content)
       .join(' ');
-    const answer = formatRentalAnswer(responseText, evidence, locale, userText);
+    const answer = formatRentalAnswer(responseText, evidence, locale, userText, listingLookup);
     if (!answer && !evidence.length) return errorResponse('empty_answer', 502);
-    const reply: ChatReply = { answer: answer.slice(0, 3500), evidence };
+    const reply: ChatReply = { answer: answer.slice(0, 3500), evidence, search };
     return Response.json(reply, { headers: { 'Cache-Control': 'no-store' } });
   } catch (error) {
     if (deadline.aborted) return errorResponse('timeout', 504);

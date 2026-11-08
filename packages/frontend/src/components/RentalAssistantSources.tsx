@@ -52,8 +52,8 @@ export default function RentalAssistantSources({
               <p>
                 {source.matches === null
                   ? zh
-                    ? '已找到区域样本'
-                    : 'Examples from this area'
+                    ? '匹配数量暂不可用'
+                    : 'Match count is unavailable'
                   : zh
                     ? number.format(source.matches) + ' 条 QRent 记录'
                     : number.format(source.matches) + ' QRent records'}
