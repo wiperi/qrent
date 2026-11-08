@@ -105,6 +105,140 @@ if (!configured || configured.hostname !== 'redis') {
 console.log('Account-store connectivity: ' + JSON.stringify(report));
 JS
   fi
+  # Summarize backup schedules and archive metadata without printing commands or file contents.
+  python3 - "$qrent_root" "$qrent_redis" <<'PY'
+import json
+import re
+import stat
+import subprocess
+import sys
+from datetime import datetime, timezone
+from pathlib import Path
+
+root = Path(sys.argv[1])
+redis_container = sys.argv[2]
+backup_action = re.compile(r"backup|snapshot|dump|bgsave|\bsave\b", re.I)
+backup_targets = {
+    "mysql": re.compile(r"mysql|mariadb|db[-_]backup|backup[-_]db", re.I),
+    "redis": re.compile(r"redis", re.I),
+    "qrent": re.compile(r"qrent", re.I),
+}
+
+
+def capture(*args):
+    try:
+        return subprocess.check_output(args, stderr=subprocess.DEVNULL, text=True, timeout=5)
+    except (OSError, subprocess.SubprocessError):
+        return None
+
+
+def matches(entries):
+    return {
+        target: sum(bool(backup_action.search(entry) and pattern.search(entry)) for entry in entries)
+        for target, pattern in backup_targets.items()
+    }
+
+
+def scheduled_lines(content):
+    return [line for line in content.splitlines() if re.match(r"^\s*(?:@\w+|[0-9*/,-]+)\s", line)]
+
+
+def files(directory):
+    try:
+        return [path for path in directory.iterdir() if not path.is_symlink() and path.is_file()]
+    except OSError:
+        return []
+
+
+user_cron = capture("crontab", "-l")
+system_cron = []
+system_cron_read = 0
+for path in [Path("/etc/crontab"), *files(Path("/etc/cron.d"))]:
+    try:
+        system_cron.extend(scheduled_lines(path.read_text(errors="replace")))
+        system_cron_read += 1
+    except OSError:
+        continue
+periodic_scripts = [
+    path.name
+    for period in ("hourly", "daily", "weekly", "monthly")
+    for path in files(Path("/etc/cron." + period))
+    if re.fullmatch(r"[A-Za-z0-9_-]+", path.name)
+]
+
+
+def timers(*scope):
+    listing = capture("systemctl", *scope, "list-timers", "--no-legend", "--no-pager")
+    return matches(listing.splitlines()) if listing is not None else None
+
+
+def utc_timestamp(seconds):
+    return datetime.fromtimestamp(seconds, timezone.utc).isoformat(timespec="seconds")
+
+
+def archives(directory, name_pattern):
+    try:
+        candidates = list(directory.iterdir())
+    except FileNotFoundError:
+        return {"present": False, "count": 0}
+    except OSError:
+        return {"present": None, "count": None}
+    metadata = []
+    for path in candidates:
+        if not name_pattern.fullmatch(path.name):
+            continue
+        try:
+            info = path.lstat()
+            if stat.S_ISREG(info.st_mode):
+                metadata.append(info)
+        except OSError:
+            continue
+    result = {"present": True, "count": len(metadata), "total_bytes": sum(info.st_size for info in metadata)}
+    if metadata:
+        latest = max(metadata, key=lambda info: info.st_mtime)
+        result.update(latest_mtime_utc=utc_timestamp(latest.st_mtime), latest_bytes=latest.st_size)
+    return result
+
+
+persistence = None
+rdb_file = None
+if redis_container:
+    info = capture("docker", "exec", redis_container, "redis-cli", "--raw", "INFO", "persistence")
+    numeric = {
+        "loading", "rdb_bgsave_in_progress", "rdb_last_save_time", "rdb_changes_since_last_save",
+        "rdb_saves", "aof_enabled", "aof_rewrite_in_progress", "aof_current_size",
+    }
+    status = {"rdb_last_bgsave_status", "aof_last_bgrewrite_status", "aof_last_write_status"}
+    if info:
+        allowed = {}
+        for line in info.splitlines():
+            key, _, value = line.partition(":")
+            if key in numeric and value.isdecimal():
+                allowed[key] = int(value)
+            elif key in status and value in {"ok", "err"}:
+                allowed[key] = value
+        persistence = allowed or None
+    snapshot = capture("docker", "exec", redis_container, "stat", "-c", "%Y %s", "/data/dump.rdb")
+    if snapshot and re.fullmatch(r"[0-9]+ [0-9]+\s*", snapshot):
+        modified, size = map(int, snapshot.split())
+        rdb_file = {"mtime_utc": utc_timestamp(modified), "bytes": size}
+
+print("Backup metadata: " + json.dumps({
+    "schedules": {
+        "user_crontab": matches(scheduled_lines(user_cron)) if user_cron is not None else None,
+        "system_crontabs": {"read": system_cron_read, "matching": matches(system_cron)},
+        "periodic_script_names": matches(periodic_scripts),
+        "system_timers": timers(),
+        "user_timers": timers("--user"),
+    },
+    "archives": {
+        "mysql": archives(root.parent / "qrent-db-backup", re.compile(r"qrent_[\w-]+\.sql(?:\.gz)?")),
+        "redis": archives(root / ".deploy" / "backups", re.compile(r"redis[-_][\w-]+\.(?:tar\.gz|rdb)")),
+    },
+    "redis_persistence": persistence,
+    "live_redis_rdb": rdb_file,
+}, sort_keys=True))
+PY
   for path in / "$HOME" /var/log "$HOME/.cache" "$HOME/.nvm" "$qrent_root/.deploy"; do
     [[ -d "$path" ]] || continue
     du -x -h --max-depth=1 "$path" 2>/dev/null | sort -h || true
