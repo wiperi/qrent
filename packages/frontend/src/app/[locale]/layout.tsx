@@ -1,7 +1,8 @@
 import Footer from '@/components/Footer';
 import Header from '@/components/Header';
 import NotificationBar from '@/components/NotificationBar';
-import { AIChatBox, AIChatToggleButton } from '@/components/AIChatBox';
+import RentalAssistantLauncher from '@/components/RentalAssistantLauncher';
+import { defaultRentalModelAvailable } from '@/lib/rental-assistant/default-model';
 import { MainContentWrapper } from '@/components/MainContentWrapper';
 import { Toaster } from '@/components/ui/toaster';
 import { AuthProvider } from '@/lib/auth-context';
@@ -109,8 +110,10 @@ export default async function LocaleLayout({
               <NotificationBar />
               <MainContentWrapper>{children}</MainContentWrapper>
               <Footer />
-              <AIChatToggleButton />
-              <AIChatBox />
+              <RentalAssistantLauncher
+                locale={locale === 'zh' ? 'zh' : 'en'}
+                defaultModelAvailable={defaultRentalModelAvailable()}
+              />
               <Toaster />
             </AuthProvider>
           </AppTRPCProvider>

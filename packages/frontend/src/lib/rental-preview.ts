@@ -9,7 +9,9 @@ export interface RentalPreviewRow {
   commuteTime?: number;
 }
 
-export function validPreviewRow(row: RentalPreviewRow): boolean {
+export function validPreviewRow(
+  row: Pick<RentalPreviewRow, 'id' | 'address' | 'region' | 'price' | 'url'>
+): boolean {
   try {
     const url = new URL(row.url);
     return (

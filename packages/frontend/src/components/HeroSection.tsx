@@ -1,13 +1,13 @@
 'use client';
 
-import { Suspense } from 'react';
+import { Suspense, type ReactNode } from 'react';
 import { useTranslations } from 'next-intl';
 import HarbourImage from './HarbourImage';
 import SearchBar from '@/components/SearchBar';
 import TodoProgressBar from './TodoProgressBar';
 import styles from '@/styles/discovery.module.css';
 
-export default function HeroSection() {
+export default function HeroSection({ rentalTools }: { rentalTools?: ReactNode }) {
   const t = useTranslations('home');
 
   return (
@@ -41,6 +41,8 @@ export default function HeroSection() {
               </div>
             </div>
           </div>
+
+          {rentalTools}
 
           {/* Bottom: Rental Progress Bar */}
           <div className="w-full">
