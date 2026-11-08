@@ -107,6 +107,7 @@ JS
   fi
   # Summarize backup schedules and archive metadata without printing commands or file contents.
   python3 - "$qrent_root" "$qrent_redis" <<'PY'
+import hashlib
 import json
 import re
 import stat
@@ -169,7 +170,9 @@ periodic_scripts = [
 
 def timers(*scope):
     listing = capture("systemctl", *scope, "list-timers", "--no-legend", "--no-pager")
-    return matches(listing.splitlines()) if listing is not None else None
+    if listing is None:
+        return None
+    return matches([line for line in listing.splitlines() if "dpkg-db-backup.timer" not in line])
 
 
 def utc_timestamp(seconds):
@@ -198,6 +201,40 @@ def archives(directory, name_pattern):
         latest = max(metadata, key=lambda info: info.st_mtime)
         result.update(latest_mtime_utc=utc_timestamp(latest.st_mtime), latest_bytes=latest.st_size)
     return result
+
+
+def daily_backups(directory):
+    try:
+        backups = sorted(
+            entry for entry in directory.iterdir()
+            if re.fullmatch(r"qrent-\d{8}T\d{12}Z", entry.name)
+            and not entry.is_symlink() and entry.is_dir()
+        )
+        if not backups:
+            return {"count": 0}
+        latest = backups[-1]
+        result = {"count": len(backups), "archive": latest.name}
+        receipt_file = latest / "receipt.json"
+        if receipt_file.is_symlink() or not receipt_file.is_file():
+            return result
+        receipt = json.loads(receipt_file.read_text())
+        for key, filename in (("mysql", "mysql.sql.gz"), ("redis", "redis.rdb")):
+            artifact = latest / filename
+            digest = hashlib.sha256()
+            if artifact.is_symlink() or not artifact.is_file():
+                return result
+            with artifact.open("rb") as stream:
+                while chunk := stream.read(1024 * 1024):
+                    digest.update(chunk)
+            if digest.hexdigest() != receipt[key]["sha256"] or artifact.stat().st_size != receipt[key]["bytes"]:
+                return result
+        result["verified"] = receipt.get("status") == "verified"
+        result["mysql_tables"] = int(receipt["mysql"]["tables"])
+        return result
+    except FileNotFoundError:
+        return {"count": 0}
+    except (OSError, ValueError, KeyError, TypeError):
+        return {"verified": False}
 
 
 persistence = None
@@ -232,6 +269,7 @@ print("Backup metadata: " + json.dumps({
         "user_timers": timers("--user"),
     },
     "archives": {
+        "daily": daily_backups(root / ".deploy" / "backups" / "daily"),
         "mysql": archives(root.parent / "qrent-db-backup", re.compile(r"qrent_[\w-]+\.sql(?:\.gz)?")),
         "redis": archives(root / ".deploy" / "backups", re.compile(r"redis[-_][\w-]+\.(?:tar\.gz|rdb)")),
     },

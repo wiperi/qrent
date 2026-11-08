@@ -1,23 +1,29 @@
 name: Backup
 
 on:
-  schedule:
-    - cron: '0 3 * * *'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: qrent-backend-backup-install
+  cancel-in-progress: false
 
 jobs:
   backup:
+    if: github.repository == 'wiperi/qrent' && github.ref == 'refs/heads/main'
     runs-on: ubuntu-latest
     environment: production
+    timeout-minutes: 10
     steps:
-      - name: Backup database
-        uses: appleboy/ssh-action@v1.0.3
+      - uses: actions/checkout@v4
         with:
-          host: ${{ secrets.SERVER_HOST }}
-          username: ${{ secrets.SERVER_USERNAME }}
-          password: ${{ secrets.SERVER_PASSWORD }}
-          script: |
-            cd ~/qrent/
-
-            export MYSQL_ROOT_PASSWORD='${{ secrets.DB_ROOT_PASSWORD }}'
-
-            bash ./scripts/db-backup.sh
+          ref: ${{ github.sha }}
+          persist-credentials: false
+      - name: Verify a backup and install the host schedule
+        env:
+          DEPLOY_SERVER_HOST: ${{ secrets.DEPLOY_SERVER_HOST }}
+          DEPLOY_SERVER_USERNAME: ${{ secrets.DEPLOY_SERVER_USERNAME }}
+          DEPLOY_SERVER_PASSWORD: ${{ secrets.DEPLOY_SERVER_PASSWORD }}
+        run: python3 ops/install_qrent_backend_backup.py
