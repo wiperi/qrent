@@ -144,6 +144,18 @@ We welcome contributions and discussions from the community!
 - **Discussions**: Have questions or ideas? Start a [discussion](https://github.com/wiperi/qrent/discussions)
 - **Email**: For partnership or general inquiries, contact us at this [email](mailto:solidtreepassing@gmail.com)
 
+## Little Q quality review
+
+The production chat route records each accepted question and its answer or failure in the private Redis store. Turns share a random conversation ID. The online buckets expire within 30 days. Only the production Vercel deployment can write to the backend route.
+
+From an authorized shell in the backend container, run the private review command for a UTC date. Its default output lists counts and candidate IDs for reported answers, incomplete turns, model errors and missing or failed source lookups.
+
+```sh
+pnpm --filter @qrent/backend ts-run src/scripts/reviewRentalAssistant.ts --day YYYY-MM-DD
+```
+
+Add `--record UUID` to inspect one turn or `--session UUID` to see that conversation's turns for the selected date. Inspect transcripts in the private terminal. Keep transcript contents out of GitHub Actions logs and support tickets.
+
 ## Contributing
 
 Contributions to Qrent are welcome! We follow the [Conventional Commits](https://www.conventionalcommits.org/) specification for commit messages.

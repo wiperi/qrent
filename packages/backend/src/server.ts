@@ -18,12 +18,17 @@ import { createExpressMiddleware } from '@trpc/server/adapters/express';
 import { appRouter } from './trpc/routers';
 import { createTRPCContext } from './trpc/context';
 import { authenticate } from './utils/helper';
+import redis from './utils/redisClient';
+import { createRentalAssistantHistoryRouter } from './routes/rentalAssistantHistory';
 
 /////////////////////////////////////////////////////////////////////
 // Server Setup
 ////////////////////////////////////////////////////////////////////
 
 const app = express();
+
+// Authenticate the private writer before parsing or logging its body.
+app.use('/api/rental-assistant-history', createRentalAssistantHistoryRouter(redis));
 
 // Middleware to parse JSON bodies
 app.use(express.json());
