@@ -165,6 +165,7 @@ jobs:
           tests/LegacySearchOrder.test.ts tests/StartupDoesNotMigrate.test.ts
           tests/AuthBoundaries.test.ts tests/AuthLifecycle.test.ts
           tests/AuthSession.test.ts tests/AuthTransport.test.ts tests/EmailQuota.test.ts
+          tests/RentalAssistantHistory.test.ts
       - name: Backend deployment and health checks
         run: |
           bash -n ops/deploy_backend.sh
