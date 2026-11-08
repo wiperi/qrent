@@ -38,6 +38,10 @@ const documents = [
   { zh: zh9, en: en9 },
 ];
 
+function publishGuideCopy(value: string) {
+  return value.replaceAll('QRent', 'Qrent');
+}
+
 export const pairedGuides = manifest
   .flatMap((source, index) => {
     const document = documents[index];
@@ -46,10 +50,10 @@ export const pairedGuides = manifest
         id: `${source.id}:${language}`,
         translation_group: source.id,
         slug: source.slug,
-        title: document.zh.title,
-        title_en: document.en.title,
-        excerpt_zh: reviewedGuideExcerpt(source.slug, 'zh', document.zh.excerpt),
-        excerpt_en: reviewedGuideExcerpt(source.slug, 'en', document.en.excerpt),
+        title: publishGuideCopy(document.zh.title),
+        title_en: publishGuideCopy(document.en.title),
+        excerpt_zh: publishGuideCopy(reviewedGuideExcerpt(source.slug, 'zh', document.zh.excerpt)),
+        excerpt_en: publishGuideCopy(reviewedGuideExcerpt(source.slug, 'en', document.en.excerpt)),
         language,
         keywords: language === 'en' ? document.en.keywords : source.keywords,
         published_at: source.publishedAt,
@@ -63,8 +67,15 @@ export const pairedGuides = manifest
           id: `${source.id}:${language}:body`,
           type: 'markdown',
           has_children: false,
-          content: mainGuideBody(
-            reviewedGuideBody(source.slug, language, source.sourceHash, document[language].content)
+          content: publishGuideCopy(
+            mainGuideBody(
+              reviewedGuideBody(
+                source.slug,
+                language,
+                source.sourceHash,
+                document[language].content
+              )
+            )
           ),
         },
       ] satisfies NotionBlock[],

@@ -2,7 +2,7 @@ import { create } from 'zustand';
 import type { ChatReply, ModelConnection } from './contracts';
 import type { ModelProvider } from './presets';
 
-export type RentalTurn = { question: string; reply: ChatReply };
+export type RentalTurn = { id: string; question: string; reply: ChatReply };
 
 type RentalSession = {
   connection?: ModelConnection;
@@ -15,6 +15,7 @@ type RentalSession = {
   pending: string;
   error: string;
   request?: AbortController;
+  sessionId?: string;
   visitPanel: () => void;
   showSettings: (open: boolean) => void;
   selectProvider: (provider: ModelProvider | 'local') => void;
@@ -22,7 +23,7 @@ type RentalSession = {
   setConnection: (connection: ModelConnection) => void;
   setDraft: (draft: string) => void;
   setError: (error: string) => void;
-  beginTurn: (question: string) => AbortController | undefined;
+  beginTurn: (question: string) => { controller: AbortController; sessionId: string } | undefined;
   finishTurn: () => void;
   addTurn: (turn: RentalTurn) => void;
   clearTurns: () => void;
@@ -42,16 +43,25 @@ export const useRentalSession = create<RentalSession>((set, get) => ({
   selectProvider: selectedProvider => set({ selectedProvider, keyDraft: '', error: '' }),
   setKeyDraft: keyDraft => set({ keyDraft }),
   setConnection: connection =>
-    set({ connection, turns: [], keyDraft: '', error: '', settingsOpen: false }),
+    set({
+      connection,
+      turns: [],
+      sessionId: undefined,
+      keyDraft: '',
+      error: '',
+      settingsOpen: false,
+    }),
   setDraft: draft => set({ draft }),
   setError: error => set({ error }),
   beginTurn: pending => {
-    if (get().request) return undefined;
-    const request = new AbortController();
-    set({ request, pending, draft: '', error: '' });
-    return request;
+    const current = get();
+    if (current.request) return undefined;
+    const controller = new AbortController();
+    const sessionId = current.sessionId ?? crypto.randomUUID();
+    set({ request: controller, sessionId, pending, draft: '', error: '' });
+    return { controller, sessionId };
   },
   finishTurn: () => set({ request: undefined, pending: '' }),
   addTurn: turn => set(state => ({ turns: [...state.turns.slice(-19), turn] })),
-  clearTurns: () => set({ turns: [], draft: '' }),
+  clearTurns: () => set({ turns: [], sessionId: undefined, draft: '' }),
 }));

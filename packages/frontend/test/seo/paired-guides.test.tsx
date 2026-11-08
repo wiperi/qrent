@@ -54,8 +54,8 @@ test('every source has exactly one complete Chinese body and its reviewed Englis
       )!;
       assert.equal(entry.post.translation_group, source.id);
       assert.equal(entry.post.published_at, source.publishedAt);
-      assert.equal(entry.post.title, zh.title);
-      assert.equal(entry.post.title_en, en.title);
+      assert.equal(entry.post.title, zh.title.replaceAll('QRent', 'Qrent'));
+      assert.equal(entry.post.title_en, en.title.replaceAll('QRent', 'Qrent'));
       assert.equal(
         entry.blocks[0].content,
         mainGuideBody(
@@ -65,7 +65,7 @@ test('every source has exactly one complete Chinese body and its reviewed Englis
             source.sourceHash,
             language === 'zh' ? zh.content : en.content
           )
-        )
+        ).replaceAll('QRent', 'Qrent')
       );
       const html = renderToStaticMarkup(<MarkdownGuide content={entry.blocks[0].content} />);
       assert.ok(html.length > 1000);

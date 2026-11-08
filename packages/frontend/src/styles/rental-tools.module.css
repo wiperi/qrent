@@ -787,3 +787,43 @@ a.sourceTitle:hover,
     display: none;
   }
 }
+
+.replyActions,
+.composerError {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 4px 12px;
+}
+
+.replyActions {
+  margin-top: 8px;
+}
+
+.replyActions button,
+.composerError button {
+  display: inline-flex;
+  min-height: 36px;
+  align-items: center;
+  gap: 5px;
+  color: #1e4c93;
+  font-size: 0.8125rem;
+  font-weight: 600;
+}
+
+.replyActions button:disabled {
+  color: #64748b;
+}
+
+.replyActions button:hover:enabled,
+.composerError button:hover:enabled {
+  text-decoration: underline;
+}
+
+.replyActions span,
+.historyNotice {
+  margin: 0;
+  color: #475569;
+  font-size: 0.75rem;
+  line-height: 1.45;
+}
