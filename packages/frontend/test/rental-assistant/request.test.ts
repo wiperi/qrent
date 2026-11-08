@@ -3,7 +3,7 @@ import { test } from 'node:test';
 import { connectModel, ModelConnectionError } from '../../src/lib/rental-assistant/model';
 import { rentalPostError, readRentalJson } from '../../src/lib/rental-request';
 
-test('a production QRent origin can post while foreign origins and oversized input are rejected', async () => {
+test('a production Qrent origin can post while foreign origins and oversized input are rejected', async () => {
   function request(origin: string, body: string) {
     return new Request('https://www.qrent.rent/api/rental-assistant/chat', {
       method: 'POST',

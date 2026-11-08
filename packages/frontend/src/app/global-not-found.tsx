@@ -1,4 +1,4 @@
-export const metadata = { title: 'Page not found / 找不到页面 | QRent', robots: { index: false } };
+export const metadata = { title: 'Page not found / 找不到页面 | Qrent', robots: { index: false } };
 import Link from 'next/link';
 
 export default function GlobalNotFound() {
@@ -13,12 +13,12 @@ export default function GlobalNotFound() {
         }}
       >
         <h1>Page not found / 找不到页面</h1>
-        <p>This page is unavailable. Continue with QRent rentals or guides.</p>
+        <p>This page is unavailable. Continue with Qrent rentals or guides.</p>
         <p>这个页面不存在，或尚未发布对应语言的版本。你可以继续浏览房源或租房指南。</p>
         <nav aria-label="Recovery links">
           <ul>
             <li>
-              <Link href="/en">QRent home</Link> · <Link href="/zh">中文首页</Link>
+              <Link href="/en">Qrent home</Link> · <Link href="/zh">中文首页</Link>
             </li>
             <li>
               <Link href="/en/rentals">University rentals</Link> ·{' '}

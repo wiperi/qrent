@@ -3,7 +3,7 @@ import { test } from 'node:test';
 import { formatRentalAnswer } from '../../src/lib/rental-assistant/answers';
 import type { AssistantEvidence } from '../../src/lib/rental-assistant/contracts';
 
-test('rent comparisons use exact QRent aggregates even when the model supplies different numbers', () => {
+test('rent comparisons use exact Qrent aggregates even when the model supplies different numbers', () => {
   const results: AssistantEvidence[] = [
     {
       kind: 'listings',

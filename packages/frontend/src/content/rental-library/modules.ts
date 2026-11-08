@@ -242,10 +242,10 @@ Post 14’s map is a conceptual sketch, not a boundary or route measurement. Cla
         t(
           `两份资料里也有墨尔本的历史选区参考：Parkville、Carlton、North Melbourne 主要围绕墨尔本大学主校区讨论；Richmond 是需要另查具体公共交通的选项。Notting Hill 对应 Monash Clayton，Caulfield 与 Glen Huntly 对应 Monash Caulfield，不能都写成“墨大周边”。
 
-收藏第12篇发表于2022年，金额没有统一说明是整租还是单间、按周还是其他周期，因此这里不把它转成最新周租表。学校、校区和具体门牌确认后，再核对当前价格与上课时段路线。当前 QRent 的房源入口以悉尼既有范围为主。`,
+收藏第12篇发表于2022年，金额没有统一说明是整租还是单间、按周还是其他周期，因此这里不把它转成最新周租表。学校、校区和具体门牌确认后，再核对当前价格与上课时段路线。当前 Qrent 的房源入口以悉尼既有范围为主。`,
           `The references also contain historical Melbourne area notes. Parkville, Carlton and North Melbourne mainly relate to the University of Melbourne’s main campus; Richmond needs a specific transport check. Notting Hill relates to Monash Clayton, while Caulfield and Glen Huntly relate to Monash Caulfield. These should not all be labelled “near Melbourne University”.
 
-Post 12 is from 2022 and does not consistently identify whole-property versus room prices or their billing period. It is not converted into a current weekly-price table. Confirm university, campus and address before checking current prices and class-time travel. QRent’s current listing entry points focus on the existing Sydney scope.`
+Post 12 is from 2022 and does not consistently identify whole-property versus room prices or their billing period. It is not converted into a current weekly-price table. Confirm university, campus and address before checking current prices and class-time travel. Qrent’s current listing entry points focus on the existing Sydney scope.`
         ),
         t(
           '墨尔本 墨大 Parkville Carlton Monash Clayton Caulfield Glen Huntly',
@@ -290,14 +290,14 @@ The source’s extra ten-minute waiting allowance is a planning buffer, not a fi
     sections: [
       s(
         'search-workflow',
-        t('Real Estate、Domain 与 QRent 怎么配合', 'Use Real Estate, Domain and QRent together'),
+        t('Real Estate、Domain 与 Qrent 怎么配合', 'Use Real Estate, Domain and Qrent together'),
         t(
           `沿用原攻略的流程：选择学校或区域，设定预算与房型，读房源详情，登记看房，按中介指定的渠道递交申请，再核对获批条件和租约。
 
 1. 在源站选择 Rent，核对区域、NSW/VIC 等州名和邮编。同名区域可能在不同州；“包含周边区域”会扩大范围。
 2. 筛周租上下限、卧室卫浴、车位、家具、入住日期和所需设施。空调等要求可辅助用关键词搜索，但仍需到详情和现场确认。
 3. 核对 Available Date（可起租日）是否适合自己；Deposit Taken 等状态提示可能已经收款或在推进租约，不代表仍可随时申请。
-4. 用列表或地图建立候选清单，再用完整门牌核对到学校与超市的路线。QRent 可帮助按既有学校、区域、预算和参考通勤筛选；最终价格、状态和申请渠道回到 Domain/Real Estate 或中介确认。
+4. 用列表或地图建立候选清单，再用完整门牌核对到学校与超市的路线。Qrent 可帮助按既有学校、区域、预算和参考通勤筛选；最终价格、状态和申请渠道回到 Domain/Real Estate 或中介确认。
 
 `,
           `Keep the handbook’s sequence: choose a university/area, set budget and housing needs, read the listing, register for inspection, apply through the agent’s specified channel, then check approval terms and the lease.
@@ -305,7 +305,7 @@ The source’s extra ten-minute waiting allowance is a planning buffer, not a fi
 1. Select Rent and confirm suburb, state and postcode. Names can recur in different states; including surrounding areas expands the search.
 2. Filter weekly price, bedrooms, bathrooms, parking, furniture, start date and facilities. Keywords such as air conditioning help, but still require verification.
 3. Match Available Date to your intended start. Deposit Taken can indicate payment or a lease in progress; it does not promise availability.
-4. Shortlist in list/map views, then check the full address for campus and shopping travel. QRent supports its existing school/area, budget and indicative-commute filters. Confirm price, status and application instructions with the source or agent.
+4. Shortlist in list/map views, then check the full address for campus and shopping travel. Qrent supports its existing school/area, budget and indicative-commute filters. Confirm price, status and application instructions with the source or agent.
 
 `
         ),

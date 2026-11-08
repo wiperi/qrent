@@ -5,10 +5,10 @@ export async function generateMetadata({ params }: { params: Promise<{ locale: s
   return pageMetadata(
     locale,
     '/account',
-    locale === 'zh' ? '账户设置 | QRent' : 'Account settings | QRent',
+    locale === 'zh' ? '账户设置 | Qrent' : 'Account settings | Qrent',
     locale === 'zh'
-      ? '管理 QRent 账户和邮箱验证。'
-      : 'Manage your QRent account and email verification.',
+      ? '管理 Qrent 账户和邮箱验证。'
+      : 'Manage your Qrent account and email verification.',
     { index: false }
   );
 }

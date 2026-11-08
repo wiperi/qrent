@@ -173,7 +173,7 @@ export function generateNotionBlogMetadata(
       type: 'article' as const,
       publishedTime: post.published_at,
       modifiedTime: post.last_edited_time,
-      authors: ['QRent'],
+      authors: ['Qrent'],
       tags: post.keywords,
     },
   };

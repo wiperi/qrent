@@ -80,7 +80,7 @@ export async function generateMetadata({ params, searchParams }: {
       title: metaContent.title,
       description: metaContent.description,
       type: 'website',
-      siteName: 'QRent',
+      siteName: 'Qrent',
     },
     twitter: {
       title: metaContent.title,

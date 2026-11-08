@@ -2,7 +2,7 @@
 
 ## Overview
 
-The QRent blog system uses Notion as a Content Management System (CMS), enabling content editors to manage blog posts directly in Notion. The system fetches content dynamically through the Notion API and renders it on the QRent website with proper styling and SEO optimization.
+The Qrent blog system uses Notion as a Content Management System (CMS), enabling content editors to manage blog posts directly in Notion. The system fetches content dynamically through the Notion API and renders it on the Qrent website with proper styling and SEO optimization.
 
 This approach separates content management from code, allowing non-technical team members to:
 - Create and edit blog posts in a familiar Notion interface
@@ -32,7 +32,7 @@ This approach separates content management from code, allowing non-technical tea
 ### Prerequisites
 
 - A Notion account with a workspace
-- Access to the QRent repository
+- Access to the Qrent repository
 - Node.js 18+ and pnpm installed
 
 ### Setup Steps
@@ -40,13 +40,13 @@ This approach separates content management from code, allowing non-technical tea
 1. **Create a Notion Integration**
    - Go to https://www.notion.so/my-integrations
    - Click "New integration"
-   - Name it "QRent Blog"
+   - Name it "Qrent Blog"
    - Select your workspace
    - Copy the "Internal Integration Token" (starts with `ntn_`)
 
 2. **Create a Notion Database**
    - Create a new database in your Notion workspace
-   - Name it "QRent Blog" or similar
+   - Name it "Qrent Blog" or similar
    - Copy the database ID from the URL (the 32-character string)
    - Share the database with your integration (click "Share" → Add your integration)
 
@@ -245,7 +245,7 @@ You can add additional properties for internal use (they won't affect the websit
 
 #### 1. Create a New Page in the Database
 
-1. Open your QRent Blog database in Notion
+1. Open your Qrent Blog database in Notion
 2. Click "+ New" to create a new page
 3. The page opens with a blank canvas
 
@@ -1614,10 +1614,10 @@ For questions or issues:
 
 ## License
 
-This documentation is part of the QRent project, licensed under the Non-Commercial License (NCL 1.0). Commercial use requires separate authorization.
+This documentation is part of the Qrent project, licensed under the Non-Commercial License (NCL 1.0). Commercial use requires separate authorization.
 
 ---
 
 **Document Version:** 1.0.0  
 **Last Updated:** 2025-11-19  
-**Maintained By:** QRent Development Team
+**Maintained By:** Qrent Development Team

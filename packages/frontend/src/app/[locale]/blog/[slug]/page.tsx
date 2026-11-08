@@ -30,7 +30,7 @@ export async function generateMetadata({ params }: PageProps) {
   const result = await getNotionBlogPost(slug, locale);
   if (!result)
     return {
-      title: locale === 'zh' ? '找不到文章 | QRent' : 'Article not found | QRent',
+      title: locale === 'zh' ? '找不到文章 | Qrent' : 'Article not found | Qrent',
       robots: { index: false },
     };
   return generateNotionBlogMetadata(result.post, locale, ['zh', 'en']);
@@ -82,10 +82,10 @@ export default async function BlogPostPage({ params }: PageProps) {
             datePublished: result.post.published_at,
             dateModified: result.post.last_edited_time,
             image: SITE_IMAGE,
-            author: { '@type': 'Organization', name: 'QRent', url: `${SITE_URL}/${locale}/team` },
+            author: { '@type': 'Organization', name: 'Qrent', url: `${SITE_URL}/${locale}/team` },
             publisher: {
               '@type': 'Organization',
-              name: 'QRent',
+              name: 'Qrent',
               url: SITE_URL,
               logo: { '@type': 'ImageObject', url: SITE_IMAGE },
             },

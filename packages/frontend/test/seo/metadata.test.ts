@@ -3,7 +3,7 @@ import test from 'node:test';
 import { pageMetadata, sitemapEntries, jsonLd } from '../../src/lib/seo';
 
 test('each translated page has its own canonical and matching language destinations', () => {
-  const meta = pageMetadata('zh', '/about', '关于 QRent', '悉尼留学生租房与通勤信息。');
+  const meta = pageMetadata('zh', '/about', '关于 Qrent', '悉尼留学生租房与通勤信息。');
   assert.equal(meta.alternates?.canonical, 'https://www.qrent.rent/zh/about');
   assert.deepEqual(meta.alternates?.languages, {
     en: 'https://www.qrent.rent/en/about',

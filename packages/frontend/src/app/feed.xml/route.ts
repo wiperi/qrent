@@ -18,7 +18,7 @@ export async function GET() {
     })
     .join('');
   return new Response(
-    `<?xml version="1.0" encoding="UTF-8"?><rss version="2.0"><channel><title>QRent rental guides</title><link>${SITE_URL}/en/blog</link><description>Practical Australian rental guides in English and Chinese.</description>${items}</channel></rss>`,
+    `<?xml version="1.0" encoding="UTF-8"?><rss version="2.0"><channel><title>Qrent rental guides</title><link>${SITE_URL}/en/blog</link><description>Practical Australian rental guides in English and Chinese.</description>${items}</channel></rss>`,
     {
       headers: {
         'Content-Type': 'application/rss+xml; charset=utf-8',

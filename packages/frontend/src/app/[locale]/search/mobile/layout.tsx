@@ -4,7 +4,7 @@ export async function generateMetadata({ params }: { params: Promise<{ locale: s
   return pageMetadata(
     locale,
     '/search/mobile',
-    locale === 'zh' ? '移动端租房筛选 | QRent' : 'Mobile Rental Filters | QRent',
+    locale === 'zh' ? '移动端租房筛选 | Qrent' : 'Mobile Rental Filters | Qrent',
     locale === 'zh' ? '在手机上筛选悉尼租房信息。' : 'Filter Sydney rental information on mobile.',
     { index: false }
   );

@@ -17,7 +17,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     ...pageMetadata(
       locale,
       '/home-demo',
-      'QRent | Homepage preview',
+      'Qrent | Homepage preview',
       'Sydney student rental search preview.'
     ),
     robots: { index: false, follow: true },

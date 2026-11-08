@@ -132,7 +132,7 @@ export async function searchListings(input: ListingInput, locale: string, signal
         return {
           school,
           suburb,
-          error: 'QRent property search unavailable. Do not estimate.',
+          error: 'Qrent property search unavailable. Do not estimate.',
         } as const;
       }
     })

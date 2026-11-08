@@ -101,10 +101,10 @@
     "icp": "网页备案号: 粤ICP备2025363367号-1"
   },
   "About": {
-    "title": "About QRent",
+    "title": "About Qrent",
     "mission": {
       "title": "Our Mission",
-      "description1": "QRent is dedicated to simplifying the rental property search experience for students and young professionals. We understand that finding the perfect place to live can be overwhelming, time-consuming, and stressful. That's why we've built a platform that aggregates rental listings, analyzes them with intelligent scoring, and helps you make informed decisions quickly.",
+      "description1": "Qrent is dedicated to simplifying the rental property search experience for students and young professionals. We understand that finding the perfect place to live can be overwhelming, time-consuming, and stressful. That's why we've built a platform that aggregates rental listings, analyzes them with intelligent scoring, and helps you make informed decisions quickly.",
       "description2": "Our smart scoring system evaluates properties based on multiple factors including location, price, amenities, and proximity to universities, giving you a comprehensive view at a glance."
     },
     "whatWeDo": {
@@ -128,7 +128,7 @@
     },
     "ourStory": {
       "title": "Our Story",
-      "description1": "QRent was born from personal experience. As students ourselves, we faced the challenges of finding quality, affordable housing while balancing studies and limited budgets. We realized that the rental market needed a better solution—one that combines technology with genuine understanding of renters' needs.",
+      "description1": "Qrent was born from personal experience. As students ourselves, we faced the challenges of finding quality, affordable housing while balancing studies and limited budgets. We realized that the rental market needed a better solution—one that combines technology with genuine understanding of renters' needs.",
       "description2": "Today, we're proud to help thousands of renters find their ideal homes, making the process easier, faster, and more transparent. We're constantly evolving our platform based on user feedback and market trends to serve you better."
     }
   },
@@ -137,16 +137,16 @@
     "subtitle": "We're a diverse group of developers, designers, and rental market enthusiasts working together to revolutionize the way people find their homes.",
     "joinTeam": {
       "title": "Join Our Team",
-      "description": "We're always looking for passionate individuals who want to make a difference in the rental market. If you're interested in joining QRent, we'd love to hear from you!",
+      "description": "We're always looking for passionate individuals who want to make a difference in the rental market. If you're interested in joining Qrent, we'd love to hear from you!",
       "getInTouch": "Get in Touch"
     },
     "members": {
       "zhiyang": {
-        "bio": "Product visionary with a strong business background. Zhiyang drives QRent's strategic direction, ensuring the platform meets real market needs while building sustainable growth for the company.",
+        "bio": "Product visionary with a strong business background. Zhiyang drives Qrent's strategic direction, ensuring the platform meets real market needs while building sustainable growth for the company.",
         "expertise": "Product Strategy, Business Development"
       },
       "cliff": {
-        "bio": "System architect and DevOps expert who designed QRent's scalable infrastructure. Cliff ensures seamless deployment pipelines and robust full-stack solutions that power our platform.",
+        "bio": "System architect and DevOps expert who designed Qrent's scalable infrastructure. Cliff ensures seamless deployment pipelines and robust full-stack solutions that power our platform.",
         "expertise": "System Architecture, DevOps, Full Stack"
       },
       "zack": {
@@ -158,7 +158,7 @@
         "expertise": "Frontend Development, React, UI/UX"
       },
       "qixin": {
-        "bio": "Frontend engineer passionate about performance and accessibility. Qixin ensures QRent delivers a fast, polished experience across all devices and browsers.",
+        "bio": "Frontend engineer passionate about performance and accessibility. Qixin ensures Qrent delivers a fast, polished experience across all devices and browsers.",
         "expertise": "Frontend Development, Performance Optimization"
       },
       "zhongtao": {
@@ -195,9 +195,9 @@
   },
   "Blog": {
     "title": "Learn how to boost your rental search",
-    "subtitle": "Discover strategies to get your ideal rental properties with QRent. From search optimization and property evaluation to lease negotiation and move-in preparation, explore our resources and take control of your rental journey.",
+    "subtitle": "Discover strategies to get your ideal rental properties with Qrent. From search optimization and property evaluation to lease negotiation and move-in preparation, explore our resources and take control of your rental journey.",
     "noPosts": "No blog posts available yet.",
-    "author": "QRent Team"
+    "author": "Qrent Team"
   },
   "Common": {
     "loading": "Loading...",
@@ -237,17 +237,17 @@
     "ogDescription": "Discover exceptional rental properties with ease. Your dream home is just a search away.",
     "twitterTitle": "Qrent - Your Perfect Home Awaits",
     "twitterDescription": "Discover exceptional rental properties with ease. Your dream home is just a search away.",
-    "bannerAlt": "QRent Sydney rental search"
+    "bannerAlt": "Qrent Sydney rental search"
   },
   "search": {
-    "title": "Property Search - QRent",
+    "title": "Property Search - Qrent",
     "description": "Search for rental properties by location, price, and amenities. Find your perfect home today.",
-    "titleWithQuery": "Search results for \"{query}\" - QRent",
-    "descriptionWithQuery": "Find rental properties matching \"{query}\" on QRent. Your perfect home awaits.",
-    "titleLocation": "{query} Rental Properties & Apartments | QRent",
-    "descriptionLocation": "Discover rental properties in {query}. Compare prices, view photos, and find your perfect home with QRent.",
-    "titleLocationType": "{query} - Rental Properties & Apartments | QRent",
-    "descriptionLocationType": "Find the best {query} rentals. Browse photos, prices, and amenities. Contact landlords directly through QRent."
+    "titleWithQuery": "Search results for \"{query}\" - Qrent",
+    "descriptionWithQuery": "Find rental properties matching \"{query}\" on Qrent. Your perfect home awaits.",
+    "titleLocation": "{query} Rental Properties & Apartments | Qrent",
+    "descriptionLocation": "Discover rental properties in {query}. Compare prices, view photos, and find your perfect home with Qrent.",
+    "titleLocationType": "{query} - Rental Properties & Apartments | Qrent",
+    "descriptionLocationType": "Find the best {query} rentals. Browse photos, prices, and amenities. Contact landlords directly through Qrent."
   },
   "LanguageSwitcher": {
     "english": "English",
