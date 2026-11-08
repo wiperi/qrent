@@ -22,9 +22,10 @@ import RentalAssistantSources from './RentalAssistantSources';
 import styles from '@/styles/rental-tools.module.css';
 
 function latestSearch(turns: RentalTurn[]) {
-  const listingTurn = turns.findLast(turn =>
-    turn.reply.evidence.some(item => item.kind === 'listings')
+  const listingTurn = turns.findLast(
+    turn => turn.reply.search || turn.reply.evidence.some(item => item.kind === 'listings')
   );
+  if (listingTurn?.reply.search) return listingTurn.reply.search;
   const listings = listingTurn?.reply.evidence.filter(item => item.kind === 'listings');
   const latest = listings?.at(-1);
   if (!latest) return undefined;

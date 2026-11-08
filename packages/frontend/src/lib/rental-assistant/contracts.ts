@@ -1,3 +1,4 @@
+import type { ListingInput } from './listings';
 import type { ModelProvider } from './presets';
 
 export type ListingExample = {
@@ -41,4 +42,8 @@ export type ModelConnection =
   | { type: 'preset'; provider: ModelProvider; apiKey: string }
   | { type: 'compatible'; baseUrl: string; model: string; apiKey: string };
 
-export type ChatReply = { answer: string; evidence: AssistantEvidence[] };
+export type ChatReply = {
+  answer: string;
+  evidence: AssistantEvidence[];
+  search?: ListingInput;
+};

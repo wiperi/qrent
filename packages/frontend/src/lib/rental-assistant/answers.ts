@@ -2,6 +2,7 @@ import type { AssistantEvidence } from './contracts';
 
 type ListingSource = Extract<AssistantEvidence, { kind: 'listings' }>;
 type Locale = 'zh' | 'en';
+type ListingLookup = { requested: boolean; failed: boolean; failedAreas: string[] };
 const currency = /(?:A?\$\s*\d|\d\s*(?:AUD|澳元))/i;
 const userRent = /(?:周租|预算|每周|budget|rent)\D{0,12}\d/i;
 
@@ -23,8 +24,8 @@ function listingSummary(source: ListingSource, locale: Locale) {
   const matches =
     source.matches === null
       ? zh
-        ? '已找到房源样本'
-        : 'Listing examples available'
+        ? '匹配数量暂不可用'
+        : 'Match count is unavailable'
       : zh
         ? source.matches + ' 条匹配房源'
         : source.matches + ' matching listings';
@@ -37,9 +38,9 @@ function listingSummary(source: ListingSource, locale: Locale) {
   return '- **' + area + '** · ' + matches + rent + ' [' + source.id + ']';
 }
 
-function listingAnswer(listings: ListingSource[], locale: Locale) {
+function listingAnswer(listings: ListingSource[], locale: Locale, incomplete: boolean) {
   const zh = locale === 'zh';
-  if (listings.every(item => item.matches === 0))
+  if (!incomplete && listings.every(item => item.matches === 0))
     return (
       (zh
         ? 'QRent 当前没有符合这些筛选条件的房源。 '
@@ -48,6 +49,7 @@ function listingAnswer(listings: ListingSource[], locale: Locale) {
     );
 
   const summary = listings.map(item => listingSummary(item, locale)).join('\n');
+  if (incomplete) return summary;
   const priced = listings
     .filter(item => item.averageWeeklyRent !== null)
     .sort((a, b) => a.averageWeeklyRent! - b.averageWeeklyRent!);
@@ -66,7 +68,8 @@ export function formatRentalAnswer(
   rawText: string,
   evidence: AssistantEvidence[],
   locale: Locale,
-  userText: string
+  userText: string,
+  lookup?: ListingLookup
 ) {
   const listings = evidence.filter(item => item.kind === 'listings');
   const draft =
@@ -81,12 +84,15 @@ export function formatRentalAnswer(
         .join(' ')
   );
   const guides = evidence.filter(item => item.kind === 'guide');
-  const guideText = listings.length
-    ? text
-        .split('\n')
-        .filter(line => /\[G\d+\]/.test(line) && !/\[R\d+\]/.test(line) && !currency.test(line))
-        .join('\n\n')
-    : text;
+  const incomplete = Boolean(lookup?.failed || (lookup?.requested && !listings.length));
+  const guideText = incomplete
+    ? ''
+    : listings.length || lookup?.requested
+      ? text
+          .split('\n')
+          .filter(line => /\[G\d+\]/.test(line) && !/\[R\d+\]/.test(line) && !currency.test(line))
+          .join('\n\n')
+      : text;
   const citations = [...guideText.matchAll(/\[([RG]\d+)\]/g)].map(match => match[1]);
   const valid = citations.every(id => guides.some(item => item.id === id));
   const guidance =
@@ -97,7 +103,23 @@ export function formatRentalAnswer(
           .map(item => '**' + item.heading + '** [' + item.id + ']\n\n' + item.text)
           .join('\n\n');
 
-  return [listings.length ? listingAnswer(listings, locale) : '', guidance]
+  let lookupNotice = '';
+  if (incomplete) {
+    const areas = lookup?.failedAreas.join(locale === 'zh' ? '、' : ', ');
+    lookupNotice = areas
+      ? locale === 'zh'
+        ? '这次未能核对 ' + areas + ' 的 QRent 房源数据。'
+        : 'QRent could not verify listings for ' + areas + '.'
+      : locale === 'zh'
+        ? '这次未能取得可核对的房源数据。请确认学校或区名后重试。'
+        : 'QRent could not verify listing data. Check the campus or suburb and try again.';
+  }
+
+  return [
+    listings.length ? listingAnswer(listings, locale, incomplete) : '',
+    lookupNotice,
+    guidance,
+  ]
     .filter(Boolean)
     .join('\n\n');
 }

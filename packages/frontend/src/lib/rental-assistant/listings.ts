@@ -47,6 +47,8 @@ export const listingInput = z.object({
     .describe('Maximum transit minutes. Null clears this filter.'),
 });
 
+export type ListingInput = z.infer<typeof listingInput>;
+
 const property = z.object({
   id: z.number().int().positive(),
   address: z.string().min(1),
@@ -102,11 +104,7 @@ export function suburbKey(value: string) {
   return key === 'sydney city' || key === 'sydney cbd' ? 'sydney' : key;
 }
 
-export async function searchListings(
-  input: z.infer<typeof listingInput>,
-  locale: string,
-  signal: AbortSignal
-) {
+export async function searchListings(input: ListingInput, locale: string, signal: AbortSignal) {
   const areas = [...new Set(input.suburbs?.map(suburbKey))];
   if (
     (!input.school && !areas.length) ||
