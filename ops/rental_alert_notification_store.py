@@ -21,6 +21,7 @@ DIGEST = re.compile(r"[a-f0-9]{64}")
 BATCH = re.compile(r"[a-f0-9]{32}")
 CURSOR = re.compile(r"[0-9]{1,20}")
 ADDRESS = re.compile(r"[!-~]+@[A-Za-z0-9.-]+")
+CRON_TAG = "# qrent-rental-alert-mail"
 
 READ_REDIS = """
 import { createRequire } from 'node:module';
@@ -86,12 +87,47 @@ def connect_ledger(path, read_only=False):
     return db
 
 
+def local_cron_status(directory):
+    result = {"installed": False, "healthy": False}
+    try:
+        marker = json.loads((directory / "installed.json").read_text())
+        cron = subprocess.check_output(
+            ["crontab", "-l"], text=True, stderr=subprocess.DEVNULL, timeout=5
+        )
+        lines = [
+            line for line in cron.splitlines()
+            if not line.lstrip().startswith("#") and line.endswith(CRON_TAG)
+        ]
+        if len(lines) != 1 or sha256(lines[0].encode()).hexdigest() != marker["cron_line_sha256"]:
+            return result
+        result["installed"] = True
+        receipt = json.loads((directory / "last-run.json").read_text())
+        finished = datetime.fromisoformat(receipt["finished_at"])
+        status = receipt["status"]
+        if status in {
+            "no_new_signups", "smtp_accepted", "smtp_outcome_unconfirmed",
+            "smtp_accepted_receipt_unconfirmed", "local_worker_failed",
+        }:
+            result["last_run"] = {
+                "status": status,
+                "finished_at": finished.astimezone(timezone.utc).isoformat(timespec="seconds"),
+            }
+            seconds = (datetime.now(timezone.utc) - finished).total_seconds()
+            result["healthy"] = (
+                status in {"no_new_signups", "smtp_accepted"} and 0 <= seconds <= 30 * 60
+            )
+    except (OSError, KeyError, TypeError, ValueError, subprocess.SubprocessError):
+        pass
+    return result
+
+
 def inspect(path, read_redis):
     result = {
         "registered": read_redis("count"),
         "sent": 0,
         "reserved": 0,
         "pending_batches": [],
+        "local_cron": local_cron_status(path.parent),
     }
     if not path.exists():
         return result
@@ -209,17 +245,19 @@ def record_delivery(path, operation, batch, digests=()):
     raise ValueError("invalid store operation")
 
 
+def dispatch(request, path=LEDGER):
+    operation = request["operation"]
+    if operation == "inspect":
+        return inspect(path, redis_read)
+    if operation == "pending":
+        return pending(path, redis_read)
+    return record_delivery(path, operation, request["batch"], request.get("digests", ()))
+
+
 def main():
     os.umask(0o077)
     request = json.loads(base64.urlsafe_b64decode(sys.argv[1]))
-    operation = request["operation"]
-    if operation == "inspect":
-        result = inspect(LEDGER, redis_read)
-    elif operation == "pending":
-        result = pending(LEDGER, redis_read)
-    else:
-        result = record_delivery(LEDGER, operation, request["batch"], request.get("digests", ()))
-    print(json.dumps(result))
+    print(json.dumps(dispatch(request)))
 
 
 if __name__ == "__main__":

@@ -5,14 +5,18 @@ import io
 import json
 import os
 import smtplib
+import stat
+import subprocess
 import tempfile
 import unittest
+from datetime import datetime, timedelta, timezone
 from hashlib import sha256
 from pathlib import Path
-from unittest.mock import patch
+from unittest.mock import Mock, patch
 
 import notify_rental_alerts as notifier
 import rental_alert_notification_store as ledger
+import install_rental_alert_cron as installer
 
 
 class RentalAlertNotificationsTest(unittest.TestCase):
@@ -128,6 +132,168 @@ class RentalAlertNotificationsTest(unittest.TestCase):
         self.assertEqual(self.calls, ["inspect", "inspect"])
         self.assertNotIn("renter@example.test", self.messages[0].get_content())
         self.assertFalse(self.path.exists())
+
+    def test_host_install_check_defers_real_pending_signups(self):
+        self.add_signup("renter@example.test")
+        result = self.run_notification(empty_only=True)
+        self.assertEqual(result, {"status": "install_check_pending_signups"})
+        self.assertEqual(self.calls, ["pending"])
+        self.assertEqual(self.messages, [])
+        self.assertFalse(self.path.exists())
+
+    def test_staged_host_check_authenticates_and_closes_without_sending(self):
+        directory = self.path.parent
+        directory.mkdir()
+        (directory / "smtp.json").write_text(json.dumps({
+            "QRENT_ALERT_OWNER_EMAIL": "qrent.owner.test@gmail.com",
+            "QRENT_ALERT_SMTP_PASSWORD": "local-test-password",
+        }))
+        connection = Mock()
+        with patch.object(notifier, "OPS", directory), patch.object(
+            notifier, "smtp_login", return_value=connection
+        ) as login, patch.object(ledger, "dispatch", return_value={"records": []}):
+            with contextlib.redirect_stdout(io.StringIO()) as output:
+                notifier.local_run(empty_only=True, state_directory=directory)
+        login.assert_called_once_with("local-test-password")
+        connection.close.assert_called_once_with()
+        for operation in ("mail", "rcpt", "data", "send_message"):
+            getattr(connection, operation).assert_not_called()
+        report = json.loads(output.getvalue())
+        self.assertEqual(report["status"], "no_new_signups")
+        self.assertEqual(report["smtp_login"], "verified")
+
+    def test_staged_smtp_failure_reports_only_the_phase_code(self):
+        directory = self.path.parent
+        directory.mkdir()
+        completed = subprocess.CompletedProcess(
+            ["local-check"], 1, b'{"status":"smtp_auth_failed"}', b"private smtp diagnostic"
+        )
+        with patch.object(installer.subprocess, "run", return_value=completed):
+            with self.assertRaisesRegex(installer.InstallCheckError, "^smtp_auth_failed$"):
+                installer.validated_files({"notifier": "pass", "store": "pass", "config": {}}, directory)
+
+    def test_inspect_requires_verified_cron_and_recent_success_receipt(self):
+        self.path.parent.mkdir()
+        line = "7,22,37,52 * * * * /usr/bin/example local # qrent-rental-alert-mail"
+        (self.path.parent / "installed.json").write_text(json.dumps({
+            "cron_line_sha256": sha256(line.encode()).hexdigest(),
+        }))
+        with patch.object(ledger.subprocess, "check_output", return_value=line + "\n"):
+            self.assertTrue(self.store("inspect")["local_cron"]["installed"])
+            self.assertFalse(self.store("inspect")["local_cron"]["healthy"])
+            receipt = self.path.parent / "last-run.json"
+            receipt.write_text(json.dumps({
+                "status": "no_new_signups", "finished_at": datetime.now(timezone.utc).isoformat(),
+            }))
+            self.assertTrue(self.store("inspect")["local_cron"]["healthy"])
+            receipt.write_text(json.dumps({
+                "status": "no_new_signups",
+                "finished_at": (datetime.now(timezone.utc) - timedelta(minutes=31)).isoformat(),
+            }))
+            self.assertFalse(self.store("inspect")["local_cron"]["healthy"])
+        with patch.object(ledger.subprocess, "check_output", return_value=""):
+            self.assertFalse(self.store("inspect")["local_cron"]["installed"])
+
+    def test_host_installer_preserves_other_cron_tasks_and_is_idempotent(self):
+        deploy = self.path.parent
+        deploy.mkdir()
+        unrelated = (
+            b"# existing comments\n\n"
+            b"# documented # qrent-rental-alert-mail\n"
+            b"15 3 * * * /private/backup # qrent-database-backup\n"
+        )
+        observed = unrelated + b"5 * * * * /old/notifier # qrent-rental-alert-mail\n"
+        writes = []
+        fixture_config = {
+            "QRENT_ALERT_OWNER_EMAIL": "qrent.owner.test@gmail.com",
+            "QRENT_ALERT_SMTP_PASSWORD": "local-test-password",
+        }
+
+        def run(command, **kwargs):
+            nonlocal observed
+            if command[0] == "systemctl":
+                return subprocess.CompletedProcess(command, 0, b"", b"")
+            if command == ["crontab", "-l"]:
+                return subprocess.CompletedProcess(command, 0, observed, b"")
+            if command == ["crontab", "-"]:
+                observed = kwargs["input"]
+                writes.append(observed)
+                return subprocess.CompletedProcess(command, 0, b"", b"")
+            self.assertEqual(command[-2], "local-check")
+            self.assertEqual(Path(command[-1]), deploy / "rental-alert-mail")
+            config = Path(command[1]).parent / "smtp.json"
+            self.assertEqual(stat.S_IMODE(config.stat().st_mode), 0o600)
+            self.assertEqual(json.loads(config.read_text()), fixture_config)
+            return subprocess.CompletedProcess(
+                command, 0, b'{"status":"no_new_signups","smtp_login":"verified"}', b""
+            )
+
+        payload = {"notifier": "pass", "store": "pass", "config": fixture_config}
+        with patch.object(installer.subprocess, "run", side_effect=run):
+            for _ in range(2):
+                receipt = installer.configure(payload, deploy)
+                self.assertTrue(receipt["unmanaged_entries_preserved"])
+                self.assertEqual(receipt["initial_check"], "no_new_signups")
+                self.assertEqual(receipt["smtp_login"], "verified")
+        self.assertEqual(len(writes), 1)
+        self.assertEqual(installer.unmanaged_entries(observed), unrelated)
+        self.assertNotIn(b"local-test-password", observed)
+        backups = list((deploy / "rental-alert-mail").glob("crontab-before-*"))
+        self.assertEqual(len(backups), 1)
+        self.assertEqual(stat.S_IMODE(backups[0].stat().st_mode), 0o600)
+        self.assertEqual(backups[0].read_bytes(), unrelated + b"5 * * * * /old/notifier # qrent-rental-alert-mail\n")
+
+    def test_no_crontab_is_distinct_from_unreadable_crontab(self):
+        with patch.object(installer.subprocess, "run", return_value=subprocess.CompletedProcess(
+            ["crontab", "-l"], 1, b"", b"no crontab for qrent\n",
+        )):
+            self.assertIsNone(installer.current_crontab())
+        with patch.object(installer.subprocess, "run", return_value=subprocess.CompletedProcess(
+            ["crontab", "-l"], 1, b"", b"permission denied",
+        )):
+            with self.assertRaisesRegex(RuntimeError, "could not be read"):
+                installer.current_crontab()
+
+    def test_failed_staging_does_not_replace_installed_worker_files(self):
+        deploy = self.path.parent
+        directory = deploy / "rental-alert-mail"
+        directory.mkdir(parents=True)
+        old = {installer.WORKER: b"old worker", installer.STORE: b"old store", installer.CONFIG: b"old config"}
+        for name, data in old.items():
+            (directory / name).write_bytes(data)
+
+        def run(command, **kwargs):
+            if command[0] == "systemctl":
+                return subprocess.CompletedProcess(command, 0, b"", b"")
+            if command == ["crontab", "-l"]:
+                return subprocess.CompletedProcess(command, 0, b"# existing cron\n", b"")
+            self.assertEqual(command[-2], "local-check")
+            raise subprocess.CalledProcessError(1, command)
+
+        with patch.object(installer.subprocess, "run", side_effect=run):
+            with self.assertRaises(subprocess.CalledProcessError):
+                installer.configure({"notifier": "pass", "store": "pass", "config": {}}, deploy)
+        self.assertEqual({name: (directory / name).read_bytes() for name in old}, old)
+        self.assertEqual(list(directory.glob("crontab-before-*")), [])
+
+    def test_mismatch_only_restores_when_managed_line_and_other_entries_match(self):
+        previous = b"4 * * * * /old/notifier # qrent-rental-alert-mail\n5 * * * * /private/backup\n"
+        retained = b"5 * * * * /private/backup\n"
+        line = b"7,22,37,52 * * * * /new/notifier # qrent-rental-alert-mail"
+        reordered = line + b"\n" + retained
+        with patch.object(installer, "current_crontab", side_effect=[reordered, previous]):
+            with patch.object(installer, "write_crontab") as write:
+                self.assertEqual(
+                    installer.restore_after_mismatch(previous, reordered, retained, line),
+                    "readback_mismatch_restored_previous",
+                )
+                write.assert_called_once_with(previous)
+        with patch.object(installer, "write_crontab") as write:
+            self.assertEqual(
+                installer.restore_after_mismatch(previous, reordered + b"# concurrent edit\n", retained, line),
+                "readback_mismatch_preserved_unmanaged_change",
+            )
+            write.assert_not_called()
 
 
 if __name__ == "__main__":

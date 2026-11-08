@@ -6,7 +6,7 @@ on:
   workflow_dispatch:
     inputs:
       mode:
-        description: Inspect the queue, send one delivery test, or process new signups
+        description: Inspect, test delivery, process signups, or install the production host timer
         type: choice
         required: true
         default: inspect
@@ -14,6 +14,7 @@ on:
           - inspect
           - smoke
           - send
+          - install-cron
 
 permissions:
   contents: read
