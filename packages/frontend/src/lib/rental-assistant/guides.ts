@@ -24,7 +24,10 @@ const queryHints: [RegExp, Record<LibraryLocale, string>][] = [
   ],
   [
     /租房(?:历史|史|记录)|担保人|rental history|guarantor/i,
-    { zh: '无本地租房史 替代文件 父母资助', en: 'no local rental history supporting documents guarantor' },
+    {
+      zh: '无本地租房史 替代文件 父母资助',
+      en: 'no local rental history supporting documents guarantor',
+    },
   ],
   [
     /房东.*(?:修|坏了|不管)|维修|漏水|报修|urgent repairs?|water leak|(?:landlord|agent).*(?:fix|repair)/i,
