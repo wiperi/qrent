@@ -57,13 +57,11 @@ test('only a valid token for the exact production deployment can write chat hist
   const issuer = 'https://oidc.vercel.com/wiperis-projects';
   const audience = 'https://vercel.com/wiperis-projects';
   const subject = 'owner:wiperis-projects:project:qrent-frontend:environment:production';
-  const keys = jest
-    .spyOn(globalThis, 'fetch')
-    .mockResolvedValue(
-      Response.json({
-        keys: [{ ...publicKey.export({ format: 'jwk' }), kid: 'fixture', alg: 'RS256' }],
-      })
-    );
+  const keys = jest.spyOn(globalThis, 'fetch').mockResolvedValue(
+    Response.json({
+      keys: [{ ...publicKey.export({ format: 'jwk' }), kid: 'fixture', alg: 'RS256' }],
+    })
+  );
   const sign = (options: jwt.SignOptions = {}, owner = 'team_wVGXQKuq4m7LvxH1vkLlRYJ2') =>
     'Bearer ' +
     jwt.sign({ owner_id: owner, environment: 'production' }, privateKey, {
