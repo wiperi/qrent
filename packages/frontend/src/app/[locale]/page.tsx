@@ -1,5 +1,6 @@
 import FilterModal from '@/components/FilterModal';
 import HeroSection from '@/components/HeroSection';
+import RentalTools from '@/components/RentalTools';
 import PropertyGrid from '@/components/PropertyGrid';
 import { Suspense } from 'react';
 import type { Metadata } from 'next';
@@ -28,7 +29,7 @@ export default async function Home({ params }: { params: Promise<{ locale: strin
   const { locale } = await params;
   return (
     <main>
-      <HeroSection />
+      <HeroSection rentalTools={<RentalTools locale={locale} />} />
       {/* <UsefulGuide /> */}
       <PropertyGrid />
       <RentalLinks locale={locale} />

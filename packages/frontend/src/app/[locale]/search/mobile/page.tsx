@@ -1,5 +1,6 @@
 import FilterModal from '@/components/FilterModal';
 import SearchBar from '@/components/SearchBar';
+import RentalTools from '@/components/RentalTools';
 import SearchResults from '../SearchResults';
 import CurrentFiltersBar from '@/components/FilterTags';
 import type { Metadata } from 'next';
@@ -97,8 +98,14 @@ export async function generateMetadata({ params, searchParams }: {
   };
 }
 
-export default async function MobileSearchPage({ searchParams }: { searchParams: Promise<SearchParams> }) {
-  const params = await searchParams;
+export default async function MobileSearchPage({
+  searchParams,
+  params,
+}: {
+  searchParams: Promise<SearchParams>;
+  params: Promise<{ locale: string }>;
+}) {
+  const [{ locale }, filters] = await Promise.all([params, searchParams]);
 
   return (
     <main className="min-h-screen bg-gray-50">
@@ -112,13 +119,14 @@ export default async function MobileSearchPage({ searchParams }: { searchParams:
       {/* Mobile-specific filters bar */}
       <section className="py-2 bg-white border-b border-gray-200">
         <div className="mx-auto px-4">
+          <RentalTools locale={locale} className="my-4" />
           <CurrentFiltersBar />
         </div>
       </section>
 
       {/* Results area - mobile optimized */}
       <section className="py-2">
-        <SearchResults searchParams={params} />
+        <SearchResults searchParams={filters} />
       </section>
       
       <FilterModal />

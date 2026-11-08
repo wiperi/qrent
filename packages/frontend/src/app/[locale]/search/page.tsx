@@ -1,5 +1,6 @@
 import FilterModal from '@/components/FilterModal';
 import SearchBar from '@/components/SearchBar';
+import RentalTools from '@/components/RentalTools';
 import SearchResults from './SearchResults';
 // 横向: 添加
 import CurrentFiltersBar from '@/components/FilterTags';
@@ -53,6 +54,7 @@ export default async function SearchPage({
       <section className="py-4">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <SearchBar />
+          <RentalTools locale={locale} className="my-4" />
 
           {/*横向*/}
           <CurrentFiltersBar />

@@ -215,6 +215,11 @@ jobs:
           TSX_TSCONFIG_PATH: packages/frontend/tsconfig.json
         run: node --import tsx --test packages/frontend/test/auth/*.test.ts
 
+      - name: Rental assistant retrieval and request boundaries
+        env:
+          TSX_TSCONFIG_PATH: packages/frontend/tsconfig.json
+        run: node --import tsx --test packages/frontend/test/rental-assistant/*.test.ts
+
   # Type checking
   typecheck:
     runs-on: ubuntu-latest
