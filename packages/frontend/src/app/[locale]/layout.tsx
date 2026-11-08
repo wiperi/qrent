@@ -22,11 +22,11 @@ import '@/styles/guides.css';
 export const viewport: Viewport = { width: 'device-width', initialScale: 1, themeColor: '#ffffff' };
 export const metadata: Metadata = {
   metadataBase: new URL(SITE_URL),
-  title: 'QRent — Sydney student rentals',
+  title: 'Qrent — Sydney student rentals',
   description: 'Compare rental prices from Domain and Real Estate around Sydney universities.',
-  openGraph: { siteName: 'QRent', images: [SITE_IMAGE] },
+  openGraph: { siteName: 'Qrent', images: [SITE_IMAGE] },
   twitter: { card: 'summary_large_image', images: [SITE_IMAGE] },
-  appleWebApp: { capable: true, statusBarStyle: 'black-translucent', title: 'QRent' },
+  appleWebApp: { capable: true, statusBarStyle: 'black-translucent', title: 'Qrent' },
 };
 
 export function generateStaticParams() {
@@ -51,7 +51,7 @@ export default async function LocaleLayout({
         <link
           rel="alternate"
           type="application/rss+xml"
-          title="QRent rental guides"
+          title="Qrent rental guides"
           href={`${SITE_URL}/feed.xml`}
         />
         <Script
@@ -86,7 +86,7 @@ export default async function LocaleLayout({
               '@context': 'https://schema.org',
               '@type': 'WebSite',
               '@id': `${SITE_URL}/#website`,
-              name: 'QRent',
+              name: 'Qrent',
               url: SITE_URL,
               inLanguage: ['en-AU', 'zh-CN'],
               description:
@@ -94,7 +94,7 @@ export default async function LocaleLayout({
               publisher: {
                 '@type': 'Organization',
                 '@id': `${SITE_URL}/#organization`,
-                name: 'QRent',
+                name: 'Qrent',
                 url: SITE_URL,
                 logo: SITE_IMAGE,
               },

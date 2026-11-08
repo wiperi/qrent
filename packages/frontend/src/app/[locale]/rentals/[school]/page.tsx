@@ -22,15 +22,15 @@ export async function generateMetadata({ params }: Props) {
   const school = RENTAL_SCHOOLS.find(item => item.slug === slug);
   if (!school)
     return {
-      title: locale === 'zh' ? '找不到学校页面 | QRent' : 'University page not found | QRent',
+      title: locale === 'zh' ? '找不到学校页面 | Qrent' : 'University page not found | Qrent',
       robots: { index: false },
     };
   return pageMetadata(
     locale,
     `/rentals/${school.slug}`,
     locale === 'zh'
-      ? `${school.nameZh}（${school.code}）周边租房与通勤 | QRent`
-      : `${school.code} Student Rentals & Commute Guide | QRent`,
+      ? `${school.nameZh}（${school.code}）周边租房与通勤 | Qrent`
+      : `${school.code} Student Rentals & Commute Guide | Qrent`,
     locale === 'zh'
       ? `浏览${school.nameZh}既有采集区域，比较 Domain 与 Real Estate 周租、房型和到 ${school.campus} 校区的通勤，查看申请与看房指南。`
       : `Compare Domain and Real Estate rental prices in the existing ${school.code} collection. Explore areas, weekly rent and public transport commutes to ${school.campus}, with practical rental guides.`
@@ -64,8 +64,8 @@ export default async function SchoolRentals({ params }: Props) {
       <p className={styles.lead}>{school.focus[zh ? 'zh' : 'en']}</p>
       <p className={styles.note}>
         {zh
-          ? 'QRent 已恢复既有悉尼范围的更新，展示 Domain 和 Real Estate 租金。周租通常是整套报价，请核对房源页的出租范围；通勤是公共交通参考值。房源可能已出租或改价，请在申请前到源站和中介确认。'
-          : 'QRent has resumed updates within its existing Sydney scope, using Domain and Real Estate rental prices. Weekly rent is usually for the entire property; check the listing for its rental scope. Public transport times are indicative. Listings may be leased or repriced, so confirm with the source and agent before applying.'}
+          ? 'Qrent 已恢复既有悉尼范围的更新，展示 Domain 和 Real Estate 租金。周租通常是整套报价，请核对房源页的出租范围；通勤是公共交通参考值。房源可能已出租或改价，请在申请前到源站和中介确认。'
+          : 'Qrent has resumed updates within its existing Sydney scope, using Domain and Real Estate rental prices. Weekly rent is usually for the entire property; check the listing for its rental scope. Public transport times are indicative. Listings may be leased or repriced, so confirm with the source and agent before applying.'}
       </p>
       <Link href={rentalSearchPath(locale, school.code)} className={styles.primaryAction}>
         {zh ? `筛选 ${school.code} 房源` : `Search ${school.code} rentals`}

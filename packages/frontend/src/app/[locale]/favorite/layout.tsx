@@ -4,7 +4,7 @@ export async function generateMetadata({ params }: { params: Promise<{ locale: s
   return pageMetadata(
     locale,
     '/favorite',
-    locale === 'zh' ? '我的收藏 | QRent' : 'Saved Rentals | QRent',
+    locale === 'zh' ? '我的收藏 | Qrent' : 'Saved Rentals | Qrent',
     locale === 'zh' ? '查看你收藏的租房信息。' : 'View the rental homes you have saved.',
     { index: false }
   );

@@ -55,8 +55,8 @@ export default function RentalAssistantSources({
                     ? '匹配数量暂不可用'
                     : 'Match count is unavailable'
                   : zh
-                    ? number.format(source.matches) + ' 条 QRent 记录'
-                    : number.format(source.matches) + ' QRent records'}
+                    ? number.format(source.matches) + ' 条 Qrent 记录'
+                    : number.format(source.matches) + ' Qrent records'}
                 {source.averageWeeklyRent !== null
                   ? ' · ' +
                     (zh ? '平均 ' : 'Average ') +

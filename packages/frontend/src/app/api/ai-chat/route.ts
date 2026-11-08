@@ -36,7 +36,7 @@ export async function POST(request: NextRequest) {
       .join('\n');
 
     // Create the prompt with system context and conversation history
-    const prompt = `You are a helpful AI assistant for QRent, a rental property platform for international students in Australia. Your role is to help students find suitable housing and give them guidence. 
+    const prompt = `You are a helpful AI assistant for Qrent, a rental property platform for international students in Australia. Your role is to help students find suitable housing and give them guidence.
 
 ${conversationHistory ? `Previous conversation:\n${conversationHistory}\n\n` : ''}User: ${message}
 

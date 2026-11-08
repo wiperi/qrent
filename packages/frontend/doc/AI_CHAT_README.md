@@ -142,7 +142,7 @@ export async function POST(request: NextRequest) {
       messages: [
         {
           role: "system",
-          content: "You are a helpful assistant for a rental property platform called QRent."
+          content: "You are a helpful assistant for a rental property platform called Qrent."
         },
         ...history.map(msg => ({
           role: msg.role,

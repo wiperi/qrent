@@ -14,8 +14,8 @@ export async function generateMetadata({ params }: { params: Promise<{ locale: s
     locale,
     '/rentals',
     locale === 'zh'
-      ? '悉尼大学周边租房与区域目录 | QRent'
-      : 'Sydney University Rental & Area Directory | QRent',
+      ? '悉尼大学周边租房与区域目录 | Qrent'
+      : 'Sydney University Rental & Area Directory | Qrent',
     locale === 'zh'
       ? '浏览 UNSW、悉尼大学与 UTS 既有采集区域，比较 Domain 与 Real Estate 租金、公共交通通勤及租房准备事项。'
       : 'Explore the existing rental collection around UNSW, the University of Sydney and UTS. Compare Domain and Real Estate prices, commute information and rental guides.'
@@ -41,8 +41,8 @@ export default async function RentalsPage({ params }: { params: Promise<{ locale
       </h1>
       <p className={styles.lead}>
         {zh
-          ? 'QRent 免费整合 Domain 与 Real Estate 的房源信息。先按学校了解既有采集区域，再按周租、卧室和公共交通时间筛选。'
-          : 'QRent is a free way to compare rental information from Domain and Real Estate. Start with your university, then filter by weekly rent, bedrooms and public transport commute.'}
+          ? 'Qrent 免费整合 Domain 与 Real Estate 的房源信息。先按学校了解既有采集区域，再按周租、卧室和公共交通时间筛选。'
+          : 'Qrent is a free way to compare rental information from Domain and Real Estate. Start with your university, then filter by weekly rent, bedrooms and public transport commute.'}
       </p>
       <p className={styles.note}>
         {zh

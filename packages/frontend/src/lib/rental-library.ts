@@ -56,7 +56,7 @@ export function rentalKnowledgeExport() {
   return {
     schemaVersion: 1,
     version: RENTAL_LIBRARY_VERSION,
-    publisher: 'QRent',
+    publisher: 'Qrent',
     publishedAt: RENTAL_LIBRARY_PUBLISHED_AT,
     sourceFiles: references.sources,
     experienceSources: references.experiences,

@@ -13,8 +13,8 @@ export async function generateMetadata({ params }: { params: Promise<{ locale: s
     locale,
     '/blog',
     locale === 'zh'
-      ? '澳洲留学生租房指南与经验 | QRent'
-      : 'Australian Student Rental Guides & Tips | QRent',
+      ? '澳洲留学生租房指南与经验 | Qrent'
+      : 'Australian Student Rental Guides & Tips | Qrent',
     locale === 'zh'
       ? '按主题阅读澳洲租房攻略与经验，搜索预算、选区、申请材料、看房、合同押金、入住与退租清单，并按大学浏览悉尼房源。'
       : 'Search Australian rental guides and experiences by topic: budgets, areas, applications, inspections, leases, bonds, moving in and moving out. Explore Sydney homes by university.'

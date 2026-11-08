@@ -17,8 +17,8 @@ export async function generateMetadata({
     locale,
     '',
     locale === 'zh'
-      ? '悉尼留学生租房 · UNSW、悉尼大学与 UTS | QRent'
-      : 'Sydney Student Rentals near UNSW, USYD & UTS | QRent',
+      ? '悉尼留学生租房 · UNSW、悉尼大学与 UTS | Qrent'
+      : 'Sydney Student Rentals near UNSW, USYD & UTS | Qrent',
     locale === 'zh'
       ? '免费对比 Domain 和 Real Estate 的悉尼租房信息，按大学、周租、房型与公共交通通勤筛选。查看 UNSW、悉尼大学和 UTS 既有采集区域与租房指南。'
       : 'Compare Domain and Real Estate rental prices around UNSW, the University of Sydney and UTS. Filter by weekly rent, bedrooms and public transport commute, with practical rental guides.'

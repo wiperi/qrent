@@ -285,8 +285,8 @@ export default function RentalAssistant({
           {!panel && (
             <p>
               {zh
-                ? 'QRent 的租房助手。可以比较周租、聊选区和看房，也能帮你准备租房申请。'
-                : 'Your QRent rental assistant. Compare weekly rents, talk through your options, or get help with an application.'}
+                ? 'Qrent 的租房助手。可以比较周租、聊选区和看房，也能帮你准备租房申请。'
+                : 'Your Qrent rental assistant. Compare weekly rents, talk through your options, or get help with an application.'}
             </p>
           )}
         </div>
@@ -514,7 +514,7 @@ export default function RentalAssistant({
             </div>
             <div className={styles.composerFoot}>
               <span>
-                {zh ? '房源与攻略来源为 QRent' : 'Listing and guide sources come from QRent'}
+                {zh ? '房源与攻略来源为 Qrent' : 'Listing and guide sources come from Qrent'}
               </span>
               {!!turns.length && (
                 <button

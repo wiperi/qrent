@@ -29,7 +29,7 @@ export async function generateMetadata({
   return pageMetadata(
     locale,
     '/search',
-    locale === 'zh' ? '悉尼房源筛选 | QRent' : 'Sydney Rental Search | QRent',
+    locale === 'zh' ? '悉尼房源筛选 | Qrent' : 'Sydney Rental Search | Qrent',
     locale === 'zh'
       ? '按大学、周租、卧室、区域和公共交通时间筛选 Domain 与 Real Estate 房源。'
       : 'Filter Domain and Real Estate rentals by university, weekly price, bedrooms, area and public transport commute.',

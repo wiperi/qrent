@@ -22,12 +22,12 @@ export function generateStaticParams() {
 export async function generateMetadata({ params }: Props) {
   const { locale, module: slug } = await params;
   const module = rentalGuideModules.find(item => item.slug === slug);
-  if (!module) return { title: 'Guide not found | QRent', robots: { index: false } };
+  if (!module) return { title: 'Guide not found | Qrent', robots: { index: false } };
   const lang = locale === 'zh' ? 'zh' : 'en';
   return pageMetadata(
     locale,
     `/guides/${slug}`,
-    `${module.title[lang]}${lang === 'zh' ? '：澳洲租房攻略' : ': Australian Rental Guide'} | QRent`,
+    `${module.title[lang]}${lang === 'zh' ? '：澳洲租房攻略' : ': Australian Rental Guide'} | Qrent`,
     module.summary[lang]
   );
 }
@@ -178,8 +178,8 @@ export default async function GuideModulePage({ params }: Props) {
             inLanguage: zh ? 'zh-CN' : 'en-AU',
             datePublished: RENTAL_LIBRARY_PUBLISHED_AT,
             dateModified: RENTAL_LIBRARY_PUBLISHED_AT,
-            author: { '@type': 'Organization', name: 'QRent' },
-            publisher: { '@type': 'Organization', name: 'QRent' },
+            author: { '@type': 'Organization', name: 'Qrent' },
+            publisher: { '@type': 'Organization', name: 'Qrent' },
             image: SITE_IMAGE,
             mainEntityOfPage: `${SITE_URL}/${locale}/guides/${slug}`,
             citation: [

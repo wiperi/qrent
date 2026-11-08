@@ -27,11 +27,11 @@ export function pageMetadata(
       title,
       description,
       url,
-      siteName: 'QRent',
+      siteName: 'Qrent',
       type: 'website',
       locale: locale === 'zh' ? 'zh_CN' : 'en_AU',
       images: [
-        { url: SITE_IMAGE, width: 3508, height: 2480, alt: 'QRent — Sydney student rentals' },
+        { url: SITE_IMAGE, width: 3508, height: 2480, alt: 'Qrent — Sydney student rentals' },
       ],
     },
     twitter: { card: 'summary_large_image', title, description, images: [SITE_IMAGE] },

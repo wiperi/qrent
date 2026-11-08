@@ -1,6 +1,6 @@
 <div align="center">
-  <img alt="QRent logo" src="./packages/frontend/public/qrent-logo.svg" height="128">
-  <h1>QRent</h1>
+  <img alt="Qrent logo" src="./packages/frontend/public/qrent-logo.svg" height="128">
+  <h1>Qrent</h1>
 
 <a href="https://www.qrent.rent"><img alt="Website" src="https://img.shields.io/badge/website-qrent.rent-blue?style=for-the-badge"></a>
 <a href="https://github.com/wiperi/qrent/blob/main/LICENSE"><img alt="License" src="https://img.shields.io/badge/license-NCL%201.0-orange?style=for-the-badge"></a>
@@ -11,9 +11,9 @@
 
 English | [简体中文](./README_CN.md)
 
-## About QRent
+## About Qrent
 
-QRent is an AI-powered rental platform built for students in Australia. It helps students find housing smarter and faster by analyzing commute time, budget, and area data to recommend the most suitable rentals — all in one place.
+Qrent is an AI-powered rental platform built for students in Australia. It helps students find housing smarter and faster by analyzing commute time, budget, and area data to recommend the most suitable rentals — all in one place.
 
 ## Our Growth
 
@@ -146,7 +146,7 @@ We welcome contributions and discussions from the community!
 
 ## Contributing
 
-Contributions to QRent are welcome! We follow the [Conventional Commits](https://www.conventionalcommits.org/) specification for commit messages.
+Contributions to Qrent are welcome! We follow the [Conventional Commits](https://www.conventionalcommits.org/) specification for commit messages.
 
 ### Commit Message Format
 

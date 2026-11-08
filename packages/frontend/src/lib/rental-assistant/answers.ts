@@ -43,8 +43,8 @@ function listingAnswer(listings: ListingSource[], locale: Locale, incomplete: bo
   if (!incomplete && listings.every(item => item.matches === 0))
     return (
       (zh
-        ? 'QRent 当前没有符合这些筛选条件的房源。 '
-        : 'QRent has no listings that match these filters. ') +
+        ? 'Qrent 当前没有符合这些筛选条件的房源。 '
+        : 'Qrent has no listings that match these filters. ') +
       listings.map(item => '[' + item.id + ']').join(' ')
     );
 
@@ -108,11 +108,11 @@ export function formatRentalAnswer(
     const areas = lookup?.failedAreas.join(locale === 'zh' ? '、' : ', ');
     lookupNotice = areas
       ? locale === 'zh'
-        ? '这次未能核对 ' + areas + ' 的 QRent 房源数据。'
-        : 'QRent could not verify listings for ' + areas + '.'
+        ? '这次未能核对 ' + areas + ' 的 Qrent 房源数据。'
+        : 'Qrent could not verify listings for ' + areas + '.'
       : locale === 'zh'
         ? '这次未能取得可核对的房源数据。请确认学校或区名后重试。'
-        : 'QRent could not verify listing data. Check the campus or suburb and try again.';
+        : 'Qrent could not verify listing data. Check the campus or suburb and try again.';
   }
 
   return [

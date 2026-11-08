@@ -1,4 +1,4 @@
-"""Send a private summary of new QRent beta signups to the site owner."""
+"""Send a private summary of new Qrent beta signups to the site owner."""
 
 import base64
 import fcntl
@@ -120,12 +120,12 @@ def make_message(owner, batch, records, smoke=False):
     message["Date"] = formatdate(usegmt=True)
     message["Message-ID"] = f"<qrent-rental-alerts-{batch}@markovo.net>"
     if smoke:
-        message["Subject"] = "QRent 租房订阅提醒联调"
-        message.set_content("这是一封 QRent 报名提醒的发信测试，未创建报名记录。")
+        message["Subject"] = "Qrent 租房订阅提醒联调"
+        message.set_content("这是一封 Qrent 报名提醒的发信测试，未创建报名记录。")
         return message
     count = len(records)
-    message["Subject"] = f"QRent 有 {count} 个新的租房订阅内测报名"
-    lines = ["以下报名已保存到 QRent，可按需要联系报名者。", ""]
+    message["Subject"] = f"Qrent 有 {count} 个新的租房订阅内测报名"
+    lines = ["以下报名已保存到 Qrent，可按需要联系报名者。", ""]
     for record in records:
         locale = "中文" if record["locale"] == "zh" else "英文"
         lines.append(f'{record["email"]}  {locale}  {record["registered"]}')
