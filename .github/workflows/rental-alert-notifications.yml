@@ -1,0 +1,44 @@
+name: Rental alert signup notifications
+
+on:
+  schedule:
+    - cron: '7,22,37,52 * * * *'
+  workflow_dispatch:
+    inputs:
+      mode:
+        description: Inspect the queue, send one delivery test, or process new signups
+        type: choice
+        required: true
+        default: inspect
+        options:
+          - inspect
+          - smoke
+          - send
+
+permissions:
+  contents: read
+
+concurrency:
+  group: qrent-rental-alert-notifications
+  cancel-in-progress: false
+
+jobs:
+  notify:
+    if: github.repository == 'wiperi/qrent' && github.ref == 'refs/heads/main'
+    environment: production
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.sha }}
+          persist-credentials: false
+      - name: Process new rental alert signups
+        env:
+          DEPLOY_SERVER_HOST: ${{ secrets.DEPLOY_SERVER_HOST }}
+          DEPLOY_SERVER_USERNAME: ${{ secrets.DEPLOY_SERVER_USERNAME }}
+          DEPLOY_SERVER_PASSWORD: ${{ secrets.DEPLOY_SERVER_PASSWORD }}
+          QRENT_ALERT_SMTP_PASSWORD: ${{ secrets.QRENT_ALERT_SMTP_PASSWORD }}
+          QRENT_ALERT_OWNER_EMAIL: ${{ secrets.QRENT_ALERT_OWNER_EMAIL }}
+          QRENT_ALERT_MODE: ${{ github.event_name == 'schedule' && 'send' || inputs.mode }}
+        run: python3 ops/notify_rental_alerts.py "$QRENT_ALERT_MODE"
