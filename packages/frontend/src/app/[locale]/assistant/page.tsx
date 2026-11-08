@@ -4,7 +4,7 @@ import RentalAssistant from '@/components/RentalAssistant';
 export async function generateMetadata({ params }: { params: Promise<{ locale: string }> }) {
   const { locale } = await params;
   return {
-    title: locale === 'zh' ? '小 Q 助手 | QRent' : 'Little Q | QRent',
+    title: locale === 'zh' ? '小 Q · AI 找房 | QRent' : 'Little Q · AI Rentals | QRent',
     robots: { index: false, follow: false },
   };
 }
