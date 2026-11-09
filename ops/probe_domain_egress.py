@@ -1,5 +1,6 @@
 """Read one public Domain search page through the production server's network."""
 
+import asyncio
 from contextlib import closing
 import json
 import os
@@ -9,6 +10,7 @@ import socket
 import subprocess
 from tempfile import TemporaryDirectory
 import time
+from urllib.parse import urlsplit
 
 from notify_rental_alerts import NotificationError, RemoteStore
 
@@ -29,37 +31,49 @@ def wait_for_forward(process, port):
     return False
 
 
-def inspect_page(proxy, profile):
-    from playwright.sync_api import Error, sync_playwright
+async def inspect_page(proxy, profile):
+    from playwright.async_api import Error, async_playwright
 
-    result = {"status": "browser_unavailable", "requests": 0, "explicit_navigations": 0}
+    result = {"status": "browser_unavailable", "requests": 0, "explicit_navigations": 0, "document_statuses": []}
     browser = shutil.which("google-chrome")
     if not browser:
         return result
     result["browser"] = subprocess.check_output([browser, "--version"], text=True).strip()
     try:
-        with sync_playwright() as driver, driver.chromium.launch_persistent_context(
-            profile, executable_path=browser, headless=False, no_viewport=True,
-            service_workers="block", proxy={"server": proxy}, timeout=9000,
-        ) as context:
-            def count_request(route):
-                if result["requests"] >= REQUEST_LIMIT:
-                    route.abort()
-                    return
-                result["requests"] += 1
-                route.continue_()
+        async with async_playwright() as driver:
+            context = await driver.chromium.launch_persistent_context(
+                profile, executable_path=browser, headless=False, no_viewport=True,
+                service_workers="allow", proxy={"server": proxy}, timeout=9000,
+            )
+            stop = None
 
-            context.route("**/*", count_request)
+            def observe_request(_request):
+                nonlocal stop
+                result["requests"] += 1
+                if result["requests"] == REQUEST_LIMIT:
+                    stop = asyncio.create_task(context.close())
+
             page = context.pages[0]
-            result["explicit_navigations"] = 1
-            response = page.goto(URL, timeout=18000, wait_until="domcontentloaded")
-            result["http"] = response.status if response else None
-            result["akamai"] = bool(response and "akamaighost" in (response.header_value("server") or "").lower())
-            result["status"] = "upstream_response_unavailable"
-            if not response or response.status != 200:
-                return result
-            page.wait_for_selector('li[data-testid^="listing-"]', state="attached", timeout=7500)
-            matches = page.evaluate(r"""() => {
+
+            def observe_response(response):
+                if (response.request.is_navigation_request() and response.frame == page.main_frame
+                        and urlsplit(response.url).hostname == "www.domain.com.au"):
+                    if len(result["document_statuses"]) < 8:
+                        result["document_statuses"].append(response.status)
+
+            context.on("request", observe_request)
+            page.on("response", observe_response)
+            try:
+                result["explicit_navigations"] = 1
+                response = await page.goto(URL, timeout=15000, wait_until="commit")
+                result["http"] = response.status if response else None
+                server = await response.header_value("server") if response else None
+                result["akamai"] = "akamaighost" in (server or "").lower()
+                result["status"] = "upstream_response_unavailable"
+                if not response or response.status != 200:
+                    return result
+                await page.wait_for_selector('li[data-testid^="listing-"]', state="attached", timeout=14000)
+                matches = await page.evaluate(r"""() => {
                 const source = document.querySelector('#__NEXT_DATA__');
                 if (!source) return 0;
                 const props = JSON.parse(source.textContent).props?.pageProps?.componentProps;
@@ -74,15 +88,29 @@ def inspect_page(proxy, profile):
                 ]).filter(id => ids.has(id));
                 return new Set(matching).size;
             }""")
-            result["matched_listing_ids"] = matches
-            result["status"] = "verified_listings" if matches and page.url.startswith(
-                "https://www.domain.com.au/rent/newtown-nsw-2042/"
-            ) else "listing_identity_unverified"
+                result["matched_listing_ids"] = matches
+                result["status"] = "verified_listings" if matches and page.url.startswith(
+                    "https://www.domain.com.au/rent/newtown-nsw-2042/"
+                ) else "listing_identity_unverified"
+            except Error:
+                if not page.is_closed():
+                    try:
+                        result["document_state"] = await asyncio.wait_for(
+                            page.evaluate("document.readyState"), timeout=1.5
+                        )
+                    except (Error, TimeoutError):
+                        pass
+                raise
+            finally:
+                if stop is None:
+                    await context.close()
+                else:
+                    await stop
     except Error as error:
-        result["status"] = (
-            "domain_connection_through_forward_failed" if "ERR_SOCKS_CONNECTION" in str(error)
-            else "browser_did_not_verify_listings"
-        )
+        result["status"] = "native_page_did_not_verify_listings"
+        result["error_type"] = type(error).__name__
+        if "ERR_SOCKS_CONNECTION" in str(error):
+            result["status"] = "domain_connection_through_forward_failed"
     return result
 
 
@@ -110,7 +138,7 @@ def main():
                 if not wait_for_forward(forward, port):
                     result = {"status": "temporary_ssh_forward_unavailable"}
                 else:
-                    result = inspect_page(f"socks5://127.0.0.1:{port}", Path(directory) / "profile")
+                    result = asyncio.run(inspect_page(f"socks5://127.0.0.1:{port}", Path(directory) / "profile"))
                 print(json.dumps(result), flush=True)
             finally:
                 if forward.poll() is None:
