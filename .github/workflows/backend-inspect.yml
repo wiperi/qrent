@@ -2,6 +2,12 @@ name: Backend host inspection
 
 on:
   workflow_dispatch:
+    inputs:
+      mode:
+        description: Inspect host capacity or probe the Domain search page through the production host
+        type: choice
+        default: inspect
+        options: [inspect, domain-egress]
 
 permissions:
   contents: read
@@ -20,8 +26,21 @@ jobs:
           ref: ${{ github.sha }}
           persist-credentials: false
       - name: Inspect capacity without deploying or changing containers
+        if: inputs.mode != 'domain-egress'
         env:
           DEPLOY_SERVER_HOST: ${{ secrets.DEPLOY_SERVER_HOST }}
           DEPLOY_SERVER_USERNAME: ${{ secrets.DEPLOY_SERVER_USERNAME }}
           DEPLOY_SERVER_PASSWORD: ${{ secrets.DEPLOY_SERVER_PASSWORD }}
         run: bash ops/release_backend.sh inspect
+      - name: Prepare the browser on the runner
+        if: inputs.mode == 'domain-egress' && github.ref == 'refs/heads/main'
+        run: |
+          python3 -m venv "$RUNNER_TEMP/qrent-domain-probe"
+          "$RUNNER_TEMP/qrent-domain-probe/bin/python" -m pip install playwright==1.62.0
+      - name: Check one Domain page through a temporary SSH forward
+        if: inputs.mode == 'domain-egress' && github.ref == 'refs/heads/main'
+        env:
+          DEPLOY_SERVER_HOST: ${{ secrets.DEPLOY_SERVER_HOST }}
+          DEPLOY_SERVER_USERNAME: ${{ secrets.DEPLOY_SERVER_USERNAME }}
+          DEPLOY_SERVER_PASSWORD: ${{ secrets.DEPLOY_SERVER_PASSWORD }}
+        run: timeout --kill-after=5s 60s xvfb-run -a "$RUNNER_TEMP/qrent-domain-probe/bin/python" ops/probe_domain_egress.py
