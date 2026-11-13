@@ -139,6 +139,24 @@ const fundingCap =
 const supportPeriod =
   /(?:前|最初)\s*(\d+)\s*(周|个月|月)|\b(?:first|initial)\s+(\d+)\s+(weeks?|months?)\b/i;
 
+const parentRelationship =
+  /(?:我是|身份是)\s*[^。；，\n]{0,36}?(母亲|父亲|妈妈|爸爸|家长)|\bI (?:am|'m) (?:the (?:applicant|tenant)['’]s |(?:his|her|their) )(mother|father|parent)\b|\bI (?:am|'m) (?:the )?(mother|father|parent) of (?:the )?(?:applicant|tenant)\b/i;
+const relationships = {
+  mother: { zh: '母亲', en: 'mother' },
+  father: { zh: '父亲', en: 'father' },
+  parent: { zh: '家长', en: 'parent' },
+};
+
+function statedParentRelationship(questions: string[], locale: Locale) {
+  const match = questions
+    .findLast(question => parentRelationship.test(question))
+    ?.match(parentRelationship);
+  const role = (match?.[1] ?? match?.[2] ?? match?.[3])?.toLowerCase();
+  if (/^(?:母亲|妈妈|mother)$/.test(role ?? '')) return relationships.mother[locale];
+  if (/^(?:父亲|爸爸|father)$/.test(role ?? '')) return relationships.father[locale];
+  if (/^(?:家长|parent)$/.test(role ?? '')) return relationships.parent[locale];
+}
+
 function limitedSupport(questions: string[], locale: Locale) {
   const amount = questions.findLast(question => fundingCap.test(question));
   const value = amount?.match(fundingCap);
@@ -333,7 +351,9 @@ export async function generateRentalLetter({
   }
 
   const relationship =
-    get('relationship') || (zh ? '[与申请人的关系]' : '[relationship to the applicant]');
+    statedParentRelationship(questions, language) ||
+    get('relationship') ||
+    (zh ? '[与申请人的关系]' : '[relationship to the applicant]');
   const parent = get('parent') || (zh ? '[资助人姓名]' : '[Parent’s name]');
   const intro = zh
     ? '我是' + applicant + '的' + relationship + '。这封信说明我拟为这次租房申请提供的资助。'
