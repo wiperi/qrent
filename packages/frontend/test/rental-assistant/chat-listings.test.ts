@@ -396,7 +396,6 @@ test('a parent letter revision retains the stated limit and duration and exclude
     ],
     modelAnswer: JSON.stringify({
       fields: {
-        relationship: { value: 'mother', quote: '我是申请人的母亲' },
         support: {
           value: 'Up to A$450 per week for the first 12 weeks.',
           quote: '每周最多 A$450，只资助前 12 周',
@@ -411,6 +410,8 @@ test('a parent letter revision retains the stated limit and duration and exclude
   assert.equal(reply.letterType, 'parent');
   assert.equal(queries.length, 0);
   assert.equal(modelRequests.length, 1);
+  assert.match(reply.answer, /I am .+mother\./i);
+  assert.doesNotMatch(reply.answer, /\[relationship to the applicant\]/i);
   assert.match(reply.answer, /up to A\$450 per week for the first 12 weeks/i);
   assert.doesNotMatch(reply.answer, /guarantee all rent|liabilities/i);
 });
