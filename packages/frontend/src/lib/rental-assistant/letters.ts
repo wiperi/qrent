@@ -1,9 +1,10 @@
-import { generateText } from 'ai';
+import { generateText, Output } from 'ai';
 import { z } from 'zod';
 import type { RentalLetterType } from './contracts';
 import { draftLanguage, isRentalDraft } from './guide-topics';
 import { modelJson } from './model-json';
 import type { connectModel } from './model';
+import { RENTAL_SCHOOLS } from '../rental-schools';
 
 type Locale = 'zh' | 'en';
 const parentLetter = /父母资助信|家长资助信|父母支持信|\bparent(?:al)?(?:[- ]support)? letter\b/i;
@@ -167,10 +168,50 @@ function limitedSupport(questions: string[], locale: Locale) {
         '.';
 }
 
-const extractionPrompt = `Extract the facts for the requested rental letter. Return JSON only with this shape: {"fields":{"study":{"value":"I have received an offer from UNSW.","quote":"我有 UNSW offer"}}}.
-Each quote must be an exact, contiguous excerpt of what the user actually stated, including all limits, dates, amounts, negation and jurisdiction. Pick the latest stated fact per field. Omit facts that the user removed, hypothetical examples, and missing fields. Never expand a factual claim or infer a positive trait or a promise. Use digits for amounts and durations when the user used digits.
+const extractionPrompt = `Extract the facts for the requested rental letter. Return JSON only with this shape: {"fields":{"study":{"value":"I have received an offer from UNSW.","quote":"我有 UNSW offer"},"funding":{"value":"My parents will support my rent.","quote":"房租由父母资助"}}}.
+Review every user message, include every stated fact that fits the allowed fields, and carry forward facts the latest message did not change. Each quote must be an exact, contiguous excerpt of what the user actually stated, including all limits, dates, amounts, negation and jurisdiction. Pick the latest stated fact per field. Omit facts that the user removed, hypothetical examples, and missing fields. Never expand a factual claim or infer a positive trait or a promise. Use digits for amounts and durations when the user used digits.
 Use short first-person sentences in study, history (positive rental experience only), funding, terms (user-stated start date or lease length only), and support (only what the parent states they will contribute, with original frequency, cap and duration). A lack of Australian rental history is scoped to Australia. Do not add any history assertion to another field.
-The other field values are names or labels only: applicant, agent, property (the mentioned address or property type), parent, relationship, contact (the user's stated contact). Leave unused fields out. A parent funding statement never creates a guarantor commitment. Preserve the requested language for sentence fields.`;
+The other field values are names or labels only: applicant, agent, property (the exact street address only), parent, relationship, contact (the user's stated contact). Use an empty fields object if there are no facts. Leave unused fields out. A parent funding statement never creates a guarantor commitment. Preserve the requested language for sentence fields.`;
+
+function directCoverFacts(questions: string[], locale: Locale) {
+  const clauses = questions.flatMap(question => question.split(/[，。；！？\n,;!?]+/));
+  const offer = clauses.findLast(
+    clause =>
+      /(?:收到|拿到|拿了|已有|我有|获(?:得|了)|received|have|got).{0,35}(?:\boffer\b|录取)|\boffer\b.{0,20}(?:from|at)\b/i.test(
+        clause
+      ) && !/还没|没有|未收到|等.*offer|waiting|not received|if I/i.test(clause)
+  );
+  const school =
+    offer && RENTAL_SCHOOLS.find(item => new RegExp('\\b' + item.code + '\\b', 'i').test(offer));
+  const omitSchool = clauses.findLast(clause =>
+    /(?:不要|删掉|去掉|不写).{0,20}(?:学校|offer|录取)|(?:remove|omit|do not mention).{0,20}(?:offer|university)/i.test(
+      clause
+    )
+  );
+  const funding = clauses.findLast(clause =>
+    /(?:父母|爸妈).{0,20}(?:房租|租金|资助)|(?:房租|租金).{0,16}(?:父母|爸妈)|\b(?:my parents|parental support)\b.{0,40}\b(?:rent|fund)\b/i.test(
+      clause
+    )
+  );
+  const parentSupport =
+    funding &&
+    /资助|支付|承担|support|pay|fund|cover/i.test(funding) &&
+    !/不再|不写|不要|不资助|不支付|不会|没有|not|only|只|最多|至多/i.test(funding) &&
+    !numbers(funding).length;
+  return {
+    study:
+      !omitSchool && school
+        ? locale === 'zh'
+          ? '我已收到 ' + school.code + ' 的录取通知。'
+          : 'I have received an offer from ' + school.code + '.'
+        : '',
+    funding: parentSupport
+      ? locale === 'zh'
+        ? '我的房租由父母资助。'
+        : 'My parents will support my rent.'
+      : '',
+  };
+}
 
 export async function generateRentalLetter({
   model,
@@ -194,6 +235,7 @@ export async function generateRentalLetter({
     model,
     system: extractionPrompt,
     prompt: JSON.stringify({ type, language, userMessages: questions }),
+    output: Output.json(),
     maxOutputTokens: 800,
     maxRetries: 0,
     abortSignal: signal,
@@ -242,7 +284,13 @@ export async function generateRentalLetter({
 
   const agent = get('agent') || (zh ? '[中介姓名]' : '[Agent’s name]');
   const applicant = get('applicant') || (zh ? '[申请人姓名]' : '[Applicant’s name]');
-  const property = get('property') || (zh ? '[房源地址]' : '[property address]');
+  const requestedAddressPlaceholder = questions.some(question =>
+    /占位符.{0,30}地址|地址.{0,30}占位符|address.{0,30}placeholder|placeholder.{0,30}address/i.test(
+      question
+    )
+  );
+  const property =
+    (!requestedAddressPlaceholder && get('property')) || (zh ? '[房源地址]' : '[property address]');
   const localHistoryStatement = questions.findLast(
     question =>
       historyMention.test(question) &&
@@ -251,15 +299,14 @@ export async function generateRentalLetter({
   const noLocal = Boolean(
     localHistoryStatement && noAustralianHistory.test(localHistoryStatement) && !historyOmitted
   );
-  const history = [
-    noLocal && (zh ? '我目前没有澳洲租房记录。' : 'I have no rental history in Australia yet.'),
-    get('history'),
-  ];
+  const localHistory =
+    noLocal && (zh ? '我目前没有澳洲租房记录。' : 'I have no rental history in Australia yet.');
   const greeting = zh ? '您好，' + agent + '：' : 'Dear ' + agent + ',';
   const close = zh ? '谢谢您的考虑。' : 'Thank you for your consideration.';
   const signOff = zh ? '此致' : 'Kind regards,';
 
   if (type === 'cover') {
+    const explicit = directCoverFacts(questions, language);
     const intro = zh
       ? '我想申请租住这套房源（' + property + '）。'
       : 'I am writing to apply for this rental (' + property + ').';
@@ -267,7 +314,15 @@ export async function generateRentalLetter({
       answer: [
         greeting,
         intro,
-        [get('study'), get('terms'), ...history, get('funding')].filter(Boolean).join(' '),
+        [
+          explicit.study || get('study'),
+          get('terms'),
+          localHistory,
+          get('history'),
+          explicit.funding || get('funding'),
+        ]
+          .filter(Boolean)
+          .join(' '),
         close,
         signOff + '\n' + (get('applicant') || (zh ? '[你的姓名]' : '[Your name]')),
       ]

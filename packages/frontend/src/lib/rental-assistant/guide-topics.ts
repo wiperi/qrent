@@ -42,6 +42,9 @@ const roommate = /Flatmates|室友|\b(?:housemates?|roommates?|share house)\b/i;
 const sharedTerms = /账单|水电|访客|清洁|轮流|\b(?:bills?|visitors?|guests?|cleaning|chores)\b/i;
 const concreteGuestLimit =
   /(?:访客|客人).{0,20}(?:最多|几小时|上限|时限)|\b(?:maximum|how (?:many hours|long)|time limit)\b.{0,45}\b(?:guests?|visitors?)\b/i;
+const reference =
+  /海外(?:推荐|证明)|前房东|推荐信|推荐人|\b(?:overseas reference|former landlord|rental references?|referees?)\b/i;
+const sharedAppliance = /公用|共用|共享|\b(?:shared|communal)\b/i;
 
 export type RuleTopic =
   | 'condition-deadline'
@@ -109,6 +112,11 @@ export function practicalGuideSections(question: string) {
       'inspection-checklist#proxy-deliverables',
       'application-documents#parent-letter-and-history',
     ];
+  if (reference.test(question))
+    return [
+      'application-documents#parent-letter-and-history',
+      'application-documents#document-checklist',
+    ];
   if (newMould.test(question))
     return ['moving-in#condition-report-checklist', 'repairs-and-moving-out#exit-and-bond'];
   if (needsApplicationEvidence(question))
@@ -167,16 +175,22 @@ export function draftLanguage(question: string, fallback: 'zh' | 'en') {
   return fallback;
 }
 
-export function practicalGuideTopic(question: string) {
+export function practicalGuideTopic(question: string, previousQuestion?: string) {
   if (
     inspectionStatus.test(question) &&
     /看房|出发|状态|\b(?:inspection|travelling|viewing|available)\b/i.test(question)
   )
     return 'inspection-status';
   if (oldListing.test(question) && appliance.test(question)) return 'appliance-inspection';
+  if (
+    sharedAppliance.test(question) &&
+    (appliance.test(question) || (previousQuestion && appliance.test(previousQuestion)))
+  )
+    return 'shared-appliance';
   if (roommate.test(question) && sharedTerms.test(question) && !concreteGuestLimit.test(question))
     return 'roommate-terms';
   if (overseasProxy.test(question) && noLocalHistory.test(question)) return 'proxy-and-history';
+  if (reference.test(question)) return 'rental-reference';
   if (newMould.test(question)) return 'new-mould';
   if (needsApplicationEvidence(question)) return 'application-evidence';
   if (inspection.test(question)) return 'inspection-checklist';

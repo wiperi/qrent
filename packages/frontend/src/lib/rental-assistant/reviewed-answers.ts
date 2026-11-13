@@ -207,8 +207,13 @@ export function reviewedRentalAnswer({
   }
 }
 
-export function practicalRentalAnswer(question: string, locale: Locale, passages: CitedPassage[]) {
-  const topic = practicalGuideTopic(question);
+export function practicalRentalAnswer(
+  question: string,
+  locale: Locale,
+  passages: CitedPassage[],
+  previousQuestion?: string
+) {
+  const topic = practicalGuideTopic(question, previousQuestion);
   const zh = locale === 'zh';
   const link = (anchor: string) => {
     const source = passages.find(passage => passage.path.endsWith('#' + anchor));
@@ -241,6 +246,29 @@ export function practicalRentalAnswer(question: string, locale: Locale, passages
           history +
           '\n\nAt the viewing, check its location, whether it is shared and whether it works. Ask the agent to confirm in writing whether it is included in the tenancy.' +
           rooms;
+  }
+  if (topic === 'shared-appliance') {
+    const rooms = link('room-checklist');
+    if (!rooms) return;
+    return zh
+      ? '如果洗衣设备是公用的，现场确认机器能否使用、公用设备是否收费。请中介书面确认租约是否包含使用权和费用。' +
+          rooms
+      : 'If the laundry is shared, check that the machine works and ask whether there is a charge. Ask the agent to confirm access and any charges in writing.' +
+          rooms;
+  }
+  if (topic === 'rental-reference') {
+    const history = link('parent-letter-and-history');
+    const documents = link('document-checklist');
+    if (!history || !documents) return;
+    return zh
+      ? '如果你在海外租过房，可以请真实的前房东做推荐人。准备租住地址、起止时间和可核实的联系方式，先征得对方同意，再提醒对方留意中介的核实邮件。' +
+          documents +
+          '\n\n如果之前和家人同住，照实写居住经历，并问中介是否接受资金证明或父母资助说明。' +
+          history
+      : 'If you rented overseas, ask a former landlord who can confirm your tenancy. Include the genuine address and rental dates, ask permission before sharing their contact details, and let them know the agent may get in touch.' +
+          documents +
+          '\n\nIf you lived with family instead, describe that accurately and ask whether the agent will accept evidence of funds or a support letter.' +
+          history;
   }
   if (topic === 'roommate-terms') {
     const terms = link('roommate-and-timing');

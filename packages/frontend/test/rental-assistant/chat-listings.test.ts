@@ -335,6 +335,57 @@ test('a cover letter about a particular property keeps the draft and skips inven
   assert.ok(reply.evidence.some((item: { path?: string }) => item.path?.endsWith('#cover-letter')));
 });
 
+test('a sparse model response retains the explicitly stated offer, funding and address placeholder', async t => {
+  const { reply } = await ask(t, {
+    locale: 'zh',
+    questions: [
+      '帮我用英文写一封租房 Cover Letter，申请悉尼一套 2B。我刚收到 UNSW 的 offer，没有澳洲租房史，房租由父母资助。请用占位符留出地址和姓名。',
+      '补充我在杭州租过房，不要加其他事实。',
+    ],
+    modelAnswer: JSON.stringify({
+      fields: {
+        property: { value: '2B in Sydney', quote: '悉尼一套 2B' },
+        history: { value: 'I rented in Hangzhou.', quote: '我在杭州租过房' },
+      },
+    }),
+  });
+  assert.match(reply.answer, /offer from UNSW/i);
+  assert.match(reply.answer, /my parents will support my rent/i);
+  assert.match(reply.answer, /rented in Hangzhou/i);
+  assert.match(reply.answer, /\[property address\]/i);
+  assert.match(reply.answer, /no rental history in Australia/i);
+});
+
+test('overseas rental referees and a shared appliance follow-up use available handbook advice', async t => {
+  const { reply } = await ask(t, {
+    questions: [
+      'I do not have an Australian rental history. How should I prepare a real overseas reference, and whom can I ask?',
+    ],
+  });
+  assert.match(reply.answer, /former landlord/);
+  assert.match(reply.answer, /permission/);
+  assert.ok(
+    reply.evidence.some((source: { path?: string }) =>
+      source.path?.endsWith('#parent-letter-and-history')
+    )
+  );
+});
+
+test('a shared-appliance follow-up recalls the earlier listing context', async t => {
+  const { reply } = await ask(t, {
+    locale: 'zh',
+    questions: [
+      '广告说有洗衣机，但历史照片没拍到，平面图也模糊。现场和签约前要核对什么？',
+      '那如果是公用的呢？我应该核对什么？',
+    ],
+  });
+  assert.match(reply.answer, /公用.{0,14}(?:收费|费用)|是否收费/);
+  assert.match(reply.answer, /书面/);
+  assert.ok(
+    reply.evidence.some((source: { path?: string }) => source.path?.endsWith('#room-checklist'))
+  );
+});
+
 test('a parent letter revision retains the stated limit and duration and excludes a guarantee', async t => {
   const { reply, queries, modelRequests } = await ask(t, {
     locale: 'zh',
