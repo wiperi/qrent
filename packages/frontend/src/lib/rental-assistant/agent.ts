@@ -98,9 +98,9 @@ export async function runRentalAssistant({
     !currentRule && isGuideFollowUp(question)
       ? priorQuestions.find(item => rentalRuleTopic(item.content))?.content
       : undefined;
-  const practicalTopic = practicalGuideTopic(question);
+  const practicalTopic = practicalGuideTopic(question, previousUserQuestion);
   const priorGuide =
-    !drafting && !currentRule && !practicalTopic && isGuideFollowUp(question)
+    !drafting && !currentRule && isGuideFollowUp(question)
       ? priorQuestions.find(
           item =>
             practicalGuideSections(item.content).length ||
@@ -225,7 +225,7 @@ export async function runRentalAssistant({
           })
         : drafting
           ? undefined
-          : practicalRentalAnswer(question, answerLocale, guideEvidence);
+          : practicalRentalAnswer(question, answerLocale, guideEvidence, previousUserQuestion);
   const citedGuides = guideEvidence.filter(item => sourcedAnswer?.includes('[' + item.id + ']'));
   if (sourcedAnswer && !listingQuestion)
     return { answer: sourcedAnswer, evidence: citedGuides, listingLookupFailed: false };
