@@ -1,0 +1,16 @@
+[Unit]
+Description=Export public Qrent homepage listing counts
+After=network-online.target qrent-mysql-egress.service
+Wants=network-online.target qrent-mysql-egress.service
+
+[Service]
+Type=oneshot
+ExecStart=/root/qrent-scraper/releases/recovery-20261027/.venv/bin/python /usr/local/lib/qrent/export_listing_stats.py
+TimeoutStartSec=45s
+Environment=PYTHONDONTWRITEBYTECODE=1
+UMask=0077
+NoNewPrivileges=yes
+PrivateTmp=yes
+ProtectSystem=strict
+ProtectHome=read-only
+ReadWritePaths=/var/www/qrent-stats
