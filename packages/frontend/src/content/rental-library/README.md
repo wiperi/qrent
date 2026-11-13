@@ -1,6 +1,6 @@
 # Source attributed rental library
 
-`modules.ts` contains eight paired Chinese/English editorial modules and 33 stable
+`modules.ts` contains eight paired Chinese/English editorial modules and 36 stable
 sections. `references.json` records the two owner-supplied source-file hashes and
 all twenty collected-post identities. Original files remain private and unchanged.
 The collection document contains text transcriptions/descriptions of images; this
@@ -25,7 +25,7 @@ labels. Outdated payment/water/deadline claims are corrected with official citat
 the source files and the ten existing paired experience articles are not rewritten.
 
 `/knowledge/rental-guides.json` is a static, noindex reference export. It contains
-66 language-specific chunks with stable canonical section URLs and evidence scope.
+72 language-specific chunks with stable canonical section URLs and evidence scope.
 It invokes no model, embedding provider or database. Local browser search is lexical
 retrieval. Little Q retrieves these sections and the paired blog articles in the
 question's language. Its FAQ matching uses wording from the legacy Qrent Word Q&A

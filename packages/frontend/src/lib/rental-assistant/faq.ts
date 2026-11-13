@@ -53,6 +53,23 @@ const faq: { match: RegExp; sections: string[] }[] = [
   },
   {
     match:
+      /(?:学校|院校).*(?:住址|租房地址|居住地址)|签证.*(?:住址|地址)|8533|(?:education provider|school|university).*residential address/i,
+    sections: ['application-documents#student-address'],
+  },
+  {
+    match:
+      /(?:父母|家人).*(?:账户|付款|代付|付租金|付押金)|(?:parents?|family).*(?:pay|account).*(?:rent|bond)/i,
+    sections: [
+      'contracts-and-bond#nsw-rent-and-family-payments',
+      'contracts-and-bond#bond-lodgement',
+    ],
+  },
+  {
+    match: /租客保险|财物保险|renter['’]?s? insurance|contents insurance/i,
+    sections: ['moving-in#contents-insurance'],
+  },
+  {
+    match:
       /(?:租房|申请).*(?:准备|需要).*(?:材料|文件)|申请材料|中介优先考虑|(?:rental|application) (?:documents?|paperwork)|what documents.*(?:apply|rent)/i,
     sections: ['application-documents#document-checklist'],
   },

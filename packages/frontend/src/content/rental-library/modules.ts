@@ -489,6 +489,26 @@ Complete address history, employment, income, identity and emergency-contact fie
         ['study-australia-applications']
       ),
       s(
+        'student-address',
+        t('留学生如何向学校更新住址', 'Updating your address with your education provider'),
+        t(
+          `先查签证批签信或 VEVO 是否列有 8533 条件。如果签证在境外获批且附有该条件，抵澳后七天内把居住地址告知教育机构，地址变更后七天内更新。
+
+报到或校内手续所需信息，查看自己学校的通知。通过学校的正式渠道提交真实现住地址，尚未入住长期住处时询问学校怎么登记临时地址。`,
+          `Check the grant letter or VEVO for condition 8533. If it applies and the visa was granted while you were overseas, tell your education provider your residential address within seven days of arriving in Australia. Update it within seven days of a change.
+
+Check your own provider's enrolment instructions. Give your current address through its official channel, and ask how to record temporary accommodation if you have not moved to a longer-term home.`
+        ),
+        t(
+          '学校要求地址 住址 8533 VEVO 留学生 搬家',
+          'student residential address education provider 8533 VEVO'
+        ),
+        ['qrent-handbook:L342-L394'],
+        ['Australia'],
+        'official-rule',
+        ['home-affairs-address']
+      ),
+      s(
         'submit-and-follow-up',
         t('看房、递交和跟进顺序', 'Inspect, submit and follow up'),
         t(
@@ -708,6 +728,26 @@ NSW prohibits landlords/agents soliciting or inviting offers above advertised re
         ['nsw-start-costs', 'nsw-rent-bidding']
       ),
       s(
+        'nsw-rent-and-family-payments',
+        t('家人资助时怎样付租金和押金', 'Pay rent and bond when family provides funds'),
+        t(
+          `先确认对方要求付的是租金、定金还是 bond。租金按租约规定的金额、周期和方式付。家人代付租金前，向中介确认付款渠道、付款人姓名及怎样备注房源或租约编号，方便把到账金额记到你的租约下。
+
+使用 NSW 的 Rental Bonds Online 时，核对租客、房屋、金额和账户资料，并保留交存回执。若要用他人的卡或账户，先向交存机构确认是否接受、付款怎么识别、退款资料怎样填写。家人提供资金时也可先转给你，再由你按已核对的流程支付。`,
+          `First confirm whether the payment is rent, a holding fee or a bond. Follow the rent amount, schedule and method in the agreement. If a family member will pay rent, confirm the method, payer name and property or tenancy reference so the agent can credit your account.
+
+For NSW Rental Bonds Online, check the tenant, property, amount and bank details, and keep the lodgement receipt. Before using someone else's card or account, confirm acceptance, payment identification and refund details with the bond service. Another option is for your family to send you the funds and for you to pay through the verified channel.`
+        ),
+        t(
+          '父母账户 家人代付 租金 押金 付款 RBO',
+          'parents pay rent bond family account third party payment RBO'
+        ),
+        ['qrent-handbook:L396-L440', 'collection-05'],
+        ['NSW'],
+        'editorial-guide',
+        ['nsw-rent-payments', 'nsw-rbo-tenants']
+      ),
+      s(
         'bond-lodgement',
         t('交存与保留押金记录', 'Lodgement and bond records'),
         t(
@@ -825,6 +865,26 @@ An apartment can also be subject to strata rules. Check the current guidance for
         ['NSW'],
         'official-rule',
         ['nsw-pets']
+      ),
+      s(
+        'contents-insurance',
+        t('租客财物保险怎么判断', 'Decide whether to buy contents insurance'),
+        t(
+          `先列电脑、家具、衣物等财物，估算重新购买的费用。把自己可承担的损失和保单的保费、自付额、单件限额放在一起比较。看清保单涵盖的事故和除外情形，尤其是合租空间、房外使用的电脑和自行车，以及意外损坏。
+
+买之前查产品披露声明（PDS），确认是否有个人责任保障及适用范围。保留贵重物品清单、照片和购买凭证。`,
+          `List what it would cost to replace your computer, furniture, clothing and other belongings. Compare the loss you could absorb with premiums, excesses and per-item limits. Check covered events and exclusions for shared homes, belongings used away from home and accidental damage.
+
+Read the Product Disclosure Statement for liability cover and its conditions. Keep an inventory, photos and receipts for valuable belongings.`
+        ),
+        t(
+          '租客保险 财物保险 保费 自付额 合租',
+          'renters insurance contents insurance excess shared home'
+        ),
+        ['qrent-handbook:L119-L174'],
+        ['Australia'],
+        'editorial-guide',
+        ['asic-contents-insurance']
       ),
       s(
         'utilities-and-water',
