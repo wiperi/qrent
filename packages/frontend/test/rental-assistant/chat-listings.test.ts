@@ -5,7 +5,9 @@ import { test, type TestContext } from 'node:test';
 import { POST } from '../../src/app/api/rental-assistant/chat/route';
 
 type Fixture = {
-  filters: Record<string, unknown>;
+  filters?: Record<string, unknown>;
+  steps?: { name: 'search_listings' | 'search_guides'; arguments: Record<string, unknown> }[];
+  locale?: 'zh' | 'en';
   unavailable?: string[];
   questions: string[];
   previousSearch?: Record<string, unknown>;
@@ -13,6 +15,7 @@ type Fixture = {
 
 async function ask(t: TestContext, fixture: Fixture) {
   const queries: Record<string, unknown>[] = [];
+  const modelRequests: Record<string, unknown>[] = [];
   const server = createServer(async (request, response) => {
     const url = new URL(request.url!, 'http://localhost');
     response.setHeader('content-type', 'application/json');
@@ -23,14 +26,18 @@ async function ask(t: TestContext, fixture: Fixture) {
         response.writeHead(503).end('{}');
         return;
       }
+      const rent = Math.min(980, query.maxPrice ?? Infinity);
+      const region = query.regions
+        ? query.regions[0].toUpperCase() + query.regions.slice(1)
+        : 'Randwick';
       response.end(
         JSON.stringify({
           result: {
             data: {
               filteredCount: 5,
-              averagePrice: 980,
+              averagePrice: rent,
               properties: [],
-              topRegions: [{ region: 'Randwick', propertyCount: 5, averagePrice: 980 }],
+              topRegions: [{ region, propertyCount: 5, averagePrice: rent }],
             },
           },
         })
@@ -40,15 +47,30 @@ async function ask(t: TestContext, fixture: Fixture) {
     let text = '';
     for await (const chunk of request) text += chunk;
     const input = JSON.parse(text);
-    const tool = input.tool_choice?.function?.name === 'search_listings';
-    const message = tool
+    const index = modelRequests.push(input) - 1;
+    const step =
+      fixture.steps?.[index] ??
+      (fixture.filters &&
+      input.tool_choice === 'auto' &&
+      input.tools?.[0]?.function?.name === 'search_listings'
+        ? { name: 'search_listings', arguments: fixture.filters }
+        : undefined);
+    if (step) {
+      assert.notEqual(input.tool_choice, 'none');
+      assert.ok(
+        input.tools?.some(
+          (tool: { function: { name: string } }) => tool.function.name === step.name
+        )
+      );
+    }
+    const message = step
       ? {
           content: null,
           tool_calls: [
             {
-              id: 'fixture-call',
+              id: 'fixture-call-' + index,
               type: 'function',
-              function: { name: 'search_listings', arguments: JSON.stringify(fixture.filters) },
+              function: { name: step.name, arguments: JSON.stringify(step.arguments) },
             },
           ],
         }
@@ -63,7 +85,7 @@ async function ask(t: TestContext, fixture: Fixture) {
           {
             index: 0,
             message: { role: 'assistant', ...message },
-            finish_reason: tool ? 'tool_calls' : 'stop',
+            finish_reason: step ? 'tool_calls' : 'stop',
           },
         ],
         usage: { prompt_tokens: 1, completion_tokens: 1, total_tokens: 2 },
@@ -98,7 +120,7 @@ async function ask(t: TestContext, fixture: Fixture) {
         'content-type': 'application/json',
       },
       body: JSON.stringify({
-        locale: 'en',
+        locale: fixture.locale ?? 'en',
         connection: { type: 'local' },
         messages: fixture.questions.map(content => ({ role: 'user', content })),
         previousSearch: fixture.previousSearch,
@@ -106,7 +128,7 @@ async function ask(t: TestContext, fixture: Fixture) {
     })
   );
   assert.equal(response.status, 200);
-  return { reply: await response.json(), queries };
+  return { reply: await response.json(), queries, modelRequests };
 }
 
 test('a failed rental lookup cannot return a model estimate as current rent', async t => {
@@ -145,4 +167,109 @@ test('a lower weekly budget retains the prior area, campus and bedroom filter', 
   assert.equal(queries[0].minBedrooms, 2);
   assert.equal(queries[0].maxBedrooms, 2);
   assert.equal(queries[0].maxPrice, 900);
+});
+
+test('one per-person budget sends separate whole-property caps for 2B and 3B', async t => {
+  const { reply, queries } = await ask(t, {
+    filters: { school: 'UNSW', bedrooms: 2, maxRent: 500 },
+    questions: ['UNSW 附近每人每周 500 刀，2B 和 3B 都看看。'],
+    locale: 'zh',
+  });
+  assert.deepEqual(
+    queries.map(query => [query.minBedrooms, query.maxBedrooms, query.maxPrice]),
+    [
+      [2, 2, 1000],
+      [3, 3, 1500],
+    ]
+  );
+  assert.match(reply.answer, /2 房.*A\$1,000/);
+  assert.match(reply.answer, /3 房.*A\$1,500/);
+  assert.match(reply.answer, /一人一间卧室/);
+  assert.doesNotMatch(reply.answer, /789/);
+  assert.equal(reply.search.perPersonRent, 500);
+  assert.deepEqual(reply.search.bedroomOptions, [2, 3]);
+});
+
+test('an actual headcount overrides the bedrooms and a tighter whole-property cap wins', async t => {
+  const { reply, queries } = await ask(t, {
+    filters: { school: 'UNSW', maxRent: 2000, occupants: 3 },
+    questions: ['UNSW 附近找 3B，我们两个人，人均 A$500，整套不超过 A$900。'],
+    locale: 'zh',
+  });
+  assert.deepEqual(
+    queries.map(query => [query.minBedrooms, query.maxPrice]),
+    [[3, 900]]
+  );
+  assert.doesNotMatch(reply.answer, /一人一间卧室/);
+  assert.match(reply.answer, /2 人均分/);
+});
+
+test('a follow-up recomputes the cap and carries forward budget basis, campus and commute', async t => {
+  const { reply, queries } = await ask(t, {
+    filters: { maxRent: 9000, maxCommute: null, occupants: 2 },
+    previousSearch: {
+      school: 'UNSW',
+      suburbs: ['Randwick'],
+      bedrooms: 2,
+      perPersonRent: 500,
+      maxCommute: 30,
+    },
+    questions: ['那 3B 呢？'],
+    locale: 'zh',
+  });
+  assert.deepEqual(
+    queries.map(query => [
+      query.targetSchool,
+      query.regions,
+      query.minBedrooms,
+      query.maxPrice,
+      query.maxCommuteTime,
+    ]),
+    [['UNSW', 'randwick', 3, 1500, 30]]
+  );
+  assert.equal(reply.search.perPersonRent, 500);
+});
+
+test('the agent uses tool results to make another distinct search and suppresses duplicates', async t => {
+  const { reply, queries, modelRequests } = await ask(t, {
+    questions: ['Find two bedrooms under A$1,000 near UNSW. If needed, check nearby suburbs.'],
+    steps: [
+      { name: 'search_listings', arguments: { suburbs: ['Eastgardens'] } },
+      { name: 'search_listings', arguments: { suburbs: ['Randwick'], bedrooms: 3, maxRent: 1200 } },
+      { name: 'search_listings', arguments: { suburbs: ['randwick'], maxRent: 1600 } },
+    ],
+  });
+  assert.equal(modelRequests.length, 4);
+  assert.deepEqual(
+    queries.map(query => [query.regions, query.minBedrooms, query.maxPrice]),
+    [
+      ['eastgardens', 2, 1000],
+      ['randwick', 2, 1000],
+    ]
+  );
+  assert.equal(reply.evidence.length, 2);
+  assert.match(reply.answer, /Eastgardens/);
+  assert.match(reply.answer, /Randwick/);
+});
+
+test('room-only searches use the room guide and avoid a whole-property lookup', async t => {
+  const { reply, queries } = await ask(t, {
+    locale: 'zh',
+    questions: ['想在 UNSW 附近找个单间，每周预算 500 刀。'],
+  });
+  assert.equal(queries.length, 0);
+  assert.ok(reply.evidence.some((item: { path?: string }) => item.path?.endsWith('#room-search')));
+});
+
+test('a mixed question searches the stated weekly budget and retrieves inspection advice', async t => {
+  const { reply, queries } = await ask(t, {
+    locale: 'zh',
+    questions: ['帮我找 Randwick 的两房，预算每周 900 刀。看房时要检查什么？'],
+  });
+  assert.equal(queries.length, 1);
+  assert.equal(queries[0].maxPrice, 900);
+  assert.ok(
+    reply.evidence.some((item: { path?: string }) => item.path?.endsWith('#room-checklist'))
+  );
+  assert.match(reply.answer, /A\$900/);
 });

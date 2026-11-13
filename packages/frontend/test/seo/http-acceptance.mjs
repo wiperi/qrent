@@ -22,7 +22,14 @@ test(
     const data = await corpus;
     assert.equal(data.sourceFiles.length, 2);
     assert.equal(data.experienceSources.length, 20);
-    assert.equal(data.chunks.length, 54);
+    assert.equal(data.chunks.length, 72);
+    const groups = new Map();
+    for (const chunk of data.chunks) {
+      const locales = groups.get(chunk.translationGroup) ?? [];
+      locales.push(chunk.locale);
+      groups.set(chunk.translationGroup, locales);
+    }
+    for (const locales of groups.values()) assert.deepEqual(locales.sort(), ['en', 'zh']);
     assert.equal(new Set(data.chunks.map(chunk => chunk.id)).size, data.chunks.length);
     assert(data.retrievalPolicy.preserveJurisdictionAndSourceDates);
   }
