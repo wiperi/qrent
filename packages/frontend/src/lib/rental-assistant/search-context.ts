@@ -63,7 +63,7 @@ const rentRangePattern = new RegExp(
   'i'
 );
 const commutePattern =
-  /(?:通勤|公交|公共交通|地铁|火车)\s*(?:最多|不超过|上限)?\s*(\d{1,3})\s*分钟|\b(?:within|under|max(?:imum)?)\s*(\d{1,3})\s*(?:min(?:ute)?s?\b)/i;
+  /(?:通勤|公交|公共交通|地铁|火车)\s*(?:(?:改成|改到|调到|降到|缩到|提高到|控制在|限制为)\s*)?(?:最多|不超过|上限)?\s*(\d{1,3})\s*分钟|\b(?:within|under|max(?:imum)?)\s*(\d{1,3})\s*(?:min(?:ute)?s?\b)/i;
 
 function countValue(value: string) {
   if (/^\d+$/.test(value)) return Number(value);

@@ -6,6 +6,7 @@ import MarkdownGuide from '@/components/MarkdownGuide';
 import {
   getModuleExperiences,
   officialReferences,
+  officialReferenceReviewedAt,
   references,
   rentalGuideModules,
   RENTAL_LIBRARY_PUBLISHED_AT,
@@ -122,8 +123,8 @@ export default async function GuideModulePage({ params }: Props) {
                 <h3>{zh ? '官方规则核对' : 'Official guidance checked'}</h3>
                 <p>
                   {zh
-                    ? '核对日期：2026-10-31。适用州与住宿类型分别看各页面说明。'
-                    : 'Checked on 31 October 2026. Read the jurisdiction and accommodation scope of each page.'}
+                    ? '按所在州和住宿合同类型查阅适用规则。'
+                    : 'Check the jurisdiction and accommodation scope for each rule.'}
                 </p>
                 <ul>
                   {official.map(item => (
@@ -131,6 +132,7 @@ export default async function GuideModulePage({ params }: Props) {
                       <a href={item.url} target="_blank" rel="noopener noreferrer">
                         {item.title}
                       </a>
+                      {' · ' + (zh ? '核对于 ' : 'Reviewed ') + officialReferenceReviewedAt(item)}
                     </li>
                   ))}
                 </ul>

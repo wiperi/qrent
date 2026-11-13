@@ -2,7 +2,11 @@
 
 `modules.ts` contains eight paired Chinese/English editorial modules and 36 stable
 sections. `references.json` records the two owner-supplied source-file hashes and
-all twenty collected-post identities. Original files remain private and unchanged.
+all twenty collected-post identities. The eight legacy Agent sources have their own
+hashes, with page, line or question locators on the relevant reviewed sections.
+Original sources remain unchanged. The old LlamaIndex index is not a source at runtime.
+Use the official references to resolve differences in rules, and query live inventory
+for current rent.
 The collection document contains text transcriptions/descriptions of images; this
 release does not claim a new reading or verification of the original 84 images.
 

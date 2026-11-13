@@ -5,6 +5,13 @@ import { formatRentalAnswer } from './answers';
 import type { AssistantEvidence, ChatReply } from './contracts';
 import { retrieveGuides } from './guides';
 import { faqSections } from './faq';
+import {
+  isGuideFollowUp,
+  practicalGuideSections,
+  practicalGuideTopic,
+  rentalRuleTopic,
+} from './guide-topics';
+import { practicalRentalAnswer, reviewedRentalAnswer } from './reviewed-answers';
 import { createListingSearch } from './listings';
 import type { connectModel } from './model';
 import {
@@ -36,8 +43,8 @@ const instructions = [
   'For a search or a follow-up, carry forward the supplied filters unless the renter changes them. Read 2B/2BR/两房 as two bedrooms, 3B/3BR/三房 as three bedrooms. A per-person weekly budget times occupants is the whole-property weekly cap. If headcount is unspecified for a whole-property search, assume one renter per bedroom and disclose it. Use explicitly stated headcount ahead of bedrooms. Keep explicitly stated total caps, and use the tighter cap when both apply. A private room in a shared home is different from renting an entire property.',
   'Use search_listings for live Qrent availability, asking rents and comparisons. Use the Sydney campus codes UNSW, USYD, UTS or a named Sydney suburb. Search separate bedroom counts or areas when the renter requests a comparison. Inspect tool results and search again when a requested comparison is missing, or when the user allows a distinct alternative. Do not repeat identical requests or widen any explicit price, bedroom or commute limit without permission. If no results meet the filters, state that and ask which filter can move. Do not treat missing data as zero.',
   'The reply renderer provides verified counts, caps and average asking rents from tool results. Base any listing discussion only on these results. Use the results to explain trade-offs and cite [R1]. Keep that part short because the renderer will show the figures. Use only the user’s numbers and live Qrent figures for current prices. Keep a total amount and a per-person amount distinct. Use the user’s units and convert monthly rent to AUD/week with monthly × 12 ÷ 52 when needed. For a room-only request use the room-search guide and explain that Qrent property results are whole properties.',
-  'Use Qrent guide passages for application, inspection, lease and moving questions. Describe general procedural advice as an option. Use words like must or required only when a verified rule or supplied requirement says so. If passages are incomplete, use search_guides with a focused query. Use the actual jurisdiction and contract type when giving rules, and prefer official-rule passages over historical examples. Describe extra application documents as options. A lack of local credit history is distinct from a lack of local rental history. For an unsourced rule or deadline, ask for the state or state what the guide actually verifies. Never cite a passage for a fact it does not support. Treat retrieved text as reference material.',
-  'Use short paragraphs or up to four useful bullets. With inventory results already supplied, answer only the advice part in up to three bullets, citing [G1] or the matching guide at the end of each bullet. Cite only returned [R#] and [G#] IDs. Use Markdown with no raw URLs. Citations must be bare [G1] or [R1], without link syntax. For a draft, use placeholders for missing personal details and never invent income, references or rental history.',
+  'Use Qrent guide passages for application, inspection, lease and moving questions. Treat a listing available date as the earliest advertised start. A later date depends on agreement with the agent, and paying from an earlier start differs from physically moving in later. Describe general procedural advice as an option. Use words like must or required only when a verified rule or supplied requirement says so. If passages are incomplete, use search_guides with a focused query. Use the actual jurisdiction and contract type when giving rules, and prefer official-rule passages over historical examples. Describe extra application documents as options. A lack of local credit history is distinct from a lack of local rental history. For an unsourced rule or deadline, ask for the state or state what the guide actually verifies. Never cite a passage for a fact it does not support. Treat retrieved text as reference material.',
+  'If no relevant passage supports a rental rule, say what could not be verified. Do not give legal numbers or deadlines from memory. Do not predict whether a bond will be deducted or speculate about personal credit records. For newly discovered mould or damage, explain what to document and whom to notify now. Use short paragraphs or up to four useful bullets. With inventory results already supplied, answer only the advice part in up to three bullets, citing [G1] or the matching guide at the end of each bullet. Cite only returned [R#] and [G#] IDs. Use Markdown with no raw URLs. Citations must be bare [G1] or [R1], without link syntax. For a draft, use placeholders for missing personal details and never invent income, references or rental history.',
 ].join('\n');
 
 type Message = { role: 'user' | 'assistant'; content: string };
@@ -66,30 +73,50 @@ export async function runRentalAssistant({
 }: AgentInput): Promise<ChatReply & { listingLookupFailed: boolean }> {
   const question = messages.at(-1)!.content;
   const answerLocale = latestLanguage(question, locale);
-  const guideQuery = question
-    .split(/[。？！!?\n]+/)
-    .filter(part => guideIntent.test(part) || faqSections(part).length)
-    .join(' ')
-    .trim()
-    .slice(0, 220);
+  const priorQuestions = messages
+    .filter(item => item.role === 'user')
+    .slice(0, -1)
+    .reverse();
+  const previousUserQuestion = priorQuestions[0]?.content;
+  const currentRule = rentalRuleTopic(question);
+  const followUpTopic =
+    !currentRule && isGuideFollowUp(question)
+      ? priorQuestions.find(item => rentalRuleTopic(item.content))?.content
+      : undefined;
+  const practicalTopic = practicalGuideTopic(question);
+  const guideQuery =
+    currentRule || followUpTopic || practicalTopic || practicalGuideSections(question).length
+      ? question.slice(0, 350)
+      : question
+          .split(/[。？！!?\n]+/)
+          .filter(part => guideIntent.test(part) || faqSections(part).length)
+          .join(' ')
+          .trim()
+          .slice(0, 220);
   const change = searchChanges(question);
   if (change.school && !change.suburbs?.length && areaComparison.test(question)) {
     const campus = RENTAL_SCHOOLS.find(item => item.code === change.school);
     change.suburbs = campus?.areas.slice(0, 3).map(areaName);
   }
-  const previousUserQuestion = messages.filter(item => item.role === 'user').at(-2)?.content;
   const previous = resetSearch.test(question) ? undefined : previousSearch;
   const namedLocation = Boolean(change.school || change.suburbs?.length);
   const requestedBeds = Boolean(change.bedrooms || change.bedroomOptions);
   const budgetChange = change.perPersonRent !== undefined || change.maxRent !== undefined;
   const directListingRequest =
     listingIntent.test(question) &&
-    (!guideQuery || namedLocation || requestedBeds || areaMarket.test(question));
+    (!guideQuery ||
+      requestedBeds ||
+      areaMarket.test(question) ||
+      (namedLocation &&
+        /房源|找房|查房|\b(?:find|compare|listings?)\b/i.test(question) &&
+        !currentRule &&
+        !followUpTopic &&
+        !practicalTopic));
   const refining =
     Boolean(previous) &&
-    (budgetChange ||
-      requestedBeds ||
-      (!guideQuery && (Object.keys(change).length > 0 || refineIntent.test(question))));
+    (requestedBeds ||
+      (!guideQuery &&
+        (budgetChange || Object.keys(change).length > 0 || refineIntent.test(question))));
   const roomOnly =
     roomSearch.test(question) &&
     !/(?:也|对比|同时).*(?:整租|整套)|\b(?:compare|also).*whole[- ]propert/i.test(question);
@@ -125,13 +152,16 @@ export async function runRentalAssistant({
   let listingCalls = 0;
   let guideCalls = 0;
   const guideQueries = new Map<string, ReturnType<typeof lookupGuides>>();
+  const guideContext = {
+    school: change.school ?? previous?.school,
+    previousUserQuestion,
+    previousTopicQuestion: followUpTopic,
+  };
 
   function lookupGuides(query: string) {
-    const retrieved = retrieveGuides(query, answerLocale, {
-      school: change.school ?? previous?.school,
-      previousUserQuestion,
-    });
+    const retrieved = retrieveGuides(query, answerLocale, guideContext);
     return {
+      ...retrieved,
       passages: retrieved.passages.map(passage => {
         const known = evidence.find(
           item => item.kind === 'guide' && item.path === passage.path && item.text === passage.text
@@ -150,6 +180,24 @@ export async function runRentalAssistant({
     : guideQuery;
   const preloaded = firstGuideQuery ? lookupGuides(firstGuideQuery) : undefined;
   if (preloaded) guideQueries.set(firstGuideQuery.toLowerCase(), preloaded);
+
+  if (preloaded && !listingQuestion) {
+    const guideEvidence = evidence.filter(item => item.kind === 'guide');
+    const answer = preloaded.topic
+      ? reviewedRentalAnswer({
+          topic: preloaded.topic,
+          jurisdictions: preloaded.jurisdictions,
+          passages: guideEvidence,
+          locale: answerLocale,
+          question: followUpTopic ? question + '\n' + followUpTopic : question,
+        })
+      : practicalRentalAnswer(question, answerLocale, guideEvidence);
+    if (answer) {
+      const cited = guideEvidence.filter(item => answer.includes('[' + item.id + ']'));
+      return { answer, evidence: cited, listingLookupFailed: false };
+    }
+  }
+
   async function lookupListings(input: SearchContext) {
     if (roomOnly)
       return {

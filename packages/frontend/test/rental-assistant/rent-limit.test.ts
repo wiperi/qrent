@@ -57,3 +57,7 @@ test('a per-person range is applied independently to each bedroom option', () =>
     ]
   );
 });
+
+test('a user can change the inherited transit cap using ordinary Chinese wording', () => {
+  assert.equal(searchChanges('那只看 3B，公交改成 25 分钟内。').maxCommute, 25);
+});

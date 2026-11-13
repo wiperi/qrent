@@ -273,3 +273,97 @@ test('a mixed question searches the stated weekly budget and retrieves inspectio
   );
   assert.match(reply.answer, /A\$900/);
 });
+
+test('reviewed NSW payment limits use the actual rent without a model guess', async t => {
+  const { reply, queries, modelRequests } = await ask(t, {
+    locale: 'zh',
+    questions: [
+      '我租的是悉尼普通公寓，每周 A$800。中介叫我交 6 周 bond，再预付 4 周租金，说每个留学生都要这样。我该怎么回？',
+    ],
+  });
+  assert.equal(queries.length, 0);
+  assert.equal(modelRequests.length, 0);
+  assert.match(reply.answer, /A\$3,200/);
+  assert.match(reply.answer, /A\$1,600/);
+  assert.ok(
+    reply.evidence.some((item: { path?: string }) => item.path?.endsWith('#nsw-upfront-payments'))
+  );
+});
+
+test('a context-only follow-up does not cite NSW lease-ending rules for a condition report', async t => {
+  const { reply, modelRequests } = await ask(t, {
+    questions: [
+      'I just got the keys to a rental in Melbourne. How long do I have to return the condition report?',
+      'And if the same lease was in Sydney instead?',
+    ],
+  });
+  assert.equal(modelRequests.length, 0);
+  assert.match(reply.answer, /7 days/);
+  assert.doesNotMatch(reply.answer, /14 days/);
+  assert.ok(reply.evidence[0]?.path.endsWith('#state-report-deadlines'));
+});
+
+test('a pet application answered from reviewed NSW rules cannot invert the deadline', async t => {
+  const { reply, modelRequests } = await ask(t, {
+    locale: 'zh',
+    questions: ['在悉尼，租约里写着不能养猫。我已经入住，可以正式申请吗？中介一直不回，怎么算？'],
+  });
+  assert.equal(modelRequests.length, 0);
+  assert.match(reply.answer, /21[^\n]*视为同意/);
+  assert.ok(reply.evidence[0]?.path.endsWith('#nsw-pets'));
+});
+
+test('a jurisdiction without matching evidence gets a clear coverage answer', async t => {
+  const { reply, modelRequests } = await ask(t, {
+    locale: 'zh',
+    questions: [
+      '布里斯班普通住宅租约，中介说允许涨租每隔六个月一次。现在昆州法定涨租频率到底是多少？',
+    ],
+  });
+  assert.equal(modelRequests.length, 0);
+  assert.match(reply.answer, /昆州[^\n]*核对/);
+  assert.doesNotMatch(reply.answer, /12 个月|60 天/);
+});
+
+test('a combined proxy-inspection and no-history question keeps both sources', async t => {
+  const { reply, queries } = await ask(t, {
+    locale: 'zh',
+    questions: [
+      '我人在国内，下个月来悉尼读书，第一次在澳洲租房。能让朋友帮我看房吗？没有本地租房记录，我能用什么材料补？',
+    ],
+  });
+  assert.equal(queries.length, 0);
+  assert.match(reply.answer, /代看/);
+  assert.match(reply.answer, /海外推荐信/);
+  assert.ok(
+    reply.evidence.some((item: { path?: string }) => item.path?.endsWith('#proxy-deliverables'))
+  );
+  assert.ok(
+    reply.evidence.some((item: { path?: string }) =>
+      item.path?.endsWith('#parent-letter-and-history')
+    )
+  );
+});
+
+test('an earliest advertised date does not turn a tenancy question into an inventory search', async t => {
+  const { reply, modelRequests, queries } = await ask(t, {
+    questions: [
+      "A listing says Available Date 1 December, but I won't land until mid-January. Do I have to move in on 1 December?",
+    ],
+  });
+  assert.equal(queries.length, 0);
+  assert.equal(modelRequests.length, 0);
+  assert.match(reply.answer, /rent is due from that agreed date/);
+});
+
+test('an unspoken guide topic survives a second jurisdiction follow-up', async t => {
+  const { reply, modelRequests } = await ask(t, {
+    questions: [
+      'How long do I have to return the condition report in Melbourne?',
+      'And if the same lease was in Sydney instead?',
+      'What if I were in Melbourne again?',
+    ],
+  });
+  assert.equal(modelRequests.length, 0);
+  assert.match(reply.answer, /5 business days/);
+});

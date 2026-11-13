@@ -62,3 +62,36 @@ test('a state-specific question excludes handbook passages limited to other stat
     )
   );
 });
+
+test('realistic wording retrieves the reviewed rule or practical checklist first', () => {
+  const cases = [
+    [
+      'zh',
+      '我租的是悉尼普通公寓，每周 A$800。中介叫我交 6 周 bond，再预付 4 周租金。',
+      '#nsw-upfront-payments',
+    ],
+    ['zh', '房东把整栋楼的冷水账单发给我，叫我分摊。', '#utilities-and-water'],
+    ['zh', '悉尼签了一年，刚住三个月。给 14 天通知就能走吗？', '#nsw-ending-notice'],
+    [
+      'en',
+      "They won't let me inspect and want me to bank-transfer a bond tonight.",
+      '#verify-agent-and-listing',
+    ],
+    [
+      'en',
+      'How long do I have to return the condition report in Melbourne?',
+      '#state-report-deadlines',
+    ],
+    ['zh', '老攻略里说 Scape 的 twin，我想一个人睡一间。', '#housing-options'],
+  ] as const;
+  for (const [locale, question, anchor] of cases)
+    assert.ok(retrieveGuides(question, locale).passages[0]?.path.endsWith(anchor), question);
+});
+
+test('a changed city reuses the previous topic and refreshes the jurisdiction', () => {
+  const { passages } = retrieveGuides('And if the same lease was in Sydney instead?', 'en', {
+    previousUserQuestion:
+      'I just got the keys in Melbourne. How long do I have to return the condition report?',
+  });
+  assert.ok(passages[0]?.path.endsWith('#state-report-deadlines'));
+});

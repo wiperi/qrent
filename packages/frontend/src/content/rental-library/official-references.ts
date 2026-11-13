@@ -92,6 +92,13 @@ export const officialReferences = [
     reviewedAt: '2026-11-14',
   },
   {
+    id: 'nsw-mould',
+    title: 'NSW Fair Trading: mould in a rental property',
+    url: 'https://www.nsw.gov.au/housing-and-construction/rules/mould-a-rental-property',
+    jurisdiction: 'NSW',
+    reviewedAt: '2026-11-14',
+  },
+  {
     id: 'nsw-disputes',
     title: 'NSW Fair Trading: resolving tenancy disputes',
     url: 'https://www.nsw.gov.au/housing-and-construction/renting-a-place-to-live/resolving-residential-tenancy-disputes',

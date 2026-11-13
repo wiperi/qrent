@@ -15,6 +15,7 @@ test('the eight stages have complete paired sections and valid source references
   assert.equal(rentalGuideModules.length, 8);
   const sourceIds = new Set([
     ...references.sources.map(row => row.id),
+    ...references.legacyAgentSources.map(row => row.id),
     ...references.experiences.map(row => row.id),
   ]);
   const officialIds = new Set(officialReferences.map(row => row.id as string));
