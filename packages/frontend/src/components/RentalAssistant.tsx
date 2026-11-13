@@ -7,8 +7,10 @@ import {
   ArrowLeft,
   ArrowRight,
   ArrowUp,
+  ArrowUpRight,
   BookOpen,
   FilePenLine,
+  HandHeart,
   Maximize2,
   MapPin,
   MessageCircle,
@@ -16,27 +18,17 @@ import {
   X,
 } from 'lucide-react';
 import ReactMarkdown from 'react-markdown';
-import type { ChatReply, RentalLetterType } from '@/lib/rental-assistant/contracts';
-import { modelPresets, modelProviders } from '@/lib/rental-assistant/presets';
+import type { ChatReply } from '@/lib/rental-assistant/contracts';
+import { requestRentalAssistant } from '@/lib/rental-assistant/client-request';
 import {
   rentalContextMessages,
   useRentalSession,
   type RentalTurn,
 } from '@/lib/rental-assistant/session';
 import RentalAssistantSources from './RentalAssistantSources';
+import RentalModelSettings, { rentalModelName } from './RentalModelSettings';
 import RentalReplyActions from './RentalReplyActions';
 import styles from '@/styles/rental-tools.module.css';
-
-const letterPrompts = {
-  cover: {
-    zh: '帮我用英文写一封租房 Cover Letter。\n\n申请人和房源地址：\n学校或工作：\n租房经历（注明国家或地区）：\n资金来源或其他想写的事实：',
-    en: 'Write an English rental cover letter.\n\nApplicant and property address:\nStudy or work:\nRental history (include the country):\nFunding or other facts to include:',
-  },
-  parent: {
-    zh: '帮我用英文写一封父母资助信（Parent Letter）。\n\n资助人、申请人及双方关系：\n资助哪些费用：\n金额、频率及资助期限：\n联系方式（可选）：',
-    en: 'Write an English parent support letter for a rental application.\n\nParent, applicant and relationship:\nExpenses covered:\nAmount, frequency and support period:\nContact details (optional):',
-  },
-};
 
 function latestSearch(turns: RentalTurn[]) {
   const listingTurn = turns.findLast(
@@ -70,7 +62,6 @@ const errorMessages: Record<string, [string, string]> = {
     'The provider rejected the request. Check your key and permissions.',
   ],
   rate_limit: ['请求较多，请稍后再试。', 'Too many requests. Try again in a moment.'],
-  invalid_key: ['请输入完整的 API Key。', 'Enter a valid API key.'],
   history_unavailable: [
     '暂时无法保存这条对话。请稍后再试。',
     'This conversation could not be saved. Try again later.',
@@ -120,13 +111,10 @@ export default function RentalAssistant({
     turns,
     draft,
     settingsOpen,
-    keyDraft,
     pending,
     error,
     request,
     showSettings,
-    selectProvider,
-    setKeyDraft,
     setDraft,
     setError,
     beginTurn,
@@ -135,17 +123,7 @@ export default function RentalAssistant({
     clearTurns,
     setConnection,
   } = session;
-  const provider =
-    session.selectedProvider ??
-    (connection?.type === 'preset'
-      ? connection.provider
-      : defaultModelAvailable
-        ? 'local'
-        : 'deepseek');
-  const preset = provider === 'local' ? undefined : modelPresets[provider];
   const conversation = useRef<HTMLDivElement>(null);
-  const composer = useRef<HTMLTextAreaElement>(null);
-  const settingsHeading = useRef<HTMLHeadingElement>(null);
   const suggestions = zh
     ? [
         'UNSW 附近每人每周 A$500，帮我比较 2B 和 3B。',
@@ -157,12 +135,7 @@ export default function RentalAssistant({
         'I have no local rental history. What can I prepare to support my application?',
         'Find two-bedroom rentals in Newtown under $900 near USYD. What should I check at an inspection?',
       ];
-  const connectedName =
-    connection?.type === 'preset'
-      ? modelPresets[connection.provider].label[locale]
-      : connection?.type === 'compatible'
-        ? connection.model
-        : connection && (zh ? '默认模型' : 'Default model');
+  const connectedName = rentalModelName(connection, locale);
   const settingsLabel = settingsOpen
     ? zh
       ? '返回对话'
@@ -176,10 +149,6 @@ export default function RentalAssistant({
         : 'Connect a model';
 
   useEffect(() => {
-    if (settingsOpen) settingsHeading.current?.focus({ preventScroll: true });
-  }, [settingsOpen]);
-
-  useEffect(() => {
     const thread = conversation.current;
     const latest = thread?.querySelector(':scope > ol > li:last-child');
     if (thread && latest) {
@@ -187,29 +156,6 @@ export default function RentalAssistant({
         latest.getBoundingClientRect().top - thread.getBoundingClientRect().top - 12;
     }
   }, [turns, pending, settingsOpen]);
-
-  function applySettings(event: React.FormEvent<HTMLFormElement>) {
-    event.preventDefault();
-    if (pending) return;
-    if (provider === 'local') {
-      setConnection({ type: 'local' });
-      return;
-    }
-    const apiKey = keyDraft.trim();
-    if (!/^[\x21-\x7e]{1,1024}$/.test(apiKey)) {
-      setError('invalid_key');
-      return;
-    }
-    setConnection({ type: 'preset', provider, apiKey });
-  }
-
-  function startLetter(type: RentalLetterType) {
-    const starter = letterPrompts[type][locale];
-    const wasStarter = Object.values(letterPrompts).some(prompt => prompt[locale] === draft);
-    setDraft(draft.trim() && !wasStarter ? starter + '\n\n' + draft : starter);
-    setError('');
-    composer.current?.focus();
-  }
 
   async function send(value: string) {
     const question = value.trim();
@@ -224,23 +170,11 @@ export default function RentalAssistant({
     const { controller, sessionId } = turn;
     try {
       const messages = rentalContextMessages(turns, question);
-      const { apiKey, ...model } =
-        connection.type === 'local' ? { ...connection, apiKey: undefined } : connection;
-      const response = await fetch('/api/rental-assistant/chat', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          ...(apiKey ? { Authorization: 'Bearer ' + apiKey } : {}),
-        },
-        body: JSON.stringify({
-          locale,
-          sessionId,
-          connection: model,
-          messages,
-          previousSearch: latestSearch(turns),
-        }),
-        signal: controller.signal,
-      });
+      const response = await requestRentalAssistant(
+        connection,
+        { locale, sessionId, messages, previousSearch: latestSearch(turns) },
+        controller.signal
+      );
       const result = await response.json();
       if (!response.ok) {
         setError(result.code || 'model_unavailable');
@@ -371,78 +305,19 @@ export default function RentalAssistant({
       </header>
 
       {settingsOpen ? (
-        <form id={settingsId} className={styles.settings} onSubmit={applySettings}>
-          <h2 tabIndex={-1} ref={settingsHeading}>
-            {zh ? '选择模型' : 'Choose a model'}
-          </h2>
-          <fieldset
-            className={styles.providerOptions}
-            aria-label={zh ? '选择模型' : 'Choose a model'}
-          >
-            {modelProviders.map(option => (
-              <label key={option} className={styles.providerOption}>
-                <input
-                  type="radio"
-                  name="provider"
-                  value={option}
-                  checked={provider === option}
-                  onChange={() => selectProvider(option)}
-                  disabled={!!pending}
-                />
-                <span>{modelPresets[option].label[locale]}</span>
-              </label>
-            ))}
-            {defaultModelAvailable && (
-              <label className={styles.providerOption}>
-                <input
-                  type="radio"
-                  name="provider"
-                  value="local"
-                  checked={provider === 'local'}
-                  onChange={() => selectProvider('local')}
-                  disabled={!!pending}
-                />
-                <span>{zh ? '默认模型' : 'Default model'}</span>
-              </label>
-            )}
-          </fieldset>
-          {preset && (
-            <label className={styles.modelKey}>
-              <span>API Key</span>
-              <input
-                name="apiKey"
-                type="password"
-                autoComplete="off"
-                placeholder={preset.keyLabel[locale]}
-                required
-                maxLength={1024}
-                value={keyDraft}
-                onChange={event => setKeyDraft(event.target.value)}
-                disabled={!!pending}
-              />
-            </label>
-          )}
-          {error && (
-            <p role="alert" className={styles.chatError}>
-              {(errorMessages[error] ?? errorMessages.model_unavailable)[zh ? 0 : 1]}
-            </p>
-          )}
-          <div className={styles.settingsFoot}>
-            <p>
-              {zh
-                ? 'Key 仅用于当前标签页的模型请求。'
-                : 'The key is used for model requests in this tab.'}
-            </p>
-            {preset && (
-              <a href={preset.help} target="_blank" rel="noreferrer">
-                {zh ? '如何获取 Key' : 'Get an API key'}
-              </a>
-            )}
-          </div>
-          <button className={styles.primary} disabled={!!pending}>
-            {zh ? '连接并继续' : 'Connect and continue'}
-          </button>
-        </form>
+        <RentalModelSettings
+          id={settingsId}
+          locale={locale}
+          connection={connection}
+          defaultModelAvailable={defaultModelAvailable}
+          pending={Boolean(pending)}
+          error={
+            error
+              ? (errorMessages[error] ?? errorMessages.model_unavailable)[zh ? 0 : 1]
+              : undefined
+          }
+          onSave={setConnection}
+        />
       ) : (
         <section className={styles.chat} aria-label={zh ? '租房对话' : 'Rental chat'}>
           <div
@@ -510,14 +385,16 @@ export default function RentalAssistant({
               className={styles.letterActions}
               aria-label={zh ? '生成租房申请信' : 'Draft rental letters'}
             >
-              <button type="button" disabled={!!pending} onClick={() => startLetter('cover')}>
+              <Link href={'/' + locale + '/assistant/letters/cover'} onNavigate={onClose}>
                 <FilePenLine size={15} aria-hidden="true" />
                 {zh ? '写申请信' : 'Write a cover letter'}
-              </button>
-              <button type="button" disabled={!!pending} onClick={() => startLetter('parent')}>
-                <FilePenLine size={15} aria-hidden="true" />
+                <ArrowUpRight size={13} aria-hidden="true" />
+              </Link>
+              <Link href={'/' + locale + '/assistant/letters/parent'} onNavigate={onClose}>
+                <HandHeart size={15} aria-hidden="true" />
                 {zh ? '写父母资助信' : 'Write a parent letter'}
-              </button>
+                <ArrowUpRight size={13} aria-hidden="true" />
+              </Link>
             </div>
             <p className={styles.historyNotice}>
               {zh
@@ -544,7 +421,6 @@ export default function RentalAssistant({
             )}
             <div className={styles.composerInput}>
               <textarea
-                ref={composer}
                 aria-label={zh ? '输入租房问题' : 'Enter a rental question'}
                 placeholder={
                   zh

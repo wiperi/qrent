@@ -77,3 +77,68 @@ test('production records an accepted question and model failure without storing 
   assert.equal(legacy.status, 400);
   assert.equal(writer.mock.calls.length, 4);
 });
+
+test('a letter draft keeps form details and letter text out of production chat history', async t => {
+  const writes: Record<string, unknown>[] = [];
+  t.mock.method(globalThis, 'fetch', async (url: string | URL | Request, init?: RequestInit) => {
+    assert.equal(String(url), 'https://api.qrent.rent/api/rental-assistant-history');
+    writes.push(JSON.parse(String(init?.body)));
+    return new Response(null, { status: 204 });
+  });
+
+  const env = {
+    VERCEL_ENV: 'production',
+    QRENT_LOCAL_MODEL_URL: 'http://127.0.0.1:3329/v1',
+    QRENT_LOCAL_MODEL_NAME: 'fixture',
+  };
+  const previous = Object.fromEntries(Object.keys(env).map(key => [key, process.env[key]]));
+  Object.assign(process.env, env);
+  t.after(() => {
+    for (const [key, value] of Object.entries(previous)) {
+      if (value === undefined) delete process.env[key];
+      else process.env[key] = value;
+    }
+  });
+
+  const response = await POST(
+    new Request(origin + '/api/rental-assistant/chat', {
+      method: 'POST',
+      headers: {
+        host: 'www.qrent.rent',
+        origin,
+        'content-type': 'application/json',
+        'x-vercel-oidc-token': 'signed-deployment',
+      },
+      body: JSON.stringify({
+        locale: 'en',
+        connection: { type: 'local' },
+        messages: [{ role: 'user', content: 'Please include Casey Example.' }],
+        letterForm: {
+          type: 'parent',
+          language: 'en',
+          applicant: 'Casey Example',
+          parent: 'Mia Example',
+          relationship: 'mother',
+          amount: '450',
+          amountKind: 'cap',
+          frequency: 'weekly',
+          contact: 'parent@example.invalid',
+        },
+      }),
+    })
+  );
+  assert.equal(response.status, 200);
+  assert.match(
+    (await response.json()).answer,
+    /Casey Example.*mother[\s\S]*A\$450[\s\S]*parent@example\.invalid/
+  );
+  assert.equal(writes.length, 2);
+  assert.equal(writes[0].question, 'Draft rental letter: parent');
+  assert.deepEqual(writes[1].outcome, {
+    status: 'answered',
+    answer: 'Rental letter draft created.',
+    listingLookupFailed: false,
+    sources: [],
+  });
+  assert.doesNotMatch(JSON.stringify(writes), /Casey|Mia|450|parent@example/);
+});

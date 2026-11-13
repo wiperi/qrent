@@ -7,6 +7,8 @@ import {
   startChatHistory,
   type ChatHistoryError,
 } from '@/lib/rental-assistant/history';
+import { rentalLetterForm } from '@/lib/rental-assistant/letter-workspace';
+import { draftWorkspaceLetter } from '@/lib/rental-assistant/workspace-draft';
 import { searchContextInput } from '@/lib/rental-assistant/search-context';
 import { connectModel, modelConnection, ModelConnectionError } from '@/lib/rental-assistant/model';
 import { rentalLocale, rentalPostError, readRentalJson } from '@/lib/rental-request';
@@ -20,6 +22,7 @@ const chatInput = z.object({
   connection: z.unknown(),
   previousSearch: searchContextInput.optional(),
   letterType: z.enum(['cover', 'parent']).optional(),
+  letterForm: rentalLetterForm.optional(),
   messages: z
     .array(
       z.object({
@@ -49,6 +52,7 @@ export async function POST(request: Request) {
     messages: received,
     previousSearch,
     letterType: requestedLetter,
+    letterForm,
   } = parsed.data;
   const credential = request.headers
     .get('authorization')
@@ -63,6 +67,33 @@ export async function POST(request: Request) {
   const modelKey = connection.type === 'local' ? undefined : connection.apiKey;
   const redact = (value: string) =>
     redactCredentials(value, modelKey && modelKey.length >= 8 ? modelKey : undefined);
+  const cleanField = (value: string | undefined) => (value ? redact(value) : value);
+  const safeForm = !letterForm
+    ? undefined
+    : letterForm.type === 'cover'
+      ? {
+          ...letterForm,
+          applicant: redact(letterForm.applicant),
+          agent: cleanField(letterForm.agent),
+          property: cleanField(letterForm.property),
+          study: cleanField(letterForm.study),
+          household: cleanField(letterForm.household),
+          terms: cleanField(letterForm.terms),
+          history: cleanField(letterForm.history),
+          funding: cleanField(letterForm.funding),
+          references: cleanField(letterForm.references),
+        }
+      : {
+          ...letterForm,
+          applicant: redact(letterForm.applicant),
+          agent: cleanField(letterForm.agent),
+          parent: redact(letterForm.parent),
+          property: cleanField(letterForm.property),
+          expenses: cleanField(letterForm.expenses),
+          duration: cleanField(letterForm.duration),
+          proof: cleanField(letterForm.proof),
+          contact: cleanField(letterForm.contact),
+        };
   const messages = received.map(message => ({ ...message, content: redact(message.content) }));
   const deadline = AbortSignal.timeout(52_000);
   const signal = AbortSignal.any([request.signal, deadline]);
@@ -74,7 +105,7 @@ export async function POST(request: Request) {
       sessionId,
       locale,
       connection,
-      question: received.at(-1)!.content,
+      question: safeForm ? 'Draft rental letter: ' + safeForm.type : received.at(-1)!.content,
     });
   } catch {
     release();
@@ -103,6 +134,21 @@ export async function POST(request: Request) {
   let model: Awaited<ReturnType<typeof connectModel>> | undefined;
   try {
     model = await connectModel(connection);
+    if (safeForm) {
+      const draft = await draftWorkspaceLetter({
+        form: safeForm,
+        model: model.model,
+        signal,
+        redact,
+      });
+      const reply: ChatReply = { ...draft, letterType: safeForm.type, evidence: [] };
+      return await complete(Response.json(reply, { headers: { 'Cache-Control': 'no-store' } }), {
+        status: 'answered',
+        answer: 'Rental letter draft created.',
+        evidence: [],
+        listingLookupFailed: false,
+      });
+    }
     const { answer, evidence, search, letterType, modelId, listingLookupFailed } =
       await runRentalAssistant({
         model: model.model,
