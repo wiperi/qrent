@@ -65,7 +65,15 @@ A studio usually has its own kitchen and bathroom. An ensuite has a private bath
           '学生公寓 社会公寓 studio ensuite 整租 分租 合租 房型',
           'student accommodation apartment unit house townhouse studio ensuite share house room'
         ),
-        ['qrent-handbook:L22-L115', 'collection-17', 'collection-18', 'collection-19']
+        [
+          'agent-april-pdf:p3-p7',
+          'agent-general:L14-L54',
+          'agent-search:L369-L503',
+          'qrent-handbook:L22-L115',
+          'collection-17',
+          'collection-18',
+          'collection-19',
+        ]
       ),
       s(
         'budget-calculation',
@@ -92,7 +100,12 @@ The source example uses $400 weekly living costs, $488 rent and $54,000 annual t
           '租房预算怎么算 每月房租 人均周租 生活费 bills 家具 押金',
           'rental budget weekly monthly rent per person living costs bills furniture bond'
         ),
-        ['qrent-handbook:L119-L174', 'collection-20']
+        [
+          'agent-budget:L3-L209',
+          'agent-general:L71-L124',
+          'qrent-handbook:L119-L174',
+          'collection-20',
+        ]
       ),
       s(
         'historic-price-examples',
@@ -138,6 +151,8 @@ Scape, Iglu, Melbourne prices and pandemic discounts in the references are also 
           'historical rent 2024 per person whole property median discount'
         ),
         [
+          'agent-budget:L210-L329',
+          'agent-april-pdf:p8-p14',
           'qrent-handbook:L139-L172',
           'collection-15',
           'collection-17',
@@ -163,7 +178,13 @@ Before sharing a lease, agree budgets, room allocation, lease length, cleaning, 
           '提前多久找房 室友 twin room 换房 申请宿舍 租期',
           'when to start rental search housemates twin room lease length room change'
         ),
-        ['qrent-handbook:L22-L48', 'collection-17', 'collection-18']
+        [
+          'agent-search:L504-L620',
+          'agent-application:L146-L255',
+          'qrent-handbook:L22-L48',
+          'collection-17',
+          'collection-18',
+        ]
       ),
     ],
   },
@@ -207,7 +228,13 @@ Historical “15–30 minute” estimates are not door-to-door promises. Persona
           'UNSW 新南 租房区域 Kensington Kingsford Randwick Eastgardens Zetland Mascot',
           'UNSW Kensington Kingsford Randwick Eastgardens Zetland Mascot neighbourhoods'
         ),
-        ['qrent-handbook:L179-L218', 'collection-13', 'collection-15'],
+        [
+          'agent-april-pdf:p11-p14',
+          'agent-budget:L210-L329',
+          'qrent-handbook:L179-L218',
+          'collection-13',
+          'collection-15',
+        ],
         ['Sydney']
       ),
       s(
@@ -296,7 +323,7 @@ The source’s extra ten-minute waiting allowance is a planning buffer, not a fi
 
 1. 在源站选择 Rent，核对区域、NSW/VIC 等州名和邮编。同名区域可能在不同州；“包含周边区域”会扩大范围。
 2. 筛周租上下限、卧室卫浴、车位、家具、入住日期和所需设施。空调等要求可辅助用关键词搜索，但仍需到详情和现场确认。
-3. 核对 Available Date（可起租日）是否适合自己；Deposit Taken 等状态提示可能已经收款或在推进租约，不代表仍可随时申请。
+3. 核对 Available Date（广告标注的最早可起租日）。如果更晚才到，和中介确认是否接受晚起租；如果租约更早开始，按合同约定付租。Deposit Taken 等状态提示可能已经收款或在推进租约，不代表仍可随时申请。
 4. 用列表或地图建立候选清单，再用完整门牌核对到学校与超市的路线。Qrent 可帮助按既有学校、区域、预算和参考通勤筛选；最终价格、状态和申请渠道回到 Domain/Real Estate 或中介确认。
 
 `,
@@ -304,7 +331,7 @@ The source’s extra ten-minute waiting allowance is a planning buffer, not a fi
 
 1. Select Rent and confirm suburb, state and postcode. Names can recur in different states; including surrounding areas expands the search.
 2. Filter weekly price, bedrooms, bathrooms, parking, furniture, start date and facilities. Keywords such as air conditioning help, but still require verification.
-3. Match Available Date to your intended start. Deposit Taken can indicate payment or a lease in progress; it does not promise availability.
+3. Available Date is the earliest advertised start. Ask the agent if a later lease start is possible. If the lease starts earlier than you arrive, rent is due from the agreed start. Deposit Taken can indicate payment or a lease in progress; it does not promise availability.
 4. Shortlist in list/map views, then check the full address for campus and shopping travel. Qrent supports its existing school/area, budget and indicative-commute filters. Confirm price, status and application instructions with the source or agent.
 
 `
@@ -313,7 +340,13 @@ The source’s extra ten-minute waiting allowance is a planning buffer, not a fi
           'realestate domain 使用教程 rent available date deposit taken 找房 筛选',
           'realestate Domain Rent available date Deposit Taken filters rental search'
         ),
-        ['qrent-handbook:L278-L320', 'collection-16', 'collection-20']
+        [
+          'agent-search:L3-L116',
+          'agent-application:L256-L438',
+          'qrent-handbook:L278-L320',
+          'collection-16',
+          'collection-20',
+        ]
       ),
       s(
         'room-search',
@@ -334,7 +367,13 @@ A map may show only an approximate location; confirm the address with the advert
           'Flatmates 分租 private room shared room ensuite bills included 找室友 Gumtree',
           'Flatmates private room shared room ensuite bills included housemates Gumtree'
         ),
-        ['qrent-handbook:L107-L115', 'qrent-handbook:L302-L311', 'collection-19']
+        [
+          'agent-search:L369-L620',
+          'agent-april-pdf:p5-p7',
+          'qrent-handbook:L107-L115',
+          'qrent-handbook:L302-L311',
+          'collection-19',
+        ]
       ),
       s(
         'verify-agent-and-listing',
@@ -351,7 +390,13 @@ Investigate unusually low prices, refusals to verify the listing and pressure to
           '核验中介 资质 证照 骗局 黑中介 私下转账',
           'verify agent licence rental scam bank transfer'
         ),
-        ['qrent-handbook:L278-L320', 'collection-05', 'collection-20'],
+        [
+          'agent-search:L117-L368',
+          'agent-lease:L394-L531',
+          'qrent-handbook:L278-L320',
+          'collection-05',
+          'collection-20',
+        ],
         ['NSW'],
         'editorial-guide',
         ['nsw-agent-licence']
@@ -376,6 +421,8 @@ Completing a renter profile does not prevent the agent requesting 2Apply, an ema
           'floor plan property history register inspection 2Apply renter profile overseas inspection'
         ),
         [
+          'agent-search:L117-L368',
+          'agent-april-pdf:p15-p16',
           'qrent-handbook:L295-L299',
           'qrent-handbook:L448-L454',
           'qrent-handbook:L584-L586',
@@ -429,7 +476,14 @@ Post 9 notes that an OSHC membership card is not a Medicare card. Keep clearly n
           '申请材料 文件清单 护照 签证 COE 存款证明 银行流水 OSHC Medicare',
           'rental application documents passport visa COE bank statement savings OSHC Medicare'
         ),
-        ['qrent-handbook:L325-L340', 'collection-06', 'collection-09', 'collection-11']
+        [
+          'agent-application:L3-L145',
+          'agent-april-pdf:p17-p18',
+          'qrent-handbook:L325-L340',
+          'collection-06',
+          'collection-09',
+          'collection-11',
+        ]
       ),
       s(
         'cover-letter',
@@ -458,7 +512,13 @@ Post 7 contributes a letter structure; the long About me in post 11 is a persona
           'cover letter 租房自荐信 About me 申请信 模板 内容',
           'rental cover letter introduction about me template application letter'
         ),
-        ['qrent-handbook:L342-L394', 'collection-07', 'collection-11'],
+        [
+          'agent-application:L256-L438',
+          'agent-april-pdf:p17-p18',
+          'qrent-handbook:L342-L394',
+          'collection-07',
+          'collection-11',
+        ],
         ['Australia']
       ),
       s(
@@ -483,7 +543,13 @@ Complete address history, employment, income, identity and emergency-contact fie
           'parent letter 父母资助信 guarantor 担保人 没有租房记录 rental history 证明人',
           'parent support letter guarantor no rental history address history referee consent'
         ),
-        ['qrent-handbook:L396-L440', 'collection-08', 'collection-11'],
+        [
+          'agent-application:L439-L606',
+          'agent-april-pdf:p17-p19',
+          'qrent-handbook:L396-L440',
+          'collection-08',
+          'collection-11',
+        ],
         ['Australia'],
         'editorial-guide',
         ['study-australia-applications']
@@ -516,18 +582,32 @@ Check your own provider's enrolment instructions. Give your current address thro
 
 可以比较多套合适房源，但获批、支付 holding fee、签约是不同阶段；做出承诺前核对后果。收藏第8篇的“当天获批”和第9篇周末后得到回复，说明时间线可能不同，不能承诺几小时获批或申请必过。
 
+自雇或没有工资单时，可以询问中介接受哪些付款能力证明，例如银行余额证明或会计师出具的收入摘要。NSW Fair Trading 的最佳实践指引建议在用银行账单证明存款时遮盖日常交易明细。也可以问中介是否接受租金支付记录，或联系已同意的前房东核对。
+
 尽量用电话处理急事，同时把重要日期、价格、费用和约定以书面方式确认。起租日太早会产生空置期间租金，先把实际到达和搬入计划核对好。`,
           `Prepare documents and a working contact number before inspecting. Express genuine interest and confirm the application channel and whether every co-tenant must apply. Save submission receipts and correspondence, then politely check receipt or missing evidence.
 
 You can compare suitable properties, but approval, paying a holding fee and signing a lease are different stages with different consequences. Posts 8 and 9 describe different response times, including an approval story and a reply after a weekend; neither guarantees same-day acceptance.
 
+If you are self-employed or do not have payslips, ask which evidence of ability to pay the agent accepts, such as a bank balance letter or an accountant’s summary of your income. NSW Fair Trading best-practice guidance encourages redacting daily transactions when a bank statement is used to demonstrate savings. You can also ask whether a rent ledger or a reference from a former landlord who has agreed to be contacted is useful.
+
 Use the phone for urgent coordination and confirm important dates, prices, charges and agreements in writing. Starting too early can mean rent before you occupy the home, so check arrival and moving plans first.`
         ),
         t(
-          '申请后多久 回复 跟进 offer 申请被拒 付款 起租日',
-          'application response follow up offer rejected application start date'
+          '申请后多久 回复 跟进 offer 申请被拒 自雇 银行流水 付款 起租日',
+          'application response follow up rejected self-employed banking history savings proof start date'
         ),
-        ['qrent-handbook:L520-L536', 'collection-06', 'collection-08', 'collection-09']
+        [
+          'agent-application:L607-L711',
+          'agent-search:L3-L116',
+          'qrent-handbook:L520-L536',
+          'collection-06',
+          'collection-08',
+          'collection-09',
+        ],
+        ['Australia'],
+        'editorial-guide',
+        ['nsw-application-privacy']
       ),
     ],
   },
@@ -565,7 +645,13 @@ Ask permission before photographing an occupied home and avoid residents’ belo
           '看房前 预约 inspection 周边 门禁 车站 超市 代看',
           'before inspection register neighbourhood access station groceries proxy'
         ),
-        ['qrent-handbook:L448-L476', 'collection-08', 'collection-10']
+        [
+          'agent-search:L237-L368',
+          'agent-april-pdf:p20-p22',
+          'qrent-handbook:L448-L476',
+          'collection-08',
+          'collection-10',
+        ]
       ),
       s(
         'room-checklist',
@@ -600,7 +686,13 @@ The source’s approximate 1.6 × 2.0 metre queen-bed example is only a measurin
           '看房清单 空调 洗碗机 采光 隔音 通风 霉斑 家具 床 尺寸',
           'inspection checklist air conditioning dishwasher light noise ventilation mould furniture bed dimensions'
         ),
-        ['qrent-handbook:L479-L506', 'collection-01', 'collection-10']
+        [
+          'agent-april-pdf:p20-p22',
+          'agent-search:L117-L236',
+          'qrent-handbook:L479-L506',
+          'collection-01',
+          'collection-10',
+        ]
       ),
       s(
         'proxy-deliverables',
@@ -621,7 +713,12 @@ Confirm bills, furniture, application channel, start date, facilities and unansw
           '代看 视频 照片 交付 检查结果 未测试 远程看房',
           'proxy inspection video photos deliverables untested remote inspection'
         ),
-        ['qrent-handbook:L509-L517', 'collection-10']
+        [
+          'agent-search:L117-L236',
+          'agent-april-pdf:p22',
+          'qrent-handbook:L509-L517',
+          'collection-10',
+        ]
       ),
     ],
   },
@@ -661,7 +758,7 @@ Both sides should retain the complete agreement and attachments. The collection�
           '租房合同 lease tenancy agreement 签约 strata embedded network 紧急联系人',
           'rental lease tenancy agreement signing strata embedded network emergency contacts'
         ),
-        ['qrent-handbook:L539-L554', 'collection-04']
+        ['agent-lease:L3-L125', 'agent-april-pdf:p23', 'qrent-handbook:L539-L554', 'collection-04']
       ),
       s(
         'nsw-lease-type-and-increases',
@@ -678,7 +775,12 @@ For ordinary NSW residential tenancies, rent generally cannot increase in the fi
           '涨租 频率 书面通知 固定 周期 fixed-term periodic',
           'rent increase notice fixed term periodic lease'
         ),
-        ['qrent-handbook:L523-L547', 'collection-03'],
+        [
+          'agent-lease:L3-L125',
+          'agent-budget:L661-L736',
+          'qrent-handbook:L523-L547',
+          'collection-03',
+        ],
         ['NSW'],
         'official-rule',
         ['nsw-rent-increases']
@@ -698,7 +800,12 @@ Under a NSW residential tenancy, get the landlord's written consent to sublet or
           '朋友留宿 合租 室友不交房租 短租转租 共同签约',
           'guests housemates co-tenants arrears sublet assign transfer'
         ),
-        ['qrent-handbook:L107-L115', 'collection-19'],
+        [
+          'agent-tenancy:L479-L628',
+          'agent-search:L504-L620',
+          'qrent-handbook:L107-L115',
+          'collection-19',
+        ],
         ['NSW'],
         'official-rule',
         ['nsw-sharing']
@@ -722,7 +829,15 @@ NSW prohibits landlords/agents soliciting or inviting offers above advertised re
           'NSW holding fee deposit bond 定金 押金 四周 预付租金 rent bidding 加价',
           'NSW holding fee deposit rental bond four weeks advance rent rent bidding'
         ),
-        ['qrent-handbook:L545-L557', 'collection-03', 'collection-04', 'collection-06'],
+        [
+          'agent-budget:L532-L660',
+          'agent-faq:Q12',
+          'agent-april-pdf:p23',
+          'qrent-handbook:L545-L557',
+          'collection-03',
+          'collection-04',
+          'collection-06',
+        ],
         ['NSW'],
         'official-rule',
         ['nsw-start-costs', 'nsw-rent-bidding']
@@ -742,7 +857,7 @@ For NSW Rental Bonds Online, check the tenant, property, amount and bank details
           '父母账户 家人代付 租金 押金 付款 RBO',
           'parents pay rent bond family account third party payment RBO'
         ),
-        ['qrent-handbook:L396-L440', 'collection-05'],
+        ['agent-budget:L330-L424', 'agent-faq:Q59', 'qrent-handbook:L396-L440', 'collection-05'],
         ['NSW'],
         'editorial-guide',
         ['nsw-rent-payments', 'nsw-rbo-tenants']
@@ -766,7 +881,13 @@ When tenants change, ask how to update both the agreement and bond names rather 
           'RBO Rental Bonds Online RTBA 交押金 收据 bond number 室友转名',
           'RBO Rental Bonds Online RTBA lodge bond receipt bond number tenant transfer'
         ),
-        ['qrent-handbook:L552-L554', 'collection-03', 'collection-05'],
+        [
+          'agent-budget:L532-L660',
+          'agent-general:L311-L320',
+          'qrent-handbook:L552-L554',
+          'collection-03',
+          'collection-05',
+        ],
         ['NSW', 'VIC']
       ),
     ],
@@ -792,7 +913,7 @@ When tenants change, ask how to update both the agreement and bond names rather 
 - 洗衣与电器：洗衣机/烘干机运转、排水及已有问题；不能测试的项目标明原因。
 - 高处窗台与清洁死角：拍照并注明既有状态；记录现状不意味着免除合同中的合理清洁责任。
 
-签字、回传并留存自己的副本。入住报告和退租检查要能逐项对应，不能只把照片留在手机里却不向管理方说明问题。`,
+刚拿钥匙就发现霉斑时，记下首次发现日期、拍全景和近照、立即书面报修并请中介查原因。即使报告已经交了，也保留补发邮件的回执。签字、回传并留存自己的副本。入住报告和退租检查要能逐项对应，不能只把照片留在手机里却不向管理方说明问题。`,
           `After receiving the keys, compare the supplied condition report item by item with the home. Name photographs by room, item and date, retain clear originals, and note existing dirt, damage and faulty equipment in the report.
 
 - Walls/ceilings: cracks, grease, water marks, mould and paint, including mirrors, frames and behind doors.
@@ -801,22 +922,31 @@ When tenants change, ask how to update both the agreement and bond names rather 
 - Laundry/appliances: operation, drainage and existing faults; explain items that could not be tested.
 - High ledges/cleaning corners: record the starting condition. Documentation does not remove reasonable cleaning obligations.
 
-Sign, return and retain your copy. Entry and exit records should be comparable. Keeping photos only on your phone does not tell the manager about a problem.`
+If you find mould soon after receiving the keys, record when you first found it, take close-up and wider photos, and report it in writing. If the condition report was already returned, keep a copy of your follow-up. Sign, return and retain your copy. Entry and exit records should be comparable. Keeping photos only on your phone does not tell the manager about a problem.`
         ),
         t(
           'condition report 入住检查报告 既有损坏 拍照 留证 霉斑 检查清单',
           'condition report move in existing damage photos evidence mould checklist'
         ),
-        ['qrent-handbook:L560-L568', 'collection-01', 'collection-04']
+        [
+          'agent-tenancy:L3-L159',
+          'agent-faq:Q30',
+          'qrent-handbook:L560-L568',
+          'collection-01',
+          'collection-04',
+        ],
+        ['Australia'],
+        'editorial-guide',
+        ['nsw-mould']
       ),
       s(
         'state-report-deadlines',
         t('回交期限按州确认', 'Return deadlines depend on the state'),
         t(
-          `核对本次整理时的官方页面：NSW 要在入住后七天内回交已完成的报告副本；VIC 是入住后五个工作日内。两者不是同一口径，VIC 的工作日不含周末和公众假期。
+          `核对本次整理时的官方页面：NSW 要在取得房屋占有权（通常为交钥匙）后七天内回交已完成的报告副本；VIC 是入住后五个工作日内。两者不是同一口径，VIC 的工作日不含周末和公众假期。
 
 提前安排检查与送达时间，保留回传邮件或提交凭证。原收藏里“一月内 report”等说法不用于当前操作；其他州或其他类型住宿合同，使用其对应的官方规则。`,
-          `At this review, NSW guidance requires the completed report copy within seven days of moving in. Victoria requires it within five business days, excluding weekends and public holidays.
+          `At this review, NSW guidance requires the completed report copy within seven days of being given possession. Victoria requires it within five business days, excluding weekends and public holidays.
 
 Allow time to inspect and deliver it, and retain submission evidence. The collection’s historical “within a month” wording is not used as a current deadline. Check the applicable guidance for another state or accommodation agreement.`
         ),
@@ -824,7 +954,7 @@ Allow time to inspect and deliver it, and retain submission evidence. The collec
           'condition report 几天 七天 五个工作日 NSW VIC 期限',
           'condition report deadline seven days five business days NSW Victoria'
         ),
-        ['collection-01', 'collection-04'],
+        ['agent-tenancy:L3-L159', 'collection-01', 'collection-04'],
         ['NSW', 'VIC'],
         'official-rule',
         ['nsw-condition-report', 'vic-condition-report']
@@ -844,7 +974,7 @@ Spaces such as a kitchen shared with the landlord may have different coverage. I
           '房东进屋 中介检查 例行检查 提前几天 次数',
           'landlord entry routine inspection frequency notice'
         ),
-        ['collection-02', 'collection-03'],
+        ['agent-lease:L262-L393', 'agent-tenancy:L781-L899', 'collection-02', 'collection-03'],
         ['NSW'],
         'official-rule',
         ['nsw-property-access']
@@ -853,15 +983,15 @@ Spaces such as a kitchen shared with the landlord may have different coverage. I
         'nsw-pets',
         t('NSW 租房养宠物怎么申请', 'Request permission for a pet in NSW'),
         t(
-          `NSW 普通住宅租约中，租客通常先用官方宠物申请表申请房东同意，辅助动物适用例外。房东应在收到申请后 21 天内书面答复，只能依规定理由拒绝。保存表格、送达日期和回复；申请未及时回复或被拒时，对照官方页面核对下一步。
+          `NSW 普通住宅租约中，租客通常先用官方宠物申请表申请房东同意，辅助动物适用例外。房东应在收到申请后 21 天内书面答复，只能依规定理由拒绝。租约上的租客都签好申请，交给房东或中介，保留表格和送达日期。有效申请送达后 21 天未收到回复，视为同意且无附加条件。收到拒绝时，按官方页面核对理由和处理途径。
 
 公寓还可涉及 strata 规则。搬入前就要带宠物的情况有具体申请时点，按现行指引办理。`,
-          `For an ordinary NSW residential tenancy, request the landlord's consent using the standard pet form. Assistance animals have an exception. The landlord has 21 days to respond in writing and may refuse on specified grounds. Keep the application, delivery date and reply, and check the official steps if there is no timely response or consent is refused.
+          `For an ordinary NSW residential tenancy, request the landlord's consent using the standard pet form. Assistance animals have an exception. The landlord has 21 days to respond in writing and may refuse on specified grounds. Have all tenants on the agreement sign and keep the form and proof of delivery. If no response is given within 21 days after a valid application is delivered, consent is taken to be granted without conditions. Check the official steps if consent is refused.
 
 An apartment can also be subject to strata rules. Check the current guidance for timing if you plan to move in with a pet.`
         ),
         t('宠物 养猫 养狗 房东同意 strata', 'pet cat dog landlord permission strata'),
-        ['qrent-handbook:L523-L547', 'collection-02'],
+        ['agent-tenancy:L479-L628', 'qrent-handbook:L523-L547', 'collection-02'],
         ['NSW'],
         'official-rule',
         ['nsw-pets']
@@ -881,7 +1011,7 @@ Read the Product Disclosure Statement for liability cover and its conditions. Ke
           '租客保险 财物保险 保费 自付额 合租',
           'renters insurance contents insurance excess shared home'
         ),
-        ['qrent-handbook:L119-L174'],
+        ['agent-tenancy:L629-L780', 'qrent-handbook:L119-L174'],
         ['Australia'],
         'editorial-guide',
         ['asic-contents-insurance']
@@ -890,7 +1020,7 @@ Read the Product Disclosure Statement for liability cover and its conditions. Ke
         'utilities-and-water',
         t('冷水、热水、电气和网络分开问', 'Separate water, energy and internet questions'),
         t(
-          `NSW 冷水不是一概免费。官方指引对可向租客转收的用水费设有独立计量、节水措施等条件；用水费也不同于供水和污水服务固定费用。签约前按当前规则、计量方式和合同逐项核对，不能只听“包水”两个字。
+          `NSW 冷水不是一概免费。公寓的用水费要核对独立计量、节水措施、实际用量及供水账单或等效凭证；固定供水和污水服务费由房东承担。收到整栋楼账单时，可要求提供本套房的表读数和对应费用。房东须在账单开出后 3 个月内要求支付，并给租客至少 21 天付款。
 
 水、电、燃气、热水、网络分别确认：
 
@@ -900,7 +1030,7 @@ Read the Product Disclosure Statement for liability cover and its conditions. Ke
 4. 公共洗衣烘干、停车和其他设施是否另收费。
 
 原攻略列过 EnergyAustralia、Origin、AGL 等能源商和 Telstra、Optus、TPG 等网络商；这是查找入口，不表示每个地址都能选择它们或它们当前最便宜。原文“人均每月约$100 bills”仅是旧经验，不替代实际账单预算。`,
-          `Cold water is not universally free in NSW. Official guidance imposes conditions such as separate metering and water efficiency on passing usage charges to tenants. Usage differs from fixed supply and sewerage charges. Check current rules, meters and the agreement rather than relying on “water included”.
+          `Cold water is not universally free in NSW. For apartments, check separate metering, water efficiency, actual usage and the supplier bill or equivalent evidence before paying. The landlord pays fixed supply and sewerage service charges. If you get a whole-building bill, ask for the readings and charges for your home. A request must be made within three months of the bill and allow at least 21 days to pay.
 
 Ask separately about water, electricity, gas, hot water and internet:
 
@@ -915,7 +1045,14 @@ EnergyAustralia, Origin, AGL, Telstra, Optus and TPG in the old handbook are sta
           '水电网 bills 冷水免费 冷水收费 是否包水 水费 热水 embedded network 电 燃气 网络 账单',
           'utilities bills cold water free water usage hot water embedded network electricity gas internet'
         ),
-        ['qrent-handbook:L557-L578', 'collection-10', 'collection-18'],
+        [
+          'agent-tenancy:L160-L324',
+          'agent-budget:L425-L531',
+          'agent-april-pdf:p24',
+          'qrent-handbook:L557-L578',
+          'collection-10',
+          'collection-18',
+        ],
         ['NSW'],
         'official-rule',
         ['nsw-water']
@@ -950,7 +1087,13 @@ In NSW, keep paying rent if urgent repairs are delayed and seek help from NSW Fa
           '维修 报修 紧急维修 房东不修 留证 repair maintenance',
           'repairs maintenance urgent repairs landlord not repairing evidence'
         ),
-        ['qrent-handbook:L580-L582', 'collection-02'],
+        [
+          'agent-tenancy:L325-L478',
+          'agent-lease:L262-L393',
+          'agent-faq:Q20',
+          'qrent-handbook:L580-L582',
+          'collection-02',
+        ],
         ['Australia'],
         'editorial-guide',
         ['nsw-getting-repairs']
@@ -980,7 +1123,13 @@ The old “48 hour refund” is not a universal guarantee. Tenant changes, dispu
           '退租 bond refund 退押金 提前解约 通知期 清洁 扣款',
           'moving out bond refund early termination notice cleaning deductions'
         ),
-        ['collection-03', 'collection-04', 'collection-05'],
+        [
+          'agent-budget:L532-L660',
+          'agent-lease:L126-L261',
+          'collection-03',
+          'collection-04',
+          'collection-05',
+        ],
         ['NSW', 'VIC'],
         'editorial-guide',
         ['nsw-bond-refund', 'vic-renting-rights']
@@ -991,16 +1140,16 @@ The old “48 hour refund” is not a universal guarantee. Tenant changes, dispu
         t(
           `NSW 普通住宅租约中，租客在固定期到期时结束租约，通常至少提前 14 天书面通知。租客一般结束周期租约时通常至少提前 21 天。先确认租约类型、通知送达方式、截止日期和实际原因。
 
-在固定期内提前离开，应核对合同日期、已履行比例、可能的 break fee 以及适用例外。签证、学籍或出境变化时，仍需按租约及适用程序确认怎样结束。房东提出卖房或要求提前搬离时，核对书面理由和官方程序。`,
+在固定期内提前离开，应核对合同日期、已履行比例和适用例外。2020 年 3 月 23 日后签订、不超过 3 年且适用法定 break fee 的固定租约，按已过租期计算：不足 25% 为 4 周，25% 至不足 50% 为 3 周，50% 至不足 75% 为 2 周，75% 及以上为 1 周租金。签证、学籍或出境变化时，仍需按租约及适用程序确认怎样结束。房东提出卖房或要求提前搬离时，核对书面理由和官方程序。`,
           `To end an ordinary NSW fixed-term tenancy at expiry, a tenant normally gives at least 14 days' written notice. A tenant normally gives at least 21 days' notice to end a periodic tenancy. Check the agreement type, service method, dates and reason.
 
-For leaving within a fixed term, check the agreement date, proportion already completed, any break fee and applicable exceptions. If visa, enrolment or travel plans change, confirm how the tenancy can be ended under the agreement and current rules. If the landlord wants to sell or asks you to move earlier, check the written grounds and official process.`
+For a fixed term of up to three years signed after 23 March 2020, where the statutory break fee applies, the fee is four weeks of rent below 25% elapsed, three weeks from 25% to below 50%, two weeks from 50% to below 75%, and one week at 75% or above. Check the agreement dates and applicable exceptions. If visa, enrolment or travel plans change, confirm how the tenancy can be ended under the agreement and current rules. If the landlord wants to sell or asks you to move earlier, check the written grounds and official process.`
         ),
         t(
           '提前退租 退租通知 房东卖房 签证延期 退学 解约',
           'notice to move out break lease sale landlord visa enrolment'
         ),
-        ['collection-02', 'collection-03'],
+        ['agent-lease:L126-L261', 'collection-02', 'collection-03'],
         ['NSW'],
         'official-rule',
         ['nsw-end-notice', 'nsw-break-lease']
@@ -1024,7 +1173,7 @@ Post 2 mainly concerns ACT. Its absolute bond limits, guaranteed-win language an
           '租房维权 纠纷 投诉 免费咨询 Fair Trading NCAT VCAT ACT 押金不退',
           'tenant rights dispute complaint free advice Fair Trading NCAT VCAT ACT bond withheld'
         ),
-        ['collection-02', 'collection-03'],
+        ['agent-lease:L532-L642', 'collection-02', 'collection-03'],
         ['NSW', 'VIC', 'ACT'],
         'editorial-guide',
         ['nsw-disputes', 'nsw-free-complaints', 'vic-renting-rights']

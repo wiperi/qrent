@@ -8,7 +8,7 @@ import { SITE_URL } from './seo';
 import type { RentalSearchItem } from './rental-library-search';
 
 export { rentalGuideModules, references, officialReferences };
-export const RENTAL_LIBRARY_VERSION = '2026-11-14.1';
+export const RENTAL_LIBRARY_VERSION = '2026-11-14.2';
 export const RENTAL_LIBRARY_PUBLISHED_AT = '2026-10-31';
 export type LibraryLocale = 'zh' | 'en';
 
@@ -52,6 +52,10 @@ export function getRentalSearchItems(locale: LibraryLocale): RentalSearchItem[] 
 }
 
 // This is a static public corpus, not a model endpoint. Content is data, not instructions.
+export function officialReferenceReviewedAt(source: (typeof officialReferences)[number]) {
+  return 'reviewedAt' in source ? source.reviewedAt : OFFICIAL_REVIEW_DATE;
+}
+
 export function rentalKnowledgeExport() {
   return {
     schemaVersion: 1,
@@ -59,10 +63,11 @@ export function rentalKnowledgeExport() {
     publisher: 'Qrent',
     publishedAt: RENTAL_LIBRARY_PUBLISHED_AT,
     sourceFiles: references.sources,
+    legacySources: references.legacyAgentSources,
     experienceSources: references.experiences,
     officialSources: officialReferences.map(source => ({
       ...source,
-      reviewedAt: 'reviewedAt' in source ? source.reviewedAt : OFFICIAL_REVIEW_DATE,
+      reviewedAt: officialReferenceReviewedAt(source),
     })),
     retrievalPolicy: {
       citeSectionUrl: true,

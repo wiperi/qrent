@@ -12,6 +12,13 @@ export const officialReferences = [
     jurisdiction: 'NSW',
   },
   {
+    id: 'nsw-application-privacy',
+    title: 'NSW Fair Trading: Handling information in rental applications',
+    url: 'https://www.nsw.gov.au/housing-and-construction/rental-forms-surveys-and-data/resources/fair-trading-commissioners-guidance/when-a-prospective-tenant-applies-for-a-property',
+    jurisdiction: 'NSW',
+    reviewedAt: '2026-11-14',
+  },
+  {
     id: 'nsw-condition-report',
     title: 'NSW Fair Trading: rental property condition reports',
     url: 'https://www.nsw.gov.au/housing-and-construction/rules/rental-property-condition-reports',
@@ -88,6 +95,13 @@ export const officialReferences = [
     id: 'nsw-agent-licence',
     title: 'NSW Fair Trading: Check a property agent licence',
     url: 'https://www.nsw.gov.au/housing-and-construction/buying-and-selling-property/buying-property-nsw/preparing-to-purchase/property-agent-or-conveyancer-licence-check',
+    jurisdiction: 'NSW',
+    reviewedAt: '2026-11-14',
+  },
+  {
+    id: 'nsw-mould',
+    title: 'NSW Fair Trading: mould in a rental property',
+    url: 'https://www.nsw.gov.au/housing-and-construction/rules/mould-a-rental-property',
     jurisdiction: 'NSW',
     reviewedAt: '2026-11-14',
   },

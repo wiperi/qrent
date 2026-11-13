@@ -8,6 +8,13 @@ import {
 import { searchRentalLibrary } from '../rental-library-search';
 import type { GuidePassage } from './contracts';
 import { faqSections } from './faq';
+import {
+  isGuideFollowUp,
+  namedStates,
+  practicalGuideSections,
+  rentalRuleTopic,
+  reviewedRuleSection,
+} from './guide-topics';
 
 type Passage = GuidePassage & {
   title: string;
@@ -130,54 +137,59 @@ export function blogPassages(locale: LibraryLocale): Passage[] {
   return passages;
 }
 
-type GuideContext = { school?: string; previousUserQuestion?: string };
-
-const states = {
-  NSW: /\bNSW\b|New South Wales|新南威尔士|新州|悉尼|\bSydney\b/i,
-  VIC: /\bVIC\b|\bVictoria\b|维州|维多利亚|墨尔本|\bMelbourne\b/i,
-  ACT: /\bACT\b|Canberra|堪培拉/i,
-  QLD: /\bQLD\b|Queensland|昆州|布里斯班|Brisbane/i,
-  WA: /\bWA\b|Western Australia|西澳|珀斯|Perth/i,
-  SA: /\bSA\b|South Australia|南澳|阿德莱德|Adelaide/i,
+type GuideContext = {
+  school?: string;
+  previousUserQuestion?: string;
+  previousTopicQuestion?: string;
 };
-
-function namedStates(text: string) {
-  return Object.entries(states)
-    .filter(([, pattern]) => pattern.test(text))
-    .map(([state]) => state);
-}
 
 export function retrieveGuides(query: string, locale: LibraryLocale, context?: GuideContext) {
   const q = query.normalize('NFKC');
+  const prior = context?.previousTopicQuestion ?? context?.previousUserQuestion ?? '';
   const explicitStates = namedStates(q);
-  const inferredStates = namedStates(context?.previousUserQuestion ?? '');
+  const inferredStates = namedStates(context?.previousUserQuestion ?? prior);
   const jurisdictions = explicitStates.length
     ? explicitStates
     : inferredStates.length
       ? inferredStates
       : context?.school
-        ? ['NSW']
+        ? ['NSW' as const]
         : [];
+  const currentTopic = rentalRuleTopic(q);
+  const topic = currentTopic ?? (isGuideFollowUp(q) ? rentalRuleTopic(prior) : undefined);
+  const inheritedTopic = Boolean(topic && !currentTopic);
+  const queryForRanking = inheritedTopic ? prior : q;
+  const priority = [
+    ...new Set([
+      ...(topic ? [reviewedRuleSection(topic)] : []),
+      ...practicalGuideSections(q),
+      ...faqSections(q),
+    ]),
+  ].slice(0, 4);
   const passages = blogPassages(locale).filter(
     passage =>
       !jurisdictions.length ||
       !passage.jurisdictions?.length ||
       passage.jurisdictions.includes('Australia') ||
       passage.jurisdictions.some(state =>
-        jurisdictions.includes(state === 'Sydney' ? 'NSW' : state === 'Melbourne' ? 'VIC' : state)
+        jurisdictions.some(
+          area => area === (state === 'Sydney' ? 'NSW' : state === 'Melbourne' ? 'VIC' : state)
+        )
       )
   );
-  const hint = queryHints.find(([pattern]) => pattern.test(q))?.[1][locale];
+  const hint = queryHints.find(([pattern]) => pattern.test(queryForRanking))?.[1][locale];
   const scores = new Map<Passage, number>();
-  searchRentalLibrary(passages, q, 16).forEach((passage, i) => scores.set(passage, 0.85 / (8 + i)));
+  searchRentalLibrary(passages, queryForRanking, 16).forEach((passage, i) =>
+    scores.set(passage, 0.85 / (8 + i))
+  );
   if (hint) {
     searchRentalLibrary(passages, hint, 12).forEach((passage, i) =>
       scores.set(passage, (scores.get(passage) ?? 0) + 1.2 / (8 + i))
     );
   }
-  for (const [index, target] of faqSections(q).slice(0, 4).entries()) {
+  for (const [index, target] of priority.entries()) {
     const matches = passages.filter(passage => passage.path === '/' + locale + '/guides/' + target);
-    const best = searchRentalLibrary(matches, q, 1)[0] ?? matches[0];
+    const best = searchRentalLibrary(matches, queryForRanking, 1)[0] ?? matches[0];
     if (best) scores.set(best, (scores.get(best) ?? 0) + 1 / (index + 1));
   }
   const results: GuidePassage[] = [];
@@ -215,5 +227,5 @@ export function retrieveGuides(query: string, locale: LibraryLocale, context?: G
     seen.set(articlePath, count + 1);
     if (results.length === 4) break;
   }
-  return { passages: results };
+  return { passages: results, jurisdictions, topic };
 }

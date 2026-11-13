@@ -5,6 +5,7 @@ import { test, type TestContext } from 'node:test';
 import { POST } from '../../src/app/api/rental-assistant/chat/route';
 
 type Fixture = {
+  modelAnswer?: string;
   filters?: Record<string, unknown>;
   steps?: { name: 'search_listings' | 'search_guides'; arguments: Record<string, unknown> }[];
   locale?: 'zh' | 'en';
@@ -74,7 +75,7 @@ async function ask(t: TestContext, fixture: Fixture) {
             },
           ],
         }
-      : { content: 'Eastgardens currently averages A$789/week.' };
+      : { content: fixture.modelAnswer ?? 'Eastgardens currently averages A$789/week.' };
     response.end(
       JSON.stringify({
         id: 'fixture-response',
@@ -262,14 +263,155 @@ test('room-only searches use the room guide and avoid a whole-property lookup', 
 });
 
 test('a mixed question searches the stated weekly budget and retrieves inspection advice', async t => {
-  const { reply, queries } = await ask(t, {
+  const { reply, queries, modelRequests } = await ask(t, {
     locale: 'zh',
     questions: ['帮我找 Randwick 的两房，预算每周 900 刀。看房时要检查什么？'],
   });
   assert.equal(queries.length, 1);
   assert.equal(queries[0].maxPrice, 900);
+  assert.equal(modelRequests.length, 0);
   assert.ok(
     reply.evidence.some((item: { path?: string }) => item.path?.endsWith('#room-checklist'))
   );
   assert.match(reply.answer, /A\$900/);
+  assert.match(reply.answer, /水压.*排水/);
+});
+
+test('a cover letter about a particular property keeps the draft and skips inventory', async t => {
+  const { reply, queries, modelRequests } = await ask(t, {
+    locale: 'zh',
+    questions: ['帮我写一封英文 cover letter 申请悉尼的 2B，我有 UNSW offer，房租由父母资助。'],
+    modelAnswer:
+      'Dear [Agent’s name],\n\nI have received an offer from UNSW. My parents will support my rent.\n\nKind regards,\n[Your name]',
+  });
+  assert.equal(queries.length, 0);
+  assert.equal(modelRequests.length, 1);
+  assert.match(reply.answer, /^Dear \[Agent’s name\],/);
+  assert.match(reply.answer, /My parents will support my rent/);
+  assert.ok(reply.evidence.some((item: { path?: string }) => item.path?.endsWith('#cover-letter')));
+});
+
+test('an English bond email uses the reviewed limit and the stated weekly rent', async t => {
+  const { reply, queries, modelRequests } = await ask(t, {
+    questions: [
+      "I rent in Sydney at A$800 per week and they asked for six weeks' bond. Write a brief, polite email asking the agent to explain or correct the amount.",
+    ],
+  });
+  assert.equal(queries.length, 0);
+  assert.equal(modelRequests.length, 0);
+  assert.match(reply.answer, /Hi \[Agent’s name\],/);
+  assert.match(reply.answer, /A\$3,200/);
+  assert.match(reply.answer, /Kind regards/);
+  assert.ok(
+    reply.evidence.some((item: { path?: string }) => item.path?.endsWith('#nsw-upfront-payments'))
+  );
+});
+
+test('a self-employed applicant can ask what evidence to share without full bank history', async t => {
+  const { reply, queries, modelRequests } = await ask(t, {
+    questions: [
+      'I was rejected for two apartments and I am not sure why. My savings are enough but I am self-employed. What can I improve without sharing my full banking history?',
+    ],
+  });
+  assert.equal(queries.length, 0);
+  assert.equal(modelRequests.length, 0);
+  assert.match(reply.answer, /bank balance|savings statement/i);
+  assert.match(reply.answer, /daily transactions/i);
+  assert.ok(
+    reply.evidence.some((item: { path?: string }) => item.path?.endsWith('#submit-and-follow-up'))
+  );
+});
+
+test('reviewed NSW payment limits use the actual rent without a model guess', async t => {
+  const { reply, queries, modelRequests } = await ask(t, {
+    locale: 'zh',
+    questions: [
+      '我租的是悉尼普通公寓，每周 A$800。中介叫我交 6 周 bond，再预付 4 周租金，说每个留学生都要这样。我该怎么回？',
+    ],
+  });
+  assert.equal(queries.length, 0);
+  assert.equal(modelRequests.length, 0);
+  assert.match(reply.answer, /A\$3,200/);
+  assert.match(reply.answer, /A\$1,600/);
+  assert.ok(
+    reply.evidence.some((item: { path?: string }) => item.path?.endsWith('#nsw-upfront-payments'))
+  );
+});
+
+test('a context-only follow-up does not cite NSW lease-ending rules for a condition report', async t => {
+  const { reply, modelRequests } = await ask(t, {
+    questions: [
+      'I just got the keys to a rental in Melbourne. How long do I have to return the condition report?',
+      'And if the same lease was in Sydney instead?',
+    ],
+  });
+  assert.equal(modelRequests.length, 0);
+  assert.match(reply.answer, /7 days/);
+  assert.doesNotMatch(reply.answer, /14 days/);
+  assert.ok(reply.evidence[0]?.path.endsWith('#state-report-deadlines'));
+});
+
+test('a pet application answered from reviewed NSW rules cannot invert the deadline', async t => {
+  const { reply, modelRequests } = await ask(t, {
+    locale: 'zh',
+    questions: ['在悉尼，租约里写着不能养猫。我已经入住，可以正式申请吗？中介一直不回，怎么算？'],
+  });
+  assert.equal(modelRequests.length, 0);
+  assert.match(reply.answer, /21[^\n]*视为同意/);
+  assert.ok(reply.evidence[0]?.path.endsWith('#nsw-pets'));
+});
+
+test('a jurisdiction without matching evidence gets a clear coverage answer', async t => {
+  const { reply, modelRequests } = await ask(t, {
+    locale: 'zh',
+    questions: [
+      '布里斯班普通住宅租约，中介说允许涨租每隔六个月一次。现在昆州法定涨租频率到底是多少？',
+    ],
+  });
+  assert.equal(modelRequests.length, 0);
+  assert.match(reply.answer, /昆州[^\n]*核对/);
+  assert.doesNotMatch(reply.answer, /12 个月|60 天/);
+});
+
+test('a combined proxy-inspection and no-history question keeps both sources', async t => {
+  const { reply, queries } = await ask(t, {
+    locale: 'zh',
+    questions: [
+      '我人在国内，下个月来悉尼读书，第一次在澳洲租房。能让朋友帮我看房吗？没有本地租房记录，我能用什么材料补？',
+    ],
+  });
+  assert.equal(queries.length, 0);
+  assert.match(reply.answer, /代看/);
+  assert.match(reply.answer, /海外推荐信/);
+  assert.ok(
+    reply.evidence.some((item: { path?: string }) => item.path?.endsWith('#proxy-deliverables'))
+  );
+  assert.ok(
+    reply.evidence.some((item: { path?: string }) =>
+      item.path?.endsWith('#parent-letter-and-history')
+    )
+  );
+});
+
+test('an earliest advertised date does not turn a tenancy question into an inventory search', async t => {
+  const { reply, modelRequests, queries } = await ask(t, {
+    questions: [
+      "A listing says Available Date 1 December, but I won't land until mid-January. Do I have to move in on 1 December?",
+    ],
+  });
+  assert.equal(queries.length, 0);
+  assert.equal(modelRequests.length, 0);
+  assert.match(reply.answer, /rent is due from that agreed date/);
+});
+
+test('an unspoken guide topic survives a second jurisdiction follow-up', async t => {
+  const { reply, modelRequests } = await ask(t, {
+    questions: [
+      'How long do I have to return the condition report in Melbourne?',
+      'And if the same lease was in Sydney instead?',
+      'What if I were in Melbourne again?',
+    ],
+  });
+  assert.equal(modelRequests.length, 0);
+  assert.match(reply.answer, /5 business days/);
 });

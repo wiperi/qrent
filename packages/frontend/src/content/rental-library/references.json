@@ -21,6 +21,88 @@
       }
     }
   ],
+  "legacyAgentSources": [
+    {
+      "id": "agent-faq",
+      "fileName": "QA问答整理 文档.docx",
+      "sha256": "198586e43ac90adbdae29044896530a1c52032ed23e8e15260fc97057db0c0ce",
+      "sourceDate": null,
+      "title": {
+        "zh": "Qrent 租房问答整理",
+        "en": "Qrent rental Q&A notes"
+      }
+    },
+    {
+      "id": "agent-april-pdf",
+      "fileName": "Qrent澳洲租房全流程攻略250417版(1).pdf",
+      "sha256": "d1729ef0e985bc8369f8123253ab62398030d84bf5078082f48bc8d792b23b86",
+      "sourceDate": "2025-04-17",
+      "title": {
+        "zh": "Qrent 澳洲租房全流程攻略 2025-04-17 版",
+        "en": "Qrent rental handbook, 17 April 2025 edition"
+      }
+    },
+    {
+      "id": "agent-general",
+      "fileName": "常识资料.md",
+      "sha256": "f51f5f7d1f85ce0134bb1afbc9cf9bae7bde6d63290e03d1b5bc928f77dbd776",
+      "sourceDate": "2025-04-06",
+      "title": {
+        "zh": "常识资料（全流程攻略文本）",
+        "en": "General rental notes"
+      }
+    },
+    {
+      "id": "agent-search",
+      "fileName": "租房前期：信息与渠道 298f84ca84a080689d83d2dcfb254ad6.md",
+      "sha256": "b62fa71aca067887eacb1b51aa56d84d238c85533211277d0606a64b34cc5bd7",
+      "sourceDate": null,
+      "title": {
+        "zh": "租房前期：信息与渠道",
+        "en": "Rental search and platforms"
+      }
+    },
+    {
+      "id": "agent-budget",
+      "fileName": "租金与预算 298f84ca84a0802aa0c6cb8cadff4e3c.md",
+      "sha256": "e7ca53b3dc5a53c7fb8433b7e92a79021ffbacd6be052927698a3c206bb69527",
+      "sourceDate": "2025-10-26",
+      "title": {
+        "zh": "租金与预算",
+        "en": "Rent and budgeting"
+      }
+    },
+    {
+      "id": "agent-lease",
+      "fileName": "租约与法律 298f84ca84a0809b9c07d07208adc064.md",
+      "sha256": "8c4cdcfefb9e2b8156427eaf526804d7126c177be476699617daea36f0b5d528",
+      "sourceDate": "2025-10-26",
+      "title": {
+        "zh": "租约与法律",
+        "en": "Leases and rental rules"
+      }
+    },
+    {
+      "id": "agent-application",
+      "fileName": "看房与申请 298f84ca84a080ed9028c159bda73e38.md",
+      "sha256": "e6d6d070ffacd4b6f7063b4bc42e727a161041720a2ae3a467a07ad8bdbcff94",
+      "sourceDate": null,
+      "title": {
+        "zh": "看房与申请",
+        "en": "Inspections and applications"
+      }
+    },
+    {
+      "id": "agent-tenancy",
+      "fileName": "入住与居住期 299f84ca84a0803993ecf6decceaa110(1).md",
+      "sha256": "d94d563ef113f89dda73b362686301b575daf6efd6e9c1b850a2f8957e87da4d",
+      "sourceDate": "2025-10-27",
+      "title": {
+        "zh": "入住与居住期",
+        "en": "Moving in and during the tenancy"
+      }
+    }
+  ],
   "experiences": [
     {
       "id": "collection-01",
