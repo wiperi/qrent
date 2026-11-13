@@ -1,5 +1,7 @@
 import type { GuidePassage } from './contracts';
 import {
+  draftLanguage,
+  isRentalDraft,
   practicalGuideTopic,
   reviewedRuleSection,
   stateNames,
@@ -130,6 +132,18 @@ export function reviewedRentalAnswer({
       const rent = quotedWeeklyRent(question);
       const bond = rent ? '（' + money(rent * 4) + '）' : '';
       const advance = rent ? '（' + money(rent * 2) + '）' : '';
+      if (isRentalDraft(question) && /押金|\bbond\b/i.test(question)) {
+        const enBond = rent ? ' (' + money(rent * 4) + ' at my weekly rent)' : '';
+        return draftLanguage(question, locale) === 'zh'
+          ? '您好，[中介姓名]：\n\n我想确认这套房的 bond 金额。按新州普通住宅租赁规定，bond 的上限是四周租金' +
+              bond +
+              '。麻烦核对一下这次的计算，并发一份把 bond 和预付租金分别列明的付款说明。谢谢。\n\n[你的姓名]\n\n规则依据' +
+              cite
+          : 'Hi [Agent’s name],\n\nCould you please confirm how the bond was calculated? For a standard NSW residential tenancy, I understand the bond is capped at four weeks of rent' +
+              enBond +
+              '. Could you review the amount and send an updated breakdown showing the bond and any advance rent separately?\n\nThanks for your help.\n\nKind regards,\n[Your name]\n\nSource' +
+              cite;
+      }
       return zh
         ? '按新州普通住宅租约，bond 最多是 4 周租金' +
             bond +
@@ -214,12 +228,12 @@ export function practicalRentalAnswer(question: string, locale: Locale, passages
           '\n\nExplain your genuine overseas or family-home history and ask which substitutes the agent accepts. Options include an overseas reference, evidence of savings or income, or a support letter if family will fund the rent.' +
           history;
   }
-  if (topic === 'quick-inspection') {
+  if (topic === 'inspection-checklist') {
     const cite = link('room-checklist');
     if (!cite) return;
     return (
       (zh
-        ? '时间有限时，优先查照片看不出来的地方。\n\n' +
+        ? '看房时优先检查照片看不出来的地方。\n\n' +
           '- 看墙角、窗框和柜内有没有霉斑、水渍或异味。开关窗户，确认通风。\n' +
           '- 开水龙头、冲马桶，看水压和排水，留意卫生间排气扇。\n' +
           '- 关窗听噪音。试门锁和空调，核对哪些房间有空调。\n' +
@@ -231,6 +245,17 @@ export function practicalRentalAnswer(question: string, locale: Locale, passages
           '- Measure space for your bed and desk. Note anything you could not test and ask the agent in writing.') +
       cite
     );
+  }
+  if (topic === 'application-evidence') {
+    const cite = link('submit-and-follow-up');
+    if (!cite) return;
+    return zh
+      ? '可以先问中介接受哪种付款能力证明，例如银行出具的余额证明，或保留姓名、日期和余额并遮掉日常交易明细的存款证明。自雇申请人也可以问是否接受会计师出具的收入摘要。' +
+          cite +
+          '\n\n也可以附上真实的租金支付记录或经同意的前房东推荐人。申请被拒时，可以问中介是否有材料需要补充。'
+      : 'Ask the agent which evidence of ability to pay they accept. Offer a bank balance letter or a savings statement showing your name, date and balance with daily transactions redacted. If you’re self-employed, ask whether they accept an accountant’s income summary.' +
+          cite +
+          '\n\nAdd a rent ledger or a former landlord who has agreed to be a referee, if available. If an application was rejected, ask whether any documents were missing.';
   }
   if (topic === 'new-mould') {
     const condition = link('condition-report-checklist');

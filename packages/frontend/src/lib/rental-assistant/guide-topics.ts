@@ -1,7 +1,7 @@
 const report = /\bcondition report\b|入住(?:检查)?报告|房屋状况报告/i;
 const timing = /几天|多久|期限|什么时候|何时|多长时间|\b(?:how long|how soon|when|deadline|due)\b/i;
 const upfront =
-  /预付(?:.{0,10}租金)?|起租费用|\badvance rent\b|\brent in advance\b|\bupfront (?:rent|payments?|costs?)\b|(?:押金|定金|\bbond\b|holding fee).{0,32}(?:上限|最多|多少|几周|过高|收多少|cap|limit|how much|[2-9]\s*(?:周|weeks?))|(?:多少|最多|上限|how much|maximum|[2-9]\s*(?:周|weeks?)).{0,32}(?:押金|\bbond\b|holding fee)/i;
+  /预付(?:.{0,10}租金)?|起租费用|\badvance rent\b|\brent in advance\b|\bupfront (?:rent|payments?|costs?)\b|(?:押金|定金|\bbond\b|holding fee).{0,32}(?:上限|最多|多少|几周|过高|收多少|cap|limit|how much|[2-9]\s*(?:周|weeks?))|(?:多少|最多|上限|how much|maximum|[2-9]\s*(?:周|weeks?)).{0,32}(?:押金|\bbond\b|holding fee)|\b(?:two|three|four|five|six|seven|eight|nine|ten) weeks?['’]? (?:of |as a )?bond\b/i;
 const water = /冷水|水费|水表|水账单|用水费|\b(?:cold water|water (?:bill|usage|charge|meter))\b/i;
 const pet =
   /(?:养|带)(?:宠物|猫|狗)|(?:宠物|猫|狗).{0,28}(?:申请|同意|不回)|\b(?:keep|bring|have|allow).*\b(?:pets?|dogs?|cats?)\b|\bpet (?:application|consent|permission)\b/i;
@@ -17,6 +17,13 @@ const repairRent =
   /(?:停付|停交|拒交|不交|不付).{0,8}(?:房租|租金)|\b(?:withhold|stop paying) (?:the |my )?rent\b/i;
 const inspection =
   /(?:去|现场|实地|第一次).{0,8}看房|看房(?:时|要|清单|检查|注意)|验房.*清单|\b(?:inspection checklist|inspection tips)\b|(?:check|look for) (?:at|during) an inspection/i;
+const applicationEvidence =
+  /自雇|个体户|自由职业|没有工资单|\b(?:self[- ]employed|without payslips|no payslips)\b/i;
+const bankingRecords =
+  /银行(?:账单|流水|交易记录)|\b(?:banking history|bank (?:statements?|transaction history))\b/i;
+const rentalApplication = /申请|中介|\b(?:apply|application|agent|rejected)\b/i;
+const draftRequest =
+  /(?:写|起草|润色|改写).{0,28}(?:一封|邮件|申请信|自荐信|回复|cover letter)|\b(?:draft|write|compose|rewrite|polish)\b[^.!?\n]{0,80}\b(?:e-?mail|letter|message|note|reply)\b/i;
 const newMould =
   /(?:霉斑|发霉|霉菌|\bmou?ld\b).{0,55}(?:拿到钥匙|入住|刚搬|刚住|moved in|got the keys)|(?:拿到钥匙|入住|刚搬|刚住|moved in|got the keys).{0,55}(?:霉斑|发霉|霉菌|\bmou?ld\b)/i;
 const overseasProxy =
@@ -72,6 +79,13 @@ export function reviewedRuleSection(topic: RuleTopic) {
   return ruleSections[topic];
 }
 
+function needsApplicationEvidence(question: string) {
+  return (
+    applicationEvidence.test(question) ||
+    (bankingRecords.test(question) && rentalApplication.test(question))
+  );
+}
+
 export function practicalGuideSections(question: string) {
   if (overseasProxy.test(question) && noLocalHistory.test(question))
     return [
@@ -80,6 +94,11 @@ export function practicalGuideSections(question: string) {
     ];
   if (newMould.test(question))
     return ['moving-in#condition-report-checklist', 'repairs-and-moving-out#exit-and-bond'];
+  if (needsApplicationEvidence(question))
+    return [
+      'application-documents#submit-and-follow-up',
+      'application-documents#document-checklist',
+    ];
   if (inspection.test(question))
     return ['inspection-checklist#room-checklist', 'inspection-checklist#before-inspection'];
   if (housing.test(question))
@@ -111,19 +130,31 @@ export function isGuideFollowUp(question: string) {
   );
 }
 
-function needsQuickInspectionChecklist(question: string) {
-  return (
-    inspection.test(question) &&
-    /(?:只有|仅有|就|只给).{0,10}(?:[0-9一二三四五六七八九十]+\s*分钟|时间很短)|\b(?:only|just)\s+(?:\d+|five|ten|fifteen)\s+minutes\b/i.test(
+export function isRentalDraft(question: string) {
+  return draftRequest.test(question);
+}
+
+export function draftLanguage(question: string, fallback: 'zh' | 'en') {
+  if (
+    /(?:用|一封|一份)英文|英文(?:邮件|申请信|自荐信|回复|\s*cover letter)|\bin English\b/i.test(
       question
     )
-  );
+  )
+    return 'en';
+  if (
+    /(?:用|一封|一份)中文|中文(?:邮件|申请信|自荐信|回复)|\bin (?:simplified )?Chinese\b/i.test(
+      question
+    )
+  )
+    return 'zh';
+  return fallback;
 }
 
 export function practicalGuideTopic(question: string) {
   if (overseasProxy.test(question) && noLocalHistory.test(question)) return 'proxy-and-history';
-  if (needsQuickInspectionChecklist(question)) return 'quick-inspection';
   if (newMould.test(question)) return 'new-mould';
+  if (needsApplicationEvidence(question)) return 'application-evidence';
+  if (inspection.test(question)) return 'inspection-checklist';
   if (
     housing.test(question) &&
     /旧(?:攻略|文|价格)|老攻略|historical|old (?:guide|prices?)/i.test(question)

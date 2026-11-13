@@ -5,6 +5,7 @@ import { test, type TestContext } from 'node:test';
 import { POST } from '../../src/app/api/rental-assistant/chat/route';
 
 type Fixture = {
+  modelAnswer?: string;
   filters?: Record<string, unknown>;
   steps?: { name: 'search_listings' | 'search_guides'; arguments: Record<string, unknown> }[];
   locale?: 'zh' | 'en';
@@ -74,7 +75,7 @@ async function ask(t: TestContext, fixture: Fixture) {
             },
           ],
         }
-      : { content: 'Eastgardens currently averages A$789/week.' };
+      : { content: fixture.modelAnswer ?? 'Eastgardens currently averages A$789/week.' };
     response.end(
       JSON.stringify({
         id: 'fixture-response',
@@ -262,16 +263,63 @@ test('room-only searches use the room guide and avoid a whole-property lookup', 
 });
 
 test('a mixed question searches the stated weekly budget and retrieves inspection advice', async t => {
-  const { reply, queries } = await ask(t, {
+  const { reply, queries, modelRequests } = await ask(t, {
     locale: 'zh',
     questions: ['帮我找 Randwick 的两房，预算每周 900 刀。看房时要检查什么？'],
   });
   assert.equal(queries.length, 1);
   assert.equal(queries[0].maxPrice, 900);
+  assert.equal(modelRequests.length, 0);
   assert.ok(
     reply.evidence.some((item: { path?: string }) => item.path?.endsWith('#room-checklist'))
   );
   assert.match(reply.answer, /A\$900/);
+  assert.match(reply.answer, /水压.*排水/);
+});
+
+test('a cover letter about a particular property keeps the draft and skips inventory', async t => {
+  const { reply, queries, modelRequests } = await ask(t, {
+    locale: 'zh',
+    questions: ['帮我写一封英文 cover letter 申请悉尼的 2B，我有 UNSW offer，房租由父母资助。'],
+    modelAnswer:
+      'Dear [Agent’s name],\n\nI have received an offer from UNSW. My parents will support my rent.\n\nKind regards,\n[Your name]',
+  });
+  assert.equal(queries.length, 0);
+  assert.equal(modelRequests.length, 1);
+  assert.match(reply.answer, /^Dear \[Agent’s name\],/);
+  assert.match(reply.answer, /My parents will support my rent/);
+  assert.ok(reply.evidence.some((item: { path?: string }) => item.path?.endsWith('#cover-letter')));
+});
+
+test('an English bond email uses the reviewed limit and the stated weekly rent', async t => {
+  const { reply, queries, modelRequests } = await ask(t, {
+    questions: [
+      "I rent in Sydney at A$800 per week and they asked for six weeks' bond. Write a brief, polite email asking the agent to explain or correct the amount.",
+    ],
+  });
+  assert.equal(queries.length, 0);
+  assert.equal(modelRequests.length, 0);
+  assert.match(reply.answer, /Hi \[Agent’s name\],/);
+  assert.match(reply.answer, /A\$3,200/);
+  assert.match(reply.answer, /Kind regards/);
+  assert.ok(
+    reply.evidence.some((item: { path?: string }) => item.path?.endsWith('#nsw-upfront-payments'))
+  );
+});
+
+test('a self-employed applicant can ask what evidence to share without full bank history', async t => {
+  const { reply, queries, modelRequests } = await ask(t, {
+    questions: [
+      'I was rejected for two apartments and I am not sure why. My savings are enough but I am self-employed. What can I improve without sharing my full banking history?',
+    ],
+  });
+  assert.equal(queries.length, 0);
+  assert.equal(modelRequests.length, 0);
+  assert.match(reply.answer, /bank balance|savings statement/i);
+  assert.match(reply.answer, /daily transactions/i);
+  assert.ok(
+    reply.evidence.some((item: { path?: string }) => item.path?.endsWith('#submit-and-follow-up'))
+  );
 });
 
 test('reviewed NSW payment limits use the actual rent without a model guess', async t => {

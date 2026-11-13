@@ -12,6 +12,13 @@ export const officialReferences = [
     jurisdiction: 'NSW',
   },
   {
+    id: 'nsw-application-privacy',
+    title: 'NSW Fair Trading: Handling information in rental applications',
+    url: 'https://www.nsw.gov.au/housing-and-construction/rental-forms-surveys-and-data/resources/fair-trading-commissioners-guidance/when-a-prospective-tenant-applies-for-a-property',
+    jurisdiction: 'NSW',
+    reviewedAt: '2026-11-14',
+  },
+  {
     id: 'nsw-condition-report',
     title: 'NSW Fair Trading: rental property condition reports',
     url: 'https://www.nsw.gov.au/housing-and-construction/rules/rental-property-condition-reports',

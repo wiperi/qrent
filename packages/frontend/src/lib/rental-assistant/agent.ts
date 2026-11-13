@@ -1,4 +1,4 @@
-import { APICallError, stepCountIs, tool, ToolLoopAgent } from 'ai';
+import { APICallError, generateText, stepCountIs, tool, ToolLoopAgent } from 'ai';
 import { z } from 'zod';
 import { areaName, RENTAL_SCHOOLS } from '../rental-schools';
 import { formatRentalAnswer } from './answers';
@@ -7,6 +7,7 @@ import { retrieveGuides } from './guides';
 import { faqSections } from './faq';
 import {
   isGuideFollowUp,
+  isRentalDraft,
   practicalGuideSections,
   practicalGuideTopic,
   rentalRuleTopic,
@@ -47,6 +48,11 @@ const instructions = [
   'If no relevant passage supports a rental rule, say what could not be verified. Do not give legal numbers or deadlines from memory. Do not predict whether a bond will be deducted or speculate about personal credit records. For newly discovered mould or damage, explain what to document and whom to notify now. Use short paragraphs or up to four useful bullets. With inventory results already supplied, answer only the advice part in up to three bullets, citing [G1] or the matching guide at the end of each bullet. Cite only returned [R#] and [G#] IDs. Use Markdown with no raw URLs. Citations must be bare [G1] or [R1], without link syntax. For a draft, use placeholders for missing personal details and never invent income, references or rental history.',
 ].join('\n');
 
+const draftInstructions = [
+  'You are Little Q, a bilingual rental writing assistant. Return the copyable draft requested in the latest message, in the requested language and approximate length. Preserve the personal facts the renter supplied. Write [property address], [name], or another placeholder when a necessary detail is missing.',
+  'Do not assume how many people will live there from the bedroom count. Do not add a start date, co-tenants, previous accommodation, employment, financial standing, personal habits, or attachments unless the renter states them. You can offer to provide supporting documents on request.',
+].join('\n');
+
 type Message = { role: 'user' | 'assistant'; content: string };
 type Locale = 'zh' | 'en';
 type AgentInput = {
@@ -73,6 +79,7 @@ export async function runRentalAssistant({
 }: AgentInput): Promise<ChatReply & { listingLookupFailed: boolean }> {
   const question = messages.at(-1)!.content;
   const answerLocale = latestLanguage(question, locale);
+  const drafting = isRentalDraft(question);
   const priorQuestions = messages
     .filter(item => item.role === 'user')
     .slice(0, -1)
@@ -118,9 +125,11 @@ export async function runRentalAssistant({
       (!guideQuery &&
         (budgetChange || Object.keys(change).length > 0 || refineIntent.test(question))));
   const roomOnly =
+    !drafting &&
     roomSearch.test(question) &&
     !/(?:也|对比|同时).*(?:整租|整套)|\b(?:compare|also).*whole[- ]propert/i.test(question);
   const listingQuestion =
+    !drafting &&
     !roomOnly &&
     (refining ||
       directListingRequest ||
@@ -135,7 +144,7 @@ export async function runRentalAssistant({
     ...change,
   };
   const canSearch = Boolean(focused.school || focused.suburbs?.length);
-  const needsMarketScope = areaMarket.test(question) && !canSearch;
+  const needsMarketScope = !drafting && areaMarket.test(question) && !canSearch;
   const missingHeadcount = Boolean(
     focused.perPersonRent && !(focused.occupants || focused.bedrooms || focused.bedroomOptions)
   );
@@ -181,9 +190,10 @@ export async function runRentalAssistant({
   const preloaded = firstGuideQuery ? lookupGuides(firstGuideQuery) : undefined;
   if (preloaded) guideQueries.set(firstGuideQuery.toLowerCase(), preloaded);
 
-  if (preloaded && !listingQuestion) {
-    const guideEvidence = evidence.filter(item => item.kind === 'guide');
-    const answer = preloaded.topic
+  const guideEvidence = evidence.filter(item => item.kind === 'guide');
+  const sourcedAnswer =
+    preloaded &&
+    (preloaded.topic && !listingQuestion
       ? reviewedRentalAnswer({
           topic: preloaded.topic,
           jurisdictions: preloaded.jurisdictions,
@@ -191,11 +201,23 @@ export async function runRentalAssistant({
           locale: answerLocale,
           question: followUpTopic ? question + '\n' + followUpTopic : question,
         })
-      : practicalRentalAnswer(question, answerLocale, guideEvidence);
-    if (answer) {
-      const cited = guideEvidence.filter(item => answer.includes('[' + item.id + ']'));
-      return { answer, evidence: cited, listingLookupFailed: false };
-    }
+      : drafting
+        ? undefined
+        : practicalRentalAnswer(question, answerLocale, guideEvidence));
+  const citedGuides = guideEvidence.filter(item => sourcedAnswer?.includes('[' + item.id + ']'));
+  if (sourcedAnswer && !listingQuestion)
+    return { answer: sourcedAnswer, evidence: citedGuides, listingLookupFailed: false };
+  if (drafting) {
+    const result = await generateText({
+      model,
+      system: draftInstructions,
+      messages: messages.filter(message => message.role === 'user'),
+      maxOutputTokens: 560,
+      maxRetries: 0,
+      abortSignal: signal,
+    });
+    const answer = redact(result.text.trim());
+    return { answer, evidence: answer ? guideEvidence : [], listingLookupFailed: false };
   }
 
   async function lookupListings(input: SearchContext) {
@@ -342,6 +364,20 @@ export async function runRentalAssistant({
     return { answer, evidence, search, listingLookupFailed: false };
   }
   const prepared = directSearch ? await lookupListings({}) : undefined;
+  if (prepared && (!guideQuery || sourcedAnswer)) {
+    const listingSources = evidence.filter(item => item.kind === 'listings');
+    return {
+      answer: [
+        formatRentalAnswer('', listingSources, answerLocale, question, listingLookup),
+        sourcedAnswer,
+      ]
+        .filter(Boolean)
+        .join('\n\n'),
+      evidence: [...listingSources, ...citedGuides],
+      search,
+      listingLookupFailed: listingLookup.failed,
+    };
+  }
   const needsTool = prepared === undefined && requireListings;
   const agent = new ToolLoopAgent({
     model,
@@ -380,14 +416,6 @@ export async function runRentalAssistant({
 
   let text = '';
   try {
-    if (prepared && !guideQuery) {
-      return {
-        answer: formatRentalAnswer('', evidence, answerLocale, question, listingLookup),
-        evidence,
-        search,
-        listingLookupFailed: listingLookup.failed,
-      };
-    }
     const result = await agent.generate({
       messages,
       abortSignal: prepared ? AbortSignal.any([signal, AbortSignal.timeout(18_000)]) : signal,

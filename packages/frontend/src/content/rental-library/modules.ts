@@ -582,16 +582,20 @@ Check your own provider's enrolment instructions. Give your current address thro
 
 可以比较多套合适房源，但获批、支付 holding fee、签约是不同阶段；做出承诺前核对后果。收藏第8篇的“当天获批”和第9篇周末后得到回复，说明时间线可能不同，不能承诺几小时获批或申请必过。
 
+自雇或没有工资单时，可以询问中介接受哪些付款能力证明，例如银行余额证明或会计师出具的收入摘要。NSW Fair Trading 的最佳实践指引建议在用银行账单证明存款时遮盖日常交易明细。也可以问中介是否接受租金支付记录，或联系已同意的前房东核对。
+
 尽量用电话处理急事，同时把重要日期、价格、费用和约定以书面方式确认。起租日太早会产生空置期间租金，先把实际到达和搬入计划核对好。`,
           `Prepare documents and a working contact number before inspecting. Express genuine interest and confirm the application channel and whether every co-tenant must apply. Save submission receipts and correspondence, then politely check receipt or missing evidence.
 
 You can compare suitable properties, but approval, paying a holding fee and signing a lease are different stages with different consequences. Posts 8 and 9 describe different response times, including an approval story and a reply after a weekend; neither guarantees same-day acceptance.
 
+If you are self-employed or do not have payslips, ask which evidence of ability to pay the agent accepts, such as a bank balance letter or an accountant’s summary of your income. NSW Fair Trading best-practice guidance encourages redacting daily transactions when a bank statement is used to demonstrate savings. You can also ask whether a rent ledger or a reference from a former landlord who has agreed to be contacted is useful.
+
 Use the phone for urgent coordination and confirm important dates, prices, charges and agreements in writing. Starting too early can mean rent before you occupy the home, so check arrival and moving plans first.`
         ),
         t(
-          '申请后多久 回复 跟进 offer 申请被拒 付款 起租日',
-          'application response follow up offer rejected application start date'
+          '申请后多久 回复 跟进 offer 申请被拒 自雇 银行流水 付款 起租日',
+          'application response follow up rejected self-employed banking history savings proof start date'
         ),
         [
           'agent-application:L607-L711',
@@ -600,7 +604,10 @@ Use the phone for urgent coordination and confirm important dates, prices, charg
           'collection-06',
           'collection-08',
           'collection-09',
-        ]
+        ],
+        ['Australia'],
+        'editorial-guide',
+        ['nsw-application-privacy']
       ),
     ],
   },
