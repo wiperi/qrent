@@ -3,10 +3,12 @@ import { once } from 'node:events';
 import { createServer } from 'node:http';
 import { test, type TestContext } from 'node:test';
 import { POST } from '../../src/app/api/rental-assistant/chat/route';
+import type { RentalLetterForm } from '../../src/lib/rental-assistant/letter-workspace';
 
 type Fixture = {
   modelAnswer?: string;
   letterType?: 'cover' | 'parent';
+  letterForm?: RentalLetterForm;
   commuteExamples?: number[];
   filters?: Record<string, unknown>;
   steps?: { name: 'search_listings' | 'search_guides'; arguments: Record<string, unknown> }[];
@@ -136,6 +138,7 @@ async function ask(t: TestContext, fixture: Fixture) {
         connection: { type: 'local' },
         messages: fixture.questions.map(content => ({ role: 'user', content })),
         letterType: fixture.letterType,
+        letterForm: fixture.letterForm,
         previousSearch: fixture.previousSearch,
       }),
     })
@@ -552,4 +555,86 @@ test('an unspoken guide topic survives a second jurisdiction follow-up', async t
   });
   assert.equal(modelRequests.length, 0);
   assert.match(reply.answer, /5 business days/);
+});
+
+test('the dedicated cover letter keeps Australian and overseas rental history distinct', async t => {
+  const { reply, modelRequests, queries } = await ask(t, {
+    questions: ['Draft cover letter'],
+    letterForm: {
+      type: 'cover',
+      language: 'en',
+      applicant: 'Casey Example',
+      property: '42 Sample Street, Randwick',
+      localHistory: 'none',
+      history: '我曾在中国杭州租房。',
+      study: '已收到 UNSW 录取通知。',
+      household: '和一位同学一起申请。',
+      funding: '租金由父母资助。',
+    },
+    modelAnswer: JSON.stringify({
+      history: 'I previously rented in Hangzhou, China.',
+      study: 'I have received an offer from UNSW.',
+      household: 'I am applying with a classmate.',
+      funding: 'My parents will help with rent.',
+      terms: 'I want to move in immediately.',
+    }),
+  });
+  assert.equal(reply.letterType, 'cover');
+  assert.match(reply.answer, /Casey Example/);
+  assert.match(reply.answer, /42 Sample Street, Randwick/);
+  assert.match(reply.answer, /received an offer from UNSW/);
+  assert.match(reply.answer, /applying with a classmate/);
+  assert.match(
+    reply.answer,
+    /no rental history in Australia yet\. I previously rented in Hangzhou, China/
+  );
+  assert.match(reply.answer, /parents will help with rent/);
+  assert.doesNotMatch(reply.answer, /immediately|never rented/i);
+  assert.equal(modelRequests.length, 1);
+  assert.doesNotMatch(JSON.stringify(modelRequests), /Casey Example|42 Sample Street/);
+  assert.deepEqual(queries, []);
+});
+
+test('parent workspace fixes relationship, cap and frequency and preserves a condition the model dropped', async t => {
+  const { reply, modelRequests } = await ask(t, {
+    questions: ['Draft parent letter'],
+    letterForm: {
+      type: 'parent',
+      language: 'en',
+      applicant: 'Casey Example',
+      parent: 'Mia Example',
+      relationship: 'mother',
+      expenses: 'I can help with rent.',
+      amount: '450',
+      amountKind: 'cap',
+      frequency: 'weekly',
+      duration: 'This support is for the first 12 weeks of the tenancy only.',
+      contact: 'parent@example.invalid',
+    },
+    modelAnswer: JSON.stringify({
+      expenses: 'I guarantee rent and can pay it in advance.',
+      amount: '900',
+      duration: 'This support is for 12 months.',
+    }),
+  });
+  assert.equal(reply.letterType, 'parent');
+  assert.equal(reply.sourcePreserved, true);
+  assert.match(reply.answer, /Mia Example.*Casey Example’s mother/);
+  assert.match(
+    reply.answer,
+    /I can help with rent\. I can contribute up to A\$450 per week\. This support is for the first 12 weeks of the tenancy only\./
+  );
+  assert.match(reply.answer, /parent@example\.invalid/);
+  assert.doesNotMatch(reply.answer, /guarantee|in advance|900|12 months/i);
+  assert.doesNotMatch(JSON.stringify(modelRequests), /parent@example|Mia Example|Casey Example/);
+});
+
+test('a sparse cover letter leaves an address placeholder and adds no personal facts', async t => {
+  const { reply, modelRequests } = await ask(t, {
+    questions: ['Draft cover letter'],
+    letterForm: { type: 'cover', language: 'zh', applicant: 'Casey Example' },
+  });
+  assert.match(reply.answer, /\[房源地址\]/);
+  assert.doesNotMatch(reply.answer, /澳洲租房记录|宠物|资金|父母|工作/);
+  assert.deepEqual(modelRequests, []);
 });

@@ -1,7 +1,6 @@
 import { create } from 'zustand';
 import { searchRentalLibrary } from '../rental-library-search';
 import type { ChatReply, ModelConnection } from './contracts';
-import type { ModelProvider } from './presets';
 
 export type RentalTurn = { id: string; question: string; reply: ChatReply };
 
@@ -51,17 +50,13 @@ type RentalSession = {
   draft: string;
   panelVisited: boolean;
   settingsOpen: boolean;
-  selectedProvider?: ModelProvider | 'local';
-  keyDraft: string;
   pending: string;
   error: string;
   request?: AbortController;
   sessionId?: string;
   visitPanel: () => void;
   showSettings: (open: boolean) => void;
-  selectProvider: (provider: ModelProvider | 'local') => void;
-  setKeyDraft: (keyDraft: string) => void;
-  setConnection: (connection: ModelConnection) => void;
+  setConnection: (connection: ModelConnection, keepConversation?: boolean) => void;
   setDraft: (draft: string) => void;
   setError: (error: string) => void;
   beginTurn: (question: string) => { controller: AbortController; sessionId: string } | undefined;
@@ -76,19 +71,14 @@ export const useRentalSession = create<RentalSession>((set, get) => ({
   draft: '',
   panelVisited: false,
   settingsOpen: false,
-  keyDraft: '',
   pending: '',
   error: '',
   visitPanel: () => set({ panelVisited: true }),
   showSettings: settingsOpen => set({ settingsOpen }),
-  selectProvider: selectedProvider => set({ selectedProvider, keyDraft: '', error: '' }),
-  setKeyDraft: keyDraft => set({ keyDraft }),
-  setConnection: connection =>
+  setConnection: (connection, keepConversation) =>
     set({
       connection,
-      turns: [],
-      sessionId: undefined,
-      keyDraft: '',
+      ...(keepConversation ? {} : { turns: [], sessionId: undefined }),
       error: '',
       settingsOpen: false,
     }),
