@@ -274,6 +274,9 @@
   },
   "PropertyGrid": {
     "dailyNewHouses": "Daily New Houses Around",
+    "updatedToday": "Updated today",
+    "currentListings": "Searchable listings",
+    "listingUnit": "",
     "loadError": "Unable to load properties. Please try again later."
   },
   "PropertyCard": {

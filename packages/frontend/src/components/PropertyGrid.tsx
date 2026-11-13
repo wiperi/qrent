@@ -6,6 +6,7 @@ import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { useTranslations } from 'next-intl';
 import { useState, useEffect } from 'react';
 import { useAuth } from '@/hooks/use-auth';
+import ListingStats from './ListingStats';
 import PropertyCard from './PropertyCard';
 import Section from './Section';
 
@@ -101,6 +102,7 @@ export default function PropertyGrid() {
   if (isPending) {
     return (
       <Section title={sectionTitle}>
+        <ListingStats />
         <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
           {Array.from({ length: 8 }).map((_, i) => (
             <div
@@ -124,6 +126,7 @@ export default function PropertyGrid() {
   if (error) {
     return (
       <Section title={sectionTitle}>
+        <ListingStats />
         <div className="text-center py-8">
           <p className="text-slate-600">{t('loadError')}</p>
         </div>
@@ -140,6 +143,7 @@ export default function PropertyGrid() {
 
   return (
     <Section title={sectionTitle}>
+      <ListingStats />
       <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
         {sortedProperties.map(property => (
           <PropertyCard

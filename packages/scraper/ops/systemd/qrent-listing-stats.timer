@@ -1,0 +1,10 @@
+[Unit]
+Description=Refresh Qrent homepage listing counts every two minutes
+
+[Timer]
+OnBootSec=1min
+OnUnitInactiveSec=2min
+AccuracySec=10s
+
+[Install]
+WantedBy=timers.target
