@@ -1,5 +1,5 @@
 import { z } from 'zod';
-import { RENTAL_SCHOOLS } from '../rental-schools';
+import { areaName, RENTAL_SCHOOLS } from '../rental-schools';
 import { validPreviewRow } from '../rental-preview';
 import type { ListingComparison, ListingExample } from './contracts';
 
@@ -104,40 +104,58 @@ export function suburbKey(value: string) {
   return key === 'sydney city' || key === 'sydney cbd' ? 'sydney' : key;
 }
 
-export async function searchListings(input: ListingInput, locale: string, signal: AbortSignal) {
-  const areas = [...new Set(input.suburbs?.map(suburbKey))];
-  if (
-    (!input.school && !areas.length) ||
-    (input.minRent && input.maxRent && input.minRent > input.maxRent)
-  )
-    return { error: 'Provide a Sydney campus or suburb and a valid weekly rent range.' } as const;
-  const targets = (areas.length ? areas : [null]).map(suburb => ({
-    suburb,
-    school:
-      input.school ??
-      RENTAL_SCHOOLS.find(item => item.areas.some(area => suburbKey(area) === suburb))?.code,
-  }));
-  const filters = {
-    minRent: input.minRent ?? undefined,
-    maxRent: input.maxRent ?? undefined,
-    bedrooms: input.bedrooms ?? undefined,
-    maxCommute: input.maxCommute ?? undefined,
-  };
-  const regions = await Promise.all(
-    targets.map(async ({ school, suburb }) => {
-      if (!school) return { suburb, error: 'Ask which campus to use for this suburb.' } as const;
-      try {
-        return await searchArea(school, suburb, filters, locale, signal);
-      } catch {
+export const listingQueryLimit = 6;
+
+export function createListingSearch(locale: string, signal: AbortSignal) {
+  type RegionResult =
+    | ListingComparison
+    | { school?: ListingComparison['school']; suburb: string | null; error: string };
+  const queries = new Map<string, Promise<RegionResult>>();
+
+  return {
+    get remaining() {
+      return listingQueryLimit - queries.size;
+    },
+    async search(input: ListingInput): Promise<{ regions: RegionResult[] } | { error: string }> {
+      const areas = [...new Set(input.suburbs?.map(suburbKey))];
+      if (
+        input.maxRent === 0 ||
+        (!input.school && !areas.length) ||
+        (input.minRent && input.maxRent && input.minRent > input.maxRent)
+      )
         return {
-          school,
-          suburb,
-          error: 'Qrent property search unavailable. Do not estimate.',
+          error: 'Provide a Sydney campus or suburb and a valid weekly rent range.',
         } as const;
-      }
-    })
-  );
-  return { regions };
+      const filters = {
+        minRent: input.minRent ?? undefined,
+        maxRent: input.maxRent ?? undefined,
+        bedrooms: input.bedrooms ?? undefined,
+        maxCommute: input.maxCommute ?? undefined,
+      };
+      const regions = await Promise.all(
+        (areas.length ? areas : [null]).map(async (suburb): Promise<RegionResult> => {
+          const school =
+            input.school ??
+            RENTAL_SCHOOLS.find(item => item.areas.some(area => suburbKey(area) === suburb))?.code;
+          if (!school) return { suburb, error: 'Ask which campus to use for this suburb.' };
+
+          const key = JSON.stringify([school, suburb, filters]);
+          const cached = queries.get(key);
+          if (cached) return cached;
+          if (queries.size >= listingQueryLimit)
+            return { school, suburb, error: 'Listing query limit reached.' };
+          const result = searchArea(school, suburb, filters, locale, signal).catch(() => ({
+            school,
+            suburb,
+            error: 'Qrent property search unavailable. Do not estimate.',
+          }));
+          queries.set(key, result);
+          return result;
+        })
+      );
+      return { regions };
+    },
+  };
 }
 
 async function searchArea(
@@ -202,7 +220,7 @@ async function searchArea(
 
   return {
     school,
-    suburb: exactStats?.region ?? suburb,
+    suburb: exactStats?.region ?? (suburb ? areaName(suburb) : null),
     matches,
     averageWeeklyRent: matches && average ? Math.round(average) : null,
     examples,

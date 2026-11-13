@@ -1,8 +1,38 @@
 import { create } from 'zustand';
+import { searchRentalLibrary } from '../rental-library-search';
 import type { ChatReply, ModelConnection } from './contracts';
 import type { ModelProvider } from './presets';
 
 export type RentalTurn = { id: string; question: string; reply: ChatReply };
+
+// Carry recent user facts and one relevant older turn. Old listing figures and
+// citation IDs expire with the turn that produced them.
+export function rentalContextMessages(turns: RentalTurn[], question: string) {
+  const recent = turns.slice(-3);
+  const older = searchRentalLibrary(
+    turns.slice(0, -3).map(turn => ({
+      title: turn.question,
+      keywords: '',
+      searchText: '',
+      turn,
+    })),
+    question,
+    1
+  )[0]?.turn;
+  const messages: { role: 'user' | 'assistant'; content: string }[] = older
+    ? [{ role: 'user', content: older.question.slice(0, 1000) }]
+    : [];
+  for (const [index, turn] of recent.entries()) {
+    messages.push({ role: 'user', content: turn.question.slice(0, 1000) });
+    if (index === 0 || turn.reply.evidence.some(item => item.kind === 'listings')) continue;
+    const answer = turn.reply.answer
+      .replace(/\s*\[[RG]\d+\]/g, '')
+      .trim()
+      .slice(0, 900);
+    if (answer) messages.push({ role: 'assistant', content: answer });
+  }
+  return [...messages, { role: 'user' as const, content: question }];
+}
 
 type RentalSession = {
   connection?: ModelConnection;

@@ -8,7 +8,7 @@ import { SITE_URL } from './seo';
 import type { RentalSearchItem } from './rental-library-search';
 
 export { rentalGuideModules, references, officialReferences };
-export const RENTAL_LIBRARY_VERSION = '2026-10-31.1';
+export const RENTAL_LIBRARY_VERSION = '2026-11-14.1';
 export const RENTAL_LIBRARY_PUBLISHED_AT = '2026-10-31';
 export type LibraryLocale = 'zh' | 'en';
 
@@ -62,7 +62,7 @@ export function rentalKnowledgeExport() {
     experienceSources: references.experiences,
     officialSources: officialReferences.map(source => ({
       ...source,
-      reviewedAt: OFFICIAL_REVIEW_DATE,
+      reviewedAt: 'reviewedAt' in source ? source.reviewedAt : OFFICIAL_REVIEW_DATE,
     })),
     retrievalPolicy: {
       citeSectionUrl: true,
@@ -87,7 +87,15 @@ export function rentalKnowledgeExport() {
           officialRefs: section.officialRefs ?? [],
           jurisdictions: section.jurisdictions,
           evidence: section.evidence,
-          reviewedAt: OFFICIAL_REVIEW_DATE,
+          reviewedAt: officialReferences.reduce<string>(
+            (date, source) =>
+              'reviewedAt' in source &&
+              section.officialRefs?.includes(source.id) &&
+              source.reviewedAt > date
+                ? source.reviewedAt
+                : date,
+            OFFICIAL_REVIEW_DATE
+          ),
         }))
       )
     ),

@@ -1,4 +1,4 @@
-import type { ListingInput } from './listings';
+import type { SearchContext } from './search-context';
 import type { ModelProvider } from './presets';
 
 export type ListingExample = {
@@ -19,6 +19,7 @@ export type ListingComparison = {
   averageWeeklyRent: number | null;
   examples: ListingExample[];
   readAt: string;
+  split?: { perPersonRent: number; occupants: number; assumed: boolean };
   filters: { minRent?: number; maxRent?: number; bedrooms?: number; maxCommute?: number };
 };
 
@@ -31,6 +32,7 @@ export type GuidePassage = {
   publishedAt: string;
   reviewedAt?: string;
   jurisdictions?: readonly string[];
+  evidence?: 'editorial-guide' | 'historical-example' | 'official-rule';
 };
 
 export type AssistantEvidence =
@@ -45,6 +47,6 @@ export type ModelConnection =
 export type ChatReply = {
   answer: string;
   evidence: AssistantEvidence[];
-  search?: ListingInput;
+  search?: SearchContext;
   reviewId?: string;
 };

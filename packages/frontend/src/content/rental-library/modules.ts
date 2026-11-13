@@ -337,6 +337,26 @@ A map may show only an approximate location; confirm the address with the advert
         ['qrent-handbook:L107-L115', 'qrent-handbook:L302-L311', 'collection-19']
       ),
       s(
+        'verify-agent-and-listing',
+        t('核验中介与付款请求', 'Verify the agent and payment request'),
+        t(
+          `在 NSW 可以用 Verify NSW 按姓名、公司或证照号查房产中介。用独立查到的办公室电话核对广告、带看人和付款请求。直接向房东租时，核对对方身份和出租权限，并确认能实看或由可信的人代看。
+
+明显低于同类房源的报价、只肯聊天却拒绝核验、催促先向私人账户转账，都值得停下来查证。核对钱款是定金、租金还是 bond，保存书面条款与收据。NSW 押金交存可核对 Rental Bonds Online 的官方邀请或其他正规交存凭证。`,
+          `In NSW, use Verify NSW to check a property agent by name, business or licence number. Call the office on a number you obtained independently to verify the advertisement, inspection and payment request. When renting directly, verify the owner's identity and authority to let the home and arrange a viewing or a trusted proxy.
+
+Investigate unusually low prices, refusals to verify the listing and pressure to transfer money to a personal account. Confirm whether a payment is rent, a holding fee or bond, and retain written terms and receipts. For a NSW bond, check the official Rental Bonds Online invitation or other valid lodgement evidence.`
+        ),
+        t(
+          '核验中介 资质 证照 骗局 黑中介 私下转账',
+          'verify agent licence rental scam bank transfer'
+        ),
+        ['qrent-handbook:L278-L320', 'collection-05', 'collection-20'],
+        ['NSW'],
+        'editorial-guide',
+        ['nsw-agent-licence']
+      ),
+      s(
         'listing-history-and-booking',
         t('补看房屋历史并登记看房', 'Check property history and register to inspect'),
         t(
@@ -450,12 +470,12 @@ Post 7 contributes a letter structure; the long About me in post 11 is a persona
         t(
           `Parent Letter 可以说明与申请人的关系、将承担哪些费用、支持金额与频率、资金来源、联系方法、日期和签名，并配合真实的资金证明。原攻略中的“每周$300”“生活费每月$800”“存款¥500,000”都是可替换的示例，不是门槛。
 
-资助说明信和承担法律责任的 guarantor 承诺并不自动等同。若中介要求担保，先读清要签的具体责任范围，再由相关人决定。没有澳洲租房史，就如实说明国内或原来与家人居住的经历，询问可接受的证明方式。
+资助说明信和承担法律责任的 guarantor 承诺并不自动等同。若中介要求担保，先读清要签的具体责任范围，再由相关人决定。没有澳洲租房史，可以如实说明海外租住或与家人居住的经历，询问中介是否接受海外推荐信、资金证明或资助信。若问的是澳洲信用记录，先确认中介实际要核对的材料；按其要求和自己的情况提供相应证明。
 
 Address history、Employment、Income、Identity documents 和 Emergency contact 分别按真实情况填写。联系推荐人前取得同意，并提醒其留意核实邮件或短信；不要编造房东、工作、推荐语或储蓄。`,
           `A parent-support letter can state the relationship, costs supported, amounts/frequency, funding source, contact details, date and signature, backed by real evidence. The handbook’s $300/week, $800/month and RMB 500,000 are replaceable examples, not thresholds.
 
-A support letter does not automatically equal a guarantor’s legal commitment. If a guarantee is requested, understand the actual liability before the relevant person agrees. Without Australian rental history, explain your genuine overseas or family-home history and ask what evidence is acceptable.
+A support letter does not automatically equal a guarantor’s legal commitment. If a guarantee is requested, understand the actual liability before the relevant person agrees. Without Australian rental history, you can explain your genuine overseas or family-home history and ask if an overseas reference, funds evidence or a support letter is acceptable. If the question is about Australian credit history, check which documents the agent is asking for and supply evidence that applies to you.
 
 Complete address history, employment, income, identity and emergency-contact fields accurately. Get referees’ permission before contact and alert them to verification messages. Do not invent landlords, jobs, references or savings.`
         ),
@@ -504,7 +524,7 @@ Use the phone for urgent coordination and confirm important dates, prices, charg
         'before-inspection',
         t('预约与周边检查', 'Booking and the surrounding area'),
         t(
-          `先登记公开看房，未排时间则联系中介确认；出发前查看是否取消、地址是否正确、自己或代看人是否已登记。查历史广告，记下照片与现场需要比对的地方。
+          `Open inspection 是中介在指定时间段安排的公开看房。先按广告提示登记，未排时间则联系中介确认；出发前查看是否取消、地址是否正确、自己或代看人是否已登记。查历史广告，记下照片与现场需要比对的地方。
 
 - 拍下房屋入口、楼道与门禁，确认门锁、访客进入方式及信箱。
 - 按真实门牌走到公交或火车站，核对去学校和市中心的路线、候车与换乘。
@@ -512,7 +532,7 @@ Use the phone for urgent coordination and confirm important dates, prices, charg
 - 查看主要道路、施工、机场或其他噪音来源，比较白天与自己实际使用时段。
 
 在仍有人居住的房屋拍照或录像前，先征得许可，避开住户个人物品和文件。`,
-          `Register for a scheduled inspection or arrange one with the agent. Before leaving, check for cancellations, the correct address and registration for you or your proxy. Review older advertisements to identify things to compare on site.
+          `An open inspection is an advertised time slot for prospective tenants to view the property. Register as directed or arrange a time with the agent. Before leaving, check for cancellations, the correct address and registration for you or your proxy. Review older advertisements to identify things to compare on site.
 
 - Record the entry, corridor and access arrangements, including locks, visitors and mail.
 - Walk from the actual address to transport and check campus/city journeys, waiting and transfers.
@@ -624,6 +644,46 @@ Both sides should retain the complete agreement and attachments. The collection�
         ['qrent-handbook:L539-L554', 'collection-04']
       ),
       s(
+        'nsw-lease-type-and-increases',
+        t('固定租约、周期租约与涨租', 'Fixed-term and periodic agreements and rent increases'),
+        t(
+          `固定租约有约定结束日期。周期租约持续到依规定结束为止。签约前查清日期、租金、调价和提前结束条款。
+
+NSW 普通住宅租约的涨租通常不得发生在首 12 个月内，之后两次涨租至少间隔 12 个月。房东一般应提前至少 60 天书面通知新租金及生效日。既有旧租约、续约、社会住房等情况应核对官方说明的适用范围。`,
+          `A fixed-term agreement has an agreed end date. A periodic agreement runs until it is ended through the applicable process. Check the dates, rent, increase and early-termination terms before signing.
+
+For ordinary NSW residential tenancies, rent generally cannot increase in the first 12 months, and subsequent increases are at least 12 months apart. The landlord normally gives at least 60 days' written notice with the new rent and effective date. Check the official guidance for transitional rules, renewals and social housing.`
+        ),
+        t(
+          '涨租 频率 书面通知 固定 周期 fixed-term periodic',
+          'rent increase notice fixed term periodic lease'
+        ),
+        ['qrent-handbook:L523-L547', 'collection-03'],
+        ['NSW'],
+        'official-rule',
+        ['nsw-rent-increases']
+      ),
+      s(
+        'nsw-shared-tenancy',
+        t('合租、访客、转租和换租客', 'Housemates, guests, subletting and transfers'),
+        t(
+          `先确认每个人是共同签约的租客、分租租客，还是同住者。共同签约时查看租约的付款责任，另外写清室友间分摊、押金、谁提前退出及有欠租时怎么处理。分租时核对对方是否有书面许可。
+
+NSW 住宅租约下，分租或转让租约要取得房东书面同意。额外同住者一般无需另行同意，但不能超过租约人数上限。访客是否构成分租要看安排，尤其是收费或长期占用；有人换出换入时同步核对押金登记。`,
+          `Identify whether each person is a co-tenant, a subtenant or an occupant. Co-tenants should read the agreement's payment obligations and record how they will split rent, bills and bond, and handle arrears or a housemate leaving. A subtenant should check the head tenant's written consent to sublet.
+
+Under a NSW residential tenancy, get the landlord's written consent to sublet or transfer the agreement. An additional occupant generally does not need consent if the agreement's occupancy cap is respected. If a visitor will pay for use of the property or occupy it long term, check how the arrangement is classified. Update the bond record when co-tenants change.`
+        ),
+        t(
+          '朋友留宿 合租 室友不交房租 短租转租 共同签约',
+          'guests housemates co-tenants arrears sublet assign transfer'
+        ),
+        ['qrent-handbook:L107-L115', 'collection-19'],
+        ['NSW'],
+        'official-rule',
+        ['nsw-sharing']
+      ),
+      s(
         'nsw-upfront-payments',
         t('NSW 起租费用分清三类', 'Three different NSW upfront payments'),
         t(
@@ -730,6 +790,43 @@ Allow time to inspect and deliver it, and retain submission evidence. The collec
         ['nsw-condition-report', 'vic-condition-report']
       ),
       s(
+        'nsw-access',
+        t('房东或中介何时可进屋', 'When a landlord or agent can enter'),
+        t(
+          `NSW 住宅租约中，未经租客同意的例行检查，每次应提前至少七天书面通知，十二个月内最多四次。维修、带潜在买家看房或紧急情况各有适用条件和通知要求。核对来访理由、通知送达时间和预定进入时间。
+
+共有厨房等租客没有专属使用权的部分，适用范围可能不同。如果对进入是否合法有争议，保留通知和沟通记录，联系 NSW Fair Trading。`,
+          `For a routine inspection without consent in a NSW residential tenancy, expect at least seven days' written notice and no more than four inspections in 12 months. Repairs, buyer inspections and emergencies have their own conditions and notice periods. Check the reason, delivery time and proposed time of entry.
+
+Spaces such as a kitchen shared with the landlord may have different coverage. If entry is disputed, retain the notice and communication and contact NSW Fair Trading.`
+        ),
+        t(
+          '房东进屋 中介检查 例行检查 提前几天 次数',
+          'landlord entry routine inspection frequency notice'
+        ),
+        ['collection-02', 'collection-03'],
+        ['NSW'],
+        'official-rule',
+        ['nsw-property-access']
+      ),
+      s(
+        'nsw-pets',
+        t('NSW 租房养宠物怎么申请', 'Request permission for a pet in NSW'),
+        t(
+          `NSW 普通住宅租约中，租客通常先用官方宠物申请表申请房东同意，辅助动物适用例外。房东应在收到申请后 21 天内书面答复，只能依规定理由拒绝。保存表格、送达日期和回复；申请未及时回复或被拒时，对照官方页面核对下一步。
+
+公寓还可涉及 strata 规则。搬入前就要带宠物的情况有具体申请时点，按现行指引办理。`,
+          `For an ordinary NSW residential tenancy, request the landlord's consent using the standard pet form. Assistance animals have an exception. The landlord has 21 days to respond in writing and may refuse on specified grounds. Keep the application, delivery date and reply, and check the official steps if there is no timely response or consent is refused.
+
+An apartment can also be subject to strata rules. Check the current guidance for timing if you plan to move in with a pet.`
+        ),
+        t('宠物 养猫 养狗 房东同意 strata', 'pet cat dog landlord permission strata'),
+        ['qrent-handbook:L523-L547', 'collection-02'],
+        ['NSW'],
+        'official-rule',
+        ['nsw-pets']
+      ),
+      s(
         'utilities-and-water',
         t('冷水、热水、电气和网络分开问', 'Separate water, energy and internet questions'),
         t(
@@ -782,19 +879,21 @@ EnergyAustralia, Origin, AGL, Telstra, Optus and TPG in the old handbook are sta
 
 维修、维护和损坏责任要结合故障原因、合同和适用规则判断，不把所有设备问题都自动归租客，也不把帖子里的个案直接当法律结论。对未完成的维修持续留痕，必要时向对应租客咨询服务求助。
 
-具体紧急维修权限、垫付金额和期限应查所在地官方说明，不同州不可混用。`,
+在 NSW，紧急维修迟迟未做时继续按租约付租金，并可向 NSW Fair Trading 寻求协助。紧急维修权限、垫付金额和期限按所在州的官方说明核对。`,
           `Record the date, room, fault, photographs and any safety impact, then notify the manager in writing. For urgent issues, also check the lease’s emergency contacts and state guidance. Retain report numbers, replies and appointments.
 
 Responsibility depends on the cause, agreement and applicable rules. Do not automatically assign every equipment fault to the tenant or treat a personal post as a legal ruling. Keep records of unresolved repairs and seek the relevant tenant advice service if needed.
 
-Check official local rules for urgent-repair authority, reimbursement amounts and deadlines; do not transfer them between states.`
+In NSW, keep paying rent if urgent repairs are delayed and seek help from NSW Fair Trading. Check the applicable state guidance for arranging urgent repairs, reimbursements and deadlines.`
         ),
         t(
           '维修 报修 紧急维修 房东不修 留证 repair maintenance',
           'repairs maintenance urgent repairs landlord not repairing evidence'
         ),
         ['qrent-handbook:L580-L582', 'collection-02'],
-        ['Australia']
+        ['Australia'],
+        'editorial-guide',
+        ['nsw-getting-repairs']
       ),
       s(
         'exit-and-bond',
@@ -825,6 +924,26 @@ The old “48 hour refund” is not a universal guarantee. Tenant changes, dispu
         ['NSW', 'VIC'],
         'editorial-guide',
         ['nsw-bond-refund', 'vic-renting-rights']
+      ),
+      s(
+        'nsw-ending-notice',
+        t('NSW 退租通知与提前解约', 'Notice and early termination in NSW'),
+        t(
+          `NSW 普通住宅租约中，租客在固定期到期时结束租约，通常至少提前 14 天书面通知。租客一般结束周期租约时通常至少提前 21 天。先确认租约类型、通知送达方式、截止日期和实际原因。
+
+在固定期内提前离开，应核对合同日期、已履行比例、可能的 break fee 以及适用例外。签证、学籍或出境变化时，仍需按租约及适用程序确认怎样结束。房东提出卖房或要求提前搬离时，核对书面理由和官方程序。`,
+          `To end an ordinary NSW fixed-term tenancy at expiry, a tenant normally gives at least 14 days' written notice. A tenant normally gives at least 21 days' notice to end a periodic tenancy. Check the agreement type, service method, dates and reason.
+
+For leaving within a fixed term, check the agreement date, proportion already completed, any break fee and applicable exceptions. If visa, enrolment or travel plans change, confirm how the tenancy can be ended under the agreement and current rules. If the landlord wants to sell or asks you to move earlier, check the written grounds and official process.`
+        ),
+        t(
+          '提前退租 退租通知 房东卖房 签证延期 退学 解约',
+          'notice to move out break lease sale landlord visa enrolment'
+        ),
+        ['collection-02', 'collection-03'],
+        ['NSW'],
+        'official-rule',
+        ['nsw-end-notice', 'nsw-break-lease']
       ),
       s(
         'dispute-help',

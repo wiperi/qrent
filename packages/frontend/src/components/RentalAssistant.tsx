@@ -17,7 +17,11 @@ import {
 import ReactMarkdown from 'react-markdown';
 import type { ChatReply } from '@/lib/rental-assistant/contracts';
 import { modelPresets, modelProviders } from '@/lib/rental-assistant/presets';
-import { useRentalSession, type RentalTurn } from '@/lib/rental-assistant/session';
+import {
+  rentalContextMessages,
+  useRentalSession,
+  type RentalTurn,
+} from '@/lib/rental-assistant/session';
 import RentalAssistantSources from './RentalAssistantSources';
 import RentalReplyActions from './RentalReplyActions';
 import styles from '@/styles/rental-tools.module.css';
@@ -131,12 +135,12 @@ export default function RentalAssistant({
   const settingsHeading = useRef<HTMLHeadingElement>(null);
   const suggestions = zh
     ? [
-        'UNSW 的 Eastgardens 和 Randwick，两房周租各多少？',
+        'UNSW 附近每人每周 A$500，帮我比较 2B 和 3B。',
         '没有澳洲租房记录，申请时能准备哪些替代材料？',
         'USYD 的 Newtown 有周租 900 以内的两房吗？看房时该检查什么？',
       ]
     : [
-        'Compare two-bedroom rents in Eastgardens and Randwick near UNSW.',
+        'Compare 2-bed and 3-bed rentals near UNSW on A$500 per person per week.',
         'I have no local rental history. What can I prepare to support my application?',
         'Find two-bedroom rentals in Newtown under $900 near USYD. What should I check at an inspection?',
       ];
@@ -198,13 +202,7 @@ export default function RentalAssistant({
     if (!turn) return;
     const { controller, sessionId } = turn;
     try {
-      const messages = turns
-        .slice(-3)
-        .flatMap(({ question, reply }) => [
-          { role: 'user', content: question },
-          ...(reply.answer ? [{ role: 'assistant', content: reply.answer }] : []),
-        ]);
-      messages.push({ role: 'user', content: question });
+      const messages = rentalContextMessages(turns, question);
       const { apiKey, ...model } =
         connection.type === 'local' ? { ...connection, apiKey: undefined } : connection;
       const response = await fetch('/api/rental-assistant/chat', {

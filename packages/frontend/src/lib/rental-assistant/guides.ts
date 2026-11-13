@@ -7,6 +7,7 @@ import {
 } from '../rental-library';
 import { searchRentalLibrary } from '../rental-library-search';
 import type { GuidePassage } from './contracts';
+import { faqSections } from './faq';
 
 type Passage = GuidePassage & {
   title: string;
@@ -15,7 +16,6 @@ type Passage = GuidePassage & {
   sourceKind: 'experience' | 'handbook';
 };
 const corpus = new Map<LibraryLocale, Passage[]>();
-const model = 'Xenova/multilingual-e5-small';
 
 const queryHints: [RegExp, Record<LibraryLocale, string>][] = [
   [
@@ -47,10 +47,15 @@ const queryHints: [RegExp, Record<LibraryLocale, string>][] = [
   ],
 ];
 
-// Keep complete sentences together when possible and limit dense-model input length.
+// Keep complete sentences together and bound the amount of reference text sent to the model.
 function splitPassage(body: string, locale: LibraryLocale) {
-  const limit = 520;
-  const text = plainGuideText(body.replace(/!\[[^\]]*\]\([^)]*\)/g, ' '));
+  const limit = 620;
+  const text = plainGuideText(
+    body
+      .replace(/!\[[^\]]*\]\([^)]*\)/g, ' ')
+      .replace(/^\s*\|(?:\s*:?-+:?\s*\|)+\s*$/gm, '')
+      .replace(/^\s*\|\s*(?:位置\s*\|\s*检查项目|Location\s*\|\s*What to check)\s*\|\s*$/gm, '')
+  );
   const chunks: string[] = [];
   let current = '';
   for (const { segment } of new Intl.Segmenter(locale, { granularity: 'sentence' }).segment(text)) {
@@ -60,7 +65,7 @@ function splitPassage(body: string, locale: LibraryLocale) {
       current = '';
     }
     if (sentence.length > limit) {
-      const parts = sentence.match(/.{1,520}/gu) ?? [];
+      const parts = sentence.match(new RegExp('.{1,' + limit + '}', 'gu')) ?? [];
       current = parts.pop() ?? '';
       chunks.push(...parts);
     } else {
@@ -116,6 +121,7 @@ export function blogPassages(locale: LibraryLocale): Passage[] {
         jurisdictions: section.jurisdictions,
         keywords: section.aliases,
         sourceKind: 'handbook',
+        evidence: section.evidence,
       });
     }
   }
@@ -124,17 +130,55 @@ export function blogPassages(locale: LibraryLocale): Passage[] {
   return passages;
 }
 
-export function retrieveGuides(query: string, locale: LibraryLocale) {
-  const passages = blogPassages(locale);
-  const hint = queryHints.find(([pattern]) => pattern.test(query))?.[1][locale];
-  const scores = new Map<Passage, number>();
-  searchRentalLibrary(passages, query, 16).forEach((passage, i) =>
-    scores.set(passage, 0.85 / (8 + i))
+type GuideContext = { school?: string; previousUserQuestion?: string };
+
+const states = {
+  NSW: /\bNSW\b|New South Wales|新南威尔士|新州|悉尼|\bSydney\b/i,
+  VIC: /\bVIC\b|\bVictoria\b|维州|维多利亚|墨尔本|\bMelbourne\b/i,
+  ACT: /\bACT\b|Canberra|堪培拉/i,
+  QLD: /\bQLD\b|Queensland|昆州|布里斯班|Brisbane/i,
+  WA: /\bWA\b|Western Australia|西澳|珀斯|Perth/i,
+  SA: /\bSA\b|South Australia|南澳|阿德莱德|Adelaide/i,
+};
+
+function namedStates(text: string) {
+  return Object.entries(states)
+    .filter(([, pattern]) => pattern.test(text))
+    .map(([state]) => state);
+}
+
+export function retrieveGuides(query: string, locale: LibraryLocale, context?: GuideContext) {
+  const q = query.normalize('NFKC');
+  const explicitStates = namedStates(q);
+  const inferredStates = namedStates(context?.previousUserQuestion ?? '');
+  const jurisdictions = explicitStates.length
+    ? explicitStates
+    : inferredStates.length
+      ? inferredStates
+      : context?.school
+        ? ['NSW']
+        : [];
+  const passages = blogPassages(locale).filter(
+    passage =>
+      !jurisdictions.length ||
+      !passage.jurisdictions?.length ||
+      passage.jurisdictions.includes('Australia') ||
+      passage.jurisdictions.some(state =>
+        jurisdictions.includes(state === 'Sydney' ? 'NSW' : state === 'Melbourne' ? 'VIC' : state)
+      )
   );
+  const hint = queryHints.find(([pattern]) => pattern.test(q))?.[1][locale];
+  const scores = new Map<Passage, number>();
+  searchRentalLibrary(passages, q, 16).forEach((passage, i) => scores.set(passage, 0.85 / (8 + i)));
   if (hint) {
     searchRentalLibrary(passages, hint, 12).forEach((passage, i) =>
       scores.set(passage, (scores.get(passage) ?? 0) + 1.2 / (8 + i))
     );
+  }
+  for (const [index, target] of faqSections(q).slice(0, 4).entries()) {
+    const matches = passages.filter(passage => passage.path === '/' + locale + '/guides/' + target);
+    const best = searchRentalLibrary(matches, q, 1)[0] ?? matches[0];
+    if (best) scores.set(best, (scores.get(best) ?? 0) + 1 / (index + 1));
   }
   const results: GuidePassage[] = [];
   const seen = new Map<string, number>();
@@ -146,8 +190,17 @@ export function retrieveGuides(query: string, locale: LibraryLocale) {
       results.some(result => result.path === passage.path && result.heading === passage.heading)
     )
       continue;
-    const { path, article, heading, text, publishedAt, reviewedAt, jurisdictions, sourceKind } =
-      passage;
+    const {
+      path,
+      article,
+      heading,
+      text,
+      publishedAt,
+      reviewedAt,
+      jurisdictions,
+      sourceKind,
+      evidence,
+    } = passage;
     results.push({
       path,
       article,
@@ -157,6 +210,7 @@ export function retrieveGuides(query: string, locale: LibraryLocale) {
       reviewedAt,
       jurisdictions,
       sourceKind,
+      evidence,
     });
     seen.set(articlePath, count + 1);
     if (results.length === 4) break;
