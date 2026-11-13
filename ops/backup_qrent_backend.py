@@ -15,7 +15,11 @@ from tempfile import TemporaryDirectory
 from threading import Timer
 
 
-DISK_RESERVE = 2 * 1024**3
+MIB = 1024**2
+# This job streams its compressed artifacts and never expands the MySQL dump on disk.
+DISK_RESERVE = 1024 * MIB
+MAX_MYSQL_BYTES = 256 * MIB
+MAX_REDIS_BYTES = 64 * MIB
 DUMP_TABLE = re.compile(rb"^CREATE TABLE `([^`]+)`")
 MANAGED = re.compile(r"qrent-\d{8}T\d{12}Z")
 ACCOUNT_TABLES = {"users", "user_sessions", "_PropertyToUser", "email_preferences"}
@@ -40,6 +44,8 @@ REDIS_DUMP = """
 set -eu
 snapshot=$(mktemp /tmp/qrent-rdb.XXXXXX)
 trap 'rm -f "$snapshot"' EXIT
+# Bound the temporary file inside the Redis container as well as the final copy.
+ulimit -f 131072
 redis-cli --rdb "$snapshot" >/dev/null 2>&1
 redis-check-rdb "$snapshot" >/dev/null 2>&1
 cat "$snapshot"
@@ -57,6 +63,7 @@ def ensure_space(directory):
 
 def write_snapshot(args, target, compress=False):
     ensure_space(target.parent)
+    output_limit = MAX_MYSQL_BYTES if compress else MAX_REDIS_BYTES
     with subprocess.Popen(args, stdout=subprocess.PIPE, stderr=subprocess.DEVNULL) as process:
         deadline = Timer(180, process.kill)
         deadline.daemon = True
@@ -65,9 +72,11 @@ def write_snapshot(args, target, compress=False):
             with target.open("xb") as output:
                 if compress:
                     with gzip.GzipFile(filename="", mode="wb", fileobj=output, mtime=0) as stream:
-                        copy_snapshot(process.stdout, stream, target.parent)
+                        copy_snapshot(process.stdout, stream, target.parent, output, output_limit)
                 else:
-                    copy_snapshot(process.stdout, output, target.parent)
+                    copy_snapshot(process.stdout, output, target.parent, output, output_limit)
+                if output.tell() > output_limit:
+                    raise RuntimeError("backup file exceeds its size limit")
                 output.flush()
                 os.fsync(output.fileno())
             if process.wait() != 0:
@@ -79,9 +88,11 @@ def write_snapshot(args, target, compress=False):
             deadline.cancel()
 
 
-def copy_snapshot(source, target, directory):
+def copy_snapshot(source, target, directory, output, output_limit):
     while chunk := source.read(1024 * 1024):
         target.write(chunk)
+        if output.tell() > output_limit:
+            raise RuntimeError("backup file exceeds its size limit")
         ensure_space(directory)
 
 
@@ -149,6 +160,8 @@ def backup(root, mysql="qrent-db-1", redis="qrent-redis-1"):
             redis_file = stage / "redis.rdb"
             write_snapshot(command(mysql, MYSQL_DUMP), mysql_file, compress=True)
             verify_mysql(mysql_file, expected)
+            if shutil.disk_usage(stage).free < DISK_RESERVE + 2 * MAX_REDIS_BYTES:
+                raise RuntimeError("insufficient space for both Redis snapshot copies")
             write_snapshot(command(redis, REDIS_DUMP), redis_file)
             with redis_file.open("rb") as rdb:
                 if rdb.read(5) != b"REDIS" or redis_file.stat().st_size <= 9:
@@ -159,6 +172,7 @@ def backup(root, mysql="qrent-db-1", redis="qrent-redis-1"):
                 "archive": destination.name,
                 "mysql": {**metadata(mysql_file), "tables": len(expected)},
                 "redis": metadata(redis_file),
+                "available_bytes": shutil.disk_usage(stage).free,
             }
             with (stage / "receipt.json").open("x") as output:
                 json.dump(receipt, output)

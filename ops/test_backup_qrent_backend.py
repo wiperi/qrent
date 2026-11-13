@@ -1,4 +1,5 @@
 import gzip
+from io import BytesIO
 import json
 import unittest
 from pathlib import Path
@@ -9,6 +10,12 @@ import backup_qrent_backend as job
 
 
 class BackendBackupTests(unittest.TestCase):
+    def test_snapshot_stops_at_the_output_budget(self):
+        output = BytesIO()
+        with patch.object(job, 'ensure_space'):
+            with self.assertRaisesRegex(RuntimeError, 'exceeds its size limit'):
+                job.copy_snapshot(BytesIO(b'x' * 32), output, Path('/tmp'), output, 16)
+
     def test_dump_with_missing_table_or_footer_is_rejected(self):
         with TemporaryDirectory() as work:
             path = Path(work) / "mysql.sql.gz"
