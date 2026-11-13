@@ -9,16 +9,27 @@ export type RentalTurn = { id: string; question: string; reply: ChatReply };
 // citation IDs expire with the turn that produced them.
 export function rentalContextMessages(turns: RentalTurn[], question: string) {
   const recent = turns.slice(-3);
-  const older = searchRentalLibrary(
-    turns.slice(0, -3).map(turn => ({
-      title: turn.question,
-      keywords: '',
-      searchText: '',
-      turn,
-    })),
-    question,
-    1
-  )[0]?.turn;
+  const earlier = turns.slice(0, -3);
+  const earlierLetter =
+    recent[0]?.reply.letterType && earlier.at(-1)?.reply.letterType === recent[0].reply.letterType
+      ? earlier.findLast(
+          turn =>
+            turn.reply.letterType === recent[0].reply.letterType &&
+            /(?:cover|parent|support) letter|申请信|自荐信|资助信/i.test(turn.question)
+        )
+      : undefined;
+  const older =
+    earlierLetter ??
+    searchRentalLibrary(
+      earlier.map(turn => ({
+        title: turn.question,
+        keywords: '',
+        searchText: '',
+        turn,
+      })),
+      question,
+      1
+    )[0]?.turn;
   const messages: { role: 'user' | 'assistant'; content: string }[] = older
     ? [{ role: 'user', content: older.question.slice(0, 1000) }]
     : [];

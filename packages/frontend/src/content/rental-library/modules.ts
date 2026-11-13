@@ -668,7 +668,7 @@ Ask permission before photographing an occupied home and avoid residents’ belo
 | 阳台与庭院 | 朝向、景观、低层隐私、临街噪音、维护责任 |
 | 楼内设施 | 电梯、健身房、泳池、门禁是否实际可用，维护与开放条件 |
 
-原清单的 Queen size 约1.6×2.0米是测量示例，床架和通道仍要单独留空间。宣传写有某设施，不等于实际运行正常。`,
+原清单的 Queen size 约1.6×2.0米是测量示例，床架和通道仍要单独留空间。现场核对设备是否在、是否为本套房专用、能否运行，并请中介书面确认是否随租。`,
           `| Location | What to check |
 | --- | --- |
 | Every room | Orientation, sunlight and obstructions; opening windows, ventilation, walls, ceilings, mould and smells |
@@ -680,7 +680,7 @@ Ask permission before photographing an occupied home and avoid residents’ belo
 | Balcony/garden | Orientation, outlook, privacy, street noise and maintenance duties |
 | Shared facilities | Actual operation, maintenance and access to lifts, gym, pool and entry systems |
 
-The source’s approximate 1.6 × 2.0 metre queen-bed example is only a measuring prompt. Allow for the frame and walkways. An advertised facility may still need operational checks.`
+The source’s approximate 1.6 × 2.0 metre queen-bed example is only a measuring prompt. Allow for the frame and walkways. At the viewing, check that the appliance is there, whether it is shared and whether it works. Ask the agent to confirm in writing whether it is included in the tenancy.`
         ),
         t(
           '看房清单 空调 洗碗机 采光 隔音 通风 霉斑 家具 床 尺寸',

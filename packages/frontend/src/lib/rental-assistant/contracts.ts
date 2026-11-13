@@ -44,9 +44,13 @@ export type ModelConnection =
   | { type: 'preset'; provider: ModelProvider; apiKey: string }
   | { type: 'compatible'; baseUrl: string; model: string; apiKey: string };
 
+export type RentalLetterType = 'cover' | 'parent';
+
 export type ChatReply = {
   answer: string;
   evidence: AssistantEvidence[];
   search?: SearchContext;
+  letterType?: RentalLetterType;
+  modelId?: string;
   reviewId?: string;
 };

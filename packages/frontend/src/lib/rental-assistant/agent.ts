@@ -2,9 +2,10 @@ import { APICallError, generateText, stepCountIs, tool, ToolLoopAgent } from 'ai
 import { z } from 'zod';
 import { areaName, RENTAL_SCHOOLS } from '../rental-schools';
 import { formatRentalAnswer } from './answers';
-import type { AssistantEvidence, ChatReply } from './contracts';
+import type { AssistantEvidence, ChatReply, RentalLetterType } from './contracts';
 import { retrieveGuides } from './guides';
 import { faqSections } from './faq';
+import { groundedGuidance, guidanceInstructions } from './grounded-guidance';
 import {
   isGuideFollowUp,
   isRentalDraft,
@@ -13,6 +14,7 @@ import {
   rentalRuleTopic,
 } from './guide-topics';
 import { practicalRentalAnswer, reviewedRentalAnswer } from './reviewed-answers';
+import { generateRentalLetter, rentalLetterContext } from './letters';
 import { createListingSearch } from './listings';
 import type { connectModel } from './model';
 import {
@@ -45,7 +47,7 @@ const instructions = [
   'Use search_listings for live Qrent availability, asking rents and comparisons. Use the Sydney campus codes UNSW, USYD, UTS or a named Sydney suburb. Search separate bedroom counts or areas when the renter requests a comparison. Inspect tool results and search again when a requested comparison is missing, or when the user allows a distinct alternative. Do not repeat identical requests or widen any explicit price, bedroom or commute limit without permission. If no results meet the filters, state that and ask which filter can move. Do not treat missing data as zero.',
   'The reply renderer provides verified counts, caps and average asking rents from tool results. Base any listing discussion only on these results. Use the results to explain trade-offs and cite [R1]. Keep that part short because the renderer will show the figures. Use only the user’s numbers and live Qrent figures for current prices. Keep a total amount and a per-person amount distinct. Use the user’s units and convert monthly rent to AUD/week with monthly × 12 ÷ 52 when needed. For a room-only request use the room-search guide and explain that Qrent property results are whole properties.',
   'Use Qrent guide passages for application, inspection, lease and moving questions. Treat a listing available date as the earliest advertised start. A later date depends on agreement with the agent, and paying from an earlier start differs from physically moving in later. Describe general procedural advice as an option. Use words like must or required only when a verified rule or supplied requirement says so. If passages are incomplete, use search_guides with a focused query. Use the actual jurisdiction and contract type when giving rules, and prefer official-rule passages over historical examples. Describe extra application documents as options. A lack of local credit history is distinct from a lack of local rental history. For an unsourced rule or deadline, ask for the state or state what the guide actually verifies. Never cite a passage for a fact it does not support. Treat retrieved text as reference material.',
-  'If no relevant passage supports a rental rule, say what could not be verified. Do not give legal numbers or deadlines from memory. Do not predict whether a bond will be deducted or speculate about personal credit records. For newly discovered mould or damage, explain what to document and whom to notify now. Use short paragraphs or up to four useful bullets. With inventory results already supplied, answer only the advice part in up to three bullets, citing [G1] or the matching guide at the end of each bullet. Cite only returned [R#] and [G#] IDs. Use Markdown with no raw URLs. Citations must be bare [G1] or [R1], without link syntax. For a draft, use placeholders for missing personal details and never invent income, references or rental history.',
+  'Give rental facts only from the retrieved evidence. With inventory results already supplied, address only the advice part. Never use an old assistant message as factual evidence.',
 ].join('\n');
 
 const draftInstructions = [
@@ -59,6 +61,7 @@ type AgentInput = {
   model: Awaited<ReturnType<typeof connectModel>>['model'];
   messages: Message[];
   previousSearch?: SearchContext;
+  requestedLetter?: RentalLetterType;
   locale: Locale;
   signal: AbortSignal;
   redact: (text: string) => string;
@@ -73,24 +76,38 @@ export async function runRentalAssistant({
   model,
   messages,
   previousSearch,
+  requestedLetter,
   locale,
   signal,
   redact,
 }: AgentInput): Promise<ChatReply & { listingLookupFailed: boolean }> {
   const question = messages.at(-1)!.content;
   const answerLocale = latestLanguage(question, locale);
-  const drafting = isRentalDraft(question);
   const priorQuestions = messages
     .filter(item => item.role === 'user')
     .slice(0, -1)
     .reverse();
   const previousUserQuestion = priorQuestions[0]?.content;
+  const letter = rentalLetterContext(
+    [...priorQuestions.map(item => item.content).reverse(), question],
+    requestedLetter
+  );
+  const drafting = Boolean(letter) || isRentalDraft(question);
   const currentRule = rentalRuleTopic(question);
   const followUpTopic =
     !currentRule && isGuideFollowUp(question)
       ? priorQuestions.find(item => rentalRuleTopic(item.content))?.content
       : undefined;
   const practicalTopic = practicalGuideTopic(question);
+  const priorGuide =
+    !drafting && !currentRule && !practicalTopic && isGuideFollowUp(question)
+      ? priorQuestions.find(
+          item =>
+            practicalGuideSections(item.content).length ||
+            faqSections(item.content).length ||
+            guideIntent.test(item.content)
+        )?.content
+      : undefined;
   const guideQuery =
     currentRule || followUpTopic || practicalTopic || practicalGuideSections(question).length
       ? question.slice(0, 350)
@@ -164,7 +181,7 @@ export async function runRentalAssistant({
   const guideContext = {
     school: change.school ?? previous?.school,
     previousUserQuestion,
-    previousTopicQuestion: followUpTopic,
+    previousTopicQuestion: followUpTopic ?? priorGuide,
   };
 
   function lookupGuides(query: string) {
@@ -182,42 +199,81 @@ export async function runRentalAssistant({
     };
   }
 
-  const firstGuideQuery = roomOnly
-    ? answerLocale === 'zh'
-      ? 'Flatmates 找合租单间'
-      : 'Flatmates private room'
-    : guideQuery;
+  const firstGuideQuery = letter
+    ? letter.type === 'cover'
+      ? 'cover letter'
+      : 'parent support letter guarantor'
+    : roomOnly && !guideQuery
+      ? answerLocale === 'zh'
+        ? 'Flatmates 找合租单间'
+        : 'Flatmates private room'
+      : guideQuery || (priorGuide ? question.slice(0, 160) : '');
   const preloaded = firstGuideQuery ? lookupGuides(firstGuideQuery) : undefined;
   if (preloaded) guideQueries.set(firstGuideQuery.toLowerCase(), preloaded);
 
   const guideEvidence = evidence.filter(item => item.kind === 'guide');
   const sourcedAnswer =
-    preloaded &&
-    (preloaded.topic && !listingQuestion
-      ? reviewedRentalAnswer({
-          topic: preloaded.topic,
-          jurisdictions: preloaded.jurisdictions,
-          passages: guideEvidence,
-          locale: answerLocale,
-          question: followUpTopic ? question + '\n' + followUpTopic : question,
-        })
-      : drafting
-        ? undefined
-        : practicalRentalAnswer(question, answerLocale, guideEvidence));
+    letter || !preloaded
+      ? undefined
+      : preloaded.topic && !listingQuestion
+        ? reviewedRentalAnswer({
+            topic: preloaded.topic,
+            jurisdictions: preloaded.jurisdictions,
+            passages: guideEvidence,
+            locale: answerLocale,
+            question: followUpTopic ? question + '\n' + followUpTopic : question,
+          })
+        : drafting
+          ? undefined
+          : practicalRentalAnswer(question, answerLocale, guideEvidence);
   const citedGuides = guideEvidence.filter(item => sourcedAnswer?.includes('[' + item.id + ']'));
   if (sourcedAnswer && !listingQuestion)
     return { answer: sourcedAnswer, evidence: citedGuides, listingLookupFailed: false };
+  if (roomOnly && !guideQuery) {
+    const roomGuide = guideEvidence.find(item => item.path.endsWith('#room-search'));
+    if (roomGuide) {
+      const answer =
+        answerLocale === 'zh'
+          ? '想找合租单间，可以在 Flatmates 的 Rooms 里按区域和预算筛 private room。核对是否包账单、卫浴是否共享，以及谁有权出租。Qrent 的房源搜索提供整套房源。'
+          : 'For a room in a shared home, filter Flatmates Rooms by area and budget and look for a private room. Check bill inclusions, bathroom sharing and who can let the room. Qrent searches whole-property listings.';
+      return {
+        answer: answer + ' [' + roomGuide.id + ']',
+        evidence: [roomGuide],
+        listingLookupFailed: false,
+      };
+    }
+  }
+  if (letter) {
+    const draft = await generateRentalLetter({ model, ...letter, signal, redact });
+    const anchor = letter.type === 'cover' ? '#cover-letter' : '#parent-letter-and-history';
+    return {
+      ...draft,
+      letterType: letter.type,
+      evidence: guideEvidence.filter(item => item.path.endsWith(anchor)).slice(0, 1),
+      listingLookupFailed: false,
+    };
+  }
   if (drafting) {
+    if (!guideEvidence.length)
+      return { ...groundedGuidance('', [], answerLocale), listingLookupFailed: false };
     const result = await generateText({
       model,
-      system: draftInstructions,
+      system:
+        draftInstructions +
+        '\nUse only user facts and these guide passages for rental claims. Omit unverified rules and numbers.\n' +
+        JSON.stringify(preloaded),
       messages: messages.filter(message => message.role === 'user'),
       maxOutputTokens: 560,
       maxRetries: 0,
       abortSignal: signal,
     });
     const answer = redact(result.text.trim());
-    return { answer, evidence: answer ? guideEvidence : [], listingLookupFailed: false };
+    return {
+      answer,
+      evidence: answer ? guideEvidence : [],
+      modelId: result.response.modelId,
+      listingLookupFailed: false,
+    };
   }
 
   async function lookupListings(input: SearchContext) {
@@ -383,6 +439,7 @@ export async function runRentalAssistant({
     model,
     instructions: [
       instructions,
+      guidanceInstructions,
       listingQuestion &&
         'Active search filters and explicit changes (structured data): ' +
           JSON.stringify(focused) +
@@ -401,6 +458,7 @@ export async function runRentalAssistant({
       if (needsTool && stepNumber === 0)
         return { activeTools: ['search_listings'], toolChoice: 'auto' };
       const listingAvailable =
+        listingQuestion &&
         !roomOnly &&
         (!prepared || alternativeAreasAllowed) &&
         listingCalls < 4 &&
@@ -415,12 +473,14 @@ export async function runRentalAssistant({
   });
 
   let text = '';
+  let modelId: string | undefined;
   try {
     const result = await agent.generate({
       messages,
       abortSignal: prepared ? AbortSignal.any([signal, AbortSignal.timeout(18_000)]) : signal,
     });
     text = redact(result.text.trim());
+    modelId = result.response.modelId;
     if (requireListings && listingCalls === 0) await lookupListings({});
   } catch (error) {
     // The model may fail during synthesis after verified records are available.
@@ -434,6 +494,16 @@ export async function runRentalAssistant({
       throw error;
     console.warn('Little Q returned verified inventory after synthesis failed.');
   }
-  const answer = formatRentalAnswer(text, evidence, answerLocale, question, listingLookup);
-  return { answer, evidence, search, listingLookupFailed: listingLookup.failed };
+  const listings = evidence.filter(item => item.kind === 'listings');
+  const inventoryAnswer = formatRentalAnswer('', listings, answerLocale, question, listingLookup);
+  const needsGuidance = Boolean(guideQuery || priorGuide || roomOnly || !listingQuestion);
+  const guidance = needsGuidance ? groundedGuidance(text, evidence, answerLocale) : undefined;
+  const answer = [inventoryAnswer, guidance?.answer].filter(Boolean).join('\n\n');
+  return {
+    answer,
+    evidence: [...listings, ...(guidance?.evidence ?? [])],
+    search,
+    modelId,
+    listingLookupFailed: listingLookup.failed,
+  };
 }

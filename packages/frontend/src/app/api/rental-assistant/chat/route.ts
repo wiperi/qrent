@@ -19,6 +19,7 @@ const chatInput = z.object({
   sessionId: z.string().uuid().optional(),
   connection: z.unknown(),
   previousSearch: searchContextInput.optional(),
+  letterType: z.enum(['cover', 'parent']).optional(),
   messages: z
     .array(
       z.object({
@@ -47,6 +48,7 @@ export async function POST(request: Request) {
     sessionId,
     messages: received,
     previousSearch,
+    letterType: requestedLetter,
   } = parsed.data;
   const credential = request.headers
     .get('authorization')
@@ -101,19 +103,23 @@ export async function POST(request: Request) {
   let model: Awaited<ReturnType<typeof connectModel>> | undefined;
   try {
     model = await connectModel(connection);
-    const { answer, evidence, search, listingLookupFailed } = await runRentalAssistant({
-      model: model.model,
-      messages,
-      previousSearch,
-      locale,
-      signal,
-      redact,
-    });
+    const { answer, evidence, search, letterType, modelId, listingLookupFailed } =
+      await runRentalAssistant({
+        model: model.model,
+        messages,
+        previousSearch,
+        requestedLetter,
+        locale,
+        signal,
+        redact,
+      });
     if (!answer && !evidence.length) return await fail('empty_answer', 502);
     const reply: ChatReply = {
       answer: answer.slice(0, 3500),
       evidence,
       search,
+      letterType,
+      modelId,
       reviewId: history?.recordId,
     };
     return await complete(Response.json(reply, { headers: { 'Cache-Control': 'no-store' } }), {

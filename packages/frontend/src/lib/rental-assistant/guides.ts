@@ -164,6 +164,9 @@ export function retrieveGuides(query: string, locale: LibraryLocale, context?: G
       ...(topic ? [reviewedRuleSection(topic)] : []),
       ...practicalGuideSections(q),
       ...faqSections(q),
+      ...(isGuideFollowUp(q) && prior
+        ? [...practicalGuideSections(prior), ...faqSections(prior)]
+        : []),
     ]),
   ].slice(0, 4);
   const passages = blogPassages(locale).filter(
@@ -180,8 +183,13 @@ export function retrieveGuides(query: string, locale: LibraryLocale, context?: G
   const hint = queryHints.find(([pattern]) => pattern.test(queryForRanking))?.[1][locale];
   const scores = new Map<Passage, number>();
   searchRentalLibrary(passages, queryForRanking, 16).forEach((passage, i) =>
-    scores.set(passage, 0.85 / (8 + i))
+    scores.set(passage, (passage.sourceKind === 'handbook' ? 1 : 0.7) / (8 + i))
   );
+  if (isGuideFollowUp(q) && prior && !inheritedTopic) {
+    searchRentalLibrary(passages, prior, 8).forEach((passage, i) =>
+      scores.set(passage, (scores.get(passage) ?? 0) + 0.45 / (8 + i))
+    );
+  }
   if (hint) {
     searchRentalLibrary(passages, hint, 12).forEach((passage, i) =>
       scores.set(passage, (scores.get(passage) ?? 0) + 1.2 / (8 + i))

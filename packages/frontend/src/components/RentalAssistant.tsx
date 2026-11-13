@@ -8,6 +8,7 @@ import {
   ArrowRight,
   ArrowUp,
   BookOpen,
+  FilePenLine,
   Maximize2,
   MapPin,
   MessageCircle,
@@ -15,7 +16,7 @@ import {
   X,
 } from 'lucide-react';
 import ReactMarkdown from 'react-markdown';
-import type { ChatReply } from '@/lib/rental-assistant/contracts';
+import type { ChatReply, RentalLetterType } from '@/lib/rental-assistant/contracts';
 import { modelPresets, modelProviders } from '@/lib/rental-assistant/presets';
 import {
   rentalContextMessages,
@@ -25,6 +26,17 @@ import {
 import RentalAssistantSources from './RentalAssistantSources';
 import RentalReplyActions from './RentalReplyActions';
 import styles from '@/styles/rental-tools.module.css';
+
+const letterPrompts = {
+  cover: {
+    zh: '帮我用英文写一封租房 Cover Letter。\n\n申请人和房源地址：\n学校或工作：\n租房经历（注明国家或地区）：\n资金来源或其他想写的事实：',
+    en: 'Write an English rental cover letter.\n\nApplicant and property address:\nStudy or work:\nRental history (include the country):\nFunding or other facts to include:',
+  },
+  parent: {
+    zh: '帮我用英文写一封父母资助信（Parent Letter）。\n\n资助人、申请人及双方关系：\n资助哪些费用：\n金额、频率及资助期限：\n联系方式（可选）：',
+    en: 'Write an English parent support letter for a rental application.\n\nParent, applicant and relationship:\nExpenses covered:\nAmount, frequency and support period:\nContact details (optional):',
+  },
+};
 
 function latestSearch(turns: RentalTurn[]) {
   const listingTurn = turns.findLast(
@@ -132,6 +144,7 @@ export default function RentalAssistant({
         : 'deepseek');
   const preset = provider === 'local' ? undefined : modelPresets[provider];
   const conversation = useRef<HTMLDivElement>(null);
+  const composer = useRef<HTMLTextAreaElement>(null);
   const settingsHeading = useRef<HTMLHeadingElement>(null);
   const suggestions = zh
     ? [
@@ -188,6 +201,14 @@ export default function RentalAssistant({
       return;
     }
     setConnection({ type: 'preset', provider, apiKey });
+  }
+
+  function startLetter(type: RentalLetterType) {
+    const starter = letterPrompts[type][locale];
+    const wasStarter = Object.values(letterPrompts).some(prompt => prompt[locale] === draft);
+    setDraft(draft.trim() && !wasStarter ? starter + '\n\n' + draft : starter);
+    setError('');
+    composer.current?.focus();
   }
 
   async function send(value: string) {
@@ -485,6 +506,19 @@ export default function RentalAssistant({
               void send(draft);
             }}
           >
+            <div
+              className={styles.letterActions}
+              aria-label={zh ? '生成租房申请信' : 'Draft rental letters'}
+            >
+              <button type="button" disabled={!!pending} onClick={() => startLetter('cover')}>
+                <FilePenLine size={15} aria-hidden="true" />
+                {zh ? '写申请信' : 'Write a cover letter'}
+              </button>
+              <button type="button" disabled={!!pending} onClick={() => startLetter('parent')}>
+                <FilePenLine size={15} aria-hidden="true" />
+                {zh ? '写父母资助信' : 'Write a parent letter'}
+              </button>
+            </div>
             <p className={styles.historyNotice}>
               {zh
                 ? '问答经脱敏后用于排查回答质量，在线记录最多保留 30 天。API Key 仅用于当前标签页的模型连接。'
@@ -510,6 +544,7 @@ export default function RentalAssistant({
             )}
             <div className={styles.composerInput}>
               <textarea
+                ref={composer}
                 aria-label={zh ? '输入租房问题' : 'Enter a rental question'}
                 placeholder={
                   zh

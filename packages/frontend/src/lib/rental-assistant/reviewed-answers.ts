@@ -214,6 +214,48 @@ export function practicalRentalAnswer(question: string, locale: Locale, passages
     const source = passages.find(passage => passage.path.endsWith('#' + anchor));
     return source ? ' [' + source.id + ']' : '';
   };
+  if (topic === 'inspection-status') {
+    const workflow = link('search-workflow');
+    const inspection = link('before-inspection');
+    if (!workflow || !inspection) return;
+    return zh
+      ? '出发前用中介办公室的联系方式确认完整地址、看房场次、是否需要登记，以及房源是否还接受申请。' +
+          inspection +
+          '\n\nDeposit Taken 可能表示已经收款或正在推进租约。两个平台状态不一致时，当前是否仍可看房或申请要由中介确认。' +
+          workflow
+      : 'Before travelling, contact the listing agent and confirm the full address, whether the inspection is going ahead, how to register, and whether they are still taking applications.' +
+          inspection +
+          '\n\n“Deposit taken” can indicate a payment or a lease in progress. When the sites disagree, the agent needs to confirm the current status.' +
+          workflow;
+  }
+  if (topic === 'appliance-inspection') {
+    const rooms = link('room-checklist');
+    const history = link('listing-history-and-booking');
+    if (!rooms || !history) return;
+    return zh
+      ? '先把历史照片和平面图当作现场核对清单。它们无法证明设备现在还在，也无法确认模糊图上的尺寸。' +
+          history +
+          '\n\n现场看设备在哪、是否为本套房专用、是否能正常运行。请中介书面确认它是否随租。' +
+          rooms
+      : 'Use the old photos and plan to decide what to inspect. They cannot establish that the appliance is still there, and a blurry plan cannot confirm its size.' +
+          history +
+          '\n\nAt the viewing, check its location, whether it is shared and whether it works. Ask the agent to confirm in writing whether it is included in the tenancy.' +
+          rooms;
+  }
+  if (topic === 'roommate-terms') {
+    const terms = link('roommate-and-timing');
+    const room = link('room-search');
+    if (!terms || !room) return;
+    return zh
+      ? '可以直接问室友：哪些账单包含在周租里，额外账单怎么分？带访客或留宿要如何提前沟通？厨房和卫浴谁打扫，怎么轮班？把说定的安排写下来。' +
+          terms +
+          '\n\n签之前再核对谁有权出租这间房、你和谁签书面约定。' +
+          room
+      : 'Ask which bills are included and how any extras are split, how visitors or overnight guests are arranged, and who cleans the shared areas. Put the arrangements you agree on in writing.' +
+          terms +
+          '\n\nBefore signing, confirm who is authorised to let the room and who will sign the agreement with you.' +
+          room;
+  }
   if (topic === 'proxy-and-history') {
     const inspection = link('proxy-deliverables');
     const history = link('parent-letter-and-history');

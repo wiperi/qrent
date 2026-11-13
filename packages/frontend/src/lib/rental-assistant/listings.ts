@@ -198,16 +198,24 @@ async function searchArea(
     .map(row => property.safeParse(row))
     .flatMap(row => (row.success && validPreviewRow(row.data) ? [row.data] : []))
     .filter(row => !suburb || suburbKey(row.region) === suburb);
+  const withinCommute = matchingRows.filter(
+    row =>
+      filters.maxCommute === undefined ||
+      (row.commuteTime !== null && row.commuteTime <= filters.maxCommute)
+  );
+  const inconsistentCommute = withinCommute.length < matchingRows.length;
   const exactStats = suburb
     ? data.topRegions.find(region => region.region && suburbKey(region.region) === suburb)
     : undefined;
   const allRegionsRepresented =
     data.topRegions.reduce((sum, region) => sum + region.propertyCount, 0) === data.filteredCount;
-  const matches = suburb
-    ? (exactStats?.propertyCount ?? (allRegionsRepresented ? 0 : null))
-    : data.filteredCount;
+  const matches = inconsistentCommute
+    ? null
+    : suburb
+      ? (exactStats?.propertyCount ?? (allRegionsRepresented ? 0 : null))
+      : data.filteredCount;
   const average = suburb ? exactStats?.averagePrice : data.averagePrice;
-  const examples: ListingExample[] = matchingRows.slice(0, 3).map(row => ({
+  const examples: ListingExample[] = withinCommute.slice(0, 3).map(row => ({
     id: row.id,
     address: row.address,
     region: row.region,

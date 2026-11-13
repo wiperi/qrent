@@ -6,6 +6,8 @@ import { POST } from '../../src/app/api/rental-assistant/chat/route';
 
 type Fixture = {
   modelAnswer?: string;
+  letterType?: 'cover' | 'parent';
+  commuteExamples?: number[];
   filters?: Record<string, unknown>;
   steps?: { name: 'search_listings' | 'search_guides'; arguments: Record<string, unknown> }[];
   locale?: 'zh' | 'en';
@@ -37,7 +39,16 @@ async function ask(t: TestContext, fixture: Fixture) {
             data: {
               filteredCount: 5,
               averagePrice: rent,
-              properties: [],
+              properties: (fixture.commuteExamples ?? []).map((commuteTime, index) => ({
+                id: index + 1,
+                address: index + 1 + ' Test Street',
+                region,
+                price: rent,
+                bedroomCount: query.minBedrooms ?? 2,
+                commuteTime,
+                publishedAt: '2026-11-14T00:00:00Z',
+                url: 'https://www.domain.com.au/test-' + (index + 1),
+              })),
               topRegions: [{ region, propertyCount: 5, averagePrice: rent }],
             },
           },
@@ -124,6 +135,7 @@ async function ask(t: TestContext, fixture: Fixture) {
         locale: fixture.locale ?? 'en',
         connection: { type: 'local' },
         messages: fixture.questions.map(content => ({ role: 'user', content })),
+        letterType: fixture.letterType,
         previousSearch: fixture.previousSearch,
       }),
     })
@@ -253,6 +265,24 @@ test('the agent uses tool results to make another distinct search and suppresses
   assert.match(reply.answer, /Randwick/);
 });
 
+test('changing the commute from 30 to 25 keeps the new filter in both search and cards', async t => {
+  const { reply, queries } = await ask(t, {
+    locale: 'zh',
+    previousSearch: { school: 'UNSW', suburbs: ['Randwick'], bedrooms: 3, maxCommute: 30 },
+    commuteExamples: [24, 30, 25],
+    questions: ['公交从 30 分钟改到 25 分钟，其他不变。'],
+  });
+  assert.deepEqual(
+    queries.map(query => query.maxCommuteTime),
+    [25]
+  );
+  assert.match(reply.answer, /≤25 分钟/);
+  assert.deepEqual(
+    reply.evidence[0].examples.map((row: { commuteMinutes: number }) => row.commuteMinutes),
+    [24, 25]
+  );
+});
+
 test('room-only searches use the room guide and avoid a whole-property lookup', async t => {
   const { reply, queries } = await ask(t, {
     locale: 'zh',
@@ -280,15 +310,71 @@ test('a mixed question searches the stated weekly budget and retrieves inspectio
 test('a cover letter about a particular property keeps the draft and skips inventory', async t => {
   const { reply, queries, modelRequests } = await ask(t, {
     locale: 'zh',
-    questions: ['帮我写一封英文 cover letter 申请悉尼的 2B，我有 UNSW offer，房租由父母资助。'],
-    modelAnswer:
-      'Dear [Agent’s name],\n\nI have received an offer from UNSW. My parents will support my rent.\n\nKind regards,\n[Your name]',
+    questions: [
+      '帮我写一封英文 cover letter 申请悉尼的 2B，我有 UNSW offer，没有澳洲租房史，房租由父母资助。',
+    ],
+    modelAnswer: JSON.stringify({
+      fields: {
+        study: { value: 'I have received an offer from UNSW.', quote: '我有 UNSW offer' },
+        history: { value: 'I have never rented before.', quote: '没有澳洲租房史' },
+        funding: { value: 'My parents will support my rent.', quote: '房租由父母资助' },
+        terms: {
+          value: 'I can pay six months in advance.',
+          quote: 'I can pay six months in advance',
+        },
+      },
+    }),
   });
   assert.equal(queries.length, 0);
   assert.equal(modelRequests.length, 1);
   assert.match(reply.answer, /^Dear \[Agent’s name\],/);
   assert.match(reply.answer, /My parents will support my rent/);
+  assert.match(reply.answer, /no rental history in Australia/i);
+  assert.doesNotMatch(reply.answer, /never rented|six months in advance/i);
+  assert.equal(reply.letterType, 'cover');
   assert.ok(reply.evidence.some((item: { path?: string }) => item.path?.endsWith('#cover-letter')));
+});
+
+test('a parent letter revision retains the stated limit and duration and excludes a guarantee', async t => {
+  const { reply, queries, modelRequests } = await ask(t, {
+    locale: 'zh',
+    letterType: 'parent',
+    questions: [
+      '请用英文写 Parent Letter。我是申请人的母亲。每周最多 A$450，只资助前 12 周。',
+      '短一点，保留每周上限和资助期限。',
+    ],
+    modelAnswer: JSON.stringify({
+      fields: {
+        relationship: { value: 'mother', quote: '我是申请人的母亲' },
+        support: {
+          value: 'Up to A$450 per week for the first 12 weeks.',
+          quote: '每周最多 A$450，只资助前 12 周',
+        },
+        contact: {
+          value: 'I guarantee all rent and liabilities.',
+          quote: 'I guarantee all rent and liabilities',
+        },
+      },
+    }),
+  });
+  assert.equal(reply.letterType, 'parent');
+  assert.equal(queries.length, 0);
+  assert.equal(modelRequests.length, 1);
+  assert.match(reply.answer, /up to A\$450 per week for the first 12 weeks/i);
+  assert.doesNotMatch(reply.answer, /guarantee all rent|liabilities/i);
+});
+
+test('a cited but unsupported rule about guest hours never reaches the answer', async t => {
+  const { reply } = await ask(t, {
+    questions: ['On Flatmates, is there a maximum number of hours visitors can stay each day?'],
+    modelAnswer: JSON.stringify({
+      answers: [{ id: 'G1', excerpt: 'Visitors may stay for a maximum of two hours per day.' }],
+      unverified: true,
+    }),
+  });
+  assert.match(reply.answer, /couldn.t verify/i);
+  assert.doesNotMatch(reply.answer, /two hours/i);
+  assert.equal(reply.evidence.length, 0);
 });
 
 test('an English bond email uses the reviewed limit and the stated weekly rent', async t => {
