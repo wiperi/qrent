@@ -8,7 +8,7 @@ import { SITE_URL } from './seo';
 import type { RentalSearchItem } from './rental-library-search';
 
 export { rentalGuideModules, references, officialReferences };
-export const RENTAL_LIBRARY_VERSION = '2026-11-14.2';
+export const RENTAL_LIBRARY_VERSION = '2026-11-14.3';
 export const RENTAL_LIBRARY_PUBLISHED_AT = '2026-10-31';
 export type LibraryLocale = 'zh' | 'en';
 

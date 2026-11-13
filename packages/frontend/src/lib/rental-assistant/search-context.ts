@@ -63,7 +63,9 @@ const rentRangePattern = new RegExp(
   'i'
 );
 const commutePattern =
-  /(?:通勤|公交|公共交通|地铁|火车)\s*(?:(?:改成|改到|调到|降到|缩到|提高到|控制在|限制为)\s*)?(?:最多|不超过|上限)?\s*(\d{1,3})\s*分钟|\b(?:within|under|max(?:imum)?)\s*(\d{1,3})\s*(?:min(?:ute)?s?\b)/i;
+  /(?:通勤|公交|公共交通|地铁|火车)(?:时间|上限)?\s*(?:(?:改成|改到|改为|调到|降到|缩到|提高到|控制在|限制为)\s*)?(?:最多|不超过|上限)?\s*(\d{1,3})\s*分钟|\b(?:within|under|max(?:imum)?)\s*(\d{1,3})\s*(?:min(?:ute)?s?\b)/i;
+const changedCommute =
+  /(?:通勤|公交|公共交通|地铁|火车)(?:时间|上限)?\s*(?:从|由)\s*\d{1,3}\s*(?:分钟)?\s*(?:(?:改|调|降|缩|放宽)(?:到|成|为)?|到|至)\s*(\d{1,3})\s*分钟|\b(?:commute|transit|bus|train)(?:\s+(?:cap|time|limit))?\s+(?:from\s+\d{1,3}\s*(?:min(?:ute)?s?)?\s+to|to|at most|no more than)\s+(\d{1,3})\s*min(?:ute)?s?\b/i;
 
 function countValue(value: string) {
   if (/^\d+$/.test(value)) return Number(value);
@@ -161,7 +163,7 @@ export function searchChanges(value: string): SearchContext {
     .map(item => areaName(item.area));
   const rooms = bedroomsIn(question);
   const occupants = occupantsIn(question);
-  const commuteMatch = commutePattern.exec(question);
+  const commuteMatch = changedCommute.exec(question) ?? commutePattern.exec(question);
   const commute = Number(commuteMatch?.[1] ?? commuteMatch?.[2]);
   const result: SearchContext = {};
   if (schools.length === 1) result.school = schools[0];

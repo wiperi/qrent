@@ -60,4 +60,6 @@ test('a per-person range is applied independently to each bedroom option', () =>
 
 test('a user can change the inherited transit cap using ordinary Chinese wording', () => {
   assert.equal(searchChanges('那只看 3B，公交改成 25 分钟内。').maxCommute, 25);
+  assert.equal(searchChanges('公交从 30 分钟改到 25 分钟，其他不变。').maxCommute, 25);
+  assert.equal(searchChanges('Change the commute cap from 30 to 25 minutes.').maxCommute, 25);
 });

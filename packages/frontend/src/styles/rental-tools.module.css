@@ -533,6 +533,32 @@ a.sourceTitle:hover,
   align-items: flex-end;
   gap: 8px;
 }
+.letterActions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-bottom: 8px;
+}
+.letterActions button {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: #fff;
+  color: #244780;
+  font-size: 13px;
+  padding: 7px 9px;
+  text-align: left;
+  cursor: pointer;
+}
+.letterActions button:hover:enabled {
+  background: #eef5ff;
+}
+.letterActions button:disabled {
+  opacity: 0.5;
+  cursor: default;
+}
 .composer textarea {
   flex: 1 1 auto;
   min-width: 0;

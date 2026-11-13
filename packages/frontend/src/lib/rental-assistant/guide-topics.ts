@@ -23,7 +23,7 @@ const bankingRecords =
   /银行(?:账单|流水|交易记录)|\b(?:banking history|bank (?:statements?|transaction history))\b/i;
 const rentalApplication = /申请|中介|\b(?:apply|application|agent|rejected)\b/i;
 const draftRequest =
-  /(?:写|起草|润色|改写).{0,28}(?:一封|邮件|申请信|自荐信|回复|cover letter)|\b(?:draft|write|compose|rewrite|polish)\b[^.!?\n]{0,80}\b(?:e-?mail|letter|message|note|reply)\b/i;
+  /(?:写|生成|起草|润色|改写).{0,28}(?:一封|邮件|申请信|自荐信|资助信|回复|(?:cover|parent) letter)|\b(?:draft|write|generate|compose|rewrite|polish)\b[^.!?\n]{0,80}\b(?:e-?mail|letter|message|note|reply)\b/i;
 const newMould =
   /(?:霉斑|发霉|霉菌|\bmou?ld\b).{0,55}(?:拿到钥匙|入住|刚搬|刚住|moved in|got the keys)|(?:拿到钥匙|入住|刚搬|刚住|moved in|got the keys).{0,55}(?:霉斑|发霉|霉菌|\bmou?ld\b)/i;
 const overseasProxy =
@@ -33,6 +33,15 @@ const noLocalHistory =
 const availableDate = /available date|可起租日|广告.*起租/i;
 const housing =
   /\b(?:scape|iglu|twin room|student accommodation)\b|学生公寓|(?:一个人|自己)睡一间|校内宿舍|校外宿舍/i;
+const inspectionStatus =
+  /deposit taken|已收定金|已收押金|房源状态.{0,15}(?:不一致|不同)|inspection.{0,28}(?:cancelled|still on)/i;
+const appliance = /洗衣机|烘干机|洗碗机|\b(?:washing machine|washer|dryer|dishwasher)\b/i;
+const oldListing =
+  /历史照片|旧照片|历史广告|平面图|\b(?:older? photos|listing history|floor plans?)\b/i;
+const roommate = /Flatmates|室友|\b(?:housemates?|roommates?|share house)\b/i;
+const sharedTerms = /账单|水电|访客|清洁|轮流|\b(?:bills?|visitors?|guests?|cleaning|chores)\b/i;
+const concreteGuestLimit =
+  /(?:访客|客人).{0,20}(?:最多|几小时|上限|时限)|\b(?:maximum|how (?:many hours|long)|time limit)\b.{0,45}\b(?:guests?|visitors?)\b/i;
 
 export type RuleTopic =
   | 'condition-deadline'
@@ -87,6 +96,14 @@ function needsApplicationEvidence(question: string) {
 }
 
 export function practicalGuideSections(question: string) {
+  if (inspectionStatus.test(question))
+    return ['platforms-and-search#search-workflow', 'inspection-checklist#before-inspection'];
+  if (appliance.test(question))
+    return oldListing.test(question)
+      ? ['inspection-checklist#room-checklist', 'platforms-and-search#listing-history-and-booking']
+      : ['inspection-checklist#room-checklist'];
+  if (roommate.test(question) && sharedTerms.test(question))
+    return ['budget-and-housing#roommate-and-timing', 'platforms-and-search#room-search'];
   if (overseasProxy.test(question) && noLocalHistory.test(question))
     return [
       'inspection-checklist#proxy-deliverables',
@@ -151,6 +168,14 @@ export function draftLanguage(question: string, fallback: 'zh' | 'en') {
 }
 
 export function practicalGuideTopic(question: string) {
+  if (
+    inspectionStatus.test(question) &&
+    /看房|出发|状态|\b(?:inspection|travelling|viewing|available)\b/i.test(question)
+  )
+    return 'inspection-status';
+  if (oldListing.test(question) && appliance.test(question)) return 'appliance-inspection';
+  if (roommate.test(question) && sharedTerms.test(question) && !concreteGuestLimit.test(question))
+    return 'roommate-terms';
   if (overseasProxy.test(question) && noLocalHistory.test(question)) return 'proxy-and-history';
   if (newMould.test(question)) return 'new-mould';
   if (needsApplicationEvidence(question)) return 'application-evidence';
