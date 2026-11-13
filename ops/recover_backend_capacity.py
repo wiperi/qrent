@@ -73,6 +73,20 @@ def apt_cache_path(mounts, path=Path('/var/cache/apt/archives')):
     return None
 
 
+def clean_apt_download_cache():
+    result = subprocess.run(
+        ['apt-get', 'clean'], capture_output=True, text=True,
+        env={**os.environ, 'LC_ALL': 'C'}, timeout=30,
+    )
+    if result.returncode == 0:
+        return 'cleaned'
+    if result.returncode == 100 and re.search(
+            r'^E: Could not get lock /var/(?:lib/apt/lists|cache/apt/archives)/lock\b',
+            result.stderr, re.MULTILINE):
+        return 'busy'
+    result.check_returncode()
+
+
 def process_uses(path, proc_root=Path('/proc')):
     """npx may contain executing tools: unknown process access also blocks removal."""
     if not proc_root.is_dir(): return True
@@ -206,8 +220,9 @@ def main(action, min_gib=3, build_cache_age='168h', retire_release='none'):
                 assert apt_cache == apt_cache_path(protected_mounts())
                 # apt-get clean locks and removes only downloaded package archives,
                 # not installed packages, package indexes, logs, or runtime state.
-                command('apt-get', 'clean')
-                report['apt_download_cache_cleaned'] = True
+                apt_status = clean_apt_download_cache()
+                report['apt_download_cache_status'] = apt_status
+                report['apt_download_cache_cleaned'] = apt_status == 'cleaned'
             if resources(root)['system']['free_bytes'] < min_disk:
                 output = prune_build_cache(build_cache_age)
                 report['old_build_cache_result'] = output.splitlines()[-1:] if output else []

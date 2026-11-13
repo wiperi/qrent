@@ -5,6 +5,7 @@ import tempfile
 import unittest
 from unittest.mock import patch
 import json
+import subprocess
 
 spec = importlib.util.spec_from_file_location('capacity', Path(__file__).with_name('recover_backend_capacity.py'))
 capacity = importlib.util.module_from_spec(spec)
@@ -121,6 +122,20 @@ class CapacitySafetyTests(unittest.TestCase):
                 self.assertIsNone(capacity.apt_cache_path([], link))
             with patch.object(capacity.shutil, 'which', return_value=None):
                 self.assertIsNone(capacity.apt_cache_path([], path))
+
+    def test_busy_apt_download_cache_allows_other_recovery_steps(self):
+        command = ['apt-get', 'clean']
+        results = [
+            subprocess.CompletedProcess(command, 100, '',
+                'E: Could not get lock /var/lib/apt/lists/lock. It is held by process 123 (apt-get)'),
+            subprocess.CompletedProcess(command, 0, '', ''),
+            subprocess.CompletedProcess(command, 100, '', 'E: Permission denied'),
+        ]
+        with patch.object(capacity.subprocess, 'run', side_effect=results):
+            self.assertEqual(capacity.clean_apt_download_cache(), 'busy')
+            self.assertEqual(capacity.clean_apt_download_cache(), 'cleaned')
+            with self.assertRaises(subprocess.CalledProcessError):
+                capacity.clean_apt_download_cache()
 
     def test_bind_mounted_cache_is_preserved(self):
         with tempfile.TemporaryDirectory() as temp:
