@@ -4,6 +4,7 @@
   --line: #d7e0ec;
   --blue: #174fd4;
   --control: #fff;
+  --header-clearance: 80px;
   color: var(--ink);
   background: #f5f7fb;
   min-height: 65vh;
@@ -303,8 +304,13 @@
 }
 .preview {
   position: sticky;
-  top: 28px;
-  scroll-margin-top: 20px;
+  top: var(--header-clearance);
+}
+.preview,
+.details,
+.settingsPanel,
+.previewHeader h2 {
+  scroll-margin-top: var(--header-clearance);
 }
 .textButton {
   min-height: 32px;
@@ -488,9 +494,6 @@
 }
 .sources .returnToDetails {
   display: none;
-}
-.details {
-  scroll-margin-top: 20px;
 }
 @media (max-width: 780px) {
   .sources .returnToDetails {
