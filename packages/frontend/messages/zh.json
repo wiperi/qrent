@@ -274,6 +274,9 @@
   },
   "PropertyGrid": {
     "dailyNewHouses": "每日新房推荐",
+    "updatedToday": "今日更新",
+    "currentListings": "当前可搜索",
+    "listingUnit": " 套",
     "loadError": "无法加载房源信息，请稍后重试。"
   },
   "PropertyCard": {
