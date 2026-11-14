@@ -28,7 +28,7 @@ export async function generateMetadata({ params }: Props) {
   return pageMetadata(
     locale,
     `/guides/${slug}`,
-    `${module.title[lang]}${lang === 'zh' ? '：澳洲租房攻略' : ': Australian Rental Guide'} | Qrent`,
+    `${module.title[lang]} | Qrent`,
     module.summary[lang]
   );
 }

@@ -5,10 +5,17 @@ import { useAuthModalEvents } from '@/lib/auth-events';
 import { useLocale, useTranslations } from 'next-intl';
 import Image from 'next/image';
 import Link from 'next/link';
+import { usePathname } from 'next/navigation';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { HiLogout, HiMenu, HiUser, HiX } from 'react-icons/hi';
 import AuthModal from './AuthModal';
 import LanguageSwitcher from './LanguageSwitcher';
+
+const navigation = [
+  { path: '/search', label: 'rentalSearch' },
+  { path: '/blog', label: 'rentalBlog' },
+  { path: '/favorite', label: 'favorite' },
+] as const;
 
 export default function Header() {
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
@@ -23,6 +30,16 @@ export default function Header() {
   const closeAuthModal = useCallback(() => setAuthModalOpen(false), []);
   const t = useTranslations('Header');
   const locale = useLocale();
+  const pathname = usePathname();
+  const navLinks = navigation.map(({ path, label }) => {
+    const href = `/${locale}${path}`;
+    const sectionActive =
+      pathname.startsWith(`${href}/`) ||
+      (path === '/blog' && pathname.startsWith(`/${locale}/guides/`));
+    const current =
+      pathname === href ? ('page' as const) : sectionActive ? ('location' as const) : undefined;
+    return { path, label, href, current };
+  });
 
   // 监听全局认证事件
   useAuthModalEvents(modalType => {
@@ -81,8 +98,7 @@ export default function Header() {
         <div className="bg-white">
           <div className="max-w-7xl mx-auto px-2 sm:px-4 lg:px-8">
             <div className="h-16 px-2 sm:px-3 lg:px-4 flex items-center justify-between">
-              {/* Left: logo + blog link */}
-              <div className="flex items-center gap-6">
+              <div className="flex items-center gap-3 md:gap-5 lg:gap-6">
                 <Link href={`/${locale}`} className="flex items-center" aria-label="Qrent home">
                   <Image
                     src="/media/qrent-logo-v1.svg"
@@ -93,25 +109,23 @@ export default function Header() {
                     className="rounded-md"
                   />
                 </Link>
-                <Link
-                  href={`/${locale}/blog`}
-                  className="hidden md:block text-slate-700 hover:text-blue-600 transition-colors font-bold"
-                >
-                  {t('rentalBlog')}
-                </Link>
-                <Link
-                  href={`/${locale}/favorite`}
-                  className="hidden md:block text-slate-700 hover:text-blue-600 transition-colors font-bold"
-                >
-                  {t('favorite')}
-                </Link>
+                <nav className="flex items-center gap-5 lg:gap-6" aria-label={t('primaryNav')}>
+                  {navLinks.map(({ path, label, href, current }) => (
+                    <Link
+                      key={path}
+                      href={href}
+                      aria-current={current}
+                      className={`${path === '/search' ? 'inline-flex' : 'hidden md:inline-flex'} min-h-11 items-center rounded-sm text-sm font-bold whitespace-nowrap transition-colors hover:text-blue-600 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-600 md:text-base ${
+                        current
+                          ? 'text-blue-700 underline decoration-2 underline-offset-8'
+                          : 'text-slate-700'
+                      }`}
+                    >
+                      {t(label)}
+                    </Link>
+                  ))}
+                </nav>
               </div>
-
-              {/* Center: desktop nav */}
-              <nav className="hidden md:flex items-center gap-8" aria-label="Primary">
-                {/* <a href="#guide" className="text-slate-700 hover:text-blue-600 transition-colors">Rental Guide</a>
-              <a href="#docs" className="text-slate-700 hover:text-blue-600 transition-colors">Document Preparation</a> */}
-              </nav>
 
               {/* Right: actions */}
               <div className="hidden md:flex items-center gap-3">
@@ -211,8 +225,8 @@ export default function Header() {
       {/* Mobile drawer and overlay */}
       {isDrawerOpen && (
         <>
-          <div className="fixed inset-0 z-40 bg-slate-900/40" onClick={closeDrawer}></div>
-          <aside className="fixed inset-y-0 left-0 z-50 w-72 bg-white shadow-xl">
+          <div className="fixed inset-0 z-[70] bg-slate-900/40" onClick={closeDrawer}></div>
+          <aside className="fixed inset-y-0 left-0 z-[80] w-72 max-w-full overflow-y-auto bg-white shadow-xl">
             <div className="h-16 flex items-center justify-between px-4 border-b">
               <div className="flex items-center">
                 <Link href={`/${locale}`} onClick={closeDrawer}>
@@ -233,9 +247,7 @@ export default function Header() {
                 <HiX className="h-5 w-5" />
               </button>
             </div>
-            <nav className="px-4 py-4 space-y-1" aria-label="Mobile">
-              {/* <a href="#guide" className="block rounded-md px-3 py-2 text-slate-700 hover:bg-slate-100 hover:text-blue-600">{t('rentalGuide')}</a> */}
-              {/* <a href="#docs" className="block rounded-md px-3 py-2 text-slate-700 hover:bg-slate-100 hover:text-blue-600">{t('documentPreparation')}</a> */}
+            <nav className="px-4 py-4 space-y-1" aria-label={t('mobileNav')}>
               <Link
                 href={`/${locale}`}
                 onClick={closeDrawer}
@@ -243,20 +255,19 @@ export default function Header() {
               >
                 {t('homepage')}
               </Link>
-              <Link
-                href={`/${locale}/blog`}
-                onClick={closeDrawer}
-                className="block rounded-md px-3 py-2 text-slate-700 hover:bg-slate-100 hover:text-blue-600"
-              >
-                {t('rentalBlog')}
-              </Link>
-              <Link
-                href={`/${locale}/favorite`}
-                onClick={closeDrawer}
-                className="block rounded-md px-3 py-2 text-slate-700 hover:bg-slate-100 hover:text-blue-600"
-              >
-                {t('favorite')}
-              </Link>
+              {navLinks.map(({ path, label, href, current }) => (
+                <Link
+                  key={path}
+                  href={href}
+                  onClick={closeDrawer}
+                  aria-current={current}
+                  className={`block rounded-md px-3 py-2 hover:bg-slate-100 hover:text-blue-600 ${
+                    current ? 'bg-blue-50 font-semibold text-blue-700' : 'text-slate-700'
+                  }`}
+                >
+                  {t(label)}
+                </Link>
+              ))}
               <div className="my-3 h-px bg-slate-200"></div>
               {isLoading || hasSessionError ? (
                 <button
