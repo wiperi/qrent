@@ -2,9 +2,9 @@
 
 import { useTRPCClient } from '@/lib/trpc';
 import { SCHOOL } from '@qrent/shared/enum';
-import { useQuery, useQueryClient } from '@tanstack/react-query';
+import { useQuery } from '@tanstack/react-query';
 import { useTranslations } from 'next-intl';
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { useAuth } from '@/hooks/use-auth';
 import ListingStats from './ListingStats';
 import PropertyCard from './PropertyCard';
@@ -14,7 +14,6 @@ export default function PropertyGrid() {
   const t = useTranslations('PropertyGrid');
   const [selectedUniversity, setSelectedUniversity] = useState(SCHOOL.UNSW);
   const trpc = useTRPCClient();
-  const queryClient = useQueryClient();
   const { user, isLoading } = useAuth();
 
   // 获取房产列表
@@ -78,61 +77,37 @@ export default function PropertyGrid() {
       : colors[school as keyof typeof colors]?.hover || 'hover:text-blue-600';
   };
 
-  const sectionTitle = (
-    <div className="flex flex-wrap justify-center items-center gap-3">
-      <span>{t('dailyNewHouses')}</span>
-      <div className="flex flex-wrap rounded-lg border border-slate-200 bg-slate-50">
-        {Object.values(SCHOOL).map(school => (
-          <button
-            key={school}
-            onClick={() => setSelectedUniversity(school)}
-            className={`px-3 py-2 transition-colors rounded-md ${
-              selectedUniversity === school
-                ? `${getUniversityColors(school, true)} shadow-sm`
-                : getUniversityColors(school, false)
-            }`}
-          >
-            {school}
-          </button>
-        ))}
-      </div>
-    </div>
-  );
-
-  if (isPending) {
-    return (
-      <Section title={sectionTitle}>
-        <ListingStats />
-        <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-          {Array.from({ length: 8 }).map((_, i) => (
-            <div
-              key={i}
-              className="animate-pulse overflow-hidden rounded-2xl border border-slate-200 bg-white"
+  const header = (
+    <div className="mb-5 flex flex-wrap items-center justify-between gap-x-5 gap-y-3 border-b border-slate-200 pb-4 sm:mb-6">
+      <div className="flex min-w-0 flex-wrap items-center gap-x-5 gap-y-3">
+        <h2 className="text-xl leading-tight font-semibold tracking-tight text-slate-950 sm:text-2xl">
+          {t('dailyNewHouses')}
+        </h2>
+        <div
+          role="group"
+          aria-label={t('schoolFilter')}
+          className="flex flex-wrap items-center gap-0.5 rounded-lg border border-slate-200 bg-slate-50 p-0.5"
+        >
+          {Object.values(SCHOOL).map(school => (
+            <button
+              key={school}
+              type="button"
+              aria-pressed={selectedUniversity === school}
+              onClick={() => setSelectedUniversity(school)}
+              className={`min-h-9 rounded-md px-3 py-1 text-sm font-semibold transition-colors ${
+                selectedUniversity === school
+                  ? getUniversityColors(school, true)
+                  : `text-slate-600 ${getUniversityColors(school, false)}`
+              }`}
             >
-              <div className="p-4 space-y-3">
-                <div className="h-4 bg-slate-200 rounded w-2/3" />
-                <div className="h-3 bg-slate-200 rounded w-1/2" />
-                <div className="h-4 bg-slate-200 rounded w-1/3" />
-                <div className="h-3 bg-slate-200 rounded w-full" />
-                <div className="h-3 bg-slate-200 rounded w-3/4" />
-              </div>
-            </div>
+              {school}
+            </button>
           ))}
         </div>
-      </Section>
-    );
-  }
-
-  if (error) {
-    return (
-      <Section title={sectionTitle}>
-        <ListingStats />
-        <div className="text-center py-8">
-          <p className="text-slate-600">{t('loadError')}</p>
-        </div>
-      </Section>
-    );
-  }
+      </div>
+      <ListingStats />
+    </div>
+  );
 
   const properties = data?.properties || [];
 
@@ -142,32 +117,52 @@ export default function PropertyGrid() {
   });
 
   return (
-    <Section title={sectionTitle}>
-      <ListingStats />
-      <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-        {sortedProperties.map(property => (
-          <PropertyCard
-            id={property.id}
-            key={property.id}
-            address={property.address}
-            region={property.region || ''}
-            price={property.price}
-            bedroomCount={property.bedroomCount}
-            bathroomCount={property.bathroomCount}
-            propertyType={property.propertyType}
-            commuteTime={property.commuteTime ?? undefined}
-            url={property.url}
-            thumbnailUrl={property.thumbnailUrl}
-            subscribed={property.subscribed}
-            averageScore={property.averageScore}
-            keywords={property.keywords}
-            description={property.description}
-            availableDate={property.availableDate}
-            publishedAt={property.publishedAt}
-            propertyId={property.id as number}
-          />
-        ))}
-      </div>
+    <Section>
+      {header}
+      {error ? (
+        <p className="py-8 text-center text-slate-600">{t('loadError')}</p>
+      ) : (
+        <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+          {isPending
+            ? Array.from({ length: 8 }, (_, i) => (
+                <div
+                  key={i}
+                  aria-hidden="true"
+                  className="animate-pulse rounded-2xl border border-slate-200 bg-white p-4"
+                >
+                  <div className="space-y-3">
+                    <div className="h-4 w-2/3 rounded bg-slate-200" />
+                    <div className="h-3 w-1/2 rounded bg-slate-200" />
+                    <div className="h-4 w-1/3 rounded bg-slate-200" />
+                    <div className="h-3 w-full rounded bg-slate-200" />
+                    <div className="h-3 w-3/4 rounded bg-slate-200" />
+                  </div>
+                </div>
+              ))
+            : sortedProperties.map(property => (
+                <PropertyCard
+                  id={property.id}
+                  key={property.id}
+                  address={property.address}
+                  region={property.region || ''}
+                  price={property.price}
+                  bedroomCount={property.bedroomCount}
+                  bathroomCount={property.bathroomCount}
+                  propertyType={property.propertyType}
+                  commuteTime={property.commuteTime ?? undefined}
+                  url={property.url}
+                  thumbnailUrl={property.thumbnailUrl}
+                  subscribed={property.subscribed}
+                  averageScore={property.averageScore}
+                  keywords={property.keywords}
+                  description={property.description}
+                  availableDate={property.availableDate}
+                  publishedAt={property.publishedAt}
+                  propertyId={property.id as number}
+                />
+              ))}
+        </div>
+      )}
     </Section>
   );
 }

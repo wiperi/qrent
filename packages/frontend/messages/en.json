@@ -273,8 +273,9 @@
     "minutes": "minutes"
   },
   "PropertyGrid": {
-    "dailyNewHouses": "Daily New Houses Around",
-    "updatedToday": "Updated today",
+    "dailyNewHouses": "Daily rental picks",
+    "newToday": "New today",
+    "schoolFilter": "Filter rental picks by university",
     "currentListings": "Searchable listings",
     "listingUnit": "",
     "loadError": "Unable to load properties. Please try again later."

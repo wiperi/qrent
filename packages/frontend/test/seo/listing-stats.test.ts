@@ -2,10 +2,11 @@ import assert from 'node:assert/strict';
 import test from 'node:test';
 import { readListingStats } from '../../src/lib/listing-stats';
 
-test('the Sydney day rolls over without carrying the previous update count into today', () => {
+test('only a fresh Sydney snapshot can supply the new-listing count', () => {
   const yesterday = {
     date: '2026-11-13',
     generatedAt: '2026-11-13T12:59:30Z',
+    newToday: 143,
     updatedToday: 1249,
     currentListings: 6665,
   };
@@ -13,12 +14,18 @@ test('the Sydney day rolls over without carrying the previous update count into 
     ...yesterday,
     date: '2026-11-14',
     generatedAt: '2026-11-13T13:00:00Z',
+    newToday: 0,
     updatedToday: 0,
   };
   assert.deepEqual(readListingStats(yesterday, new Date('2026-11-13T12:59:59Z')), yesterday);
   assert.equal(readListingStats(yesterday, new Date('2026-11-13T13:00:00Z')), null);
   assert.deepEqual(readListingStats(today, new Date('2026-11-13T13:00:05Z')), today);
   assert.equal(readListingStats(today, new Date('2026-11-13T13:10:00Z')), null);
+  assert.equal(
+    readListingStats({ ...today, newToday: undefined }, new Date('2026-11-13T13:00:05Z')),
+    null
+  );
+  assert.equal(readListingStats({ ...today, newToday: 1 }, new Date('2026-11-13T13:00:05Z')), null);
   assert.equal(
     readListingStats({ ...today, updatedToday: 6666 }, new Date('2026-11-13T13:00:05Z')),
     null
