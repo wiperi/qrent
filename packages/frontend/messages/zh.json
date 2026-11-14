@@ -365,7 +365,7 @@
   },
   "NotificationBar": {
     "label": "更新通知",
-    "message": "房源已恢复更新，现支持 Real Estate 和 Domain 两个平台的租金信息。"
+    "message": "房源已恢复更新，现支持 Realestate 和 Domain 两个平台的租金信息。"
   },
   "Account": {
     "title": "账户设置",
