@@ -22,27 +22,21 @@ export default function ListingStats() {
   if (!stats) return null;
 
   return (
-    <div className="mb-5 flex justify-center">
-      <dl className="inline-grid max-w-full grid-cols-2 divide-x divide-blue-100 rounded-xl border border-blue-100 bg-blue-50/70 py-2.5">
-        <div className="flex flex-col items-center gap-x-2 px-3 sm:flex-row sm:px-4">
-          <dt className="order-2 text-center text-xs font-medium text-slate-700 sm:order-1 sm:text-sm">
-            {t('updatedToday')}
-          </dt>
-          <dd className="order-1 text-lg font-semibold tabular-nums text-brand sm:order-2">
-            {format.number(stats.updatedToday)}
-            <span className="text-xs font-medium">{t('listingUnit')}</span>
-          </dd>
-        </div>
-        <div className="flex flex-col items-center gap-x-2 px-3 sm:flex-row sm:px-4">
-          <dt className="order-2 text-center text-xs font-medium text-slate-700 sm:order-1 sm:text-sm">
-            {t('currentListings')}
-          </dt>
-          <dd className="order-1 text-lg font-semibold tabular-nums text-slate-900 sm:order-2">
-            {format.number(stats.currentListings)}
-            <span className="text-xs font-medium">{t('listingUnit')}</span>
-          </dd>
-        </div>
-      </dl>
-    </div>
+    <dl className="flex w-fit max-w-full shrink-0 items-center divide-x divide-slate-200">
+      <div className="flex flex-wrap items-baseline gap-x-1.5 pr-3 sm:pr-4">
+        <dt className="text-xs font-medium text-slate-600">{t('newToday')}</dt>
+        <dd className="whitespace-nowrap text-lg/6 font-semibold tabular-nums text-brand">
+          {format.number(stats.newToday)}
+          <span className="text-xs font-medium">{t('listingUnit')}</span>
+        </dd>
+      </div>
+      <div className="flex flex-wrap items-baseline gap-x-1.5 pl-3 sm:pl-4">
+        <dt className="text-xs font-medium text-slate-600">{t('currentListings')}</dt>
+        <dd className="whitespace-nowrap text-lg/6 font-semibold tabular-nums text-slate-900">
+          {format.number(stats.currentListings)}
+          <span className="text-xs font-medium">{t('listingUnit')}</span>
+        </dd>
+      </div>
+    </dl>
   );
 }

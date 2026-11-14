@@ -6,20 +6,23 @@ from datetime import datetime, time, timezone
 import json
 import os
 from pathlib import Path
+import re
 import sys
 from tempfile import mkstemp
 from zoneinfo import ZoneInfo
 
 SYDNEY = ZoneInfo('Australia/Sydney')
 SCHOOLS = ('UNSW', 'USYD', 'UTS')
+DAILY_QUEUE = re.compile(r'school-enrichment-\d{8}_\d{6}_\d{6}')
 
 
-def published_ids(output: Path, now: datetime) -> set[int]:
+def daily_publications(output: Path, now: datetime) -> tuple[set[int], int]:
     day = now.astimezone(SYDNEY).date()
     start = datetime.combine(day, time.min, tzinfo=SYDNEY).timestamp()
     ids = set()
+    inserted = 0
     for path in output.glob('school-enrichment-*/queue/batch-*/receipt.json'):
-        if path.stat().st_mtime < start:
+        if not DAILY_QUEUE.fullmatch(path.parents[2].name) or path.stat().st_mtime < start:
             continue
         receipt = json.loads(path.read_text())
         if receipt['status'] != 'processed' or not receipt['published_addresses']:
@@ -33,8 +36,17 @@ def published_ids(output: Path, now: datetime) -> set[int]:
         batch = {int(house_id) for _, house_id in receipt['published_ids']}
         if len(batch) != receipt['published_addresses']:
             raise ValueError('Batch receipt count and published identities differ')
+        publication = publish['publication']
+        if not publication or publication != receipt['publication']:
+            raise ValueError('Batch receipt and MySQL publication counters differ')
+        # MySQL has one row per listing. The first school inserts it, and subsequent
+        # schools and republications update that same row.
+        inserts = sum(school['inserted'] for school in publication.values())
+        if not 0 <= inserts <= len(batch):
+            raise ValueError('Batch insert count exceeds the published inventory')
+        inserted += inserts
         ids.update(batch)
-    return ids
+    return ids, inserted
 
 
 def searchable_ids(mysql_env: Path) -> set[int]:
@@ -62,12 +74,16 @@ def searchable_ids(mysql_env: Path) -> set[int]:
 
 def export(root: Path, destination: Path) -> None:
     now = datetime.now(timezone.utc)
-    today = published_ids(root / 'output', now)
+    today, inserted = daily_publications(root / 'output', now)
     current = searchable_ids(root / 'enrichment/qrent-writer.env')
+    updated = len(today & current)
+    if inserted > updated:
+        raise ValueError('New listings exceed today’s confirmed searchable inventory')
     snapshot = {
         'date': now.astimezone(SYDNEY).date().isoformat(),
         'generatedAt': now.isoformat(timespec='seconds'),
-        'updatedToday': len(today & current),
+        'newToday': inserted,
+        'updatedToday': updated,
         'currentListings': len(current),
     }
     # Only the aggregate is world-readable. Replace it after both sources pass.

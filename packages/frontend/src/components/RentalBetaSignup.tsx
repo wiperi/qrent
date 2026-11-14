@@ -15,6 +15,7 @@ export default function RentalBetaSignup({
 }) {
   const zh = locale === 'zh';
   const label = useId();
+  const signupHint = useId();
   const [email, setEmail] = useState('');
   const [state, setState] = useState<State>('idle');
 
@@ -48,8 +49,8 @@ export default function RentalBetaSignup({
   const notice =
     state === 'saved'
       ? zh
-        ? '内测意向已登记。'
-        : 'Your interest has been registered.'
+        ? '已报名，内测开放后我们会邮件联系你。'
+        : 'You’re on the list. We’ll email you when the beta opens.'
       : state === 'limited'
         ? zh
           ? '请求过多，请稍后再试。'
@@ -72,13 +73,23 @@ export default function RentalBetaSignup({
         </span>
         <div>
           <div className={styles.signupTitle}>
-            <h2 id={label}>{zh ? '订阅每日房源更新' : 'Get daily rental updates'}</h2>
-            <span>{zh ? '内测招募' : 'Early access'}</span>
+            <h2 id={label}>
+              {zh ? (
+                <>
+                  符合你条件的新房源，
+                  <wbr />
+                  直接发到邮箱
+                </>
+              ) : (
+                'Matching new rentals, straight to your inbox'
+              )}
+            </h2>
+            <span>{zh ? '内测招募' : 'Beta waitlist'}</span>
           </div>
           <p>
             {zh
-              ? '留下邮箱，内测开放后我们会邮件联系你，确认想看的区域、预算和入住时间。'
-              : 'Leave your email. When the beta opens, we’ll ask about your areas, budget and move-in date.'}
+              ? '内测开放后，Qrent 每天从 Real Estate 和 Domain 筛选悉尼房源。有新房源符合你的预算、区域和入住时间，就邮件提醒你。'
+              : 'When the beta opens, Qrent will check Real Estate and Domain daily and email you when new Sydney rentals match your budget, preferred areas and move-in date.'}
           </p>
         </div>
       </div>
@@ -88,6 +99,7 @@ export default function RentalBetaSignup({
             type="email"
             name="email"
             aria-label={zh ? '邮箱地址' : 'Email address'}
+            aria-describedby={signupHint}
             autoComplete="email"
             placeholder={zh ? '输入邮箱地址' : 'Your email address'}
             value={email}
@@ -100,12 +112,26 @@ export default function RentalBetaSignup({
             disabled={state === 'sending'}
           />
           <button className={styles.primary} disabled={state === 'sending'}>
-            {state === 'sending' ? (zh ? '登记中…' : 'Saving…') : zh ? '报名内测' : 'Join the beta'}
+            {state === 'sending'
+              ? zh
+                ? '登记中…'
+                : 'Saving…'
+              : zh
+                ? '报名内测'
+                : 'Join the waitlist'}
           </button>
         </div>
-        <p role="status" className={styles.signupNotice} data-state={confirmed ? 'success' : state}>
+        <p
+          id={signupHint}
+          role="status"
+          className={styles.signupNotice}
+          data-state={confirmed ? 'success' : state}
+        >
           {confirmed && <Check size={14} aria-hidden="true" />}
-          {notice}
+          {notice ||
+            (zh
+              ? '开放后邮件邀请你设置筛选条件。'
+              : 'We’ll invite you to set your filters when it opens.')}
         </p>
       </form>
       {assistantAction}

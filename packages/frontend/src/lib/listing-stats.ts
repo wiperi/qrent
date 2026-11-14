@@ -1,6 +1,7 @@
 export interface ListingStatsSnapshot {
   date: string;
   generatedAt: string;
+  newToday: number;
   updatedToday: number;
   currentListings: number;
 }
@@ -15,16 +16,19 @@ const sydneyDay = new Intl.DateTimeFormat('en-CA', {
 export function readListingStats(value: unknown, now = new Date()): ListingStatsSnapshot | null {
   if (value === null || typeof value !== 'object') return null;
 
-  const { date, generatedAt, updatedToday, currentListings } =
+  const { date, generatedAt, newToday, updatedToday, currentListings } =
     value as Partial<ListingStatsSnapshot>;
   if (
     date !== sydneyDay.format(now) ||
     typeof generatedAt !== 'string' ||
+    typeof newToday !== 'number' ||
     typeof updatedToday !== 'number' ||
     typeof currentListings !== 'number' ||
+    !Number.isSafeInteger(newToday) ||
     !Number.isSafeInteger(updatedToday) ||
     !Number.isSafeInteger(currentListings) ||
-    updatedToday < 0 ||
+    newToday < 0 ||
+    updatedToday < newToday ||
     currentListings < updatedToday
   ) {
     return null;
@@ -41,5 +45,5 @@ export function readListingStats(value: unknown, now = new Date()): ListingStats
     return null;
   }
 
-  return { date, generatedAt, updatedToday, currentListings };
+  return { date, generatedAt, newToday, updatedToday, currentListings };
 }
