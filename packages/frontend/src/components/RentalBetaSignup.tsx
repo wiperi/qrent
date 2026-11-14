@@ -88,8 +88,8 @@ export default function RentalBetaSignup({
           </div>
           <p>
             {zh
-              ? '内测开放后，Qrent 每天从 Real Estate 和 Domain 筛选悉尼房源。有新房源符合你的预算、区域和入住时间，就邮件提醒你。'
-              : 'When the beta opens, Qrent will check Real Estate and Domain daily and email you when new Sydney rentals match your budget, preferred areas and move-in date.'}
+              ? '内测开放后，Qrent 每天从 Realestate 和 Domain 筛选悉尼房源。有新房源符合你的预算、区域和入住时间，就邮件提醒你。'
+              : 'When the beta opens, Qrent will check Realestate and Domain daily and email you when new Sydney rentals match your budget, preferred areas and move-in date.'}
           </p>
         </div>
       </div>

@@ -23,7 +23,7 @@ export const viewport: Viewport = { width: 'device-width', initialScale: 1, them
 export const metadata: Metadata = {
   metadataBase: new URL(SITE_URL),
   title: 'Qrent — Sydney student rentals',
-  description: 'Compare rental prices from Domain and Real Estate around Sydney universities.',
+  description: 'Compare rental prices from Domain and Realestate around Sydney universities.',
   openGraph: { siteName: 'Qrent', images: [SITE_IMAGE] },
   twitter: { card: 'summary_large_image', images: [SITE_IMAGE] },
   appleWebApp: { capable: true, statusBarStyle: 'black-translucent', title: 'Qrent' },
@@ -90,7 +90,7 @@ export default async function LocaleLayout({
               url: SITE_URL,
               inLanguage: ['en-AU', 'zh-CN'],
               description:
-                'Free rental comparison around Sydney universities using Domain and Real Estate listings.',
+                'Free rental comparison around Sydney universities using Domain and Realestate listings.',
               publisher: {
                 '@type': 'Organization',
                 '@id': `${SITE_URL}/#organization`,
