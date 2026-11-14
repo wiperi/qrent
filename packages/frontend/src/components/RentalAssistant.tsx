@@ -396,10 +396,10 @@ export default function RentalAssistant({
                 <ArrowUpRight size={13} aria-hidden="true" />
               </Link>
             </div>
-            <p className={styles.historyNotice}>
+            <p className={styles.modelKeyNote}>
               {zh
-                ? '问答经脱敏后用于排查回答质量，在线记录最多保留 30 天。API Key 仅用于当前标签页的模型连接。'
-                : 'Redacted chats are kept online for up to 30 days for quality review. Your API key is used for model requests in this tab.'}
+                ? 'API Key 仅用于当前标签页的模型连接。'
+                : 'Your API key is used for model requests in this tab.'}
             </p>
             {error && (
               <div className={styles.composerError}>
