@@ -51,6 +51,10 @@
   font-weight: 650;
   font-size: 17px;
   line-height: 1.4;
+  text-wrap: balance;
+}
+.signupTitle h2:lang(zh) {
+  word-break: keep-all;
 }
 .signupTitle span {
   border-radius: 5px;

@@ -74,9 +74,15 @@ export default function RentalBetaSignup({
         <div>
           <div className={styles.signupTitle}>
             <h2 id={label}>
-              {zh
-                ? '符合你条件的新房源，直接发到邮箱'
-                : 'Matching new rentals, straight to your inbox'}
+              {zh ? (
+                <>
+                  符合你条件的新房源，
+                  <wbr />
+                  直接发到邮箱
+                </>
+              ) : (
+                'Matching new rentals, straight to your inbox'
+              )}
             </h2>
             <span>{zh ? '内测招募' : 'Beta waitlist'}</span>
           </div>
