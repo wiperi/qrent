@@ -25,7 +25,10 @@ const s = (
 export const rentalGuideModules: GuideModule[] = [
   {
     slug: 'budget-and-housing',
-    title: t('预算与房型', 'Budget and housing types'),
+    title: t(
+      '租房预算怎么算？学生公寓、整租与分租怎么选？',
+      'How to budget for student housing, a whole rental or a room'
+    ),
     summary: t(
       '先确定可承担的总费用，再比较学生公寓、整租与分租。',
       'Set an affordable total budget, then compare student accommodation, whole properties and rooms.'
@@ -190,7 +193,10 @@ Before sharing a lease, agree budgets, room allocation, lease length, cleaning, 
   },
   {
     slug: 'areas-and-commute',
-    title: t('学校选区与通勤', 'Areas and the campus commute'),
+    title: t(
+      'UNSW、悉尼大学和 UTS 附近怎么选区，通勤时间怎么算？',
+      'Where to rent near UNSW, USYD and UTS and how to check your commute'
+    ),
     summary: t(
       '以具体校区和门牌为起点，比较步行、公共交通与日常配套。',
       'Compare walking, public transport and amenities using the actual campus and street address.'
@@ -304,7 +310,10 @@ The source’s extra ten-minute waiting allowance is a planning buffer, not a fi
   },
   {
     slug: 'platforms-and-search',
-    title: t('平台找房与筛选', 'Platforms and rental search'),
+    title: t(
+      '在 Realestate、Domain 和 Qrent 找房，怎么看起租日和预约入口？',
+      'How to find rentals and check availability on Realestate, Domain and Qrent'
+    ),
     summary: t(
       '读懂区域、房源状态、起租日和申请入口，再安排看房。',
       'Check areas, listing status, availability and application channels before arranging inspections.'
@@ -435,7 +444,10 @@ Completing a renter profile does not prevent the agent requesting 2Apply, an ema
   },
   {
     slug: 'application-documents',
-    title: t('申请材料与自荐信', 'Application documents and letters'),
+    title: t(
+      '租房申请要准备哪些材料？自荐信怎么写？',
+      'How to prepare rental application documents and write a cover letter'
+    ),
     summary: t(
       '把身份、资金、居住史、证明人与入住计划整理成可核实的申请。',
       'Prepare verifiable identity, funding, housing history, references and move-in plans.'
@@ -613,7 +625,10 @@ Use the phone for urgent coordination and confirm important dates, prices, charg
   },
   {
     slug: 'inspection-checklist',
-    title: t('看房与代看清单', 'Inspection and proxy checklist'),
+    title: t(
+      '看房要检查什么？现场看房与代看清单',
+      'What to check at a rental inspection or ask someone else to check'
+    ),
     summary: t(
       '从门口、周边到每个房间，把现场需要确认的项目逐项记录。',
       'Record what to check outside, around the neighbourhood and in every room.'
@@ -724,7 +739,10 @@ Confirm bills, furniture, application channel, start date, facilities and unansw
   },
   {
     slug: 'contracts-and-bond',
-    title: t('合同、定金与押金', 'Lease, holding fee and bond'),
+    title: t(
+      '签租约前要核对什么？NSW 定金、押金和预付租金怎么区分？',
+      'NSW lease checklist, holding fees, bonds and advance rent'
+    ),
     summary: t(
       '核对租约、钱款名称与监管凭证，按所在州确认适用规则。',
       'Check the lease, payment type and lodgement evidence under the relevant state rules.'
@@ -894,7 +912,10 @@ When tenants change, ask how to update both the agreement and bond names rather 
   },
   {
     slug: 'moving-in',
-    title: t('入住检查与水电网络', 'Moving in, reports and utilities'),
+    title: t(
+      '入住怎么验房、填房屋状况报告和开通水电网？',
+      'How to complete the move-in condition report and set up utilities and internet'
+    ),
     summary: t(
       '把既有缺陷记进报告，留好影像，再确认账单和服务开通。',
       'Document existing defects, retain evidence and arrange bills and service connections.'
@@ -1061,7 +1082,10 @@ EnergyAustralia, Origin, AGL, Telstra, Optus and TPG in the old handbook are sta
   },
   {
     slug: 'repairs-and-moving-out',
-    title: t('维修、退租与争议', 'Repairs, moving out and disputes'),
+    title: t(
+      '房屋有问题怎么报修？退租通知和押金怎么处理？',
+      'How to request repairs, give notice and claim your bond'
+    ),
     summary: t(
       '先留证和书面沟通，再按所在州的维修、通知与押金流程处理。',
       'Keep evidence and written communication, then use the state’s repair, notice and bond process.'
