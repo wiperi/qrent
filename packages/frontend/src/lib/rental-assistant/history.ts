@@ -98,7 +98,13 @@ export async function startChatHistory(
                       suburb: source.suburb && redactCredentials(source.suburb, key),
                       matches: source.matches,
                       averageWeeklyRent: source.averageWeeklyRent,
-                      filters: source.filters,
+                      // The history endpoint validates a separate, narrower filter schema.
+                      filters: {
+                        minRent: source.filters.minRent,
+                        maxRent: source.filters.maxRent,
+                        bedrooms: source.filters.bedrooms,
+                        maxCommute: source.filters.maxCommute,
+                      },
                       examples: source.examples.slice(0, 6).map(row => ({
                         id: row.id,
                         weeklyRent: row.weeklyRent,

@@ -1,10 +1,54 @@
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
 import { POST } from '../../src/app/api/rental-assistant/chat/route';
+import { startChatHistory } from '../../src/lib/rental-assistant/history';
 
 const origin = 'https://www.qrent.rent';
 const key = 'sk-fixture-user-secret-123456';
 const sessionId = 'e55fdc75-77db-4cee-801b-140bb06359c1';
+
+test('production history accepts a listing answer that used an exact bathroom filter', async t => {
+  const writes: string[] = [];
+  t.mock.method(globalThis, 'fetch', async (_url: string | URL | Request, init?: RequestInit) => {
+    writes.push(String(init?.body));
+    return new Response(null, { status: 204 });
+  });
+  const previous = process.env.VERCEL_ENV;
+  process.env.VERCEL_ENV = 'production';
+  t.after(() => {
+    if (previous === undefined) delete process.env.VERCEL_ENV;
+    else process.env.VERCEL_ENV = previous;
+  });
+
+  const history = await startChatHistory(
+    new Request(origin, { headers: { 'x-vercel-oidc-token': 'signed-deployment' } }),
+    { locale: 'zh', sessionId, connection: { type: 'local' }, question: 'Randwick 2B2B 周租？' }
+  );
+  assert.ok(history);
+  const savedFilters = { minRent: 500, maxRent: 1000, bedrooms: 2, maxCommute: 30 };
+  const filters = { ...savedFilters, bathrooms: 2 };
+  await history.finish({
+    status: 'answered',
+    answer: 'Randwick 两房两卫样本周租 A$900。',
+    listingLookupFailed: false,
+    evidence: [
+      {
+        id: 'L1',
+        kind: 'listings',
+        school: 'UNSW',
+        suburb: 'Randwick',
+        matches: 1,
+        averageWeeklyRent: 900,
+        filters,
+        examples: [],
+        readAt: '2026-11-16T00:00:00.000Z',
+      },
+    ],
+  });
+  assert.equal(writes.length, 2);
+  assert.deepEqual(JSON.parse(writes[1]).outcome.sources[0].filters, savedFilters);
+  assert.equal(filters.bathrooms, 2);
+});
 
 function rejectedModelRequest(token?: string, legacy = false) {
   return new Request(origin + '/api/rental-assistant/chat', {
