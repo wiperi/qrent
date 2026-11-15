@@ -38,6 +38,13 @@ export const listingInput = z.object({
     .max(20)
     .nullish()
     .describe('Exact positive bedroom count. Null clears this filter.'),
+  bathrooms: z
+    .number()
+    .int()
+    .min(1)
+    .max(20)
+    .nullish()
+    .describe('Exact shared bathroom count for the requested layout(s). Null clears this filter.'),
   maxCommute: z
     .number()
     .int()
@@ -130,6 +137,7 @@ export function createListingSearch(locale: string, signal: AbortSignal) {
         minRent: input.minRent ?? undefined,
         maxRent: input.maxRent ?? undefined,
         bedrooms: input.bedrooms ?? undefined,
+        bathrooms: input.bathrooms ?? undefined,
         maxCommute: input.maxCommute ?? undefined,
       };
       const regions = await Promise.all(
@@ -178,6 +186,8 @@ async function searchArea(
     maxPrice: filters.maxRent,
     minBedrooms: filters.bedrooms,
     maxBedrooms: filters.bedrooms,
+    minBathrooms: filters.bathrooms,
+    maxBathrooms: filters.bathrooms,
     maxCommuteTime: filters.maxCommute,
     orderBy: [{ publishedAt: 'desc' }, { id: 'desc' }],
   };

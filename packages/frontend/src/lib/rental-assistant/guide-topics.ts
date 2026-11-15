@@ -46,6 +46,43 @@ const reference =
   /海外(?:推荐|证明)|前房东|推荐信|推荐人|\b(?:overseas reference|former landlord|rental references?|referees?)\b/i;
 const sharedAppliance = /公用|共用|共享|\b(?:shared|communal)\b/i;
 
+const planningTopics = [
+  {
+    topic: 'timing',
+    question:
+      /(?:什么时候|几月|提前多久|提早多久|多早|多久前|太早|太晚|来得及).{0,18}(?:找房|看房|租房|订房|合租)|(?:找房|看房|租房|订房|合租).{0,18}(?:太早|太晚|晚不晚|早不早|会不会.{0,4}晚|来得及|提前多久)|\b(?:when|how (?:early|far in advance))\b.{0,35}\b(?:look|start|search|rent)\b/i,
+    section: 'budget-and-housing#roommate-and-timing',
+  },
+  {
+    topic: 'roommates',
+    question:
+      /(?:怎么|去哪|哪里|哪儿|找|认识).{0,8}室友|室友.{0,12}(?:怎么找|去哪找|哪里找|好找|难找)|\b(?:find|meet|look for|where to find)\b.{0,26}\b(?:housemates?|roommates?)\b/i,
+    section: 'budget-and-housing#roommate-and-timing',
+  },
+  {
+    topic: 'commute',
+    question:
+      /教学楼|晚课.{0,14}(?:回|走|安全)|(?:走路|步行).{0,14}(?:上课|到校|到学校|校园)|\b(?:teaching building|walk(?:ing)? to (?:class|campus)|evening classes?)\b/i,
+    section: 'areas-and-commute#door-to-door-check',
+  },
+  {
+    topic: 'features',
+    question:
+      /(?:找|带|有|看房|房源|筛|确认|关键词).{0,18}(?:空调|煤气灶|燃气灶)|(?:空调|煤气灶|燃气灶).{0,12}(?:怎么|搜|筛|确认)|\b(?:air.?conditioning|gas (?:cooking|cooktop|stove))\b/i,
+    section: 'platforms-and-search#search-workflow',
+  },
+  {
+    topic: 'quote',
+    question:
+      /(?:中介|代看|代订).{0,24}(?:溢价|贵|比价|报价高|服务费)|(?:溢价|报价贵).{0,16}(?:中介|代看|代订)|\b(?:agent|booking service)\b.{0,28}\b(?:premium|higher quote|service fee)\b/i,
+    section: 'platforms-and-search#search-workflow',
+  },
+] as const;
+
+export function rentalPlanningTopics(question: string) {
+  return planningTopics.filter(item => item.question.test(question));
+}
+
 export type RuleTopic =
   | 'condition-deadline'
   | 'upfront'
@@ -124,6 +161,8 @@ export function practicalGuideSections(question: string) {
       'application-documents#submit-and-follow-up',
       'application-documents#document-checklist',
     ];
+  const plan = rentalPlanningTopics(question);
+  if (plan.length) return [...new Set(plan.map(item => item.section))];
   if (inspection.test(question))
     return ['inspection-checklist#room-checklist', 'inspection-checklist#before-inspection'];
   if (housing.test(question))
@@ -193,6 +232,7 @@ export function practicalGuideTopic(question: string, previousQuestion?: string)
   if (reference.test(question)) return 'rental-reference';
   if (newMould.test(question)) return 'new-mould';
   if (needsApplicationEvidence(question)) return 'application-evidence';
+  if (rentalPlanningTopics(question).length) return 'rental-planning';
   if (inspection.test(question)) return 'inspection-checklist';
   if (
     housing.test(question) &&

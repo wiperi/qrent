@@ -22,7 +22,7 @@ const scenarios = [
   {
     id: 'transit',
     turns: [
-      '帮我查 UNSW 附近 Randwick 的 2B 和 3B，每人每周 A$500，公交 30 分钟内。',
+      '帮我查 UNSW 附近 Randwick 的 2B2B 和 3B2B，每人每周 A$500，公交 30 分钟内。',
       '只看 3B，公交从 30 分钟改到 25 分钟，其他不变。',
     ],
   },
@@ -51,6 +51,12 @@ const scenarios = [
     turns: [
       'How long do I have to return a rental condition report in Melbourne?',
       'And if the same lease is in Sydney instead?',
+    ],
+  },
+  {
+    id: 'planning',
+    turns: [
+      '二月起租，现在看房会不会太早？开学后怎么找室友？想步行到教学楼，燃气灶怎么筛？华人中介报价贵，怎么比？',
     ],
   },
   {
@@ -89,15 +95,16 @@ function assertTurn(id, index, data) {
     assert.deepEqual(
       listings.map(source => [
         source.filters.bedrooms,
+        source.filters.bathrooms,
         source.filters.maxRent,
         source.filters.maxCommute,
       ]),
       index === 0
         ? [
-            [2, 1000, 30],
-            [3, 1500, 30],
+            [2, 2, 1000, 30],
+            [3, 2, 1500, 30],
           ]
-        : [[3, 1500, 25]]
+        : [[3, 2, 1500, 25]]
     );
     for (const source of listings) {
       assert(
@@ -116,6 +123,12 @@ function assertTurn(id, index, data) {
   if (id === 'appliance' && index === 0) assert.match(answer, /书面确认.{0,10}随租/);
   if (id === 'status') assert.match(answer, /contact the listing agent/i);
   if (id === 'jurisdiction') assert.match(answer, index === 0 ? /5 business days/ : /7 days/);
+  if (id === 'planning') {
+    for (const wording of [/6–8 周.*2–3 周/, /小红书发帖/, /Google Maps/, /gas cooking/, /服务费/])
+      assert.match(answer, wording);
+    assert.equal(data.evidence.filter(source => source.kind === 'guide').length, 3);
+    assert.equal(listings.length, 0);
+  }
 }
 
 let failed = 0;

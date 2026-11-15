@@ -3,6 +3,7 @@ import { once } from 'node:events';
 import { createServer } from 'node:http';
 import { test, type TestContext } from 'node:test';
 import { POST } from '../../src/app/api/rental-assistant/chat/route';
+import type { AssistantEvidence } from '../../src/lib/rental-assistant/contracts';
 import type { RentalLetterForm } from '../../src/lib/rental-assistant/letter-workspace';
 
 type Fixture = {
@@ -218,6 +219,44 @@ test('an actual headcount overrides the bedrooms and a tighter whole-property ca
   );
   assert.doesNotMatch(reply.answer, /一人一间卧室/);
   assert.match(reply.answer, /2 人均分/);
+});
+
+test('2B2B and 3B2B keep both bathrooms in every listing comparison', async t => {
+  const { reply, queries } = await ask(t, {
+    questions: ['UNSW 附近每人每周 A$500，比较 2B2B 和 3B2B 的周租。'],
+    locale: 'zh',
+  });
+  assert.deepEqual(
+    queries.map(q => [q.minBedrooms, q.maxBedrooms, q.minBathrooms, q.maxBathrooms, q.maxPrice]),
+    [
+      [2, 2, 2, 2, 1000],
+      [3, 3, 2, 2, 1500],
+    ]
+  );
+  assert.match(reply.answer, /2 房 2 卫.*2 人均分/);
+  assert.match(reply.answer, /3 房 2 卫.*3 人均分/);
+  assert.equal(reply.search.bathrooms, 2);
+});
+
+test('Little Q gives concrete first-rental advice for all of the requested planning topics', async t => {
+  const { reply, queries, modelRequests } = await ask(t, {
+    questions: [
+      '二月起租，现在看房会不会太早？开学后怎么找室友？想步行到教学楼，燃气灶怎么筛？华人中介报价贵，怎么比？',
+    ],
+    locale: 'zh',
+  });
+  assert.match(reply.answer, /6–8 周.*2–3 周/);
+  assert.match(reply.answer, /小红书发帖/);
+  assert.match(reply.answer, /Google Maps.*上课那栋楼/);
+  assert.match(reply.answer, /Realestate 或 Domain.*gas cooking/);
+  assert.match(reply.answer, /每周租金.*服务费.*起租/);
+  assert.doesNotMatch(reply.answer, /洗衣|air conditioning/);
+  assert.equal(
+    reply.evidence.filter((source: AssistantEvidence) => source.kind === 'guide').length,
+    3
+  );
+  assert.equal(queries.length, 0);
+  assert.equal(modelRequests.length, 0);
 });
 
 test('a follow-up recomputes the cap and carries forward budget basis, campus and commute', async t => {

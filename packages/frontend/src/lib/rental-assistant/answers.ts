@@ -29,6 +29,10 @@ function listingSummary(source: ListingSource, locale: Locale) {
       ? source.filters.bedrooms + ' 房'
       : source.filters.bedrooms + ' bed'
     : '';
+  const bathrooms = source.filters.bathrooms
+    ? source.filters.bathrooms + (zh ? ' 卫' : ' bath')
+    : '';
+  const layout = [bedrooms, bathrooms].filter(Boolean).join(' ');
   const { minRent, maxRent } = source.filters;
   const cap =
     minRent && maxRent
@@ -45,7 +49,7 @@ function listingSummary(source: ListingSource, locale: Locale) {
       ? '公交 ≤' + source.filters.maxCommute + ' 分钟'
       : 'transit ≤' + source.filters.maxCommute + ' min'
     : '';
-  const labels = [area, bedrooms, cap, limit].filter(Boolean).join(' · ');
+  const labels = [area, layout, cap, limit].filter(Boolean).join(' · ');
   const matches =
     source.matches === null
       ? zh
@@ -120,7 +124,7 @@ function listingAnswer(listings: ListingSource[], locale: Locale, incomplete: bo
           lowest.id +
           ']'
       : '';
-  return [sharedNote, intro, summary, recommendation].filter(Boolean).join('\n\n');
+  return [intro || recommendation, sharedNote, summary].filter(Boolean).join('\n\n');
 }
 
 export function formatRentalAnswer(

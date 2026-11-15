@@ -111,6 +111,25 @@ function bedroomsIn(question: string) {
   return latest.length ? latest : numbers(question);
 }
 
+function bathroomsIn(question: string) {
+  const preferred = question
+    .split(/只看|只要|改成|换成|\bonly\b|\binstead\s+(?:look for|find)\b/i)
+    .at(-1)!;
+  const shorthand = /(?<![a-z0-9])\d{1,2}\s*b\s*(\d{1,2})\s*b(?![a-z0-9])/gi;
+  const words = new RegExp(
+    '(?<![a-z0-9])(' + count + ')\\s*(?:卫(?:生间)?|bathrooms?\\b|ba\\b)',
+    'gi'
+  );
+  const requested = new Set(
+    [...preferred.matchAll(shorthand), ...preferred.matchAll(words)]
+      .map(match => countValue(match[1]))
+      .filter(value => value >= 1 && value <= 20)
+  );
+  if (requested.size === 1) return [...requested][0];
+  if (requested.size > 1 || /卫浴不限|不限卫浴|\bany number of bathrooms\b/i.test(question))
+    return null;
+}
+
 function occupantsIn(question: string) {
   const pattern = new RegExp(
     '(?:我们(?:是|有)?|一共|总共|实际|只有)\\s*(' +
@@ -178,6 +197,8 @@ export function searchChanges(value: string): SearchContext {
     result.bedrooms = rooms.length === 1 ? rooms[0] : null;
     result.bedroomOptions = rooms.length > 1 ? rooms : null;
   }
+  const bathrooms = bathroomsIn(question);
+  if (bathrooms !== undefined) result.bathrooms = bathrooms;
   if (occupants) result.occupants = occupants;
   if (commute > 0 && commute <= 180) result.maxCommute = commute;
   if (
@@ -267,6 +288,7 @@ export function listingScenarios(context: SearchContext) {
       minRent,
       maxRent,
       maxCommute,
+      bathrooms,
       perPersonRent,
       perPersonMinRent,
       occupants,
@@ -291,6 +313,7 @@ export function listingScenarios(context: SearchContext) {
           minRent: effectiveFloor,
           maxRent: effectiveCap,
           bedrooms,
+          bathrooms,
           maxCommute,
         },
         split,

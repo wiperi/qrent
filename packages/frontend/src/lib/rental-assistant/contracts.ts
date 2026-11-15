@@ -20,7 +20,13 @@ export type ListingComparison = {
   examples: ListingExample[];
   readAt: string;
   split?: { perPersonRent: number; occupants: number; assumed: boolean };
-  filters: { minRent?: number; maxRent?: number; bedrooms?: number; maxCommute?: number };
+  filters: {
+    minRent?: number;
+    maxRent?: number;
+    bedrooms?: number;
+    bathrooms?: number;
+    maxCommute?: number;
+  };
 };
 
 export type GuidePassage = {
