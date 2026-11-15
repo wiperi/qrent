@@ -3,6 +3,7 @@ import {
   draftLanguage,
   isRentalDraft,
   practicalGuideTopic,
+  rentalPlanningTopics,
   reviewedRuleSection,
   stateNames,
   type RuleTopic,
@@ -297,6 +298,43 @@ export function practicalRentalAnswer(
           inspection +
           '\n\nExplain your genuine overseas or family-home history and ask which substitutes the agent accepts. Options include an overseas reference, evidence of savings or income, or a support letter if family will fund the rent.' +
           history;
+  }
+  if (topic === 'rental-planning') {
+    const features = [
+      /空调|air.?conditioning/i.test(question) &&
+        (zh
+          ? '要空调就找 air conditioning，约看时确认哪间有空调。'
+          : 'Look for “air conditioning” and check which rooms have it at the inspection.'),
+      /燃气灶|煤气灶|gas (?:cooking|cooktop|stove)/i.test(question) &&
+        (zh
+          ? '要燃气灶就找 gas cooking 或 gas cooktop，约看时直接看灶台。'
+          : 'Look for “gas cooking” or “gas cooktop” and check the cooktop at the inspection.'),
+    ]
+      .filter(Boolean)
+      .join(zh ? '' : ' ');
+    const advice = {
+      timing: zh
+        ? '先按实际起租日倒推。租社会房的话，提前 6–8 周定预算和选区，起租前 2–3 周集中约看和申请。现在可以先比价，看到合适的再问中介能从哪天起租。'
+        : 'Work back from when you want the lease to start. For a private rental, use the 6–8 weeks before that to plan your budget and areas. Focus on inspections and applications in the last 2–3 weeks.',
+      roommates: zh
+        ? '找人一起整租，可以直接在小红书发帖，写清学校、每人预算和哪天想搬。开学后才找的话多留点时间。想先住进现成合租，就去 Flatmates 看空房。'
+        : 'To find someone to rent a whole place with, post in a student housing group or on Xiaohongshu with your campus, budget per person and move-in date. If you want to join an existing share house, start with the available rooms on Flatmates.',
+      commute: zh
+        ? '把房子的门牌输进 Google Maps，终点选你实际上课那栋楼。同一个校园不同楼走过去可能差一截。有晚课的话，再查一遍下课时从车站走回家要走哪条路。'
+        : 'Put the street address into Google Maps and use your actual teaching building as the destination. Walking times can differ across one campus. For evening classes, check the route from the stop back to your door at that time.',
+      features:
+        (zh
+          ? '打开 Realestate 或 Domain 的房源详情。'
+          : 'Open the listing on Realestate or Domain. ') + features,
+      quote: zh
+        ? '先问清这笔钱是每周租金，还是另外收的服务费，也问清哪天起租。拿 Realestate 或 Domain 上同区同房型、起租日接近的房源比，再决定这笔差价值不值。'
+        : 'Ask what the weekly rent is, what service fees are separate and when the lease starts. Compare listings of the same type in the same suburb with a similar start date on Realestate or Domain before paying extra.',
+    };
+    const parts = rentalPlanningTopics(question).flatMap(({ topic, section }) => {
+      const cite = link(section.split('#')[1]);
+      return cite ? [advice[topic] + cite] : [];
+    });
+    if (parts.length) return parts.join('\n\n');
   }
   if (topic === 'inspection-checklist') {
     const cite = link('room-checklist');

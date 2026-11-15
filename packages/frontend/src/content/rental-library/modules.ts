@@ -170,10 +170,14 @@ Scape, Iglu, Melbourne prices and pandemic discounts in the references are also 
         'roommate-and-timing',
         t('提前准备与室友约定', 'Plan timing and housemates'),
         t(
-          `原攻略的筹备顺序是：提前约5–7周明确需求和预算，约3–5周准备文件，再围绕合适的起租日安排实看和申请。这是规划参考，不是所有房源统一开放的时间。
+          `租社会房可以按实际起租日倒推。提前 6–8 周定预算、选区并准备申请材料，起租前 2–3 周集中约看和申请。先看房源可入住日期，再问中介愿意接受哪天起租。
+
+找人一起租整套，可以在小红书发帖写清学校、每人预算和搬入时间。开学后才找室友多留点时间，想加入现成合租可以先在 Flatmates 看空房。
 
 一起整租前，先写清每人预算、主次卧分配、租期、清洁、作息、访客、家具归属、账单分摊，以及有人提前搬走怎么办。学生公寓的 twin room 要特别确认是否共享卧室、床位之间如何分隔、室友分配及换房政策。收藏第17、18篇的噪音、空间和维修经历是适合向运营方提问的检查项，不是对全部住户或公寓的统一结论。`,
-          `The handbook suggests setting needs and budget about 5–7 weeks ahead, preparing documents around 3–5 weeks ahead, and arranging inspections around a suitable start date. This is a planning sequence, not a universal release schedule.
+          `Work back from the date you want a private lease to start. Set your budget and shortlist suburbs about 6–8 weeks out, and focus on inspections and applications in the last 2–3 weeks. Check the available date and ask the agent when the lease can start.
+
+To find people to share a whole property, post in a student housing group or on Xiaohongshu with your campus, budget per person and move-in date. Allow extra time if you start after classes begin. For a room in an existing share, check Flatmates.
 
 Before sharing a lease, agree budgets, room allocation, lease length, cleaning, routines, visitors, furniture ownership, bills and early departures. For a twin room, confirm whether the bedroom is shared, how beds are separated, housemate allocation and room-change rules. Noise, space and maintenance stories in posts 17 and 18 are useful questions for providers, not universal findings about every resident or building.`
         ),
@@ -292,10 +296,10 @@ Post 12 is from 2022 and does not consistently identify whole-property versus ro
         'door-to-door-check',
         t('按门到门时间检查通勤', 'Check the whole door-to-door journey'),
         t(
-          `把通勤拆成四段：从门口走到站点、候车、乘车或换乘、下车走到教学楼。按实际上课的工作日与时段检查，兼看晚课返程；有多校室友时，分别查每个人的校区。
+          `把通勤拆成四段：从门口走到站点、候车、乘车或换乘、下车走到教学楼。在 Google Maps 输入房屋门牌，终点选实际上课的教学楼。同一校园不同楼的步行时间也可能相差不少。按上课时段查，晚课再看下车到门口那段路。多校室友各自查实际校区。
 
 原文额外预留约10分钟候车是经验缓冲，不是每条线路固定等待时间。再核对最近的 Coles、ALDI、Woolworths、药店、便利店和健身设施，记录实际步行时间。最终用具体门牌复核照片、地图与现场，不能根据区域圆圈或帖子地图推算精确通勤。`,
-          `Split the journey into walking to the stop, waiting, riding/transferring, and walking to the teaching building. Check the weekday and time of your classes, including the return after evening classes. Housemates at different campuses need separate checks.
+          `Split the journey into walking to the stop, waiting, riding/transferring, and walking to the teaching building. Enter the full street address and the actual teaching building in Google Maps. Walking times can vary even on the same campus. Check at class time and check the route from the stop to your door after evening classes. Housemates at different campuses need separate checks.
 
 The source’s extra ten-minute waiting allowance is a planning buffer, not a fixed wait on every route. Also check groceries, pharmacies, convenience stores and exercise facilities using actual walking times. Verify the street address against the map and inspection; an approximate circle or a post’s sketch cannot establish an exact commute.`
         ),
@@ -326,22 +330,22 @@ The source’s extra ten-minute waiting allowance is a planning buffer, not a fi
     sections: [
       s(
         'search-workflow',
-        t('Real Estate、Domain 与 Qrent 怎么配合', 'Use Real Estate, Domain and Qrent together'),
+        t('Realestate、Domain 与 Qrent 怎么配合', 'Use Realestate, Domain and Qrent together'),
         t(
           `沿用原攻略的流程：选择学校或区域，设定预算与房型，读房源详情，登记看房，按中介指定的渠道递交申请，再核对获批条件和租约。
 
 1. 在源站选择 Rent，核对区域、NSW/VIC 等州名和邮编。同名区域可能在不同州；“包含周边区域”会扩大范围。
-2. 筛周租上下限、卧室卫浴、车位、家具、入住日期和所需设施。空调等要求可辅助用关键词搜索，但仍需到详情和现场确认。
+2. 筛周租上下限、卧室卫浴、车位、家具、入住日期和所需设施。想要空调，就在房源详情找 air conditioning。想要燃气灶，就找 gas cooking 或 gas cooktop。约看时确认具体房间的空调和实际灶具。
 3. 核对 Available Date（广告标注的最早可起租日）。如果更晚才到，和中介确认是否接受晚起租；如果租约更早开始，按合同约定付租。Deposit Taken 等状态提示可能已经收款或在推进租约，不代表仍可随时申请。
-4. 用列表或地图建立候选清单，再用完整门牌核对到学校与超市的路线。Qrent 可帮助按既有学校、区域、预算和参考通勤筛选；最终价格、状态和申请渠道回到 Domain/Real Estate 或中介确认。
+4. 用列表或地图建立候选清单，再用完整门牌核对到学校与超市的路线。Qrent 可帮助按既有学校、区域、预算和参考通勤筛选；最终价格、状态和申请渠道回到 Domain、Realestate 或中介确认。如果报价比预期贵，问清周租、额外服务费和起租日，再和同区同房型、起租日接近的房源比。
 
 `,
           `Keep the handbook’s sequence: choose a university/area, set budget and housing needs, read the listing, register for inspection, apply through the agent’s specified channel, then check approval terms and the lease.
 
 1. Select Rent and confirm suburb, state and postcode. Names can recur in different states; including surrounding areas expands the search.
-2. Filter weekly price, bedrooms, bathrooms, parking, furniture, start date and facilities. Keywords such as air conditioning help, but still require verification.
+2. Filter weekly price, bedrooms, bathrooms, parking, furniture, start date and facilities. Look for “air conditioning” or “gas cooking” / “gas cooktop” in the listing. At the inspection, check which rooms have air conditioning and look at the cooktop.
 3. Available Date is the earliest advertised start. Ask the agent if a later lease start is possible. If the lease starts earlier than you arrive, rent is due from the agreed start. Deposit Taken can indicate payment or a lease in progress; it does not promise availability.
-4. Shortlist in list/map views, then check the full address for campus and shopping travel. Qrent supports its existing school/area, budget and indicative-commute filters. Confirm price, status and application instructions with the source or agent.
+4. Shortlist in list/map views, then check the full address for campus and shopping travel. Qrent supports its existing school/area, budget and indicative-commute filters. Confirm price, status and application instructions with the source or agent. For a higher quote, ask about weekly rent, separate service fees and the lease start. Compare similar listings in the same suburb with a similar start date.
 
 `
         ),
