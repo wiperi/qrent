@@ -3,6 +3,7 @@ import { once } from 'node:events';
 import { createServer } from 'node:http';
 import { test, type TestContext } from 'node:test';
 import { POST } from '../../src/app/api/rental-assistant/chat/route';
+import type { AssistantEvidence } from '../../src/lib/rental-assistant/contracts';
 import type { RentalLetterForm } from '../../src/lib/rental-assistant/letter-workspace';
 
 type Fixture = {
@@ -250,7 +251,10 @@ test('Little Q gives concrete first-rental advice for all of the requested plann
   assert.match(reply.answer, /Realestate 或 Domain.*gas cooking/);
   assert.match(reply.answer, /每周租金.*服务费.*起租/);
   assert.doesNotMatch(reply.answer, /洗衣|air conditioning/);
-  assert.equal(reply.evidence.filter(source => source.kind === 'guide').length, 3);
+  assert.equal(
+    reply.evidence.filter((source: AssistantEvidence) => source.kind === 'guide').length,
+    3
+  );
   assert.equal(queries.length, 0);
   assert.equal(modelRequests.length, 0);
 });
