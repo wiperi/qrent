@@ -6,6 +6,10 @@ import { createTRPCContext } from '@trpc/tanstack-react-query';
 import { observable } from '@trpc/server/observable';
 import { isUnauthorized, readAuthToken, writeAuthToken } from './auth-storage';
 
+export const BACKEND_URL =
+  process.env.NEXT_PUBLIC_BACKEND_URL ||
+  (process.env.NODE_ENV === 'development' ? 'http://localhost:3201' : 'https://api.qrent.rent');
+
 // Create tRPC context for React components
 export const { TRPCProvider, useTRPC, useTRPCClient } = createTRPCContext<AppRouter>();
 
@@ -46,10 +50,6 @@ export function getQueryClient() {
 
 // Factory function to create tRPC client
 export function createTRPCClientInstance() {
-  const backendUrl =
-    process.env.NEXT_PUBLIC_BACKEND_URL ||
-    (process.env.NODE_ENV === 'development' ? 'http://localhost:3201' : 'https://api.qrent.rent');
-
   const headers = (token: string | null | undefined) => {
     const pathLocale =
       typeof window !== 'undefined' ? window.location.pathname.split('/')[1] : DEFAULT_LOCALE;
@@ -88,10 +88,10 @@ export function createTRPCClientInstance() {
         // must not send an already queued mutation using the next account's token.
         condition: op => !!op.context.sessionToken || op.type === 'mutation',
         true: httpLink({
-          url: `${backendUrl}/trpc`,
+          url: `${BACKEND_URL}/trpc`,
           headers: ({ op }) => headers(op.context.sessionToken as string | null),
         }),
-        false: httpBatchLink({ url: `${backendUrl}/trpc`, headers: () => headers(null) }),
+        false: httpBatchLink({ url: `${BACKEND_URL}/trpc`, headers: () => headers(null) }),
       }),
     ],
   });
