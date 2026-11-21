@@ -57,6 +57,27 @@ describe('existing website search compatibility', () => {
     expect(result.properties[0].descriptionEn).toBeUndefined();
   });
 
+  it('passes the address query together with the current filters and pagination', async () => {
+    await propertiesRouter.createCaller(context).search({
+      targetSchool: 'UNSW',
+      addressQuery: '  14/97 George St  ',
+      maxPrice: 1100,
+      regions: 'redfern',
+      page: 2,
+      pageSize: 12,
+    });
+    expect(search).toHaveBeenCalledWith(
+      expect.objectContaining({
+        targetSchool: 'UNSW',
+        addressQuery: '14/97 George St',
+        maxPrice: 1100,
+        regions: 'redfern',
+        page: 2,
+        pageSize: 12,
+      })
+    );
+  });
+
   it.each([
     [{ price: 'asc' }],
     [{ id: 'desc' }],

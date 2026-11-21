@@ -70,6 +70,7 @@ export const propertiesRouter = t.router({
   search: publicProcedure
     .input(
       preferenceSchema.extend({
+        addressQuery: z.string().trim().max(120).optional(),
         page: z.number().int().min(1).default(1),
         pageSize: z.number().int().min(1).max(100).default(20),
         orderBy: z.array(propertyOrderBySchema).optional(),
@@ -77,7 +78,7 @@ export const propertiesRouter = t.router({
     )
     .query(async ({ input, ctx }) => {
       // Extract pagination and orderBy params
-      const { page, pageSize, orderBy, ...preferences } = input;
+      const { addressQuery, page, pageSize, orderBy, ...preferences } = input;
 
       // The existing website requests 12 rows with score-only sorting.
       // Prioritize recent records for that default; leave other orders intact.
@@ -113,6 +114,7 @@ export const propertiesRouter = t.router({
       // Search properties with all params including pagination
       const properties = await propertyService.getPropertiesByPreferences({
         ...createPreferenceData,
+        addressQuery,
         page,
         pageSize,
         orderBy: searchOrderBy,

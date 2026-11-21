@@ -32,6 +32,7 @@ type SearchParams = {
 
 export default function SearchResults({ searchParams }: { searchParams: SearchParams }) {
   const page = Number(searchParams.page ?? '1') || 1;
+  const addressQuery = useSearchParams().get('q')?.trim().slice(0, 120);
   const { user, isLoading } = useAuth();
   const t = useTranslations('SearchResults');
   const queryClient = useQueryClient();
@@ -45,6 +46,7 @@ export default function SearchResults({ searchParams }: { searchParams: SearchPa
 
     return {
       targetSchool: university,
+      addressQuery: addressQuery || undefined,
       page,
       pageSize: 12,
       minPrice: searchParams.priceMin ? Number(searchParams.priceMin) : undefined,
@@ -78,7 +80,7 @@ export default function SearchResults({ searchParams }: { searchParams: SearchPa
               },
             ],
     };
-  }, [searchParams, page]);
+  }, [searchParams, page, addressQuery]);
 
   const trpc = useTRPCClient();
 
@@ -144,7 +146,7 @@ export default function SearchResults({ searchParams }: { searchParams: SearchPa
                 <p className="text-slate-600">Unable to load properties. Please try again later.</p>
               </div>
             ) : properties.length === 0 ? (
-              <EmptyState query={searchParams.q || ''} />
+              <EmptyState query={addressQuery || ''} />
             ) : (
               <div className="mt-6 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
                 {properties.map(property => (

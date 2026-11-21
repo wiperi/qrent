@@ -356,6 +356,12 @@ export default function PropertyCard({
 
       {/* Content area with padding */}
       <div className="p-4 h-[300px] flex flex-col">
+        {!thumbnailUrl && (
+          <div className="mb-2">
+            <h3 className="font-semibold text-slate-900 break-words">{formatAddress(address)}</h3>
+            <p className="text-sm text-slate-600">{formatRegion(region)}</p>
+          </div>
+        )}
         <p className="text-brand font-semibold text-lg">
           ${price.toLocaleString()}
           <span className="text-sm text-slate-500 font-normal">{t('perWeek')}</span>

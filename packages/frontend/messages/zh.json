@@ -33,6 +33,8 @@
     "signoutFailed": "退出未完成，请检查网络后重试。"
   },
   "SearchBar": {
+    "addressLabel": "房源地址",
+    "addressPlaceholder": "输入门牌、街道或区域，例如 97 George St",
     "placeholder": "按城市、地址或学校搜索...",
     "searchButton": "搜索",
     "filters": "筛选",
