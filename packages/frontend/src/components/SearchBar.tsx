@@ -3,7 +3,7 @@
 import { SCHOOL } from '@qrent/shared/enum';
 import { useLocale, useTranslations } from 'next-intl';
 import { usePathname, useRouter, useSearchParams } from 'next/navigation';
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useTransition } from 'react';
 import { HiAdjustments, HiSearch } from 'react-icons/hi';
 
 // BEDROOM_OPTIONS will be created inside the component to use translations
@@ -18,6 +18,7 @@ export default function SearchBar({
   const searchParams = useSearchParams();
   const locale = useLocale();
   const t = useTranslations('SearchBar');
+  const [isNavigating, startSearch] = useTransition();
 
   // Create bedroom options with translations
   const BEDROOM_OPTIONS = [
@@ -69,12 +70,14 @@ export default function SearchBar({
 
   const onSubmit = (e: React.FormEvent) => {
     e.preventDefault();
+    if (isNavigating) return;
+
     const params = new URLSearchParams(searchParams.toString());
     updateSearchParamsWithFilters(params);
     params.set('page', '1');
     const mobileSearchPath = `/${locale}/search/mobile`;
     const searchPath = pathname === mobileSearchPath ? mobileSearchPath : `/${locale}/search`;
-    router.push(`${searchPath}?${params.toString()}`);
+    startSearch(() => router.push(`${searchPath}?${params.toString()}`));
   };
 
   return (
@@ -212,10 +215,18 @@ export default function SearchBar({
           {/* Search Button */}
           <button
             type="submit"
-            className="inline-flex items-center justify-center gap-1.5 rounded-xl bg-blue-600 px-2 py-2.5 text-sm font-semibold text-white hover:bg-blue-700 transition flex-shrink-0"
+            disabled={isNavigating}
+            className="inline-flex min-w-24 items-center justify-center gap-1.5 rounded-xl bg-blue-600 px-2 py-2.5 text-sm font-semibold text-white transition hover:bg-blue-700 disabled:cursor-wait disabled:bg-blue-700 flex-shrink-0"
           >
-            <HiSearch className="h-4 w-4" />
-            {t('searchButton')}
+            {isNavigating ? (
+              <span
+                aria-hidden="true"
+                className="h-4 w-4 rounded-full border-2 border-current border-r-transparent motion-safe:animate-spin"
+              />
+            ) : (
+              <HiSearch aria-hidden="true" className="h-4 w-4" />
+            )}
+            {t(isNavigating ? 'searching' : 'searchButton')}
           </button>
         </div>
       </div>

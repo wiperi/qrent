@@ -1,3 +1,5 @@
+import SearchProgress from './SearchProgress';
+
 export default function Loading() {
   return (
     <main>
@@ -10,6 +12,7 @@ export default function Loading() {
       </section>
       <section className="pb-12 md:pb-16">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <SearchProgress />
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 lg:gap-8">
             <aside className="lg:col-span-3 space-y-4">
               <div className="rounded-xl border border-slate-200 bg-white p-4">
