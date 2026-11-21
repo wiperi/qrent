@@ -33,6 +33,7 @@
     "signoutFailed": "Sign out could not be completed. Check your connection and try again."
   },
   "SearchBar": {
+    "searching": "Searching…",
     "addressLabel": "Property address",
     "addressPlaceholder": "Enter a street number, street or suburb, e.g. 97 George St",
     "placeholder": "Search by city, address or school...",
@@ -259,6 +260,7 @@
     "chinese": "中文"
   },
   "SearchResults": {
+    "searching": "Searching for rentals…",
     "searchResults": "Search Results",
     "averagePrice": "Average Price",
     "averageCommute": "Average Commute",

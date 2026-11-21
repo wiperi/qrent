@@ -33,6 +33,7 @@
     "signoutFailed": "退出未完成，请检查网络后重试。"
   },
   "SearchBar": {
+    "searching": "搜索中…",
     "addressLabel": "房源地址",
     "addressPlaceholder": "输入门牌、街道或区域，例如 97 George St",
     "placeholder": "按城市、地址或学校搜索...",
@@ -259,6 +260,7 @@
     "chinese": "中文"
   },
   "SearchResults": {
+    "searching": "正在查找房源…",
     "searchResults": "搜索结果",
     "averagePrice": "平均价格",
     "averageCommute": "平均通勤时间",

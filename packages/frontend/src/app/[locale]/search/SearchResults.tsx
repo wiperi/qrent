@@ -10,6 +10,7 @@ import { useSearchParams } from 'next/navigation';
 import { useMemo, useEffect } from 'react';
 import { HiSearch } from 'react-icons/hi';
 import { demoOrderBy } from '@/lib/home-demo';
+import SearchProgress from './SearchProgress';
 
 type SearchParams = {
   q?: string;
@@ -124,6 +125,7 @@ export default function SearchResults({ searchParams }: { searchParams: SearchPa
   return (
     <section className="pb-12 md:pb-16">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <SearchProgress active={isPending} />
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 lg:gap-8">
           {/* Left: stats/info */}
           <aside className="lg:col-span-3">
@@ -131,7 +133,7 @@ export default function SearchResults({ searchParams }: { searchParams: SearchPa
           </aside>
 
           {/* Right: pagination + results */}
-          <div className="lg:col-span-9">
+          <div className="lg:col-span-9" aria-busy={isPending}>
             <h2 id="results-heading" tabIndex={-1} className="sr-only">
               {t('searchResults')}
             </h2>
