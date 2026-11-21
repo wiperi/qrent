@@ -1,6 +1,7 @@
 """Recover rebuildable host caches and tmpfs headroom; never remove runtime state."""
 from datetime import datetime, timezone
 import fcntl
+import gzip
 import hashlib
 import json
 import os
@@ -9,6 +10,7 @@ from pathlib import Path
 import shutil
 import subprocess
 import sys
+import tarfile
 
 def command(*args):
     return subprocess.check_output(args, text=True).strip()
@@ -25,6 +27,73 @@ def prune_build_cache(minimum_age):
 def image_inventory():
     template = '[{{json .ID}},{{json .Repository}},{{json .Tag}}]'
     return {tuple(json.loads(line)) for line in command('docker', 'image', 'ls', '--no-trunc', '--format', template).splitlines()}
+
+
+def retirement_aliases(root, candidate, inventory):
+    aliases = {row for row in inventory if row[0] == candidate[0]}
+    for _, repository, tag in aliases - {candidate}:
+        match = re.fullmatch(r'rollback-([a-f0-9]{40})', tag)
+        if repository != 'qrent-backend' or not match:
+            raise ValueError('Unrelated image aliases must be preserved')
+        receipt_path = root/'.deploy/receipts'/(match[1]+'.json')
+        if not receipt_path.is_file():
+            raise ValueError('Unverified rollback aliases must be preserved')
+        receipt = json.loads(receipt_path.read_text())
+        if (receipt.get('status') != 'deployed' or receipt.get('release') != match[1]
+                or receipt.get('new_backend_image') != 'qrent-backend:release-'+match[1]
+                or receipt.get('previous_backend_image') != candidate[0]):
+            raise ValueError('Unverified rollback aliases must be preserved')
+    return sorted(aliases)
+
+
+def verify_image_archive(path, image_id, references):
+    with tarfile.open(path, mode='r:gz') as archive:
+        entries = json.load(archive.extractfile('manifest.json'))
+        tags = set()
+        for entry in entries:
+            config = archive.extractfile(entry['Config']).read()
+            if 'sha256:'+hashlib.sha256(config).hexdigest() != image_id:
+                raise ValueError('Archived Docker image did not match the selected image')
+            for layer in entry['Layers']:
+                if not archive.getmember(layer).isfile():
+                    raise ValueError('Archived Docker image is missing a layer')
+            tags.update(entry['RepoTags'])
+        if tags != set(references):
+            raise ValueError('Archived Docker image did not preserve its release and rollback tags')
+    # Read through the compressed stream to verify its checksum and footer.
+    with gzip.open(path, mode='rb') as stream:
+        while stream.read(1024*1024):
+            pass
+
+
+def archive_retired_image(root, candidate, aliases):
+    references = [repository+':'+tag for _, repository, tag in aliases]
+    directory = root/'.deploy/retired-images'
+    directory.mkdir(parents=True, exist_ok=True)
+    destination = directory/(candidate[2]+'.tar.gz')
+    if not destination.exists():
+        partial = destination.with_suffix('.part')
+        try:
+            with partial.open('wb') as raw:
+                with gzip.GzipFile(fileobj=raw, mode='wb', compresslevel=1) as archive:
+                    with subprocess.Popen(['docker', 'image', 'save', *references], stdout=subprocess.PIPE) as export:
+                        shutil.copyfileobj(export.stdout, archive)
+                        if export.wait():
+                            raise RuntimeError('Docker image export failed')
+                raw.flush()
+                os.fsync(raw.fileno())
+            verify_image_archive(partial, candidate[0], references)
+            partial.replace(destination)
+        finally:
+            partial.unlink(missing_ok=True)
+    else:
+        verify_image_archive(destination, candidate[0], references)
+    digest = hashlib.sha256()
+    with destination.open('rb') as archive:
+        for block in iter(lambda: archive.read(1024*1024), b''):
+            digest.update(block)
+    return {'archive': str(destination.relative_to(root)), 'bytes': destination.stat().st_size,
+            'sha256': digest.hexdigest(), 'image_id': candidate[0], 'references': references}
 
 
 def retirement_candidate(root, release, inventory):
@@ -46,12 +115,11 @@ def retirement_candidate(root, release, inventory):
     candidates = [row for row in inventory if row[1:] == ('qrent-backend', tag)]
     if not candidates: return None  # A previously retired tag remains a no-op.
     candidate = candidates[0]
-    aliases = {row for row in inventory if row[0] == candidate[0]}
-    if aliases != {candidate}: raise ValueError('Additional image aliases must be preserved')
     used = command('docker', 'ps', '-aq', '--no-trunc').splitlines()
     in_use = set(command('docker', 'inspect', '--format', '{{.Image}}', *used).splitlines()) if used else set()
     if candidate[0] in {current, receipt['previous_backend_image'], *in_use}:
         raise ValueError('Current, rollback and container images must be preserved')
+    retirement_aliases(root, candidate, inventory)
     return candidate
 
 
@@ -174,6 +242,7 @@ def main(action, min_gib=3, build_cache_age='168h', retire_release='none'):
     before = containers()
     images_before = image_inventory()
     retired = retirement_candidate(root, retire_release, images_before)
+    aliases = retirement_aliases(root, retired, images_before) if retired else []
     protected = {p: hashlib.sha256(p.read_bytes()).digest() for p in (root/'.env', root/'docker-compose.yml')}
     mounts = protected_mounts()
     caches = cache_paths(home, mounts)
@@ -184,6 +253,7 @@ def main(action, min_gib=3, build_cache_age='168h', retire_release='none'):
               'build_cache_minimum_age': build_cache_age,
               'retire_release_requested': retire_release,
               'retirement_candidate': retired,
+              'retirement_aliases': aliases,
               'required_system_free_bytes': min_disk}
     for path in caches:
         size = int(command('du', '-sx', '-B1', str(path)).split()[0])
@@ -211,9 +281,13 @@ def main(action, min_gib=3, build_cache_age='168h', retire_release='none'):
                 assert path in cache_paths(home, protected_mounts())
                 shutil.rmtree(path)
             if resources(root)['system']['free_bytes'] < min_disk and retired:
-                assert retired == retirement_candidate(root, retire_release, image_inventory())
-                # One explicit obsolete release only; no force/prune and no volume operation.
-                command('docker', 'image', 'rm', '--no-prune', retired[1]+':'+retired[2])
+                inventory = image_inventory()
+                assert retired == retirement_candidate(root, retire_release, inventory)
+                assert aliases == retirement_aliases(root, retired, inventory)
+                archived = archive_retired_image(root, retired, aliases)
+                report['retired_image_archive'] = archived
+                # Only this verified image's release and historical rollback tags.
+                command('docker', 'image', 'rm', '--no-prune', *archived['references'])
                 report['images_or_volumes_deleted'] = True
                 report['retired_image'] = retired
             if resources(root)['system']['free_bytes'] < min_disk and apt_cache:
@@ -228,7 +302,7 @@ def main(action, min_gib=3, build_cache_age='168h', retire_release='none'):
                 report['old_build_cache_result'] = output.splitlines()[-1:] if output else []
             report['after'] = resources(root)
             report['existing_container_identity_preserved'] = containers() == before
-            keep_images = images_before - ({retired} if report.get('retired_image') else set())
+            keep_images = images_before - (set(aliases) if report.get('retired_image') else set())
             report['existing_image_inventory_preserved'] = keep_images.issubset(image_inventory())
             report['environment_and_compose_preserved'] = all(hashlib.sha256(p.read_bytes()).digest() == h
                 for p,h in protected.items())

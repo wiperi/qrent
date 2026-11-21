@@ -61,6 +61,27 @@ class CapacitySafetyTests(unittest.TestCase):
                 with self.assertRaisesRegex(ValueError,'rollback receipt'):
                     capacity.retirement_candidate(root,'d'*40,{candidate})
 
+    def test_historical_rollback_alias_requires_the_successful_successor_receipt(self):
+        with tempfile.TemporaryDirectory() as temp:
+            root = Path(temp)
+            self.retirement_fixture(root)
+            image_id = 'sha256:'+'c'*64
+            candidate = (image_id, 'qrent-backend', 'release-'+'d'*40)
+            alias = (image_id, 'qrent-backend', 'rollback-'+'e'*40)
+            inventory = {candidate, alias, *self.protected_images()}
+            with self.assertRaisesRegex(ValueError, 'Unverified rollback aliases'):
+                capacity.retirement_aliases(root, candidate, inventory)
+            path = root/'.deploy/receipts'/('e'*40+'.json')
+            receipt = {'status': 'deployed', 'release': 'e'*40,
+                       'new_backend_image': 'qrent-backend:release-'+'e'*40,
+                       'previous_backend_image': image_id}
+            path.write_text(json.dumps(receipt))
+            self.assertEqual(capacity.retirement_aliases(root, candidate, inventory), [candidate, alias])
+            receipt['previous_backend_image'] = 'sha256:'+'f'*64
+            path.write_text(json.dumps(receipt))
+            with self.assertRaisesRegex(ValueError, 'Unverified rollback aliases'):
+                capacity.retirement_aliases(root, candidate, inventory)
+
     def test_invalid_retirement_identity_stops_before_host_inspection(self):
         with patch.object(capacity,'command') as run:
             with self.assertRaises(AssertionError): capacity.main('apply',2,'168h','bad;command')
