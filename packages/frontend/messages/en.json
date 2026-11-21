@@ -33,6 +33,8 @@
     "signoutFailed": "Sign out could not be completed. Check your connection and try again."
   },
   "SearchBar": {
+    "addressLabel": "Property address",
+    "addressPlaceholder": "Enter a street number, street or suburb, e.g. 97 George St",
     "placeholder": "Search by city, address or school...",
     "searchButton": "Search",
     "filters": "Filters",

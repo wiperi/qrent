@@ -10,8 +10,10 @@ import { HiAdjustments, HiSearch } from 'react-icons/hi';
 
 export default function SearchBar({
   schoolOptions = Object.values(SCHOOL),
+  showAddressSearch = false,
 }: {
   schoolOptions?: readonly SCHOOL[];
+  showAddressSearch?: boolean;
 }) {
   const router = useRouter();
   const pathname = usePathname();
@@ -30,6 +32,7 @@ export default function SearchBar({
   ] as const;
 
   // First-level filter states
+  const [address, setAddress] = useState('');
   const [targetSchool, setTargetSchool] = useState<string>('UNSW');
   const [maxPrice, setMaxPrice] = useState<string>('');
   const [commuteTime, setCommuteTime] = useState<string>('');
@@ -37,6 +40,7 @@ export default function SearchBar({
 
   // Initialize first-level filters from URL parameters
   useEffect(() => {
+    setAddress(searchParams.get('q')?.slice(0, 120) || '');
     setTargetSchool(searchParams.get('university') || 'UNSW');
     setMaxPrice(searchParams.get('priceMax') || '');
     setCommuteTime(searchParams.get('commuteMax') || '');
@@ -45,7 +49,7 @@ export default function SearchBar({
 
   useEffect(() => {
     const heading = document.getElementById('results-heading') as HTMLHeadingElement | null;
-    if (heading) heading.focus();
+    if (heading) heading.focus({ preventScroll: true });
   }, [searchParams]);
 
   // Helper function to update search params with filter values
@@ -55,11 +59,14 @@ export default function SearchBar({
       else params.delete(key);
     };
 
+    if (showAddressSearch) setOrDelete('q', address.trim());
     setOrDelete('university', targetSchool);
     setOrDelete('priceMax', maxPrice);
     setOrDelete('commuteMax', commuteTime);
-    setOrDelete('bedroomsMin', numBedrooms);
-    setOrDelete('bedroomsMax', numBedrooms && parseInt(numBedrooms) < 5 ? numBedrooms : '');
+    if (!showAddressSearch || numBedrooms !== (searchParams.get('bedroomsMin') || '')) {
+      setOrDelete('bedroomsMin', numBedrooms);
+      setOrDelete('bedroomsMax', numBedrooms && parseInt(numBedrooms) < 5 ? numBedrooms : '');
+    }
   };
 
   const onSubmit = (e: React.FormEvent) => {
@@ -67,12 +74,39 @@ export default function SearchBar({
     const params = new URLSearchParams(searchParams.toString());
     updateSearchParamsWithFilters(params);
     params.set('page', '1');
-    router.push(`/${locale}/search?${params.toString()}`);
+    const searchPath = showAddressSearch ? pathname : `/${locale}/search`;
+    router.push(`${searchPath}?${params.toString()}`);
   };
 
   return (
     <form onSubmit={onSubmit} className="w-full">
       <div className="rounded-2xl bg-white shadow-card ring-1 ring-slate-200 p-4 md:p-5">
+        {showAddressSearch && (
+          <div className="mb-4">
+            <label
+              htmlFor="property-address"
+              className="mb-1 block text-xs font-medium text-slate-700"
+            >
+              {t('addressLabel')}
+            </label>
+            <div className="relative">
+              <HiSearch
+                aria-hidden="true"
+                className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400"
+              />
+              <input
+                id="property-address"
+                type="search"
+                value={address}
+                onChange={event => setAddress(event.target.value)}
+                maxLength={120}
+                autoComplete="off"
+                placeholder={t('addressPlaceholder')}
+                className="h-10 w-full rounded-lg border border-slate-200 pl-9 pr-3 text-sm text-slate-700 placeholder-slate-400 focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
+              />
+            </div>
+          </div>
+        )}
         <div className="flex flex-col gap-3 md:flex-row md:items-end md:gap-4">
           {/* Target School */}
           <div className="flex flex-col flex-1">

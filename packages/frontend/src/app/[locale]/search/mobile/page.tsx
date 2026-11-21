@@ -1,6 +1,5 @@
 import FilterModal from '@/components/FilterModal';
 import SearchBar from '@/components/SearchBar';
-import RentalTools from '@/components/RentalTools';
 import SearchResults from '../SearchResults';
 import CurrentFiltersBar from '@/components/FilterTags';
 import type { Metadata } from 'next';
@@ -100,26 +99,23 @@ export async function generateMetadata({ params, searchParams }: {
 
 export default async function MobileSearchPage({
   searchParams,
-  params,
 }: {
   searchParams: Promise<SearchParams>;
-  params: Promise<{ locale: string }>;
 }) {
-  const [{ locale }, filters] = await Promise.all([params, searchParams]);
+  const filters = await searchParams;
 
   return (
     <main className="min-h-screen bg-gray-50">
       {/* Mobile-specific search bar */}
       <section className="py-3 bg-white shadow-sm sticky top-0 z-10">
         <div className="mx-auto px-4">
-          <SearchBar />
+          <SearchBar showAddressSearch />
         </div>
       </section>
 
       {/* Mobile-specific filters bar */}
       <section className="py-2 bg-white border-b border-gray-200">
         <div className="mx-auto px-4">
-          <RentalTools locale={locale} className="my-4" />
           <CurrentFiltersBar />
         </div>
       </section>

@@ -4,6 +4,7 @@ import HttpError from '@/error/HttpError';
 import validationService from './ValidationService';
 import _ from 'lodash';
 import { emailService } from './EmailService';
+import { propertyAddressFilter } from '@/utils/propertyAddressFilter';
 
 // Type definitions for service responses
 type PropertyWithRegion = Omit<Property, 'regionId'> & {
@@ -103,6 +104,7 @@ class PropertyService {
       page: number;
       pageSize: number;
       publishedAt?: string;
+      addressQuery?: string;
       orderBy?: Prisma.PropertyOrderByWithRelationInput[];
     }
   ): Promise<SearchPropertiesResponse> {
@@ -136,7 +138,11 @@ class PropertyService {
       orderBy = preferences.orderBy;
     }
 
-    const filter: Prisma.PropertyWhereInput = {};
+    const addressQuery = preferences.addressQuery?.trim();
+    const filter = addressQuery ? propertyAddressFilter(addressQuery) : {};
+    if (addressQuery && !orderBy.some(order => order.id)) {
+      orderBy = [...orderBy, { id: 'desc' }];
+    }
 
     // Move-in date filter
     if (preferences.moveInDate) {
