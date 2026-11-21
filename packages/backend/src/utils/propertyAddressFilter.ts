@@ -43,14 +43,18 @@ export function propertyAddressFilter(query: string): Prisma.PropertyWhereInput 
   return {
     AND: [...terms].map(term => {
       if (/^\d/.test(term)) {
-        const matches = addressWord(term, addressSeparators, addressSeparators);
+        // Older listings store unit and street numbers separated by a hyphen.
+        const numbers = term.includes('/') ? [term, term.replace(/\//g, '-')] : [term];
+        const matches = numbers.flatMap(number =>
+          addressWord(number, addressSeparators, addressSeparators)
+        );
         if (/^\d{4}$/.test(term)) matches.push({ region: { postcode: Number(term) } });
         return { OR: matches };
       }
 
       const streetType = streetTypes.find(variants => variants.includes(term));
       const matches = streetType
-        ? streetType.flatMap(variant => addressWord(variant, [' '], [' ', ',', '.']))
+        ? streetType.flatMap(variant => addressWord(variant, [' ', '-'], [' ', '-', ',', '.']))
         : [{ address: { contains: term } }, { region: { name: { contains: term } } }];
       if (['nsw', 'vic'].includes(term)) {
         matches.push({ region: { state: { equals: term } } });

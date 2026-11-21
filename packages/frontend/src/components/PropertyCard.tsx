@@ -159,7 +159,7 @@ export default function PropertyCard({
 
   const formatAddress = (address: string) => {
     const firstDashIndex = address.indexOf('-');
-    if (firstDashIndex === -1) return capitalizeEnglishWords(address);
+    if (firstDashIndex === -1 || address.includes(' ')) return capitalizeEnglishWords(address);
 
     const unitNumber = address.substring(0, firstDashIndex);
     const remainder = address.substring(firstDashIndex + 1).replace(/-/g, ' ');
