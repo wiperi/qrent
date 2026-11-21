@@ -10,10 +10,8 @@ import { HiAdjustments, HiSearch } from 'react-icons/hi';
 
 export default function SearchBar({
   schoolOptions = Object.values(SCHOOL),
-  showAddressSearch = false,
 }: {
   schoolOptions?: readonly SCHOOL[];
-  showAddressSearch?: boolean;
 }) {
   const router = useRouter();
   const pathname = usePathname();
@@ -59,11 +57,11 @@ export default function SearchBar({
       else params.delete(key);
     };
 
-    if (showAddressSearch) setOrDelete('q', address.trim());
+    setOrDelete('q', address.trim());
     setOrDelete('university', targetSchool);
     setOrDelete('priceMax', maxPrice);
     setOrDelete('commuteMax', commuteTime);
-    if (!showAddressSearch || numBedrooms !== (searchParams.get('bedroomsMin') || '')) {
+    if (numBedrooms !== (searchParams.get('bedroomsMin') || '')) {
       setOrDelete('bedroomsMin', numBedrooms);
       setOrDelete('bedroomsMax', numBedrooms && parseInt(numBedrooms) < 5 ? numBedrooms : '');
     }
@@ -74,39 +72,38 @@ export default function SearchBar({
     const params = new URLSearchParams(searchParams.toString());
     updateSearchParamsWithFilters(params);
     params.set('page', '1');
-    const searchPath = showAddressSearch ? pathname : `/${locale}/search`;
+    const mobileSearchPath = `/${locale}/search/mobile`;
+    const searchPath = pathname === mobileSearchPath ? mobileSearchPath : `/${locale}/search`;
     router.push(`${searchPath}?${params.toString()}`);
   };
 
   return (
     <form onSubmit={onSubmit} className="w-full">
       <div className="rounded-2xl bg-white shadow-card ring-1 ring-slate-200 p-4 md:p-5">
-        {showAddressSearch && (
-          <div className="mb-4">
-            <label
-              htmlFor="property-address"
-              className="mb-1 block text-xs font-medium text-slate-700"
-            >
-              {t('addressLabel')}
-            </label>
-            <div className="relative">
-              <HiSearch
-                aria-hidden="true"
-                className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400"
-              />
-              <input
-                id="property-address"
-                type="search"
-                value={address}
-                onChange={event => setAddress(event.target.value)}
-                maxLength={120}
-                autoComplete="off"
-                placeholder={t('addressPlaceholder')}
-                className="h-10 w-full rounded-lg border border-slate-200 pl-9 pr-3 text-sm text-slate-700 placeholder-slate-400 focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
-              />
-            </div>
+        <div className="mb-4">
+          <label
+            htmlFor="property-address"
+            className="mb-1 block text-xs font-medium text-slate-700"
+          >
+            {t('addressLabel')}
+          </label>
+          <div className="relative">
+            <HiSearch
+              aria-hidden="true"
+              className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400"
+            />
+            <input
+              id="property-address"
+              type="search"
+              value={address}
+              onChange={event => setAddress(event.target.value)}
+              maxLength={120}
+              autoComplete="off"
+              placeholder={t('addressPlaceholder')}
+              className="h-10 w-full rounded-lg border border-slate-200 pl-9 pr-3 text-sm text-slate-700 placeholder-slate-400 focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
+            />
           </div>
-        )}
+        </div>
         <div className="flex flex-col gap-3 md:flex-row md:items-end md:gap-4">
           {/* Target School */}
           <div className="flex flex-col flex-1">

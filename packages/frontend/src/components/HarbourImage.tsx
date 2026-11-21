@@ -2,13 +2,25 @@ type Props = { alt: string; sizes: string; className?: string; priority?: boolea
 
 // Pre-encoded from our original photograph. No request-time image transformation.
 export default function HarbourImage({ alt, sizes, className, priority = false }: Props) {
-  const srcSet = (format: string) =>
-    [640, 960, 1440, 1920]
+  const srcSet = (format: string, widths = [640, 960, 1440, 1920]) =>
+    widths
       .map(width => `/media/sydney-harbour-v1-${width}.${format} ${width}w`)
       .join(', ');
   return (
     <picture>
+      <source
+        media="(max-width: 639px)"
+        type="image/avif"
+        srcSet={srcSet('avif', [640, 960])}
+        sizes={sizes}
+      />
       <source type="image/avif" srcSet={srcSet('avif')} sizes={sizes} />
+      <source
+        media="(max-width: 639px)"
+        type="image/webp"
+        srcSet={srcSet('webp', [640, 960])}
+        sizes={sizes}
+      />
       <img
         src="/media/sydney-harbour-v1-960.webp"
         srcSet={srcSet('webp')}

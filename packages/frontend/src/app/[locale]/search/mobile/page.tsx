@@ -109,7 +109,7 @@ export default async function MobileSearchPage({
       {/* Mobile-specific search bar */}
       <section className="py-3 bg-white shadow-sm sticky top-0 z-10">
         <div className="mx-auto px-4">
-          <SearchBar showAddressSearch />
+          <SearchBar />
         </div>
       </section>
 
